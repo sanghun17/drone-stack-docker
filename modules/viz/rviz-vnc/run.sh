@@ -25,7 +25,12 @@ pgrep -x x11vnc  >/dev/null 2>&1 || { x11vnc -display :99 -localhost -nopw -fore
 source /opt/ros/noetic/setup.bash
 [ -f /work/ws/risk-aware/devel/setup.bash ] && source /work/ws/risk-aware/devel/setup.bash
 source /work/config/ros_env.sh   # ROS_MASTER_URI / ROS_IP — single source, edit-and-go
-export LIBGL_ALWAYS_SOFTWARE=1   # rviz GL via mesa llvmpipe on the virtual display
+# Force mesa software GL (llvmpipe). The container has the nvidia GL (runtime: nvidia for
+# jax/torch), and libglvnd otherwise picks nvidia -> fails on the Xvfb display. These three
+# pin rviz to llvmpipe so it renders on :99; x11vnc then ships the pixels over VNC.
+export __GLX_VENDOR_LIBRARY_NAME=mesa
+export LIBGL_ALWAYS_SOFTWARE=1
+export GALLIUM_DRIVER=llvmpipe
 
 echo ">> rviz on :99 served via VNC localhost:5900"
 echo ">> from your machine:  ssh -L 5900:localhost:5900 hmcl@<jetson>  then VNC -> localhost:5900"
