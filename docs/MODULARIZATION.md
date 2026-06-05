@@ -82,31 +82,38 @@ stacks/d435i-voxblox.yml         modules/<group>/<name>/
 
 ## 4. Progress
 
-- ✅ **Engine**: `scripts/gen.py` + `up.sh`. Native per-arch build, `include`-free single image.
-- ✅ **d435i-voxblox modules** (ported faithfully from the pure-jetson Dockerfile + run scripts):
+- ✅ **Engine**: `scripts/gen.py` + `up.sh` ({clone|gen|build|up|build-ws|run|sh|down}). Native per-arch build.
+- ✅ **d435i-voxblox modules** (faithful port of the pure-jetson Dockerfile + run scripts):
   `base` (l4t-jetpack + ROS Noetic), `sensor/realsense-d435i`, `odometry/fast-livo` (Sophus
   a621ff), `compute/{torch,spconv,jax}`, `planner/risk-aware`. `stacks/d435i-voxblox.yml`.
-- ✅ **Static check**: `gen.py d435i-voxblox` produces a Dockerfile matching the pure-jetson
-  recipe (same FROM + same install steps; independent modules merely reordered).
+- ✅ **Clone-based + per-module workspaces**: `up.sh clone` runs each module's `clone.sh`
+  (git clone the component @ jetson-orin-agx into `ws/<module>/src`, gitignored). The jaxlib
+  wheel (76M) is git-**tracked** in `modules/compute/jax/wheels/` — the only reused artifact.
+- ✅ **BUILT + VERIFIED on the Jetson (2026-06-05 — pjs → dsd migration):**
+  - image built from modules **~13 min** (spconv source build + jaxlib wheel install).
+  - container runs; torch 2.1 / jax 0.4.13 import OK.
+  - `up.sh build-ws`: **all 56 risk-aware pkgs + fast-livo succeed**.
+  - voxblox runtime: **106 synthetic-cloud integrations, NO crash, ~31 ms/cloud (= pjs)**.
+  - ⇒ `git clone dsd → up.sh clone → up → build-ws` reproduces the pjs stack.
 - ✅ Repo: `github.com/sanghun17/drone-stack-docker` (`main`).
 
 ---
 
 ## 5. Remaining
 
-1. **`lidar-epic` modules** — `sensor/livox-mid360`, `planner/epic`, `control/mavros`;
-   port from drone-exploration-stack's Dockerfile/scripts. → `stacks/lidar-epic.yml`.
-2. **Build + run verification (DEFERRED on purpose)** — a clean build rebuilds
-   jax/spconv/cumm/grpc/voxblox from source = **hours**. Do on idle time / in background.
-   Until then: **develop on the legacy `pjs-dev`** (already built + verified); the modular
-   repo is source-only.
+1. **Live camera verify (BLOCKED — needs physical replug)** — the D435i went into a
+   hardware-error state (Motion Module / Depth stream start failure) from repeated start/stop.
+   NOT a dsd issue (same config as pjs; depth streamed 15 Hz on dsd's first launch). After a
+   USB replug, verify the live camera→fast-livo→voxblox→planner→jax chain, then retire pjs.
+   `pjs-dev` is **STOPPED but kept as fallback** (`docker start pjs-dev`) until then.
+2. **`lidar-epic` modules** — `sensor/livox-mid360`, `planner/epic`, `control/mavros`;
+   port from drone-exploration-stack. → `stacks/lidar-epic.yml`.
 3. **amd64 / x86** — `base.base_image.amd64` + `compute/torch` amd64 branch are TODOs; fill
-   when an x86 host is wired (the user will signal). Native-build there.
-4. **jaxlib wheel** — baked wheel is gitignored (large). Drop the pure-jetson baked wheel in
-   `modules/compute/jax/wheels/`, or `JAXLIB_MODE=source` (XLA patch + bazel ~40min).
-5. **Reuse-image dev mode (optional)** — make `up.sh` able to point a stack at an existing
-   prebuilt image (e.g. `pure-jetson-stack:E`) for instant dev without a clean rebuild.
-6. Minor: `needs:` cycle detection; per-stack workspace paths (currently reuse the pjs ones).
+   when an x86 host is wired. Native-build there.
+4. **Build-cache optimization (minor)** — `gen.py` does `COPY modules/` early, so editing a
+   runtime script (run/clone/build_ws) invalidates the image cache. Move the COPY after the
+   RUN install steps (or COPY only `install.sh` + `wheels/`) to avoid needless rebuilds.
+5. Minor: `needs:` cycle detection.
 
 ---
 
