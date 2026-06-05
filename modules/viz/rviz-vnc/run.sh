@@ -6,6 +6,15 @@
 #   2)  open any VNC client -> localhost:5900   (or a browser if noVNC is added)
 #
 # Pass an rviz config: run.sh -d /work/ws/risk-aware/src/.../some.rviz
+
+# (host) auto-enter the dsd container; (inside) run the node.
+if [ ! -f /.dockerenv ]; then
+  __C=drone-stack-d435i-voxblox; docker start "$__C" >/dev/null 2>&1
+  __S="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+  __R="$(cd "$(dirname "$__S")/../../.." && pwd)"
+  __TT=$([ -t 1 ] && echo -it || echo -i)
+  exec docker exec $__TT "$__C" bash "/work/${__S#$__R/}" "$@"
+fi
 set -e
 export DISPLAY=:99
 
