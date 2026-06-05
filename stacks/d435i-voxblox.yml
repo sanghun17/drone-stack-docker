@@ -6,4 +6,3 @@ modules:
   - sensor/realsense-d435i
   - odometry/fast-livo
   - planner/risk-aware
-  - viz/rviz-vnc   # 원격 rviz (Xvfb+x11vnc, SSH 터널로 보기)
