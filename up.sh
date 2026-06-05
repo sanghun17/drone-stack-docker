@@ -1,13 +1,17 @@
 #!/bin/bash
 # drone-stack orchestrator. Native build per host arch (arm64 Jetson / amd64 x86).
 #
-#   ./up.sh gen   <stack>                 # generate .build/<stack>/{Dockerfile,compose.yml}
-#   ./up.sh build <stack>                 # gen + docker build the single image
-#   ./up.sh up    <stack>                 # gen + build + start the single container (idle)
-#   ./up.sh run   <stack> <module>[/run]  # exec a module's run script inside the container
-#   ./up.sh sh    <stack>                 # shell into the container
-#   ./up.sh down  <stack>                 # stop/remove the container
-#   ./up.sh ls    <stack>                 # list the stack's modules + their run scripts
+#   ./up.sh clone    <stack>              # git-clone each module's source into ws/<module>/src
+#   ./up.sh gen      <stack>              # generate .build/<stack>/{Dockerfile,compose.yml}
+#   ./up.sh build    <stack>              # gen + docker build the single image
+#   ./up.sh up       <stack>              # gen + build + start the single container (idle)
+#   ./up.sh build-ws <stack>             # catkin-build each module's workspace in the container
+#   ./up.sh run      <stack> <module>     # exec a module's run script inside the container
+#   ./up.sh sh       <stack>              # shell into the container
+#   ./up.sh down     <stack>              # stop/remove the container
+#   ./up.sh ls       <stack>              # list the stack's modules + their run scripts
+#
+#   typical first run:  clone -> up -> build-ws -> run <camera> / <fastlivo> / <planner>
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck disable=SC1091
@@ -40,6 +44,11 @@ case "$cmd" in
   clone) need_stack; gen >/dev/null
          while read -r m; do
            [ -f "$ROOT/modules/$m/clone.sh" ] && { echo ">> clone: $m"; bash "$ROOT/modules/$m/clone.sh"; }
+         done < "$ROOT/.build/$stack/modules.txt" ;;
+  build-ws) need_stack; gen >/dev/null     # catkin-build each module's workspace in the container
+         while read -r m; do
+           [ -f "$ROOT/modules/$m/build_ws.sh" ] && { echo ">> build-ws: $m"; \
+             docker exec "drone-stack-$stack" bash -lc "bash /work/modules/$m/build_ws.sh"; }
          done < "$ROOT/.build/$stack/modules.txt" ;;
   ls)    need_stack; gen >/dev/null; sed -n 's/^#   //p' "$(CF)" ;;
   *) sed -n '2,12p' "$0" ;;
