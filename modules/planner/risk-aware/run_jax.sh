@@ -9,7 +9,15 @@ if [ ! -f /.dockerenv ]; then
   __S="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
   __R="$(cd "$(dirname "$__S")/../../.." && pwd)"
   __TT=$([ -t 1 ] && echo -it || echo -i)
-  exec docker exec $__TT "$__C" bash "/work/${__S#$__R/}" "$@"
+  # Ctrl+C here -> stop the node INSIDE the container too. docker exec does not
+  # reliably forward SIGINT, so do it explicitly: SIGINT the python node (clean
+  # shutdown). roscore is left alone — it's the shared master other modules use.
+  __M="jax_main_node_ros_new.py"
+  cleanup(){ docker exec "$__C" pkill -INT -f "$__M" >/dev/null 2>&1; }
+  trap 'cleanup; exit 130' INT TERM
+  docker exec $__TT "$__C" bash "/work/${__S#$__R/}" "$@"; __rc=$?
+  cleanup            # also catch crash/normal exit that orphaned the node
+  exit $__rc
 fi
 set -e
 source /opt/ros/noetic/setup.bash
