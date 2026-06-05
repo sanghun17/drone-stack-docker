@@ -6,3 +6,4 @@ modules:
   - sensor/realsense-d435i
   - odometry/fast-livo
   - planner/risk-aware
+  - control/mavros

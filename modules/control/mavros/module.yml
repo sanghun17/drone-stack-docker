@@ -1,0 +1,11 @@
+name: mavros
+group: control
+description: MAVROS bridge to the PX4 FCU (px4.launch, fcu_url from config/stack.env). mavros is vendored + built in the risk-aware workspace, so no extra image deps.
+
+needs: [planner/risk-aware]     # mavros lives in ws/risk-aware (built by planner/risk-aware)
+
+mounts:
+  - "/dev:/dev"                 # FCU serial (e.g. /dev/ttyUSB0)
+
+run: [run.sh]
+provides: [fcu, mavros]
