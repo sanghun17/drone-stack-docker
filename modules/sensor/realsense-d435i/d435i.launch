@@ -1,11 +1,9 @@
 <launch>
   <!-- D435i for FAST-LIVO + voxblox on Jetson Orin (onboard USB hub).
-       initial_reset  : wakes the IMU motion module (else color/IMU can fail to start)
        enable_sync    : false, the HW-clock syncer otherwise breaks depth/color
        allow_no_texture_points : keep publishing points even without a color match
        All params live HERE, not on the roslaunch command line. -->
   <include file="$(find realsense2_camera)/launch/rs_camera.launch">
-    <arg name="initial_reset"           value="true"/>
     <arg name="depth_width"             value="640"/>
     <arg name="depth_height"            value="480"/>
     <arg name="depth_fps"               value="15"/>

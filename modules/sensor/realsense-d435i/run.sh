@@ -1,8 +1,7 @@
 #!/bin/bash
 # sensor/realsense-d435i: D435i driver. All camera params live in d435i.launch.
 # VERIFIED on Jetson Orin onboard USB: pointcloud ~23Hz, color/depth 15Hz, IMU 202Hz.
-# If you hit "Bond broken, exiting" on start, just re-run — the initial_reset HW reset
-# occasionally trips the nodelet bond; a clean retry catches it.
+# initial_reset is OFF (fast start, no HW reset). If color/IMU don't come up, replug the camera.
 
 # (host) auto-enter the dsd container; (inside) run the node.
 if [ ! -f /.dockerenv ]; then

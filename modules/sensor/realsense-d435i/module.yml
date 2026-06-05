@@ -1,6 +1,6 @@
 name: realsense-d435i
 group: sensor
-description: Intel RealSense D435i driver (depth + color + IMU). All 4 streams via initial_reset + enable_sync:=false.
+description: Intel RealSense D435i driver (depth + color + IMU). All 4 streams; enable_sync:=false.
 
 deps:
   apt:
