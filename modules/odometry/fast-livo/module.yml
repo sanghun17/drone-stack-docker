@@ -1,0 +1,13 @@
+name: fast-livo
+group: odometry
+description: FAST-LIVO2 (visual/LiDAR-inertial odometry). Sophus dep baked into the image; fast_livo itself is built in-container from the bind-mounted source workspace.
+
+deps:
+  source: [install.sh]      # Sophus a621ff (libSophus.so + sophus/se3.h)
+
+mounts:
+  - "${LIVO_SRC}:/livo_ws/src"        # fast_livo source (separate git repo)
+  - "${LIVO_WS}:/livo_ws"             # catkin build/devel persist on host
+
+run: [run.sh]
+provides: [odometry, odom-tf]

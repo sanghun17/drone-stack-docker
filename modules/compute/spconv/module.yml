@@ -1,0 +1,16 @@
+name: spconv
+group: compute
+description: cumm 0.4.11 + spconv 2.3.6 from source (CUDA 11.4 / Orin sm_87). For epoch_680 map_encoder + C++ sparse_vfe.
+
+needs: [compute/torch]      # spconv builds against torch
+
+env:
+  CUDA_HOME: /usr/local/cuda
+  PATH: /usr/local/cuda/bin:${PATH}
+  CUMM_CUDA_ARCH_LIST: "8.7"
+
+deps:
+  pip: [pccm, ccimport, pybind11, ninja, wheel]
+  source: [install.sh]      # cumm + spconv git source builds
+
+provides: [spconv, cumm]

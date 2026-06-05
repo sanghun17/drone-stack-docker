@@ -1,0 +1,15 @@
+name: jax
+group: compute
+description: jaxlib 0.4.13 + jax + flax/optax (CUDA 11.4 / Orin sm_87). py3.8 caps jax at 0.4.13. flax --no-deps (tensorstore has no aarch64 wheel).
+
+needs: [compute/spconv]     # ordering: after torch/spconv (shares CUDA env)
+
+deps:
+  source: [install.sh]      # jaxlib (baked wheel, else source) + jax + flax/optax ecosystem
+
+provides: [jax, jaxlib, flax, optax]
+
+# NOTE: install.sh prefers a baked wheel at modules/compute/jax/wheels/jaxlib-*.whl
+# (the bake-once result; seconds). Without it, set JAXLIB_MODE=source to build from
+# source (XLA cupti patch + bazel ~40min). The .whl is gitignored (large binary) —
+# drop the pure-jetson-stack baked wheel here for a fast clean build.

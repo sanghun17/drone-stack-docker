@@ -1,0 +1,15 @@
+name: torch
+group: compute
+description: PyTorch 2.1.0. Ships libtorch (torch/lib + cmake) that voxblox C++ links against.
+
+deps:
+  # torch wheel links these at runtime (not in the L4T base)
+  apt:
+    - libopenblas-dev
+    - libomp-dev
+    - libopenmpi-dev
+  # arch-specific torch wheel is selected inside install.sh ($TARGETARCH)
+  source:
+    - install.sh
+
+provides: [torch, libtorch]

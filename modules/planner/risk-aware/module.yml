@@ -1,0 +1,34 @@
+name: risk-aware
+group: planner
+description: Risk-aware exploration planner — voxblox (uncertainty TSDF) + mav_active_3d_planning exploration + JAX MPPI local planner. Built in-container from ${PLANNER_SRC}.
+
+needs: [compute/torch, compute/spconv, compute/jax]   # torch/spconv (model) + jax (MPPI)
+
+deps:
+  # build deps for the ETH-ASL workspace: catkin_grpc builds grpc from source
+  # (rsync/libtool/autotools/ssl/zlib), protobuf_catkin builds protobuf from source.
+  apt:
+    - rsync
+    - libtool
+    - autoconf
+    - automake
+    - pkg-config
+    - zlib1g-dev
+    - libssl-dev
+    - libtbb-dev
+    - ros-noetic-tf-conversions
+    - ros-noetic-tf2-geometry-msgs
+    - ros-noetic-interactive-markers
+    - ros-noetic-geographic-msgs
+    - ros-noetic-nlopt
+    - python3-future
+    - libdw-dev
+    - ros-noetic-control-toolbox
+
+mounts:
+  - "${PLANNER_SRC}:/ws/src/risk_aware_planning"   # planner source (jetson-orin-agx branch)
+  - "${PLANNER_WS}:/ws"                             # catkin build/devel persist on host
+  - "${RISK_AWARE_ASSETS}:/root/risk_aware_assets"  # model weights
+
+run: [run_voxblox.sh, run_planner.sh, run_jax.sh]
+provides: [voxblox-map, exploration, jax-mppi]

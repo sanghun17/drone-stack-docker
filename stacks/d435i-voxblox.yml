@@ -1,0 +1,8 @@
+# d435i-voxblox — D435i + FAST-LIVO + voxblox + risk-aware planner + JAX MPPI.
+# Mirrors the legacy pure-jetson-stack (arm64 / Jetson Orin). planner/risk-aware
+# auto-pulls compute/{torch,spconv,jax} via its `needs:`.
+arch: [arm64]
+modules:
+  - sensor/realsense-d435i
+  - odometry/fast-livo
+  - planner/risk-aware

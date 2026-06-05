@@ -7,6 +7,9 @@ Dockerfile.*.generated
 src/
 vendor/
 
+# large baked build artifacts (drop locally for a fast clean build; not vendored)
+modules/compute/jax/wheels/*.whl
+
 # ROS / build artifacts
 build/
 devel/

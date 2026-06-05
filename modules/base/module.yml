@@ -1,28 +1,42 @@
 name: base
 group: base
-description: Architecture module — ROS Noetic base image + common build toolchain. Always included.
+description: Architecture module — CUDA/L4T base image + ROS Noetic + common toolchain. Always included.
 
-# base image is set in config/stack.env (BASE_IMAGE, multi-arch). up.sh starts the
-# generated Dockerfile FROM it, then applies these common deps before any other module.
+# Arch-specific base image (FROM). arm64 = NVIDIA Jetson L4T+CUDA; amd64 TBD (x86 CUDA).
+base_image:
+  arm64: nvcr.io/nvidia/l4t-jetpack:r35.4.1
+  # amd64: nvidia/cuda:11.4.3-cudnn8-devel-ubuntu20.04   # FILL when an x86 host is wired
+
+env:
+  ROS_DISTRO: noetic
+
 deps:
+  # lean base apt (default repos). Heavy ETH-ASL deps (glog/gflags/protobuf) are
+  # built from the planner workspace, not apt-installed here.
   apt:
+    - curl
+    - wget
+    - gnupg2
+    - lsb-release
+    - ca-certificates
     - build-essential
     - cmake
     - git
-    - wget
+    - unzip
+    - pkg-config
     - python3-pip
-    - python3-catkin-tools
-    - python3-rosdep
-    - ros-noetic-tf2-ros
-    - ros-noetic-topic-tools
-  pip:
-    - catkin_pkg
-  source: []
+    - python3-dev
+    - libeigen3-dev
+    - usbutils
+    - udev
+    - geographiclib-tools
+    - libgeographic-dev
+  # ROS Noetic needs an apt repo added first -> install.sh (+ rosdep init + geo datasets)
+  source:
+    - install.sh
 
-# base mounts are minimal; per-stack workspaces + source repos are mounted by the
-# planner/odometry/sensor modules that own them.
 mounts:
-  - "/tmp/.X11-unix:/tmp/.X11-unix"   # rviz X11 (optional, harmless if no display)
+  - "/tmp/.X11-unix:/tmp/.X11-unix"   # rviz X11 (optional)
 
-run: []          # base launches nothing; it provides roscore (auto-started by run helper)
+run: []
 provides: [ros-noetic, roscore]

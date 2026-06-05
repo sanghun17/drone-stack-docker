@@ -1,0 +1,15 @@
+name: realsense-d435i
+group: sensor
+description: Intel RealSense D435i driver (depth + color + IMU). All 4 streams via initial_reset + enable_sync:=false.
+
+deps:
+  apt:
+    - ros-noetic-realsense2-camera
+    - ros-noetic-realsense2-description
+  # if arm64 apt lacks it, fall back to a librealsense source build (TODO: install.sh)
+
+mounts:
+  - "/dev:/dev"
+
+run: [run.sh]
+provides: [camera, depth-cloud, color, imu]
