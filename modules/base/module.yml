@@ -31,6 +31,13 @@ deps:
     - udev
     - geographiclib-tools
     - libgeographic-dev
+    # headless rviz over VNC (scripts/rviz.sh): render on Xvfb w/ mesa software GL, serve via
+    # x11vnc, show with the 2D tigervnc viewer forwarded over ssh -X.
+    - xvfb
+    - x11vnc
+    - tigervnc-viewer
+    - libgl1-mesa-dri
+    - libgl1-mesa-glx
   # ROS Noetic needs an apt repo added first -> install.sh (+ rosdep init + geo datasets)
   source:
     - install.sh
