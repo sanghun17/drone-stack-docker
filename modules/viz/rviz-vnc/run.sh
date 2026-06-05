@@ -24,7 +24,7 @@ pgrep -x x11vnc  >/dev/null 2>&1 || { x11vnc -display :99 -localhost -nopw -fore
 
 source /opt/ros/noetic/setup.bash
 [ -f /work/ws/risk-aware/devel/setup.bash ] && source /work/ws/risk-aware/devel/setup.bash
-export ROS_MASTER_URI="http://localhost:${ROS_MASTER_PORT:-11399}"
+source /work/config/ros_env.sh   # ROS_MASTER_URI / ROS_IP — single source, edit-and-go
 export LIBGL_ALWAYS_SOFTWARE=1   # rviz GL via mesa llvmpipe on the virtual display
 
 echo ">> rviz on :99 served via VNC localhost:5900"

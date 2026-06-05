@@ -14,8 +14,7 @@ fi
 set -e
 source /opt/ros/noetic/setup.bash
 source /work/ws/risk-aware/devel/setup.bash
-PORT="${ROS_MASTER_PORT:-11399}"
-export ROS_MASTER_URI="http://localhost:${PORT}"
+source /work/config/ros_env.sh   # ROS_MASTER_URI / ROS_IP — single source, edit-and-go
 
 # local_planner_mpc/ is not a catkin pkg; the node resolves itself via this symlink.
 [ -e "${HOME}/risk-aware_planning/src" ] || {
@@ -24,7 +23,7 @@ export ROS_MASTER_URI="http://localhost:${PORT}"
 }
 JAX="${HOME}/risk-aware_planning/src/mav_active_3d_planning/local_planner_mpc/jax_main_node_ros_new.py"
 
-if ! pgrep -f "roscore -p ${PORT}" >/dev/null 2>&1; then
-  roscore -p "${PORT}" >/tmp/roscore_${PORT}.log 2>&1 & sleep 4
+if ! pgrep -f "roscore -p ${ROS_MASTER_PORT}" >/dev/null 2>&1; then
+  roscore -p "${ROS_MASTER_PORT}" >/tmp/roscore_${ROS_MASTER_PORT}.log 2>&1 & sleep 4
 fi
 exec python3 "${JAX}" --gpu 0 --planner motion_primitives --mode exploration "$@"

@@ -30,5 +30,5 @@ cat >> /root/.bashrc <<'RC'
 source /opt/ros/noetic/setup.bash
 [ -f /work/ws/risk-aware/devel/setup.bash ] && source /work/ws/risk-aware/devel/setup.bash
 [ -f /work/ws/fast-livo/devel/setup.bash ] && source /work/ws/fast-livo/devel/setup.bash
-export ROS_MASTER_URI=http://localhost:11399
+[ -f /work/config/ros_env.sh ] && source /work/config/ros_env.sh   # ROS_MASTER_URI / ROS_IP (single source)
 RC

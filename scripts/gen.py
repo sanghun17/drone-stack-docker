@@ -139,8 +139,9 @@ def gen_compose(mods, arch, stack, env):
                 "runtime": "nvidia" if arch == "arm64" else None,
                 "working_dir": "/work",
                 "volumes": ["../..:/work"] + mounts,
+                # ROS_MASTER_URI / ROS_IP are NOT set here on purpose — they live in
+                # config/ros_env.sh (mounted), so the IP is edit-and-go with no recreate.
                 "environment": [
-                    "ROS_MASTER_URI=http://localhost:%s" % env.get("ROS_MASTER_PORT", "11399"),
                     "DISPLAY=${DISPLAY:-:0}",
                 ],
                 "command": ["sleep", "infinity"],

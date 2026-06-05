@@ -1,9 +1,8 @@
 #!/bin/bash
-# sensor/realsense-d435i: D435i driver. VERIFIED config (Jetson Orin + onboard USB hub):
-#   initial_reset:=true  -> wakes the IMU motion module
-#   enable_sync:=false   -> HW-clock timestamps otherwise break the depth/color syncer
-#   allow_no_texture_points -> publish points even without a color match
-# All 4 streams: pointcloud ~23Hz, color/depth 15Hz, IMU 202Hz.
+# sensor/realsense-d435i: D435i driver. All camera params live in d435i.launch.
+# VERIFIED on Jetson Orin onboard USB: pointcloud ~23Hz, color/depth 15Hz, IMU 202Hz.
+# If you hit "Bond broken, exiting" on start, just re-run — the initial_reset HW reset
+# occasionally trips the nodelet bond; a clean retry catches it.
 
 # (host) auto-enter the dsd container; (inside) run the node.
 if [ ! -f /.dockerenv ]; then
@@ -15,19 +14,11 @@ if [ ! -f /.dockerenv ]; then
 fi
 set -e
 source /opt/ros/noetic/setup.bash
-PORT="${ROS_MASTER_PORT:-11399}"
-export ROS_MASTER_URI="http://localhost:${PORT}"
+source /work/config/ros_env.sh   # ROS_MASTER_URI / ROS_IP — single source, edit-and-go
 
-if ! pgrep -f "roscore -p ${PORT}" >/dev/null 2>&1; then
-  roscore -p "${PORT}" >/tmp/roscore_${PORT}.log 2>&1 &
-  sleep 4
+# ensure a master (idempotent)
+if ! pgrep -f "roscore -p ${ROS_MASTER_PORT}" >/dev/null 2>&1; then
+  roscore -p "${ROS_MASTER_PORT}" >/tmp/roscore_${ROS_MASTER_PORT}.log 2>&1 & sleep 4
 fi
 
-exec roslaunch realsense2_camera rs_camera.launch \
-  ${RS_SERIAL:+serial_no:=${RS_SERIAL}} \
-  initial_reset:=true \
-  depth_width:=640 depth_height:=480 depth_fps:=15 \
-  color_width:=640 color_height:=480 color_fps:=15 \
-  enable_gyro:=true enable_accel:=true unite_imu_method:=linear_interpolation \
-  filters:=pointcloud allow_no_texture_points:=true \
-  enable_sync:=false "$@"
+exec roslaunch "$(dirname "${BASH_SOURCE[0]}")/d435i.launch" "$@"

@@ -13,11 +13,10 @@ fi
 set -e
 source /opt/ros/noetic/setup.bash
 source /work/ws/fast-livo/devel/setup.bash
-PORT="${ROS_MASTER_PORT:-11399}"
-export ROS_MASTER_URI="http://localhost:${PORT}"
+source /work/config/ros_env.sh   # ROS_MASTER_URI / ROS_IP — single source, edit-and-go
 
-if ! pgrep -f "roscore -p ${PORT}" >/dev/null 2>&1; then
-  roscore -p "${PORT}" >/tmp/roscore_${PORT}.log 2>&1 &
+if ! pgrep -f "roscore -p ${ROS_MASTER_PORT}" >/dev/null 2>&1; then
+  roscore -p "${ROS_MASTER_PORT}" >/tmp/roscore_${ROS_MASTER_PORT}.log 2>&1 &
   sleep 4
 fi
 
