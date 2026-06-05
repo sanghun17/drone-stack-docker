@@ -1,7 +1,7 @@
 # `module.yml` schema
 
 Every module is a directory `modules/<group>/<name>/` with a `module.yml` manifest.
-`up.sh` reads the manifest of each module a stack selects, **unions their deps**
+`setup.sh` reads the manifest of each module a stack selects, **unions their deps**
 (arch-aware, de-duped) into one image, and merges their mounts/run into one container.
 
 ```yaml

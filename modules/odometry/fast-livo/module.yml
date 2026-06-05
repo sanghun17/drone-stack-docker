@@ -6,7 +6,7 @@ deps:
   source: [install.sh]      # Sophus a621ff (libSophus.so + sophus/se3.h)
 
 # source + workspace live under the repo at ws/fast-livo (-> /work/ws/fast-livo),
-# cloned by `up.sh clone`. No external mount (the repo is mounted at /work).
+# cloned by `setup.sh clone`. No external mount (the repo is mounted at /work).
 workspace: /work/ws/fast-livo
 clone: clone.sh
 run: [run.sh]

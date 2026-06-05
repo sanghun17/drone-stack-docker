@@ -34,7 +34,7 @@ deps:
     - pyvista
 
 # source + workspace live under the repo at ws/risk-aware (-> /work/ws/risk-aware),
-# cloned by `up.sh clone`. Only the external model weights are mounted.
+# cloned by `setup.sh clone`. Only the external model weights are mounted.
 workspace: /work/ws/risk-aware
 mounts:
   - "${RISK_AWARE_ASSETS}:/root/risk_aware_assets"  # model weights (external, large)

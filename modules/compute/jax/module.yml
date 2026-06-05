@@ -11,5 +11,6 @@ provides: [jax, jaxlib, flax, optax]
 
 # NOTE: install.sh prefers a baked wheel at modules/compute/jax/wheels/jaxlib-*.whl
 # (the bake-once result; seconds). Without it, set JAXLIB_MODE=source to build from
-# source (XLA cupti patch + bazel ~40min). The .whl is gitignored (large binary) —
-# drop the pure-jetson-stack baked wheel here for a fast clean build.
+# source (XLA cupti patch + bazel ~40min). The .whl IS git-tracked (see .gitignore) —
+# it ships with the repo, so a fresh clone builds jax in seconds. The build reads it via
+# a transient bind-mount (gen_dockerfile_compose.py), so the wheel is never baked into the image.

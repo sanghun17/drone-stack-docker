@@ -1,15 +1,15 @@
 #!/bin/bash
 # drone-stack orchestrator. Native build per host arch (arm64 Jetson / amd64 x86).
 #
-#   ./up.sh clone    <stack>              # git-clone each module's source into ws/<module>/src
-#   ./up.sh gen      <stack>              # generate .build/<stack>/{Dockerfile,compose.yml}
-#   ./up.sh build    <stack>              # gen + docker build the single image
-#   ./up.sh up       <stack>              # gen + build + start the single container (idle)
-#   ./up.sh build-ws <stack>             # catkin-build each module's workspace in the container
-#   ./up.sh run      <stack> <module>     # exec a module's run script inside the container
-#   ./up.sh sh       <stack>              # shell into the container
-#   ./up.sh down     <stack>              # stop/remove the container
-#   ./up.sh ls       <stack>              # list the stack's modules + their run scripts
+#   ./setup.sh clone    <stack>              # git-clone each module's source into ws/<module>/src
+#   ./setup.sh gen      <stack>              # generate .build/<stack>/{Dockerfile,compose.yml}
+#   ./setup.sh build    <stack>              # gen + docker build the single image
+#   ./setup.sh up       <stack>              # gen + build + start the single container (idle)
+#   ./setup.sh build-ws <stack>             # catkin-build each module's workspace in the container
+#   ./setup.sh run      <stack> <module>     # exec a module's run script inside the container
+#   ./setup.sh sh       <stack>              # shell into the container
+#   ./setup.sh down     <stack>              # stop/remove the container
+#   ./setup.sh ls       <stack>              # list the stack's modules + their run scripts
 #
 #   typical first run:  clone -> up -> build-ws -> run <camera> / <fastlivo> / <planner>
 set -euo pipefail
@@ -22,19 +22,26 @@ ARCH=$(uname -m); case "$ARCH" in aarch64) ARCH=arm64;; x86_64) ARCH=amd64;; esa
 
 cmd="${1:-help}"; stack="${2:-}"
 need_stack(){ [ -n "$stack" ] || { echo "need <stack> (see stacks/)"; exit 1; }; }
-gen(){ python3 "$ROOT/scripts/gen.py" "$stack" --arch "$ARCH"; }
+# the generated Dockerfile uses BuildKit `RUN --mount` (modules/ is bind-mounted at
+# build time, never COPY-ed in) — so buildx is required for build/up.
+need_buildx(){ docker buildx version >/dev/null 2>&1 || {
+  echo "ERROR: 'docker buildx' missing — the build needs BuildKit (RUN --mount)."
+  echo "  install the buildx CLI plugin -> ~/.docker/cli-plugins/docker-buildx"
+  echo "  (releases: https://github.com/docker/buildx/releases , arm64 asset: buildx-*.linux-arm64)"
+  exit 1; }; }
+gen(){ python3 "$ROOT/scripts/gen_dockerfile_compose.py" "$stack" --arch "$ARCH"; }
 DF(){ echo "$ROOT/.build/$stack/Dockerfile"; }
 CF(){ echo "$ROOT/.build/$stack/compose.yml"; }
 
 case "$cmd" in
   gen)   need_stack; gen ;;
-  build) need_stack; gen
+  build) need_stack; need_buildx; gen
          echo ">> docker build (native $ARCH) -> drone-stack:$stack"
          docker build -f "$(DF)" -t "drone-stack:$stack" "$ROOT" ;;
-  up)    need_stack; gen
+  up)    need_stack; need_buildx; gen
          docker build -f "$(DF)" -t "drone-stack:$stack" "$ROOT"
          docker compose -f "$(CF)" up -d
-         echo ">> container drone-stack-$stack up. start nodes: ./up.sh run $stack <module>" ;;
+         echo ">> container drone-stack-$stack up. start nodes: ./setup.sh run $stack <module>" ;;
   run)   need_stack; mod="${3:?need <module> e.g. sensor/realsense-d435i}"
          [ -f "$ROOT/modules/$mod" ] || mod="$mod/run.sh"   # allow dir or explicit script
          docker exec -it "drone-stack-$stack" bash -lc \

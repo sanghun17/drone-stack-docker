@@ -35,7 +35,7 @@ you **compose per run**: pick the modules → get exactly one tailored image + o
 | layer | a module is… | lives in |
 |-------|--------------|----------|
 | **source** | a component git repo (fast_livo, risk_aware_planning, EPIC, livox-driver) | separate repos, **bind-mounted** (gitignored), never vendored |
-| **image** | a set of declared deps (apt/pip/source builds) | `module.yml` `deps:`, **unioned by `gen.py`** into one Dockerfile |
+| **image** | a set of declared deps (apt/pip/source builds) | `module.yml` `deps:`, **unioned by `gen_dockerfile_compose.py`** into one Dockerfile |
 | **runtime** | ROS node(s) | `run*.sh` per module, run **inside the one container** (shared roscore :11399) |
 
 **Key decision — approach A (declarative manifests + a thin generator):**
@@ -55,46 +55,46 @@ stacks/d435i-voxblox.yml         modules/<group>/<name>/
   modules:                         install.sh   # complex/source builds (referenced via deps.source)
     - sensor/realsense-d435i       run*.sh      # launch the module's ROS node(s)
     - odometry/fast-livo
-    - planner/risk-aware   ──►  scripts/gen.py  ──►  .build/<stack>/Dockerfile  + compose.yml
+    - planner/risk-aware   ──►  scripts/gen_dockerfile_compose.py  ──►  .build/<stack>/Dockerfile  + compose.yml
                                    (base always first; `needs:` resolved deps-first;
                                     deps unioned arch-aware & de-duped → one image)
 ```
 
 - **`module.yml`** schema: see [MODULE_SCHEMA.md](MODULE_SCHEMA.md). Fields: `name, group,
   base_image{arch}, env, deps{apt,pip,source, <arch>{…}}, mounts, run, needs, provides`.
-- **`scripts/gen.py`** `<stack> [--arch]`: resolve module order (base + stack list +
+- **`scripts/gen_dockerfile_compose.py`** `<stack> [--arch]`: resolve module order (base + stack list +
   transitive `needs`), union deps for the arch, emit `FROM base_image[arch]` then one
   `RUN` block per module (its apt → pip → source install.sh). Emits a single `dev` compose
   service with merged mounts.
-- **`up.sh`** `{gen|build|up|run|sh|down|ls} <stack>`: **native build per host arch**
+- **`setup.sh`** `{gen|build|up|run|sh|down|ls} <stack>`: **native build per host arch**
   (`uname` → arm64/amd64; no buildx — build amd64 on the x86 host later). `up` = gen +
   build + start the idle container; `run <stack> <module>` execs a module's `run.sh` inside it.
 
 **Example**
 ```bash
-./up.sh up  d435i-voxblox                       # one image + one container
-./up.sh run d435i-voxblox sensor/realsense-d435i  # start the camera node
-./up.sh run d435i-voxblox odometry/fast-livo
-./up.sh run d435i-voxblox planner/risk-aware/run_planner.sh
+./setup.sh up  d435i-voxblox                       # one image + one container
+./setup.sh run d435i-voxblox sensor/realsense-d435i  # start the camera node
+./setup.sh run d435i-voxblox odometry/fast-livo
+./setup.sh run d435i-voxblox planner/risk-aware/run_planner.sh
 ```
 
 ---
 
 ## 4. Progress
 
-- ✅ **Engine**: `scripts/gen.py` + `up.sh` ({clone|gen|build|up|build-ws|run|sh|down}). Native per-arch build.
+- ✅ **Engine**: `scripts/gen_dockerfile_compose.py` + `setup.sh` ({clone|gen|build|up|build-ws|run|sh|down}). Native per-arch build.
 - ✅ **d435i-voxblox modules** (faithful port of the pure-jetson Dockerfile + run scripts):
   `base` (l4t-jetpack + ROS Noetic), `sensor/realsense-d435i`, `odometry/fast-livo` (Sophus
   a621ff), `compute/{torch,spconv,jax}`, `planner/risk-aware`. `stacks/d435i-voxblox.yml`.
-- ✅ **Clone-based + per-module workspaces**: `up.sh clone` runs each module's `clone.sh`
+- ✅ **Clone-based + per-module workspaces**: `setup.sh clone` runs each module's `clone.sh`
   (git clone the component @ jetson-orin-agx into `ws/<module>/src`, gitignored). The jaxlib
   wheel (76M) is git-**tracked** in `modules/compute/jax/wheels/` — the only reused artifact.
 - ✅ **BUILT + VERIFIED on the Jetson (2026-06-05 — pjs → dsd migration):**
   - image built from modules **~13 min** (spconv source build + jaxlib wheel install).
   - container runs; torch 2.1 / jax 0.4.13 import OK.
-  - `up.sh build-ws`: **all 56 risk-aware pkgs + fast-livo succeed**.
+  - `setup.sh build-ws`: **all 56 risk-aware pkgs + fast-livo succeed**.
   - voxblox runtime: **106 synthetic-cloud integrations, NO crash, ~31 ms/cloud (= pjs)**.
-  - ⇒ `git clone dsd → up.sh clone → up → build-ws` reproduces the pjs stack.
+  - ⇒ `git clone dsd → setup.sh clone → up → build-ws` reproduces the pjs stack.
 - ✅ Repo: `github.com/sanghun17/drone-stack-docker` (`main`).
 
 ---
@@ -110,9 +110,11 @@ stacks/d435i-voxblox.yml         modules/<group>/<name>/
    port from drone-exploration-stack. → `stacks/lidar-epic.yml`.
 3. **amd64 / x86** — `base.base_image.amd64` + `compute/torch` amd64 branch are TODOs; fill
    when an x86 host is wired. Native-build there.
-4. **Build-cache optimization (minor)** — `gen.py` does `COPY modules/` early, so editing a
-   runtime script (run/clone/build_ws) invalidates the image cache. Move the COPY after the
-   RUN install steps (or COPY only `install.sh` + `wheels/`) to avoid needless rebuilds.
+4. **No baked `modules/` (DONE)** — `modules/` is **not** `COPY`-ed in. Each `install.sh`
+   runs via a transient BuildKit `RUN --mount=type=bind,source=modules` (needs buildx).
+   Nothing from `modules/` — scripts or the jax wheel — is baked into the image, so editing
+   a runtime script never busts the image cache and there is no stale `/modules` at runtime
+   (the only modules tree in a running container is the `/work` bind-mount = the live repo).
 5. Minor: `needs:` cycle detection.
 
 ---

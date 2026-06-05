@@ -1,6 +1,6 @@
 #!/bin/bash
 # Fetch the fast_livo source (= the whole livo_ws src space: FAST-LIVO2 + rpg_vikit +
-# vision_opencv) into livo_ws/src (pinned branch). Run by `up.sh clone <stack>`.
+# vision_opencv) into livo_ws/src (pinned branch). Run by `setup.sh clone <stack>`.
 set -e
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 DST="$ROOT/ws/fast-livo/src"

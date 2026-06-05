@@ -1,6 +1,6 @@
 #!/bin/bash
 # Fetch the risk_aware_planning source into the planner workspace (pinned branch).
-# Run by `up.sh clone <stack>`. Cloned tree is gitignored by drone-stack.
+# Run by `setup.sh clone <stack>`. Cloned tree is gitignored by drone-stack.
 set -e
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 DST="$ROOT/ws/risk-aware/src/risk_aware_planning"
