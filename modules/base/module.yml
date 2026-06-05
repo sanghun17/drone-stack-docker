@@ -1,0 +1,28 @@
+name: base
+group: base
+description: Architecture module — ROS Noetic base image + common build toolchain. Always included.
+
+# base image is set in config/stack.env (BASE_IMAGE, multi-arch). up.sh starts the
+# generated Dockerfile FROM it, then applies these common deps before any other module.
+deps:
+  apt:
+    - build-essential
+    - cmake
+    - git
+    - wget
+    - python3-pip
+    - python3-catkin-tools
+    - python3-rosdep
+    - ros-noetic-tf2-ros
+    - ros-noetic-topic-tools
+  pip:
+    - catkin_pkg
+  source: []
+
+# base mounts are minimal; per-stack workspaces + source repos are mounted by the
+# planner/odometry/sensor modules that own them.
+mounts:
+  - "/tmp/.X11-unix:/tmp/.X11-unix"   # rviz X11 (optional, harmless if no display)
+
+run: []          # base launches nothing; it provides roscore (auto-started by run helper)
+provides: [ros-noetic, roscore]
