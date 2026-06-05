@@ -1,0 +1,14 @@
+name: rviz-vnc
+group: viz
+description: Headless rviz over VNC — virtual display (Xvfb :99) + x11vnc (localhost:5900) + software GL. View remotely via an SSH tunnel + any VNC client (no local X server / ssh -X needed).
+
+deps:
+  apt:
+    - xvfb              # virtual X display (no monitor on the Jetson)
+    - x11vnc            # VNC server attached to the virtual display
+    - fluxbox           # minimal WM so rviz windows behave
+    - libgl1-mesa-dri   # software OpenGL (llvmpipe) for rviz on the virtual display
+    - libgl1-mesa-glx
+
+run: [run.sh]
+provides: [remote-viz]

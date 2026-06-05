@@ -24,6 +24,14 @@ deps:
     - python3-future
     - libdw-dev
     - ros-noetic-control-toolbox
+  # JAX MPPI node python deps (jax_main_node_ros_new.py + time_profiler + viz/IO)
+  pip:
+    - matplotlib
+    - pyquaternion
+    - open3d
+    - tqdm
+    - trimesh
+    - pyvista
 
 # source + workspace live under the repo at ws/risk-aware (-> /work/ws/risk-aware),
 # cloned by `up.sh clone`. Only the external model weights are mounted.
