@@ -25,5 +25,6 @@ echo ">> rviz in $C on your DISPLAY=$DISPLAY (via SSH X11). Ctrl-C to close."
 exec docker exec -it -e DISPLAY="$DISPLAY" -e XAUTHORITY=/tmp/.dsd.xauth "$C" bash -lc "
   source /opt/ros/noetic/setup.bash
   [ -f /work/ws/risk-aware/devel/setup.bash ] && source /work/ws/risk-aware/devel/setup.bash
-  export ROS_MASTER_URI=http://localhost:11399
+  [ -f /work/config/ros_env.sh ] && source /work/config/ros_env.sh
+  export LIBGL_ALWAYS_INDIRECT=1   # render on YOUR machine, not the container's Jetson GPU
   exec rviz $*"
