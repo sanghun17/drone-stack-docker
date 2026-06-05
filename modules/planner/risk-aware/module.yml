@@ -25,10 +25,12 @@ deps:
     - libdw-dev
     - ros-noetic-control-toolbox
 
+# source + workspace live under the repo at ws/risk-aware (-> /work/ws/risk-aware),
+# cloned by `up.sh clone`. Only the external model weights are mounted.
+workspace: /work/ws/risk-aware
 mounts:
-  - "${PLANNER_SRC}:/ws/src/risk_aware_planning"   # planner source (jetson-orin-agx branch)
-  - "${PLANNER_WS}:/ws"                             # catkin build/devel persist on host
-  - "${RISK_AWARE_ASSETS}:/root/risk_aware_assets"  # model weights
+  - "${RISK_AWARE_ASSETS}:/root/risk_aware_assets"  # model weights (external, large)
 
+clone: clone.sh
 run: [run_voxblox.sh, run_planner.sh, run_jax.sh]
 provides: [voxblox-map, exploration, jax-mppi]

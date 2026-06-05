@@ -5,7 +5,7 @@
 # Trigger after up: rosservice call /planner/planner_node/toggle_running "data: true"
 set -e
 source /opt/ros/noetic/setup.bash
-source /ws/devel/setup.bash
+source /work/ws/risk-aware/devel/setup.bash
 PORT="${ROS_MASTER_PORT:-11399}"
 export ROS_MASTER_URI="http://localhost:${PORT}"
 if ! pgrep -f "roscore -p ${PORT}" >/dev/null 2>&1; then

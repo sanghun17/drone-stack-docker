@@ -5,9 +5,9 @@ description: FAST-LIVO2 (visual/LiDAR-inertial odometry). Sophus dep baked into 
 deps:
   source: [install.sh]      # Sophus a621ff (libSophus.so + sophus/se3.h)
 
-mounts:
-  - "${LIVO_SRC}:/livo_ws/src"        # fast_livo source (separate git repo)
-  - "${LIVO_WS}:/livo_ws"             # catkin build/devel persist on host
-
+# source + workspace live under the repo at ws/fast-livo (-> /work/ws/fast-livo),
+# cloned by `up.sh clone`. No external mount (the repo is mounted at /work).
+workspace: /work/ws/fast-livo
+clone: clone.sh
 run: [run.sh]
 provides: [odometry, odom-tf]

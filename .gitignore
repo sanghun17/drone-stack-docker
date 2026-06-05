@@ -3,12 +3,12 @@
 *.generated.yml
 Dockerfile.*.generated
 
-# cloned component source (bind-mounted from elsewhere; never vendored here)
-src/
-vendor/
+# per-module catkin workspaces under ws/<module>/ — src/ populated by `up.sh clone`
+# (component repos, own git), build/devel local. Whole ws/ gitignored; clone recreates.
+/ws/
 
-# large baked build artifacts (drop locally for a fast clean build; not vendored)
-modules/compute/jax/wheels/*.whl
+# NOTE: modules/compute/jax/wheels/*.whl IS tracked (the reused jaxlib artifact —
+# avoids the multi-hour jaxlib-from-source rebuild). Intentionally NOT ignored.
 
 # ROS / build artifacts
 build/

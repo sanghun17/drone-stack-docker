@@ -178,6 +178,7 @@ def main():
     os.makedirs(outdir, exist_ok=True)
     open(os.path.join(outdir, "Dockerfile"), "w").write(gen_dockerfile(mods, arch, env))
     open(os.path.join(outdir, "compose.yml"), "w").write(gen_compose(mods, arch, a.stack, env))
+    open(os.path.join(outdir, "modules.txt"), "w").write("\n".join(m["_path"] for m in mods) + "\n")
 
     print("stack '%s' arch=%s  modules: %s" % (a.stack, arch, ", ".join(m["_path"] for m in mods)))
     print("  -> %s/Dockerfile" % outdir)

@@ -3,7 +3,7 @@
 # Needs the camera up. fast_livo is built in /livo_ws (catkin) from the mounted source.
 set -e
 source /opt/ros/noetic/setup.bash
-source /livo_ws/devel/setup.bash
+source /work/ws/fast-livo/devel/setup.bash
 PORT="${ROS_MASTER_PORT:-11399}"
 export ROS_MASTER_URI="http://localhost:${PORT}"
 

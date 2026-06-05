@@ -37,6 +37,10 @@ case "$cmd" in
            "source /opt/ros/noetic/setup.bash; export ROS_MASTER_URI=http://localhost:$PORT; bash /work/modules/$mod" ;;
   sh)    need_stack; docker exec -it "drone-stack-$stack" bash ;;
   down)  need_stack; docker compose -f "$(CF)" down ;;
+  clone) need_stack; gen >/dev/null
+         while read -r m; do
+           [ -f "$ROOT/modules/$m/clone.sh" ] && { echo ">> clone: $m"; bash "$ROOT/modules/$m/clone.sh"; }
+         done < "$ROOT/.build/$stack/modules.txt" ;;
   ls)    need_stack; gen >/dev/null; sed -n 's/^#   //p' "$(CF)" ;;
   *) sed -n '2,12p' "$0" ;;
 esac

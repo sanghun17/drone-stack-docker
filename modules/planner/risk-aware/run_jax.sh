@@ -4,14 +4,14 @@
 # Needs run_planner.sh up first. First run ~80s (JAX JIT).
 set -e
 source /opt/ros/noetic/setup.bash
-source /ws/devel/setup.bash
+source /work/ws/risk-aware/devel/setup.bash
 PORT="${ROS_MASTER_PORT:-11399}"
 export ROS_MASTER_URI="http://localhost:${PORT}"
 
 # local_planner_mpc/ is not a catkin pkg; the node resolves itself via this symlink.
 [ -e "${HOME}/risk-aware_planning/src" ] || {
   mkdir -p "${HOME}/risk-aware_planning"
-  ln -s /ws/src/risk_aware_planning "${HOME}/risk-aware_planning/src"
+  ln -s /work/ws/risk-aware/src/risk_aware_planning "${HOME}/risk-aware_planning/src"
 }
 JAX="${HOME}/risk-aware_planning/src/mav_active_3d_planning/local_planner_mpc/jax_main_node_ros_new.py"
 
