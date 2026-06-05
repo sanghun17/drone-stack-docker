@@ -26,5 +26,8 @@ exec docker exec -it -e DISPLAY="$DISPLAY" -e XAUTHORITY=/tmp/.dsd.xauth "$C" ba
   source /opt/ros/noetic/setup.bash
   [ -f /work/ws/risk-aware/devel/setup.bash ] && source /work/ws/risk-aware/devel/setup.bash
   [ -f /work/config/ros_env.sh ] && source /work/config/ros_env.sh
-  export LIBGL_ALWAYS_INDIRECT=1   # render on YOUR machine, not the container's Jetson GPU
+  # render on YOUR machine, not the container's Jetson GPU:
+  # force the mesa GLX vendor (else libglvnd keeps picking nvidia -> direct -> black over ssh -X)
+  export __GLX_VENDOR_LIBRARY_NAME=mesa
+  export LIBGL_ALWAYS_INDIRECT=1
   exec rviz $*"
