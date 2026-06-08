@@ -16,5 +16,18 @@
     <arg name="filters"                 value="pointcloud"/>
     <arg name="allow_no_texture_points" value="true"/>
     <arg name="enable_sync"             value="false"/>
+    <arg name="clip_distance"           value="6.0"/>  <!-- cap depth/pointcloud at 6m (D435i depth degrades past ~6m) -->
   </include>
+
+  <!-- ===== 10Hz decimation shared by fast-livo (odom) + voxblox (mapping) =====
+       D435i has no native 10fps mode (only 6/15/30/60/90), so the camera runs at
+       15Hz and we throttle to 10Hz HERE, once, for both consumers. topic_tools
+       throttle preserves the header stamp -> fast-livo's odom stamp == voxblox's
+       cloud stamp -> exact TF lookup match, fewer "queue too long" drops.
+       IMU stays full-rate (~200Hz) on /camera/imu: high IMU rate fills the gaps
+       between the slower 10Hz lidar/image frames (propagation). -->
+  <node pkg="topic_tools" type="throttle" name="cloud_throttle_10hz"
+        args="messages /camera/depth/color/points 10.0 /camera/depth/color/points_10hz"/>
+  <node pkg="topic_tools" type="throttle" name="image_throttle_10hz"
+        args="messages /camera/color/image_raw 10.0 /camera/color/image_raw_10hz"/>
 </launch>
