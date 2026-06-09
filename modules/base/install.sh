@@ -14,7 +14,6 @@ apt-get update && apt-get install -y --no-install-recommends \
   ros-noetic-pcl-ros ros-noetic-pcl-conversions \
   ros-noetic-tf2-ros ros-noetic-tf2-eigen ros-noetic-eigen-conversions \
   ros-noetic-cv-bridge ros-noetic-image-transport ros-noetic-image-transport-plugins \
-  ros-noetic-rviz \
   ros-noetic-ddynamic-reconfigure \
   python3-rosdep python3-rosinstall python3-catkin-tools python3-osrf-pycommon
 ( [ -f /etc/ros/rosdep/sources.list.d/20-default.list ] || rosdep init )

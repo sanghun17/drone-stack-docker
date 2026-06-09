@@ -7,3 +7,7 @@ modules:
   - odometry/fast-livo
   - planner/risk-aware
   - control/mavros
+  # GUI utilities last (after the expensive compute layers) so editing them never rebuilds
+  # torch/spconv/jax. Both pull utility/gui-vnc (Xvfb+VNC) via `needs:`.
+  - utility/rviz          # rviz       -> scripts/utility_rviz.sh
+  - utility/rqt           # rqt + plugins -> scripts/utility_rqt.sh

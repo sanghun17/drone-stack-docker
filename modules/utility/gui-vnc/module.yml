@@ -1,0 +1,23 @@
+name: gui-vnc
+group: utility
+description: Shared headless-GUI-over-VNC chain for the utility/* GUIs (rviz, rqt, ...). The L4T
+  nvidia GL can't direct-render Qt/OpenGL apps over ssh -X (black window / no display), so GUIs
+  render on a virtual Xvfb display with mesa software GL, x11vnc turns that into pixels, and a 2D
+  tigervnc viewer — which forwards fine over ssh -X — shows it on your screen. Pulled in via
+  `needs:` by utility/rviz, utility/rqt, etc. — install once, shared by all.
+
+deps:
+  apt:
+    - xvfb               # virtual X display (:99) to render onto
+    - x11vnc             # exposes that display as a VNC server
+    - tigervnc-viewer    # 2D viewer (xtigervncviewer) — forwards over ssh -X to your screen
+    - libgl1-mesa-dri    # software GL (llvmpipe) so 3D renders without the nvidia GL
+    - libgl1-mesa-glx
+    - x11-utils          # xwininfo / xdpyinfo / xprop — inspect the headless display when debugging
+    - openbox            # lightweight WM: gives GUI windows a title bar so you can move/resize/maximize
+
+mounts:
+  - "/tmp/.X11-unix:/tmp/.X11-unix"   # host X socket (X11)
+
+run: []
+provides: [gui-vnc]

@@ -1,0 +1,17 @@
+name: rqt
+group: utility
+description: rqt — ROS Qt GUI framework + the common plugins (plot, graph, console, topic monitor,
+  image view, ...). Launch headless on the Jetson host with scripts/utility_rqt.sh — same Xvfb + VNC
+  trick as rviz (see utility/gui-vnc), shown on your screen over ssh -X.
+
+needs:
+  - utility/gui-vnc      # Xvfb + x11vnc + tigervnc viewer + mesa software GL
+
+deps:
+  apt:
+    - ros-noetic-rqt
+    - ros-noetic-rqt-common-plugins
+    - ros-noetic-rqt-tf-tree     # TF Tree plugin (NOT in common-plugins); needs graphviz `dot` (pulled in)
+
+run: []
+provides: [rqt]

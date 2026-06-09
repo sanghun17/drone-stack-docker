@@ -1,0 +1,15 @@
+name: rviz
+group: utility
+description: RViz 3D visualization. Launch headless on the Jetson host with scripts/utility_rviz.sh — it
+  renders rviz on the shared Xvfb display and shows it on your screen over ssh -X (see
+  utility/gui-vnc for the how/why). First of the utility/* group (rqt / foxglove / qgc may follow).
+
+needs:
+  - utility/gui-vnc      # Xvfb + x11vnc + tigervnc viewer + mesa software GL
+
+deps:
+  apt:
+    - ros-noetic-rviz
+
+run: []
+provides: [rviz]
