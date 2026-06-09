@@ -1,7 +1,7 @@
 #!/bin/bash
 # control/mavros: MAVROS bridge to the PX4 flight controller (px4.launch).
-# FCU_URL from config/stack.env (default /dev/ttyUSB0:921600); gcs_url empty (onboard
-# companion). mavros is built in the risk-aware workspace (ws/risk-aware).
+# Params (fcu_url, gcs_url) live in px4.launch; fcu_url falls back to $FCU_URL from
+# config/stack.env via optenv. mavros is built in the risk-aware workspace (ws/risk-aware).
 
 # (host) auto-enter the dsd container; (inside) run the node.
 if [ ! -f /.dockerenv ]; then
@@ -26,11 +26,12 @@ source /opt/ros/noetic/setup.bash
 source /work/ws/risk-aware/devel/setup.bash
 [ -f /work/config/stack.env ] && source /work/config/stack.env   # FCU_URL
 source /work/config/ros_env.sh   # ROS_MASTER_URI / ROS_IP — single source, edit-and-go
-FCU_URL="${FCU_URL:-/dev/ttyUSB0:921600}"
+[ -n "${FCU_URL:-}" ] && export FCU_URL   # let px4.launch read it via $(optenv FCU_URL ...); value lives in the launch
 
 if ! pgrep -f "roscore -p ${ROS_MASTER_PORT}" >/dev/null 2>&1; then
   roscore -p "${ROS_MASTER_PORT}" >/tmp/roscore_${ROS_MASTER_PORT}.log 2>&1 & sleep 4
 fi
 
-# px4.launch = PX4-flavoured MAVROS; gcs_url empty (onboard companion).
-exec roslaunch mavros px4.launch fcu_url:="${FCU_URL}" gcs_url:="" "$@"
+# px4.launch = PX4-flavoured MAVROS. All params (fcu_url, gcs_url) are managed IN
+# px4.launch — never pass them inline here (roslaunch silently ignores empty `arg:=`).
+exec roslaunch mavros px4.launch "$@"
