@@ -1,7 +1,8 @@
 #!/bin/bash
 # planner/risk-aware: voxblox uncertainty mapping (uncertainty_voxblox_d435i.launch). MAPPING ONLY.
 # Needs camera + fast-livo (transforms the cloud into the FAST-LIVO odom frame).
-# NOTE: run_planner.sh already includes voxblox — don't run both.
+# Run this ALONGSIDE run_planner.sh — voxblox (mapping) and the planner are
+# separate launches (ml/sim structure). Order is flexible; topics late-bind.
 
 # (host) auto-enter the dsd container; (inside) run the node.
 if [ ! -f /.dockerenv ]; then

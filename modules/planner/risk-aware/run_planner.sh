@@ -1,7 +1,8 @@
 #!/bin/bash
 # planner/risk-aware: exploration planner bring-up (real_planning.launch) =
-# voxblox + mav_active_3d_planning exploration + odom relay + bbox params.
-# INCLUDES voxblox (don't also run run_voxblox.sh). Needs camera + fast-livo.
+# mav_active_3d_planning exploration + odom relay + bbox params.
+# Voxblox is SEPARATE: run run_voxblox.sh alongside this (mapping and planner
+# are independent launches, mirroring the ml/sim structure). Needs camera + fast-livo.
 # Trigger after up: rosservice call /planner/planner_node/toggle_running "data: true"
 
 # (host) auto-enter the dsd container; (inside) run the node.
