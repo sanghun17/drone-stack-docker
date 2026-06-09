@@ -6,9 +6,15 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /Sensor1
+        - /Sensor1/PointCloud_RGB1
+        - /Sensor1/PointCloud_RGB1/Status1
         - /Estimation1
+        - /Voxblox1
+        - /Voxblox1/Voxblox_Trajectory1
+        - /Voxblox1/Voxblox_Trajectory1/Status1
       Splitter Ratio: 0.5557350516319275
-    Tree Height: 613
+    Tree Height: 583
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -147,62 +153,78 @@ Visualization Manager:
           Value: true
       Enabled: true
       Name: Estimation
-    - Alpha: 0.25
-      Autocompute Intensity Bounds: true
-      Autocompute Value Bounds:
-        Max Value: 3.125
-        Min Value: -2.875
-        Value: true
-      Axis: Z
-      Channel Name: intensity
-      Class: rviz/PointCloud2
-      Color: 255; 255; 255
-      Color Transformer: RGB8
-      Decay Time: 0
+    - Class: rviz/Group
+      Displays:
+        - Class: rviz/MarkerArray
+          Enabled: true
+          Marker Topic: /planner/trajectory_visualization
+          Name: Voxblox_Trajectory
+          Namespaces:
+            candidate_text: true
+            candidate_trajectories: true
+            candidate_uncertainty: true
+            canidate_gains: true
+            completed_trajectory: true
+          Queue Size: 100
+          Value: true
+        - Alpha: 0.5
+          Autocompute Intensity Bounds: true
+          Autocompute Value Bounds:
+            Max Value: 10
+            Min Value: -10
+            Value: true
+          Axis: Z
+          Channel Name: intensity
+          Class: rviz/PointCloud2
+          Color: 255; 0; 0
+          Color Transformer: FlatColor
+          Decay Time: 0
+          Enabled: true
+          Invert Rainbow: false
+          Max Color: 255; 255; 255
+          Min Color: 0; 0; 0
+          Name: Voxblox_Feature
+          Position Transformer: XYZ
+          Queue Size: 10
+          Selectable: true
+          Size (Pixels): 3
+          Size (m): 0.10000000149011612
+          Style: Flat Squares
+          Topic: /planner/voxblox_node/uncertainty_pointcloud
+          Unreliable: false
+          Use Fixed Frame: true
+          Use rainbow: true
+          Value: true
+        - Alpha: 0.25
+          Autocompute Intensity Bounds: true
+          Autocompute Value Bounds:
+            Max Value: 3.125
+            Min Value: -2.875
+            Value: true
+          Axis: Z
+          Channel Name: intensity
+          Class: rviz/PointCloud2
+          Color: 255; 255; 255
+          Color Transformer: RGB8
+          Decay Time: 0
+          Enabled: true
+          Invert Rainbow: false
+          Max Color: 255; 255; 255
+          Min Color: 0; 0; 0
+          Name: Voxblox_Surface
+          Position Transformer: XYZ
+          Queue Size: 10
+          Selectable: true
+          Size (Pixels): 3
+          Size (m): 0.25
+          Style: Boxes
+          Topic: /planner/voxblox_node/surface_pointcloud
+          Unreliable: false
+          Use Fixed Frame: true
+          Use rainbow: true
+          Value: true
       Enabled: true
-      Invert Rainbow: false
-      Max Color: 255; 255; 255
-      Min Color: 0; 0; 0
-      Name: Voxblox_Surface
-      Position Transformer: XYZ
-      Queue Size: 10
-      Selectable: true
-      Size (Pixels): 3
-      Size (m): 0.25
-      Style: Boxes
-      Topic: /planner/voxblox_node/surface_pointcloud
-      Unreliable: false
-      Use Fixed Frame: true
-      Use rainbow: true
-      Value: true
-    - Alpha: 0.5
-      Autocompute Intensity Bounds: true
-      Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
-        Value: true
-      Axis: Z
-      Channel Name: intensity
-      Class: rviz/PointCloud2
-      Color: 255; 0; 0
-      Color Transformer: FlatColor
-      Decay Time: 0
-      Enabled: true
-      Invert Rainbow: false
-      Max Color: 255; 255; 255
-      Min Color: 0; 0; 0
-      Name: Voxblox_Feature
-      Position Transformer: XYZ
-      Queue Size: 10
-      Selectable: true
-      Size (Pixels): 3
-      Size (m): 0.10000000149011612
-      Style: Flat Squares
-      Topic: /planner/voxblox_node/uncertainty_pointcloud
-      Unreliable: false
-      Use Fixed Frame: true
-      Use rainbow: true
-      Value: true
+      Name: Voxblox
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -231,7 +253,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 12.890668869018555
+      Distance: 7.143970012664795
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -239,29 +261,29 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -0.04735568165779114
-        Y: 0.0716920793056488
-        Z: -0.27232086658477783
-      Focal Shape Fixed Size: true
+        X: 0
+        Y: 0
+        Z: 0
+      Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.7297963500022888
+      Pitch: -0.10460174083709717
       Target Frame: <Fixed Frame>
-      Yaw: 3.6853973865509033
+      Yaw: 2.6753976345062256
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 911
+  Height: 881
   Hide Left Dock: false
   Hide Right Dock: false
   Image_Depth:
     collapsed: false
   Image_RGB:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd00000004000000000000026d000002f0fc020000000bfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005d00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003e000002f0000000cb00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb000000120049006d006100670065005f0052004700420000000283000000ab0000001600fffffffb0000000c00430061006d006500720061000000026d000000c10000000000000000fb000000160049006d006100670065005f00440065007000740068000000026d000000c10000001600ffffff000000010000010f000002f0fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000003e000002f0000000a500fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000007220000003efc0100000002fb0000000800540069006d00650100000000000007220000033700fffffffb0000000800540069006d006501000000000000045000000000000000000000039a000002f000000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000004000000000000026d000002d2fc020000000bfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005d00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003e000002d2000000cb00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb000000120049006d006100670065005f0052004700420000000265000000ab0000001600fffffffb0000000c00430061006d006500720061000000026d000000c10000000000000000fb000000160049006d006100670065005f00440065007000740068000000026d000000c10000001600ffffff000000010000010f000002d2fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000003e000002d2000000a500fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000006400000003efc0100000002fb0000000800540069006d00650100000000000006400000033700fffffffb0000000800540069006d00650100000000000004500000000000000000000002b8000002d200000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -270,6 +292,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 1826
-  X: 50
-  Y: 80
+  Width: 1600
+  X: -1
+  Y: -20
