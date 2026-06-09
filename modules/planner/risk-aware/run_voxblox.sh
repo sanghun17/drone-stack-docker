@@ -6,9 +6,11 @@
 
 # (host) auto-enter the dsd container; (inside) run the node.
 if [ ! -f /.dockerenv ]; then
-  __C=drone-stack-d435i-voxblox; docker start "$__C" >/dev/null 2>&1
+  __C=drone-stack-d435i-voxblox
   __S="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
   __R="$(cd "$(dirname "$__S")/../../.." && pwd)"
+  source "$__R/modules/ensure_container.sh"   # recreate $__C if missing / stale-mounted (repo moved)
+  docker start "$__C" >/dev/null 2>&1
   __TT=$([ -t 1 ] && echo -it || echo -i)
   # Ctrl+C here -> stop the launch INSIDE the container too. docker exec does not
   # reliably forward SIGINT, so do it explicitly: SIGINT roslaunch (clean node

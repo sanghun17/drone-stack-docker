@@ -23,12 +23,10 @@ rm -rf /var/lib/apt/lists/*
 # --- geographiclib datasets (mavros runtime needs them) ---
 wget -qO- https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh | bash || true
 
-# interactive-shell convenience: auto-source ROS + the workspaces (if built) for `dsd`
+# interactive-shell convenience: hook the ROS env for `dsd`. The actual source list
+# lives in config/interactive_ros.sh (mounted at /work — edit-and-go, no rebuild).
 cat >> /root/.bashrc <<'RC'
 
 # drone-stack: ROS env for interactive shells
-source /opt/ros/noetic/setup.bash
-[ -f /work/ws/risk-aware/devel/setup.bash ] && source /work/ws/risk-aware/devel/setup.bash
-[ -f /work/ws/fast-livo/devel/setup.bash ] && source /work/ws/fast-livo/devel/setup.bash
-[ -f /work/config/ros_env.sh ] && source /work/config/ros_env.sh   # ROS_MASTER_URI / ROS_IP (single source)
+[ -f /work/config/interactive_ros.sh ] && source /work/config/interactive_ros.sh
 RC
