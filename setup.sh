@@ -16,7 +16,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck disable=SC1091
 [ -f "$ROOT/config/stack.env" ] && source "$ROOT/config/stack.env"
-PORT="${ROS_MASTER_PORT:-11399}"
+PORT="${ROS_MASTER_PORT:-11311}"
 
 ARCH=$(uname -m); case "$ARCH" in aarch64) ARCH=arm64;; x86_64) ARCH=amd64;; esac
 
