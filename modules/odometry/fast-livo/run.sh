@@ -25,9 +25,9 @@ source /opt/ros/noetic/setup.bash
 source /work/ws/fast-livo/devel/setup.bash
 source /work/config/ros_env.sh   # ROS_MASTER_URI / ROS_IP — single source, edit-and-go
 
-if ! pgrep -f "roscore -p ${ROS_MASTER_PORT}" >/dev/null 2>&1; then
-  roscore -p "${ROS_MASTER_PORT}" >/tmp/roscore_${ROS_MASTER_PORT}.log 2>&1 &
-  sleep 4
-fi
+source /work/modules/ensure_roscore.sh   # master up on $ROS_MASTER_PORT — TCP probe, not a blind sleep 4
 
-exec roslaunch fast_livo mapping_d435i.launch "$@"
+# CPUS_POOL pins roslaunch + the helper nodes (smart_tf_bridge, static tf) OFF the
+# camera cores 0-1 AND off fast-livo's own cores; the mapping node itself overrides
+# this via its launch-prefix (taskset CPUS_FASTLIVO) in mapping_d435i.launch.
+exec taskset -c "${CPUS_POOL:?config/ros_env.sh not sourced}" roslaunch fast_livo mapping_d435i.launch "$@"

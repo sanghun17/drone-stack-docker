@@ -28,10 +28,9 @@ source /work/ws/risk-aware/devel/setup.bash
 source /work/config/ros_env.sh   # ROS_MASTER_URI / ROS_IP — single source, edit-and-go
 [ -n "${FCU_URL:-}" ] && export FCU_URL   # let px4.launch read it via $(optenv FCU_URL ...); value lives in the launch
 
-if ! pgrep -f "roscore -p ${ROS_MASTER_PORT}" >/dev/null 2>&1; then
-  roscore -p "${ROS_MASTER_PORT}" >/tmp/roscore_${ROS_MASTER_PORT}.log 2>&1 & sleep 4
-fi
+source /work/modules/ensure_roscore.sh   # master up on $ROS_MASTER_PORT — TCP probe, not a blind sleep 4
 
 # px4.launch = PX4-flavoured MAVROS. All params (fcu_url, gcs_url) are managed IN
 # px4.launch — never pass them inline here (roslaunch silently ignores empty `arg:=`).
-exec roslaunch mavros px4.launch "$@"
+# CPUS_POOL (config/ros_env.sh): stay OFF camera cores 0-1 (uvc watchdog protection).
+exec taskset -c "${CPUS_POOL:?config/ros_env.sh not sourced}" roslaunch mavros px4.launch "$@"

@@ -1,6 +1,26 @@
 <launch>
   <!-- D435i for FAST-LIVO + voxblox on Jetson Orin (onboard USB hub).
-       enable_sync    : false, the HW-clock syncer otherwise breaks depth/color
+       initial_reset  : true. The D435i motion module often enumerates (gyro/accel
+                        TF frames appear) yet streams ZERO samples after an unclean
+                        stop, so /camera/imu goes silent -> fast-livo sync_packages()
+                        never completes -> /aft_mapped_to_init dead, even while
+                        depth/color/pointcloud keep flowing. A HW reset on startup
+                        clears that stuck motion module (== the "replug the camera"
+                        remedy run.sh mentions, automated). Costs ~3-5s at startup.
+       enable_sync    : true. Syncs ONLY the depth/color/IR VIDEO frames (cuts the
+                        "No stream match for pointcloud texture" warnings). The IMU
+                        is NOT synced: the motion sensor bypasses _syncer and
+                        streams on its own callback (verified in realsense2_camera
+                        2.3.2 base_realsense_node.cpp; IMU uses unite_imu_method,
+                        separate). NOT implicated in the startup "IMU and LiDAR not
+                        synced! delta: -N" storm — that storm is the uvc streamer
+                        watchdog restarting the VIDEO streams (depth/color dark
+                        10-25s, IMU endpoint survives) when fast-livo's nice -15
+                        startup burst preempts the camera's libusb threads. Fixed
+                        by CPU fencing: camera on cores 0-1 (run.sh taskset),
+                        fast-livo on 2-3 (mapping_d435i.launch launch-prefix).
+                        Verified with sync=true + an independent rostopic delay
+                        probe: steady 130ms, no growth, 10.0Hz.
        allow_no_texture_points : keep publishing points even without a color match
        All params live HERE, not on the roslaunch command line. -->
   <include file="$(find realsense2_camera)/launch/rs_camera.launch">
@@ -13,9 +33,10 @@
     <arg name="enable_gyro"             value="true"/>
     <arg name="enable_accel"            value="true"/>
     <arg name="unite_imu_method"        value="linear_interpolation"/>
+    <arg name="initial_reset"           value="true"/>  <!-- HW-reset on start: wakes the stuck D435i motion module so /camera/imu actually streams -->
     <arg name="filters"                 value="pointcloud"/>
     <arg name="allow_no_texture_points" value="true"/>
-    <arg name="enable_sync"             value="false"/>
+    <arg name="enable_sync"             value="true"/>
     <arg name="clip_distance"           value="6.0"/>  <!-- cap depth/pointcloud at 6m (D435i depth degrades past ~6m) -->
   </include>
 
@@ -38,7 +59,11 @@
        on a 15Hz source keeps every OTHER frame -> only 7.5Hz.
        IMU stays full-rate (~200Hz) on /camera/imu: high IMU rate fills the gaps
        between the slower 10Hz lidar/image frames (propagation). -->
-  <node pkg="d435i_tools" type="paired_drop.py" name="paired_drop_10hz" output="screen">
+  <node pkg="d435i_tools" type="paired_drop.py" name="paired_drop_10hz" output="screen"
+        launch-prefix="taskset -c $(env CPUS_POOL)">
+    <!-- launch-prefix moves this relay (~0.2 core, nice 0) OUT of the camera fence
+         it would inherit from run.sh's taskset: cores 0-1 stay EXCLUSIVE to the
+         driver's libusb/uvc threads (uvc watchdog protection). -->
     <param name="keep"  value="2"/>
     <param name="every" value="3"/>
     <param name="slop"  value="0.025"/>  <!-- pair if |stamp diff| <= 25ms (frames are 67ms apart) -->

@@ -34,26 +34,34 @@ fi
 # (1) ensure Xvfb:$DN + x11vnc:$P + websockify:$WP + the app are up (liveness-checked, not pgrep)
 docker exec -i "$C" env DN="$DN" P="$P" WP="$WP" PROC="$APPNAME" W="$W" bash -s -- "$@" <<'EOSH'
 D=":$DN"
+# CPU coremap (config/ros_env.sh): the WHOLE VNC stack (Xvfb/openbox/x11vnc/
+# websockify + the app) goes in CPUS_POOL — cores 0-1 are the camera's (uvc
+# watchdog) and 2-3 are fast-livo's. Source it here so the infra blocks below
+# see CPUS_POOL too, not just the app block. nice +10: visualization YIELDS to
+# the autonomy nodes sharing the pool (voxblox/planner/jax) under contention;
+# when they're idle it still gets every spare cycle.
+source /work/config/ros_env.sh
+T="taskset -c ${CPUS_POOL:?config/ros_env.sh not sourced} nice -n 10"
 # Xvfb on its own display
 if ! xdpyinfo -display "$D" >/dev/null 2>&1; then
   rm -f "/tmp/.X${DN}-lock" "/tmp/.X11-unix/X${DN}" 2>/dev/null
-  nohup Xvfb "$D" -screen 0 1600x900x24 >"/tmp/xvfb${DN}.log" 2>&1 &
+  nohup $T Xvfb "$D" -screen 0 1600x900x24 >"/tmp/xvfb${DN}.log" 2>&1 &
   for i in $(seq 1 20); do xdpyinfo -display "$D" >/dev/null 2>&1 && break; sleep 0.5; done
 fi
 # window manager — gives the app a title bar/border so you can move/resize/maximize it. One openbox/display.
 if ! xprop -display "$D" -root _NET_SUPPORTING_WM_CHECK 2>/dev/null | grep -q "window id"; then
-  DISPLAY="$D" nohup openbox >"/tmp/openbox${DN}.log" 2>&1 & sleep 1
+  DISPLAY="$D" nohup $T openbox >"/tmp/openbox${DN}.log" 2>&1 & sleep 1
 fi
 # x11vnc on its own port (localhost-only; websockify is the LAN-facing door). -wait/-defer = poll/defer ms.
 if ! python3 -c "import socket;s=socket.socket();s.settimeout(1);s.connect(('127.0.0.1',$P));s.close()" 2>/dev/null; then
-  nohup x11vnc -display "$D" -localhost -nopw -forever -shared -rfbport "$P" -wait "$W" -defer "$W" >"/tmp/x11vnc${P}.log" 2>&1 &
+  nohup $T x11vnc -display "$D" -localhost -nopw -forever -shared -rfbport "$P" -wait "$W" -defer "$W" >"/tmp/x11vnc${P}.log" 2>&1 &
   for i in $(seq 1 10); do python3 -c "import socket;s=socket.socket();s.settimeout(1);s.connect(('127.0.0.1',$P));s.close()" 2>/dev/null && break; sleep 0.5; done
 fi
 # websockify: serve noVNC + bridge the web port -> the vnc port, so a plain BROWSER can view (zero install).
 # 0.0.0.0 = reachable on the LAN. NOTE: no auth (matches x11vnc -nopw); lock down with a vnc password or a
 # websockify --auth-plugin/token if this host is on an untrusted network.
 if ! python3 -c "import socket;s=socket.socket();s.settimeout(1);s.connect(('127.0.0.1',$WP));s.close()" 2>/dev/null; then
-  nohup websockify --web=/opt/novnc "0.0.0.0:$WP" "localhost:$P" >"/tmp/websockify${WP}.log" 2>&1 &
+  nohup $T websockify --web=/opt/novnc "0.0.0.0:$WP" "localhost:$P" >"/tmp/websockify${WP}.log" 2>&1 &
   for i in $(seq 1 10); do python3 -c "import socket;s=socket.socket();s.settimeout(1);s.connect(('127.0.0.1',$WP));s.close()" 2>/dev/null && break; sleep 0.5; done
 fi
 # the app, on this display — confirm by a real window (not pgrep, which zombies fool)
@@ -62,8 +70,9 @@ if ! xwininfo -display "$D" -root -tree 2>/dev/null | grep -qi "$PROC"; then
   [ -f /work/ws/risk-aware/devel/setup.bash ] && source /work/ws/risk-aware/devel/setup.bash
   [ -f /work/config/ros_env.sh ] && source /work/config/ros_env.sh
   export XDG_RUNTIME_DIR=/tmp/runtime-root; mkdir -p "$XDG_RUNTIME_DIR"; chmod 700 "$XDG_RUNTIME_DIR"
+  # rviz is ~2.3 cores of llvmpipe software GL — pool + nice +10 ($T above).
   DISPLAY="$D" __GLX_VENDOR_LIBRARY_NAME=mesa LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe \
-    nohup "$@" >"/tmp/${PROC}.log" 2>&1 &
+    nohup $T "$@" >"/tmp/${PROC}.log" 2>&1 &
   for i in $(seq 1 20); do xwininfo -display "$D" -root -tree 2>/dev/null | grep -qi "$PROC" && break; sleep 1; done
 fi
 EOSH

@@ -33,7 +33,6 @@ source /work/config/ros_env.sh   # ROS_MASTER_URI / ROS_IP — single source, ed
 }
 JAX="${HOME}/risk-aware_planning/src/mav_active_3d_planning/local_planner_mpc/jax_main_node_ros_new.py"
 
-if ! pgrep -f "roscore -p ${ROS_MASTER_PORT}" >/dev/null 2>&1; then
-  roscore -p "${ROS_MASTER_PORT}" >/tmp/roscore_${ROS_MASTER_PORT}.log 2>&1 & sleep 4
-fi
-exec python3 "${JAX}" --gpu 0 --planner motion_primitives --mode exploration "$@"
+source /work/modules/ensure_roscore.sh   # master up on $ROS_MASTER_PORT — TCP probe, not a blind sleep 4
+# CPUS_POOL (config/ros_env.sh): stay OFF camera cores 0-1 (uvc watchdog, see run_voxblox.sh).
+exec taskset -c "${CPUS_POOL:?config/ros_env.sh not sourced}" python3 "${JAX}" --gpu 0 --planner motion_primitives --mode exploration "$@"

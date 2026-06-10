@@ -27,7 +27,6 @@ set -e
 source /opt/ros/noetic/setup.bash
 source /work/ws/risk-aware/devel/setup.bash
 source /work/config/ros_env.sh   # ROS_MASTER_URI / ROS_IP — single source, edit-and-go
-if ! pgrep -f "roscore -p ${ROS_MASTER_PORT}" >/dev/null 2>&1; then
-  roscore -p "${ROS_MASTER_PORT}" >/tmp/roscore_${ROS_MASTER_PORT}.log 2>&1 & sleep 4
-fi
-exec roslaunch active_3d_planning_app_reconstruction real_planning.launch "$@"
+source /work/modules/ensure_roscore.sh   # master up on $ROS_MASTER_PORT — TCP probe, not a blind sleep 4
+# CPUS_POOL (config/ros_env.sh): stay OFF camera cores 0-1 (uvc watchdog, see run_voxblox.sh).
+exec taskset -c "${CPUS_POOL:?config/ros_env.sh not sourced}" roslaunch active_3d_planning_app_reconstruction real_planning.launch "$@"
