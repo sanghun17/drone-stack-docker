@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!-- Minimal runtime package so roslaunch can resolve <node pkg="d435i_tools"/>
+     (paired_drop.py in this dir). run.sh prepends this dir to ROS_PACKAGE_PATH;
+     nothing is catkin-built. -->
+<package format="2">
+  <name>d435i_tools</name>
+  <version>0.1.0</version>
+  <description>Helper nodes for the D435i module: stamp-matched paired 10Hz decimation.</description>
+  <maintainer email="hmcl@hmcl">hmcl</maintainer>
+  <license>MIT</license>
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+</package>

@@ -30,4 +30,8 @@ if ! pgrep -f "roscore -p ${ROS_MASTER_PORT}" >/dev/null 2>&1; then
   roscore -p "${ROS_MASTER_PORT}" >/tmp/roscore_${ROS_MASTER_PORT}.log 2>&1 & sleep 4
 fi
 
-exec roslaunch "$(dirname "${BASH_SOURCE[0]}")/d435i.launch" "$@"
+MODDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# paired_drop.py lives in this module dir, declared as ROS package "d435i_tools"
+# (package.xml, no catkin build) so roslaunch can resolve <node pkg="d435i_tools"/>.
+export ROS_PACKAGE_PATH="$MODDIR${ROS_PACKAGE_PATH:+:$ROS_PACKAGE_PATH}"
+exec roslaunch "$MODDIR/d435i.launch" "$@"

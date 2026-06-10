@@ -21,13 +21,30 @@
 
   <!-- ===== 10Hz decimation shared by fast-livo (odom) + voxblox (mapping) =====
        D435i has no native 10fps mode (only 6/15/30/60/90), so the camera runs at
-       15Hz and we throttle to 10Hz HERE, once, for both consumers. topic_tools
-       throttle preserves the header stamp -> fast-livo's odom stamp == voxblox's
-       cloud stamp -> exact TF lookup match, fewer "queue too long" drops.
+       15Hz and we decimate to 10Hz HERE, once, for both consumers.
+       paired_drop.py (pkg d435i_tools, this dir) pairs image+cloud BY HEADER
+       STAMP first, then ONE counter keeps 2 of every 3 PAIRS -> 15*2/3 = 10.0Hz
+       (mean; spacing alternates ~67/133ms since 10 isn't an even divisor of 15).
+       Header stamps pass through untouched, so fast-livo's odom stamp ==
+       voxblox's cloud stamp -> exact TF lookup match, no "queue too long" drops.
+       WHY NOT two `topic_tools drop 1 3` relays (previous setup): drop is a
+       per-message COUNTER, so each relay's surviving frame subset depends on
+       which frame it happened to see first after a (re)start. When the two
+       phases land misaligned (random, e.g. the uvc watchdog restarting the
+       video streams) the topics share only 1-in-3 frames -> fast-livo odom at
+       exactly 5Hz + endless "No point!!!". One counter over PAIRS makes the two
+       outputs carry the same frame subset by construction.
+       WHY NOT `throttle messages 10`: its "publish if elapsed >= 1/rate" rule
+       on a 15Hz source keeps every OTHER frame -> only 7.5Hz.
        IMU stays full-rate (~200Hz) on /camera/imu: high IMU rate fills the gaps
        between the slower 10Hz lidar/image frames (propagation). -->
-  <node pkg="topic_tools" type="throttle" name="cloud_throttle_10hz"
-        args="messages /camera/depth/color/points 10.0 /camera/depth/color/points_10hz"/>
-  <node pkg="topic_tools" type="throttle" name="image_throttle_10hz"
-        args="messages /camera/color/image_raw 10.0 /camera/color/image_raw_10hz"/>
+  <node pkg="d435i_tools" type="paired_drop.py" name="paired_drop_10hz" output="screen">
+    <param name="keep"  value="2"/>
+    <param name="every" value="3"/>
+    <param name="slop"  value="0.025"/>  <!-- pair if |stamp diff| <= 25ms (frames are 67ms apart) -->
+    <remap from="image_in"  to="/camera/color/image_raw"/>
+    <remap from="image_out" to="/camera/color/image_raw_10hz"/>
+    <remap from="cloud_in"  to="/camera/depth/color/points"/>
+    <remap from="cloud_out" to="/camera/depth/color/points_10hz"/>
+  </node>
 </launch>
