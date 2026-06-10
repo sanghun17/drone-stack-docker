@@ -34,7 +34,14 @@
     <arg name="enable_accel"            value="true"/>
     <arg name="unite_imu_method"        value="linear_interpolation"/>
     <arg name="initial_reset"           value="true"/>  <!-- HW-reset on start: wakes the stuck D435i motion module so /camera/imu actually streams -->
-    <arg name="filters"                 value="pointcloud"/>
+    <!-- spatial: edge-preserving smoothing at FULL 640x480 — suppresses depth
+         speckle without touching resolution. decimation: deliberately OFF —
+         it would quarter the cloud fast-livo registers against (the 10cm
+         VoxelGrid downsample exists only on the voxblox branch, so resolution
+         lost here is lost for odometry too). temporal: deliberately OFF — on
+         a moving platform it trails ghosts that would be carved into the map
+         as fake structure. -->
+    <arg name="filters"                 value="spatial,pointcloud"/>
     <arg name="allow_no_texture_points" value="true"/>
     <arg name="enable_sync"             value="true"/>
     <arg name="clip_distance"           value="6.0"/>  <!-- cap depth/pointcloud at 6m (D435i depth degrades past ~6m) -->
@@ -71,5 +78,31 @@
     <remap from="image_out" to="/camera/color/image_raw_10hz"/>
     <remap from="cloud_in"  to="/camera/depth/color/points"/>
     <remap from="cloud_out" to="/camera/depth/color/points_10hz"/>
+  </node>
+
+  <!-- IR emitter at max power (default 150/360): denser projector pattern ->
+       better stereo matching indoors. dynparam blocks until the driver's
+       reconfigure server is up, sets the value once, exits (exit is fine:
+       the node is not required). Power draw is irrelevant here. -->
+  <node pkg="dynamic_reconfigure" type="dynparam" name="set_laser_power"
+        args="set /camera/stereo_module laser_power 360"/>
+
+  <!-- Depth-noise debug view: cloud projected on the color image, distance-
+       colored (red=near) -> /camera/depth_overlay. Computes NOTHING until
+       someone subscribes (1s poll), so it is free to keep launched here.
+       Off the camera cores for the same reason as paired_drop above. -->
+  <node pkg="d435i_tools" type="depth_overlay.py" name="depth_overlay" output="screen"
+        respawn="true" launch-prefix="taskset -c $(env CPUS_POOL)">
+    <!-- respawn: lets us apply new params live (rosparam set + kill -> fresh read) -->
+    <param name="range_min" value="0.3"/>
+    <param name="range_max" value="6.0"/>  <!-- match clip_distance -->
+    <param name="point_px"     value="2"/>    <!-- 2x2 dots, but alpha-blended (1px too faint, opaque 2x2 hid the RGB) -->
+    <param name="alpha"        value="0.55"/>
+    <param name="point_stride" value="2"/>    <!-- every 2nd point: keeps cb < 100ms/frame -->
+    <remap from="image_in"    to="/camera/color/image_raw_10hz"/>
+    <remap from="cloud_in"    to="/camera/depth/color/points_10hz"/>
+    <remap from="image_out"   to="/camera/depth_overlay"/>
+    <remap from="camera_info" to="/camera/color/camera_info"/>
+    <remap from="extrinsics"  to="/camera/extrinsics/depth_to_color"/>
   </node>
 </launch>
