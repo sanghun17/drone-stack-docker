@@ -1,8 +1,17 @@
 name: mavros
 group: control
-description: MAVROS bridge to the PX4 FCU (px4.launch, fcu_url from config/stack.env). mavros is vendored + built in the risk-aware workspace, so no extra image deps.
+description: MAVROS bridge to the PX4 FCU (px4.launch, fcu_url from config/stack.env). mavros itself is vendored + built in the risk-aware workspace; the image only needs GeographicLib (libs + datasets).
 
 needs: [planner/risk-aware]     # mavros lives in ws/risk-aware (built by planner/risk-aware)
+
+deps:
+  # GeographicLib: link dep for the ws build + runtime datasets (moved OUT of base
+  # on purpose — keeps the base layer frozen so compute layers never rebuild)
+  apt:
+    - geographiclib-tools
+    - libgeographic-dev
+  source:
+    - install.sh              # geographiclib datasets download
 
 mounts:
   - "/dev:/dev"                 # FCU serial (e.g. /dev/ttyUSB0)

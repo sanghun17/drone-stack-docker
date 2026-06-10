@@ -29,9 +29,7 @@ deps:
     - libeigen3-dev
     - usbutils
     - udev
-    - geographiclib-tools
-    - libgeographic-dev
-  # ROS Noetic needs an apt repo added first -> install.sh (+ rosdep init + geo datasets)
+  # ROS Noetic needs an apt repo added first -> install.sh (+ rosdep init)
   source:
     - install.sh
 

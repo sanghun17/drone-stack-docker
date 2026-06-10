@@ -2,12 +2,17 @@
 # Mirrors the legacy pure-jetson-stack (arm64 / Jetson Orin). planner/risk-aware
 # auto-pulls compute/{torch,spconv,jax} via its `needs:`.
 arch: [arm64]
+# Order = Dockerfile layer order: most-expensive/most-stable first, churniest last,
+# so an edit only rebuilds layers BELOW it. Hours-long compute builds right after base;
+# risk-aware (active dev: pip list churns) and GUI utilities at the bottom.
 modules:
+  - compute/torch         # hours to build — keep at the top, right after base
+  - compute/spconv
+  - compute/jax
+  - odometry/fast-livo    # source build, stable
   - sensor/realsense-d435i
-  - odometry/fast-livo
-  - planner/risk-aware
+  - planner/risk-aware    # apt+pip lists churn with planner dev -> below the heavy layers
   - control/mavros
-  # GUI utilities last (after the expensive compute layers) so editing them never rebuilds
-  # torch/spconv/jax. Both pull utility/gui-vnc (Xvfb+VNC) via `needs:`.
+  # Both GUIs pull utility/gui-vnc (Xvfb+VNC) via `needs:`.
   - utility/rviz          # rviz       -> scripts/utility_rviz.sh
   - utility/rqt           # rqt + plugins -> scripts/utility_rqt.sh

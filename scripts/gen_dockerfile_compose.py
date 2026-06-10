@@ -93,6 +93,12 @@ def gen_dockerfile(mods, arch, env):
     # bind-mount (see the RUN --mount lines below), so nothing from modules/ — not the
     # scripts, not the jax wheel — is baked into the image. No /modules at runtime;
     # the only modules tree in a running container is the /work bind-mount (the live repo).
+    #
+    # CACHE: BuildKit hashes the CONTENT of every bind-mounted path into the layer's
+    # cache key (verified: a whole-`modules/` mount re-runs on ANY file edit under
+    # modules/, even an unrelated run.sh). So each RUN mounts ONLY its own install
+    # script + the module's declared `assets:` — editing run scripts / launch files /
+    # other modules never invalidates an install layer.
     L.append("")
 
     for m in mods:
@@ -114,9 +120,13 @@ def gen_dockerfile(mods, arch, env):
             L.append("RUN python3 -m pip install --no-cache-dir \\")
             L.append("      " + " ".join('"%s"' % p for p in pip))
         for s in src:
-            # transient bind-mount: modules/ is available during THIS RUN only, never baked in
-            L.append("RUN --mount=type=bind,source=modules,target=/modules "
-                     "TARGETARCH=%s bash /modules/%s/%s" % (arch, path, s))
+            # transient bind-mounts, scoped to this module's script (+ declared assets)
+            # so the layer's cache key ignores everything else under modules/
+            binds = [(s, True)] + [(a, False) for a in (m.get("assets") or [])]
+            mnt = " \\\n    ".join(
+                "--mount=type=bind,source=modules/%s/%s,target=/modules/%s/%s"
+                % (path, f, path, f) for f, _ in binds)
+            L.append("RUN %s \\\n    TARGETARCH=%s bash /modules/%s/%s" % (mnt, arch, path, s))
         L.append("")
     return "\n".join(L) + "\n"
 

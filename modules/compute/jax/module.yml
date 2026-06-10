@@ -7,6 +7,8 @@ needs: [compute/spconv]     # ordering: after torch/spconv (shares CUDA env)
 deps:
   source: [install.sh]      # jaxlib (baked wheel, else source) + jax + flax/optax ecosystem
 
+assets: [wheels]            # extra files install.sh reads (bind-mounted into its RUN)
+
 provides: [jax, jaxlib, flax, optax]
 
 # NOTE: install.sh prefers a baked wheel at modules/compute/jax/wheels/jaxlib-*.whl
