@@ -22,3 +22,6 @@ __pycache__/
 .vscode/
 .idea/
 .nfs*
+
+# profiling output dumped by jax_main_node_ros_new.py --profiling_* (pkl + png)
+/profiling_results/
