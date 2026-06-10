@@ -31,7 +31,10 @@ deps:
     - open3d
     - tqdm
     - trimesh
-    - pyvista
+    # pyvista DROPPED 2026-06-10: only the offline eval script
+    # (uncertainty_predictor/.../evaluate/plot_trajectory_on_mesh.py) imports it, and
+    # pip's aarch64 pairing is broken (pyvista 0.44 + vtk 9.5 wheel lacks vtkCapsuleSource).
+    # Re-add WITH version pins if that script ever needs to run on the Jetson.
 
 # source + workspace live under the repo at ws/risk-aware (-> /work/ws/risk-aware),
 # cloned by `setup.sh clone`. Only the external model weights are mounted.
