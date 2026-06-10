@@ -15,7 +15,7 @@ if [ ! -f /.dockerenv ]; then
   # teardown). roscore is left alone — it's the shared master other modules use.
   __M="roslaunch fast_livo mapping_d435i.launch"
   cleanup(){ docker exec "$__C" pkill -INT -f "$__M" >/dev/null 2>&1; }
-  trap 'cleanup; exit 130' INT TERM
+  trap 'cleanup; exit 130' INT TERM HUP
   docker exec $__TT "$__C" bash "/work/${__S#$__R/}" "$@"; __rc=$?
   cleanup            # also catch crash/normal exit that orphaned nodes
   exit $__rc

@@ -16,7 +16,7 @@ if [ ! -f /.dockerenv ]; then
   # shutdown). roscore is left alone — it's the shared master other modules use.
   __M="jax_main_node_ros_new.py"
   cleanup(){ docker exec "$__C" pkill -INT -f "$__M" >/dev/null 2>&1; }
-  trap 'cleanup; exit 130' INT TERM
+  trap 'cleanup; exit 130' INT TERM HUP
   docker exec $__TT "$__C" bash "/work/${__S#$__R/}" "$@"; __rc=$?
   cleanup            # also catch crash/normal exit that orphaned the node
   exit $__rc
