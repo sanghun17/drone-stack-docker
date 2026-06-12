@@ -4,6 +4,7 @@ description: OptiTrack mocap pose via vrpn_client_ros (ros-drivers, kinetic-deve
 
 deps:
   apt:
+    - netbase                # /etc/protocols — vrpn getprotobyname() fails without it (no handshake)
     - ros-noetic-vrpn        # VRPN lib (find_package(VRPN) in vrpn_client_ros)
     - ros-noetic-tf2-ros     # not in ros-base; broadcast_tf + client build dep
 
