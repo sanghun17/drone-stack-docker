@@ -16,3 +16,4 @@ modules:
   # Both GUIs pull utility/gui-vnc (Xvfb+VNC) via `needs:`.
   - utility/rviz          # rviz       -> scripts/utility_rviz.sh
   - utility/rqt           # rqt + plugins -> scripts/utility_rqt.sh
+  - odometry/optitrack    # vrpn_client_ros (tiny apt layer) — appended LAST so heavy layers stay cached

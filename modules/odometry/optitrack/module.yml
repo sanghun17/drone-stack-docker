@@ -1,0 +1,15 @@
+name: optitrack
+group: odometry
+description: OptiTrack mocap pose via vrpn_client_ros (ros-drivers, kinetic-devel — ROS1, builds clean on noetic). Publishes /vrpn_client_node/<Tracker>/pose. Server IP from config/stack.env OPTITRACK_SERVER.
+
+deps:
+  apt:
+    - ros-noetic-vrpn        # VRPN lib (find_package(VRPN) in vrpn_client_ros)
+    - ros-noetic-tf2-ros     # not in ros-base; broadcast_tf + client build dep
+
+# source + workspace live under the repo at ws/optitrack (-> /work/ws/optitrack),
+# cloned by `setup.sh clone`. No external mount (the repo is mounted at /work).
+workspace: /work/ws/optitrack
+clone: clone.sh
+run: [run.sh]
+provides: [mocap, pose-gt]
