@@ -1,21 +1,26 @@
 <launch>
-  <!-- OptiTrack via VRPN. ALL params live HERE (never inline key:=val in run scripts).
-       Server IP = lab mocap PC (Motive). Value comes from config/stack.env
-       OPTITRACK_SERVER via optenv — edit-and-go, no rebuild.
-       Topics: /vrpn_client_node/<TrackerName>/pose (one per rigid body in Motive,
-       trackers auto-discovered at refresh_tracker_frequency). -->
+  <!-- OptiTrack via VRPN. Server IP = OPTITRACK_SERVER (config/stack.env). -->
   <node pkg="vrpn_client_ros" type="vrpn_client_node" name="vrpn_client_node" output="screen"
         launch-prefix="taskset -c $(env CPUS_POOL)">
     <rosparam subst_value="true">
-      server: $(optenv OPTITRACK_SERVER 192.168.50.10)
+      server: $(optenv OPTITRACK_SERVER 192.168.50.13)
       port: 3883
       update_frequency: 100.0
       frame_id: world
-      <!-- Use the Jetson's receive time, NOT the mocap PC clock (hosts are not
-           NTP-synced; EKF2/fast-livo consumers need stamps in local time). -->
-      use_server_time: false
+      use_server_time: false   <!-- Jetson receive time; mocap PC is not NTP-synced -->
       broadcast_tf: true
       refresh_tracker_frequency: 1.0
     </rosparam>
   </node>
+
+  <!-- tracker pose -> /mavros/vision_pose/pose @30Hz. Relayed VERBATIM —
+       verify Motive-axis vs ENU alignment before arming (VERIFY-BEFORE-FLIGHT). -->
+  <arg name="tracker" default="pure"/>
+  <node pkg="topic_tools" type="throttle" name="vision_pose_throttle" output="screen"
+        launch-prefix="taskset -c $(env CPUS_POOL)"
+        args="messages /vrpn_client_node/$(arg tracker)/pose 30.0 /mavros/vision_pose/pose"/>
+  <!-- prints the first relayed pose once, then exits -->
+  <node pkg="rostopic" type="rostopic" name="vision_pose_announce" output="screen"
+        launch-prefix="taskset -c $(env CPUS_POOL)"
+        args="echo -n1 /mavros/vision_pose/pose/pose/position"/>
 </launch>
