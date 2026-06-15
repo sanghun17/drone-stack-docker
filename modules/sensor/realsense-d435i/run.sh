@@ -9,7 +9,7 @@
 # reliable signal — the 'Depth stream start failure' WARN also appears on good starts, so it
 # is NOT used as a trigger), and relaunches on failure. After CAM_TRIES dead starts it prints
 # an unplug/replug instruction and exits non-zero. Tunable via env:
-#   CAM_TRIES (4)   CAM_SETTLE (25s/try)   CAM_GRACE (12s)   CAM_GAP (3s)
+#   CAM_TRIES (4)   CAM_SETTLE (60s/try)   CAM_GRACE (12s)   CAM_GAP (3s)
 
 # (host) auto-enter the dsd container; (inside) run the node.
 if [ ! -f /.dockerenv ]; then
@@ -42,7 +42,7 @@ LAUNCH="$MODDIR/d435i.launch"
 # (package.xml, no catkin build) so roslaunch can resolve <node pkg="d435i_tools"/>.
 export ROS_PACKAGE_PATH="$MODDIR${ROS_PACKAGE_PATH:+:$ROS_PACKAGE_PATH}"
 TRIES="${CAM_TRIES:-4}"     # max launch attempts before giving up
-SETTLE="${CAM_SETTLE:-25}"  # s to wait for streams per attempt (reset ~7s + setup ~7s + margin)
+SETTLE="${CAM_SETTLE:-60}"  # s to wait for streams per attempt (reset ~7s + setup ~7s + margin)
 GRACE="${CAM_GRACE:-12}"    # s before first stream probe (reset+setup still running)
 GAP="${CAM_GAP:-3}"         # s between attempts
 LOG=/tmp/realsense_d435i.log
@@ -56,7 +56,19 @@ stop_launch(){
 trap 'printf "\n[camera] interrupted — stopping.\n"; stop_launch; exit 130' INT TERM
 
 probe(){ timeout "${2:-3}" rostopic hz "$1" 2>/dev/null | grep -q "average rate"; }
-streams_up(){ probe /camera/imu 3 && probe /camera/depth/color/points 3 && probe /camera/color/image_raw 3; }
+# color/depth liveness from realsense's own /diagnostics FrequencyStatus (level 0=met, 2=dead).
+# It's a windowed frame count, so it won't be fooled by the single transient frame a 3s
+# `rostopic hz` probe catches just before a USB/MIPI wedge pulls color back down (which is how
+# a wedged color stream slipped past as "UP"). IMU has no FrequencyStatus, so it keeps the probe.
+diag_ok(){
+  timeout "${1:-4}" rostopic echo /diagnostics 2>/dev/null | awk '
+    /level:/ { lvl=$2 }
+    /manager_color: Frequency Status/ { c=lvl; sc=1 }
+    /manager_depth: Frequency Status/ { d=lvl; sd=1 }
+    END { exit (sc && sd && c==0 && d==0) ? 0 : 1 }
+  '
+}
+streams_up(){ probe /camera/imu 3 && diag_ok 4; }
 
 for ((try=1; try<=TRIES; try++)); do
   echo "==================================================================="
@@ -77,7 +89,7 @@ for ((try=1; try<=TRIES; try++)); do
   SECONDS=0
   while [ "$SECONDS" -lt "$SETTLE" ]; do
     if ! kill -0 "$LP" 2>/dev/null; then reason="driver process exited early"; break; fi
-    if [ "$SECONDS" -ge "$GRACE" ] && probe /camera/imu 2 && streams_up; then ok=1; break; fi
+    if [ "$SECONDS" -ge "$GRACE" ] && streams_up; then ok=1; break; fi
     printf "\r[camera] attempt %d/%d  warming up… %2ds/%ds   " "$try" "$TRIES" "$SECONDS" "$SETTLE"
     sleep 1
   done
