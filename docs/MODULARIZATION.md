@@ -55,14 +55,14 @@ stacks/d435i-voxblox.yml         modules/<group>/<name>/
   modules:                         install.sh   # complex/source builds (referenced via deps.source)
     - sensor/realsense-d435i       run*.sh      # launch the module's ROS node(s)
     - odometry/fast-livo
-    - planner/risk-aware   ──►  scripts/gen_dockerfile_compose.py  ──►  .build/<stack>/Dockerfile  + compose.yml
+    - planner/risk-aware   ──►  tools/gen_dockerfile_compose.py  ──►  .build/<stack>/Dockerfile  + compose.yml
                                    (base always first; `needs:` resolved deps-first;
                                     deps unioned arch-aware & de-duped → one image)
 ```
 
 - **`module.yml`** schema: see [MODULE_SCHEMA.md](MODULE_SCHEMA.md). Fields: `name, group,
   base_image{arch}, env, deps{apt,pip,source, <arch>{…}}, mounts, run, needs, provides`.
-- **`scripts/gen_dockerfile_compose.py`** `<stack> [--arch]`: resolve module order (base + stack list +
+- **`tools/gen_dockerfile_compose.py`** `<stack> [--arch]`: resolve module order (base + stack list +
   transitive `needs`), union deps for the arch, emit `FROM base_image[arch]` then one
   `RUN` block per module (its apt → pip → source install.sh). Emits a single `dev` compose
   service with merged mounts.
@@ -82,7 +82,7 @@ stacks/d435i-voxblox.yml         modules/<group>/<name>/
 
 ## 4. Progress
 
-- ✅ **Engine**: `scripts/gen_dockerfile_compose.py` + `setup.sh` ({clone|gen|build|up|build-ws|run|sh|down}). Native per-arch build.
+- ✅ **Engine**: `tools/gen_dockerfile_compose.py` + `setup.sh` ({clone|gen|build|up|build-ws|run|sh|down}). Native per-arch build.
 - ✅ **d435i-voxblox modules** (faithful port of the pure-jetson Dockerfile + run scripts):
   `base` (l4t-jetpack + ROS Noetic), `sensor/realsense-d435i`, `odometry/fast-livo` (Sophus
   a621ff), `compute/{torch,spconv,jax}`, `planner/risk-aware`. `stacks/d435i-voxblox.yml`.

@@ -21,4 +21,4 @@ source /opt/ros/noetic/setup.bash
 source /work/ws/risk-aware/devel/setup.bash
 source /work/config/ros_env.sh
 source /work/modules/ensure_roscore.sh
-exec roslaunch flight_safety safety.launch "$@"
+exec taskset -c "${CPUS_POOL:?config/ros_env.sh not sourced}" roslaunch flight_safety safety.launch "$@"

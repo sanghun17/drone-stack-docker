@@ -29,7 +29,7 @@ need_buildx(){ docker buildx version >/dev/null 2>&1 || {
   echo "  install the buildx CLI plugin -> ~/.docker/cli-plugins/docker-buildx"
   echo "  (releases: https://github.com/docker/buildx/releases , arm64 asset: buildx-*.linux-arm64)"
   exit 1; }; }
-gen(){ python3 "$ROOT/scripts/gen_dockerfile_compose.py" "$stack" --arch "$ARCH"; }
+gen(){ python3 "$ROOT/tools/gen_dockerfile_compose.py" "$stack" --arch "$ARCH"; }
 DF(){ echo "$ROOT/.build/$stack/Dockerfile"; }
 CF(){ echo "$ROOT/.build/$stack/compose.yml"; }
 

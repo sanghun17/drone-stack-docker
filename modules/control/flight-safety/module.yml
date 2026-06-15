@@ -7,6 +7,7 @@ needs: [planner/risk-aware]     # flight_safety builds in ws/risk-aware; uses ma
 deps:
   apt:
     - ros-noetic-diagnostic-updater
+    - ros-noetic-rqt-runtime-monitor   # /diagnostics GUI for scripts/utility_diagnostic.sh
 
 clone: clone.sh
 run: [run_monitor.sh]           # observe-only by default. run_safety.sh (KILL authority) = manual.
