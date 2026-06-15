@@ -1,12 +1,15 @@
 name: optitrack
 group: odometry
-description: OptiTrack mocap pose via vrpn_client_ros (ros-drivers, kinetic-devel — ROS1, builds clean on noetic). Publishes /vrpn_client_node/<Tracker>/pose. Server IP from config/stack.env OPTITRACK_SERVER.
+description: OptiTrack mocap pose via vrpn_client_ros (ros-drivers fork, kinetic-devel — ROS1, builds clean on noetic). Publishes /vrpn_client_node/<Tracker>/pose + in-node /diagnostics (link/rate/dropout/freeze via flight_safety StreamDiagnostic). Server IP from config/stack.env OPTITRACK_SERVER.
+
+needs: [control/flight-safety]   # vrpn_client_ros #includes flight_safety/stream_diagnostic.h (built in ws/risk-aware first)
 
 deps:
   apt:
-    - netbase                # /etc/protocols — vrpn getprotobyname() fails without it (no handshake)
-    - ros-noetic-vrpn        # VRPN lib (find_package(VRPN) in vrpn_client_ros)
-    - ros-noetic-tf2-ros     # not in ros-base; broadcast_tf + client build dep
+    - netbase                       # /etc/protocols — vrpn getprotobyname() fails without it (no handshake)
+    - ros-noetic-vrpn               # VRPN lib (find_package(VRPN) in vrpn_client_ros)
+    - ros-noetic-tf2-ros            # not in ros-base; broadcast_tf + client build dep
+    - ros-noetic-diagnostic-updater # vrpn links libdiagnostic_updater for the in-node self-report
 
 # source + workspace live under the repo at ws/optitrack (-> /work/ws/optitrack),
 # cloned by `setup.sh clone`. No external mount (the repo is mounted at /work).
