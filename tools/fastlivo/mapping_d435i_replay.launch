@@ -1,0 +1,60 @@
+<launch>
+  <!-- FAST-LIVO2 OPEN-LOOP replay: run the odometry node against a recorded bag
+       (no camera, no flight). Driven by tools/fastlivo/replay_fastlivo.sh, which
+       starts this launch, then plays the bag with rosbag clock publishing.
+
+       use_sim_time is MANDATORY: the node stamps /aft_mapped_to_init with
+       ros::Time::now() (LIVMapper.cpp:1359), NOT the sensor stamp. Only under
+       sim time does that stamp track bag time, so the estimate lands on the same
+       clock as the ground-truth (vrpn) recorded in the bag -> eval can align them. -->
+  <param name="/use_sim_time" value="true"/>
+
+  <!-- swap in an edited copy to A/B a calibration change (extrinsics / time_offset /
+       imu cov) without rebuilding, via replay_fastlivo.sh config:=<file> -->
+  <arg name="config"     default="$(find fast_livo)/config/d435i.yaml"/>
+  <arg name="cam_calib"  default="$(find fast_livo)/config/camera_d435i.yaml"/>
+  <!-- true: bag holds RAW /camera/color/image_raw + /camera/depth/color/points,
+       regenerate the 10Hz pair here (identical to the live d435i.launch decimation).
+       false (default): bag already holds the *_10hz topics fast-livo consumes. -->
+  <arg name="paired_drop" default="false"/>
+  <!-- off by default: in analysis we WANT to see a divergence, not kill the node. -->
+  <arg name="odom_guard"  default="false"/>
+
+  <node pkg="tf" type="static_transform_publisher" name="odom_to_camera_init"
+        args="0 0 0 0.5 -0.5 0.5 -0.5 odom camera_init 100"/>
+
+  <rosparam command="load" file="$(arg config)"/>
+  <param name="common/cam_calib_file" value="$(arg cam_calib)"/>
+  <param name="debug/verbose" value="false"/>
+
+  <!-- no taskset/nice: offline replay is not competing with a live camera, so the
+       CPU-fence rationale from mapping_d435i.launch does not apply. -->
+  <node pkg="fast_livo" type="fastlivo_mapping" name="laserMapping" output="screen"/>
+
+  <node pkg="fast_livo" type="smart_static_tf_bridge.py" name="smart_tf_bridge" output="log">
+    <param name="parent" value="aft_mapped"/>
+    <param name="child"  value="camera_imu_optical_frame"/>
+    <param name="x" value="0.0"/> <param name="y" value="0.0"/> <param name="z" value="0.0"/>
+    <param name="qx" value="0.0"/> <param name="qy" value="0.0"/> <param name="qz" value="0.0"/> <param name="qw" value="1.0"/>
+  </node>
+
+  <group if="$(arg paired_drop)">
+    <node pkg="d435i_tools" type="paired_drop.py" name="paired_drop_10hz" output="screen">
+      <param name="keep"  value="2"/>
+      <param name="every" value="3"/>
+      <param name="slop"  value="0.025"/>
+      <remap from="image_in"  to="/camera/color/image_raw"/>
+      <remap from="image_out" to="/camera/color/image_raw_10hz"/>
+      <remap from="cloud_in"  to="/camera/depth/color/points"/>
+      <remap from="cloud_out" to="/camera/depth/color/points_10hz"/>
+    </node>
+  </group>
+
+  <group if="$(arg odom_guard)">
+    <node pkg="fast_livo" type="odom_guard.py" name="odom_guard" output="screen">
+      <param name="max_dist" value="100.0"/>
+      <param name="kill_node" value="/laserMapping"/>
+      <param name="enabled" value="true"/>
+    </node>
+  </group>
+</launch>
