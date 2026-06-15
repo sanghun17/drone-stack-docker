@@ -32,13 +32,12 @@ alive(){ docker exec "$C" bash -lc \
   "source /opt/ros/noetic/setup.bash; source /work/config/ros_env.sh; rosnode list 2>/dev/null | grep -qx $NODE"; }
 if alive; then
   echo ">> restarting monitor (reloads config)"
-  docker exec "$C" pkill -INT -f "$MON" 2>/dev/null || true
-  for _ in $(seq 1 10); do alive || break; sleep 0.5; done
+  docker exec "$C" pkill -INT -f "$MON" 2>/dev/null || true   # no death-wait: relaunch bumps the old name
 fi
 docker exec "$C" bash -lc \
   "source /opt/ros/noetic/setup.bash; source /work/config/ros_env.sh; rosparam delete $NODE" >/dev/null 2>&1 || true
 docker exec -d "$C" bash /work/modules/control/flight-safety/run_monitor.sh
-for _ in $(seq 1 12); do alive && break; sleep 1; done
+for _ in $(seq 1 14); do alive && break; sleep 0.5; done
 if alive; then
   echo ">> monitor node started (DETACHED — stop with: $0 stop)"
 else
@@ -48,10 +47,9 @@ else
   exit 1
 fi
 # (2) rqt_runtime_monitor GUI (reads /diagnostics raw) via the shared headless-VNC launcher.
-# Restart it too: kill the old rqt (a separate docker exec, so pkill excludes its own pid —
-# safe) so _vnc_gui starts a fresh window; this also clears stale diagnostic entries. The VNC
-# infra (Xvfb/x11vnc/websockify) stays up, so the browser just reconnects. Invoke as an rqt
-# plugin, NOT `rqt_runtime_monitor` (that exe is in lib/, rosrun-style, not on PATH).
-docker exec "$C" pkill -f "rqt_runtime_monitor.runtime_monitor" 2>/dev/null || true; sleep 2
+# NOT restarted — rqt_runtime_monitor reads /diagnostics LIVE, so it reflects the monitor's new
+# config automatically; re-running just re-attaches (fast). (For a truly fresh rqt that also
+# drops stale entries, use `stop` then start.) Invoke as an rqt plugin, NOT `rqt_runtime_monitor`
+# (that exe is in lib/, rosrun-style, not on PATH).
 exec "$HERE/_vnc_gui.sh" "$DN" "$VNC" "$WEB" monitor \
   rqt --standalone rqt_runtime_monitor.runtime_monitor.RuntimeMonitor "$@"
