@@ -23,12 +23,25 @@ if [ "${1:-start}" = "stop" ]; then
 fi
 
 docker start "$C" >/dev/null 2>&1
-# (1) monitor node — observe-only, detached (light). Idempotent: start only if absent.
-if docker exec "$C" pgrep -f "$MON" >/dev/null 2>&1; then
-  echo ">> monitor already running"
+# (1) monitor node — observe-only, detached (light). Liveness by rosnode, NOT pgrep: pid1
+# `sleep infinity` never reaps, so a dead/zombie roslaunch fools pgrep. Poll AFTER starting so a
+# silent launch failure (e.g. flight_safety not built) is reported here, not masked downstream.
+NODE=/flight_safety_monitor
+alive(){ docker exec "$C" bash -lc \
+  "source /opt/ros/noetic/setup.bash; source /work/config/ros_env.sh; rosnode list 2>/dev/null | grep -qx $NODE"; }
+if alive; then
+  echo ">> monitor already running ($NODE)"
 else
   docker exec -d "$C" bash /work/modules/control/flight-safety/run_monitor.sh
-  echo ">> monitor node started (DETACHED — stop with: $0 stop)"
+  for _ in $(seq 1 12); do alive && break; sleep 1; done
+  if alive; then
+    echo ">> monitor node started (DETACHED — stop with: $0 stop)"
+  else
+    echo "ERROR: $NODE did not come up — flight_safety is probably not built (or no roscore)."
+    echo "  build it:  ./setup.sh build-ws d435i-voxblox"
+    echo "       (or:  docker exec $C bash -lc 'source /opt/ros/noetic/setup.bash; cd /work/ws/risk-aware; catkin build flight_safety')"
+    exit 1
+  fi
 fi
 # (2) rqt_runtime_monitor GUI (reads /diagnostics) via the shared headless-VNC launcher.
 exec "$HERE/_vnc_gui.sh" "$DN" "$VNC" "$WEB" monitor rqt_runtime_monitor "$@"
