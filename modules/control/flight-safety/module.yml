@@ -1,0 +1,13 @@
+name: flight-safety
+group: control
+description: Flight-safety monitoring + reaction (VRPN/RC fault -> hold/land/kill, geofence, control MUX). Source lives in the risk-aware workspace (sibling of risk_aware_planning), so it builds there and gets mavros_msgs for free.
+
+needs: [planner/risk-aware]     # flight_safety builds in ws/risk-aware; uses mavros_msgs
+
+deps:
+  apt:
+    - ros-noetic-diagnostic-updater
+
+clone: clone.sh
+run: [run_monitor.sh]           # observe-only by default. run_safety.sh (KILL authority) = manual.
+provides: [flight-safety]
