@@ -43,5 +43,9 @@ else
     exit 1
   fi
 fi
-# (2) rqt_runtime_monitor GUI (reads /diagnostics) via the shared headless-VNC launcher.
-exec "$HERE/_vnc_gui.sh" "$DN" "$VNC" "$WEB" monitor rqt_runtime_monitor "$@"
+# (2) rqt_runtime_monitor GUI (reads /diagnostics raw) via the shared headless-VNC launcher.
+# Invoke as an rqt plugin, NOT `rqt_runtime_monitor`: that exe lives in lib/rqt_runtime_monitor/
+# (rosrun-style), not on PATH — `rqt --standalone <class>` is the canonical launch (class string
+# taken from the package's own standalone entry-point / plugin.xml).
+exec "$HERE/_vnc_gui.sh" "$DN" "$VNC" "$WEB" monitor \
+  rqt --standalone rqt_runtime_monitor.runtime_monitor.RuntimeMonitor "$@"
