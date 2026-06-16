@@ -6,13 +6,11 @@
 # the only way to get the viewer + Advanced-Mode Depth Control sliders to tune the edge "flying
 # pixel" drag.
 #
-# WHY system-wide (/usr/local, not an isolated prefix): isolation's only purpose would be to keep
-# the CUDA SDK off the ROS pipeline (JAX GPU contention) — accepted as fine. The VIEWER links this
-# CUDA lib via its rpath. NOTE (verified): the ROS node (realsense2_camera) still loads the APT
-# librealsense from /opt/ros/noetic/lib — ROS setup.bash prepends that to LD_LIBRARY_PATH, which
-# beats ldconfig's /usr/local. So the pipeline stays on the CPU lib by default; to move it onto
-# CUDA, prepend /usr/local/lib to LD_LIBRARY_PATH in the camera launch (separate opt-in, after a
-# JAX-contention check).
+# WHY system-wide (/usr/local, not an isolated prefix): the viewer AND the ROS pipeline use this
+# CUDA librealsense. ROS's setup.bash would otherwise make the node load the apt CPU lib first (it
+# prepends /opt/ros/noetic/lib to LD_LIBRARY_PATH; the nodelet has no RPATH), so we DELETE the apt
+# librealsense libs below — every consumer then resolves our /usr/local CUDA build via ldconfig.
+# Same soname 2.50 -> ABI-compatible. JAX GPU contention on Orin's unified memory is accepted.
 #
 # Version pinned to 2.50.0 to MATCH the apt librealsense realsense2_camera 2.3.2 was built
 # against (same SONAME/ABI, no surprises). Taeyoung96/librealsense-Docker uses 2.47.0 — changed.
@@ -45,7 +43,14 @@ cmake -B build -S . \
   # legacy PYTHON_EXECUTABLE hint) and fails on missing Dev headers. pyrealsense2 isn't needed
   # for the viewer; re-add later with a proper Python3 hint if we want it.
 cmake --build build -j"$JOBS" --target install
-ldconfig   # /usr/local/lib librealsense2 (CUDA) takes precedence over the apt one
+
+# Remove the apt librealsense SDK libs (pulled in by ros-noetic-realsense2-camera) so the ROS node
+# can't load them over our CUDA build via ROS's LD_LIBRARY_PATH. With them gone, the nodelet
+# resolves /usr/local through ldconfig. dpkg still marks the deb installed (harmless in a built
+# image). NOTE the patterns: 'librealsense2.so*' / 'librealsense2-gl.so*' (literal dot) match ONLY
+# the SDK libs — NOT 'librealsense2_camera.so', the wrapper nodelet we must keep.
+find /opt/ros/noetic/lib \( -name 'librealsense2.so*' -o -name 'librealsense2-gl.so*' \) -delete 2>/dev/null || true
+ldconfig
 
 rm -rf "/opt/librealsense-${RS_VER}"   # source tree not needed at runtime; keep the layer small
 
