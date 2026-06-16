@@ -6,7 +6,11 @@ deps:
   apt:
     - ros-noetic-realsense2-camera
     - ros-noetic-realsense2-description
-  # if arm64 apt lacks it, fall back to a librealsense source build (TODO: install.sh)
+  source:
+    # arm64 apt has no realsense-viewer -> source-build librealsense 2.50.0 + CUDA + the
+    # graphical viewer, system-wide. Viewer uses the CUDA lib; the ROS node keeps the apt lib
+    # (ROS LD_LIBRARY_PATH precedence) unless explicitly pointed at /usr/local.
+    - install.sh
 
 mounts:
   - "/dev:/dev"
