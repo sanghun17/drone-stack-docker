@@ -34,14 +34,17 @@
     <arg name="enable_accel"            value="true"/>
     <arg name="unite_imu_method"        value="linear_interpolation"/>
     <arg name="initial_reset"           value="true"/>  <!-- HW-reset on start: wakes the stuck D435i motion module so /camera/imu actually streams -->
-    <!-- spatial: edge-preserving smoothing at FULL 640x480 — suppresses depth
-         speckle without touching resolution. decimation: deliberately OFF —
-         it would quarter the cloud fast-livo registers against (the 10cm
-         VoxelGrid downsample exists only on the voxblox branch, so resolution
-         lost here is lost for odometry too). temporal: deliberately OFF — on
-         a moving platform it trails ghosts that would be carved into the map
-         as fake structure. -->
-    <arg name="filters"                 value="spatial,pointcloud"/>
+    <!-- decimation 3x: ON (was OFF). Full-res pointcloud is ~66ms/frame — right at
+         the 67ms 15fps budget; in the OptiTrack volume the per-frame time spikes
+         over it -> color frames back up -> the color UVC stream starves and dies
+         (watchdog on EP132; depth/IMU survive). decim 3x caps pointcloud at ~18ms
+         (verified back-to-back IN the volume: full-res DIE@27s vs decim SURVIVE)
+         and drops density to ~Mid-360 1s-cumulative (~7 pts/deg^2). fast-livo
+         already thins via point_filter_num:10. magnitude=3 set by the
+         set_decimation dynparam node below (rs_camera.launch has no arg for it).
+         spatial: edge-preserving depth speckle smoothing. temporal: OFF — trails
+         ghosts on a moving platform. -->
+    <arg name="filters"                 value="decimation,spatial,pointcloud"/>
     <arg name="allow_no_texture_points" value="true"/>
     <arg name="enable_sync"             value="true"/>
     <arg name="clip_distance"           value="6.0"/>  <!-- cap depth/pointcloud at 6m (D435i depth degrades past ~6m) -->
@@ -86,6 +89,20 @@
        the node is not required). Power draw is irrelevant here. -->
   <node pkg="dynamic_reconfigure" type="dynparam" name="set_laser_power"
         args="set /camera/stereo_module laser_power 360"/>
+
+  <!-- High Accuracy depth preset (default 0=Custom): raises the matcher confidence
+       threshold so low-confidence pixels are dropped -> kills frame-to-frame speckle
+       AND the edge "flying pixel" shadows that get carved into voxblox as fake walls.
+       Cost: sparser cloud / more holes. Does NOT touch laser_power (verified live).
+       No arg in rs_camera.launch -> set via dynparam, same blocks-until-ready pattern. -->
+  <node pkg="dynamic_reconfigure" type="dynparam" name="set_visual_preset"
+        args="set /camera/stereo_module visual_preset 3"/>
+
+  <!-- decimation magnitude 3 (default 2): 640x480 -> 213x160, ~1/9 points ->
+       pointcloud ~18ms, density ~Mid-360. Same dynparam-blocks-until-ready pattern
+       as set_laser_power. The "decimation" filter must be in <filters> above. -->
+  <node pkg="dynamic_reconfigure" type="dynparam" name="set_decimation"
+        args="set /camera/decimation filter_magnitude 3"/>
 
   <!-- Depth-noise debug view: cloud projected on the color image, distance-
        colored (red=near) -> /camera/depth_overlay. Computes NOTHING until
