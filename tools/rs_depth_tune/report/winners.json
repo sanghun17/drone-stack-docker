@@ -1,0 +1,98 @@
+{
+  "baseline": {
+    "param-leftrightthreshold": 24,
+    "param-neighborthresh": 7,
+    "param-secondpeakdelta": 325,
+    "param-texturedifferencethresh": 0,
+    "fill": 0.9519,
+    "cliff": 1704.35,
+    "floater": 27.75,
+    "noise": 7.33,
+    "params": {
+      "param-leftrightthreshold": 24,
+      "param-neighborthresh": 7,
+      "param-secondpeakdelta": 325,
+      "param-texturedifferencethresh": 0
+    }
+  },
+  "1. Max density (most points / most detail)": {
+    "param-leftrightthreshold": 24,
+    "param-neighborthresh": 7,
+    "param-secondpeakdelta": 325,
+    "param-texturedifferencethresh": 0,
+    "fill": 0.9519,
+    "cliff": 1704.35,
+    "floater": 27.75,
+    "noise": 7.33,
+    "params": {
+      "param-leftrightthreshold": 24,
+      "param-neighborthresh": 7,
+      "param-secondpeakdelta": 325,
+      "param-texturedifferencethresh": 0
+    }
+  },
+  "2. Min drag (cleanest, fewest flying-pixels)": {
+    "param-leftrightthreshold": 12,
+    "param-neighborthresh": 108,
+    "param-secondpeakdelta": 650,
+    "param-texturedifferencethresh": 1722,
+    "fill": 0.9236,
+    "cliff": 436.85,
+    "floater": 10.3,
+    "noise": 7.09,
+    "params": {
+      "param-leftrightthreshold": 12,
+      "param-neighborthresh": 108,
+      "param-secondpeakdelta": 650,
+      "param-texturedifferencethresh": 1722
+    }
+  },
+  "3. Balanced (low drag, keep as much density)": {
+    "param-leftrightthreshold": 24,
+    "param-neighborthresh": 7,
+    "param-secondpeakdelta": 650,
+    "param-texturedifferencethresh": 0,
+    "fill": 0.9273,
+    "cliff": 512.75,
+    "floater": 11.5,
+    "noise": 7.08,
+    "params": {
+      "param-leftrightthreshold": 24,
+      "param-neighborthresh": 7,
+      "param-secondpeakdelta": 650,
+      "param-texturedifferencethresh": 0
+    }
+  },
+  "4. Sharp edges, drag-limited (boundaries w/o smearing)": {
+    "param-leftrightthreshold": 24,
+    "param-neighborthresh": 25,
+    "param-secondpeakdelta": 650,
+    "param-texturedifferencethresh": 0,
+    "fill": 0.9277,
+    "cliff": 574.2,
+    "floater": 16.65,
+    "noise": 7.08,
+    "params": {
+      "param-leftrightthreshold": 24,
+      "param-neighborthresh": 25,
+      "param-secondpeakdelta": 650,
+      "param-texturedifferencethresh": 0
+    }
+  },
+  "5. Low temporal noise (smoothest surfaces)": {
+    "param-leftrightthreshold": 12,
+    "param-neighborthresh": 25,
+    "param-secondpeakdelta": 650,
+    "param-texturedifferencethresh": 0,
+    "fill": 0.9253,
+    "cliff": 517.05,
+    "floater": 13.15,
+    "noise": 6.98,
+    "params": {
+      "param-leftrightthreshold": 12,
+      "param-neighborthresh": 25,
+      "param-secondpeakdelta": 650,
+      "param-texturedifferencethresh": 0
+    }
+  }
+}
