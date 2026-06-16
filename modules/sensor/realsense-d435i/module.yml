@@ -8,8 +8,8 @@ deps:
     - ros-noetic-realsense2-description
   source:
     # arm64 apt has no realsense-viewer -> source-build librealsense 2.50.0 + CUDA + the
-    # graphical viewer, system-wide. install.sh also deletes the apt librealsense so the ROS
-    # node uses this CUDA lib too (GPU pointcloud/color).
+    # graphical viewer, system-wide. Keeps BOTH libs (apt CPU + /usr/local CUDA) for run.sh's
+    # CPU/CUDA toggle (CPU when decimated, CUDA at full-res).
     - install.sh
 
 mounts:

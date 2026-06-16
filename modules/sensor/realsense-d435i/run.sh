@@ -41,6 +41,15 @@ LAUNCH="$MODDIR/d435i.launch"
 # paired_drop.py lives in this module dir, declared as ROS package "d435i_tools"
 # (package.xml, no catkin build) so roslaunch can resolve <node pkg="d435i_tools"/>.
 export ROS_PACKAGE_PATH="$MODDIR${ROS_PACKAGE_PATH:+:$ROS_PACKAGE_PATH}"
+# librealsense CPU/CUDA select (both libs ship in the image, see install.sh): the apt CPU lib at
+# /opt/ros/noetic/lib is ROS's default; /usr/local is the CUDA build. CUDA only pays off at
+# full-res (deproject -> GPU, no color flap); with decimation the cloud is tiny so GPU dispatch
+# overhead outweighs it (measured 2026-06-16: GR3D 0% decimated vs 5-12% full-res). So auto-pick
+# by the launch's filter chain: CPU if it decimates, CUDA at full-res. Override: CAMERA_LRS=cpu|cuda.
+LRS="${CAMERA_LRS:-auto}"
+[ "$LRS" = auto ] && { grep -q 'value="[^"]*decimation' "$LAUNCH" && LRS=cpu || LRS=cuda; }
+[ "$LRS" = cuda ] && export LD_LIBRARY_PATH="/usr/local/lib:${LD_LIBRARY_PATH}"
+echo "[camera] librealsense lib: $LRS"
 TRIES="${CAM_TRIES:-4}"     # max launch attempts before giving up
 SETTLE="${CAM_SETTLE:-60}"  # s to wait for streams per attempt (reset ~7s + setup ~7s + margin)
 GRACE="${CAM_GRACE:-12}"    # s before first stream probe (reset+setup still running)

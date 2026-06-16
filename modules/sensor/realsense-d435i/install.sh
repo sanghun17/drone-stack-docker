@@ -6,11 +6,11 @@
 # the only way to get the viewer + Advanced-Mode Depth Control sliders to tune the edge "flying
 # pixel" drag.
 #
-# WHY system-wide (/usr/local, not an isolated prefix): the viewer AND the ROS pipeline use this
-# CUDA librealsense. ROS's setup.bash would otherwise make the node load the apt CPU lib first (it
-# prepends /opt/ros/noetic/lib to LD_LIBRARY_PATH; the nodelet has no RPATH), so we DELETE the apt
-# librealsense libs below — every consumer then resolves our /usr/local CUDA build via ldconfig.
-# Same soname 2.50 -> ABI-compatible. JAX GPU contention on Orin's unified memory is accepted.
+# WHY system-wide (/usr/local): the viewer (rpath -> /usr/local) always uses this CUDA build. We
+# KEEP the apt CPU librealsense too (at /opt/ros/noetic/lib) so run.sh can toggle the camera node
+# between CPU and CUDA via LD_LIBRARY_PATH with no rebuild. ROS's setup.bash puts /opt/ros/noetic/lib
+# first -> CPU is the default; run.sh prepends /usr/local/lib for CUDA mode (full-res). Same soname
+# 2.50 -> ABI-compatible either way.
 #
 # Version pinned to 2.50.0 to MATCH the apt librealsense realsense2_camera 2.3.2 was built
 # against (same SONAME/ABI, no surprises). Taeyoung96/librealsense-Docker uses 2.47.0 — changed.
@@ -43,14 +43,11 @@ cmake -B build -S . \
   # legacy PYTHON_EXECUTABLE hint) and fails on missing Dev headers. pyrealsense2 isn't needed
   # for the viewer; re-add later with a proper Python3 hint if we want it.
 cmake --build build -j"$JOBS" --target install
+ldconfig   # register the /usr/local CUDA libs (the apt CPU lib stays at /opt/ros/noetic/lib)
 
-# Remove the apt librealsense SDK libs (pulled in by ros-noetic-realsense2-camera) so the ROS node
-# can't load them over our CUDA build via ROS's LD_LIBRARY_PATH. With them gone, the nodelet
-# resolves /usr/local through ldconfig. dpkg still marks the deb installed (harmless in a built
-# image). NOTE the patterns: 'librealsense2.so*' / 'librealsense2-gl.so*' (literal dot) match ONLY
-# the SDK libs — NOT 'librealsense2_camera.so', the wrapper nodelet we must keep.
-find /opt/ros/noetic/lib \( -name 'librealsense2.so*' -o -name 'librealsense2-gl.so*' \) -delete 2>/dev/null || true
-ldconfig
+# Both librealsense builds are kept on purpose for run.sh's CPU/CUDA toggle:
+#   apt CPU  -> /opt/ros/noetic/lib/aarch64-linux-gnu  (ROS LD_LIBRARY_PATH default)
+#   CUDA     -> /usr/local/lib                          (run.sh prepends for full-res)
 
 rm -rf "/opt/librealsense-${RS_VER}"   # source tree not needed at runtime; keep the layer small
 
