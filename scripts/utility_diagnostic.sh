@@ -5,20 +5,22 @@
 #   bash scripts/utility_diagnostic.sh          # start monitor + GUI
 #   bash scripts/utility_diagnostic.sh stop     # stop both
 #
-# GUI runs on its OWN display :97 / VNC 5902 / web 6082 (rviz=99/5900/6080, rqt=98/5901/6081).
+# GUI shares the headless desktop :99 / VNC 5900 / web 6080 with rviz/rqt/realsense -> ONE browser tab
+# (scroll the empty desktop, or right-click the title bar -> Send To Desktop, to give it its own
+# workspace). `stop` kills ONLY the monitor node + its GUI window — NOT the shared Xvfb/x11vnc/
+# websockify, which the other GUIs live on.
 set -e
 C=drone-stack-d435i-voxblox
 HERE="$(dirname "$(readlink -f "$0")")"
 MON="roslaunch flight_safety monitoring.launch"
-DN=97; VNC=5902; WEB=6082
+DN=99; VNC=5900; WEB=6080   # SHARED GUI desktop (same as rviz/rqt/realsense)
 
 if [ "${1:-start}" = "stop" ]; then
-  docker exec "$C" pkill -INT -f "$MON"             2>/dev/null || true
-  docker exec "$C" pkill -f "rqt_runtime_monitor"   2>/dev/null || true
-  docker exec "$C" pkill -f "x11vnc.*-rfbport $VNC" 2>/dev/null || true
-  docker exec "$C" pkill -f "websockify.*:$WEB"     2>/dev/null || true
-  docker exec "$C" pkill -f "Xvfb :$DN"             2>/dev/null || true
-  echo ">> diagnostic stopped (monitor + GUI on display :$DN)"
+  # kill ONLY our two pieces: the monitor node + its rqt_runtime_monitor window. The Xvfb/x11vnc/
+  # websockify are the SHARED desktop (rviz/rqt/realsense live there too) -> leave them up.
+  docker exec "$C" pkill -INT -f "$MON"           2>/dev/null || true
+  docker exec "$C" pkill -f "rqt_runtime_monitor" 2>/dev/null || true
+  echo ">> diagnostic stopped (monitor node + its GUI). Shared desktop :$DN stays up for rviz/rqt/realsense."
   exit 0
 fi
 

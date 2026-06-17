@@ -8,7 +8,7 @@ description: Shared headless-GUI-over-VNC chain for the utility/* GUIs (rviz, rq
 
 deps:
   apt:
-    - xvfb               # virtual X display (:99/:98) to render onto
+    - xvfb               # virtual X display (:99 shared by rviz/rqt/realsense/diagnostic) to render onto
     - x11vnc             # exposes that display as a VNC server (bound to localhost)
     - websockify         # bridges the VNC port to a WebSocket so a plain browser can connect (zero install)
     - python3-numpy      # websockify HyBi fast path — faster at the higher framerates we now run
