@@ -47,7 +47,7 @@
     <arg name="filters"                 value="decimation,spatial,pointcloud"/>
     <arg name="allow_no_texture_points" value="true"/>
     <arg name="enable_sync"             value="true"/>
-    <arg name="clip_distance"           value="6.0"/>  <!-- cap depth/pointcloud at 6m (D435i depth degrades past ~6m) -->
+    <arg name="clip_distance"           value="10.0"/>  <!-- max range 10m (standard config). NOTE: D435i depth noise grows ~dist^2, so >~6m is noisy — was 6.0, raised to the standard 10m per use -->
   </include>
 
   <!-- ===== 10Hz decimation shared by fast-livo (odom) + voxblox (mapping) =====
