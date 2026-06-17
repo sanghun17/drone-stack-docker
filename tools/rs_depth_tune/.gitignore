@@ -1,5 +1,0 @@
-# generated renders/report (regenerable from sweep_report.py) — keep small data (csv/json) tracked
-report/*.pdf
-report/*.png
-report/*.log
-__pycache__/
