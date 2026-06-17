@@ -16,6 +16,7 @@ deps:
     - libgl1-mesa-glx
     - x11-utils          # xwininfo / xdpyinfo / xprop — inspect the headless display when debugging
     - openbox            # lightweight WM: gives GUI windows a title bar so you can move/resize/maximize
+    - zenity             # GTK file dialog backend for tinyfiledialogs (realsense-viewer Load/Save preset)
   source:
     - install.sh         # fetch modern noVNC (1.4.0) -> /opt/novnc; apt's novnc (1.0.0) lacks the
                          #   Quality/Compression UI + resize/quality URL params we want
