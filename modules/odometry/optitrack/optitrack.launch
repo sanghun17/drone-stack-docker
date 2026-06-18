@@ -6,21 +6,31 @@
       server: $(optenv OPTITRACK_SERVER 192.168.50.13)
       port: 3883
       update_frequency: 100.0
-      frame_id: world
+      frame_id: odom           <!-- common frame with FAST-LIVO: broadcast_tf -> odom->tracker;
+                                    fast-livo's odom->body_init latch (mapping_d435i.launch
+                                    mocap_init:=true) roots LIVO in this same testbed-centre frame -->
       use_server_time: false   <!-- Jetson receive time; mocap PC is not NTP-synced -->
       broadcast_tf: true
       refresh_tracker_frequency: 1.0
+      <!-- in-node self-report (flight_safety::StreamDiagnostic) -> /diagnostics, watched by the
+           L2 monitor (rate/freeze/no-data -> WARN=land / ERROR=kill via the severity policy). -->
+      diag_min_rate: 30.0        <!-- WARN(=LAND) only on a RATE COLLAPSE <27Hz; VRPN polls @100. low so a
+                                      mild dip doesn't auto-land (WARN->land is the L3 policy now). 0=off -->
+      diag_max_rate: 0.0         <!-- 0=off: over-rate on mocap is benign, not a fault -->
+      diag_freeze_window: 0.5    <!-- ERROR(=KILL) if position unchanged (|d|<1e-6 m) longer than this -->
     </rosparam>
   </node>
 
-  <!-- tracker pose -> /mavros/vision_pose/pose @30Hz. Relayed VERBATIM —
+  <!-- tracker pose -> /vision_pose/mocap @30Hz (a MUX INPUT, not vision_pose directly — the
+       vision-pose-mux module selects mocap-vs-vio for /mavros/vision_pose/pose). Relayed VERBATIM;
        verify Motive-axis vs ENU alignment before arming (VERIFY-BEFORE-FLIGHT). -->
   <arg name="tracker" default="pure"/>
+  <arg name="out" default="/vision_pose/mocap"/>
   <node pkg="topic_tools" type="throttle" name="vision_pose_throttle" output="screen"
         launch-prefix="taskset -c $(env CPUS_POOL)"
-        args="messages /vrpn_client_node/$(arg tracker)/pose 30.0 /mavros/vision_pose/pose"/>
+        args="messages /vrpn_client_node/$(arg tracker)/pose 30.0 $(arg out)"/>
   <!-- prints the first relayed pose once, then exits -->
   <node pkg="rostopic" type="rostopic" name="vision_pose_announce" output="screen"
         launch-prefix="taskset -c $(env CPUS_POOL)"
-        args="echo -n1 /mavros/vision_pose/pose/pose/position"/>
+        args="echo -n1 $(arg out)/pose/position"/>
 </launch>

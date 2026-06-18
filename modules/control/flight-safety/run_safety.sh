@@ -1,6 +1,7 @@
 #!/bin/bash
-# control/flight-safety: M2 reaction tier (safety.launch). *** KILL AUTHORITY ***
-# Not in module.yml `run:` — start manually, intentionally, only when intervention is wanted.
+# control/flight-safety: L3 response/mux (response.launch). *** KILL AUTHORITY ***
+# Layers on top of the observe stack — run run_monitor.sh (observe) FIRST; it consumes
+# /flight_safety/fault. Not in module.yml `run:` — start manually, only when intervention is wanted.
 
 if [ ! -f /.dockerenv ]; then
   __C=drone-stack-d435i-voxblox
@@ -9,7 +10,7 @@ if [ ! -f /.dockerenv ]; then
   source "$__R/modules/ensure_container.sh"
   docker start "$__C" >/dev/null 2>&1
   __TT=$([ -t 1 ] && echo -it || echo -i)
-  __M="roslaunch flight_safety safety.launch"
+  __M="roslaunch flight_safety response.launch"
   cleanup(){ docker exec "$__C" pkill -INT -f "$__M" >/dev/null 2>&1; }
   trap 'cleanup; exit 130' INT TERM HUP
   docker exec $__TT "$__C" bash "/work/${__S#$__R/}" "$@"; __rc=$?
@@ -21,4 +22,4 @@ source /opt/ros/noetic/setup.bash
 source /work/ws/risk-aware/devel/setup.bash
 source /work/config/ros_env.sh
 source /work/modules/ensure_roscore.sh
-exec taskset -c "${CPUS_POOL:?config/ros_env.sh not sourced}" roslaunch flight_safety safety.launch "$@"
+exec taskset -c "${CPUS_POOL:?config/ros_env.sh not sourced}" roslaunch flight_safety response.launch "$@"

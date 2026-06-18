@@ -1,7 +1,9 @@
 #!/bin/bash
 # odometry/optitrack: VRPN client to the lab OptiTrack (Motive) server.
 # All params live in optitrack.launch; server IP = OPTITRACK_SERVER (config/stack.env).
-# Publishes /vrpn_client_node/<Tracker>/pose per rigid body (auto-discovered).
+# Publishes /vrpn_client_node/<Tracker>/pose per rigid body (auto-discovered) + relays the
+# tracker pose to /vision_pose/mocap (a vision-pose-mux INPUT, NOT /mavros/vision_pose/pose;
+# run the vision-pose-mux module to actually feed EKF2).
 
 # (host) auto-enter the dsd container; (inside) run the node.
 if [ ! -f /.dockerenv ]; then
@@ -31,7 +33,7 @@ source /work/config/ros_env.sh   # ROS_MASTER_URI / ROS_IP / CPUS_* — single s
 source /work/modules/ensure_roscore.sh   # master up on $ROS_MASTER_PORT — TCP probe, not a blind sleep 4
 
 MODDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-echo "[optitrack] relaying tracker pose -> /mavros/vision_pose/pose @30Hz (first relayed pose prints below)"
+echo "[optitrack] relaying tracker pose -> /vision_pose/mocap @30Hz (mux input; first relayed pose prints below)"
 # CPUS_POOL (config/ros_env.sh): stay OFF camera cores 0-1 (uvc watchdog protection)
 # and fast-livo cores 2-3. The node itself is pinned via launch-prefix in the launch;
 # taskset here covers roslaunch + any helpers.

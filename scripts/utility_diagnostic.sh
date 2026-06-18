@@ -12,7 +12,7 @@
 set -e
 C=drone-stack-d435i-voxblox
 HERE="$(dirname "$(readlink -f "$0")")"
-MON="roslaunch flight_safety monitoring.launch"
+MON="roslaunch flight_safety observe.launch"   # L1 diagnosis + L2 monitor (observe-only)
 DN=99; VNC=5900; WEB=6080   # SHARED GUI desktop (same as rviz/rqt/realsense)
 
 if [ "${1:-start}" = "stop" ]; then
@@ -25,19 +25,20 @@ if [ "${1:-start}" = "stop" ]; then
 fi
 
 docker start "$C" >/dev/null 2>&1
-# (1) monitor node — observe-only, detached (light). RESTART on every run so config edits
-# take effect: stop the old node + CLEAR its rosparams (a plain reload MERGES, so removed/
-# renamed keys would linger and the node would see a stale+new mix), then start fresh.
+# (1) observe stack (L1 diagnosis + L2 monitor) — observe-only, detached (light). RESTART on every
+# run so config edits take effect: stop the old nodes + CLEAR their rosparams (a plain reload MERGES,
+# so removed/renamed keys would linger and the node would see a stale+new mix), then start fresh.
 # Liveness by rosnode, NOT pgrep (pid1 `sleep infinity` never reaps; a dead roslaunch fools pgrep).
-NODE=/flight_safety_monitor
+NODE=/flight_safety_monitor   # L2 readiness indicator (L1 flight_safety_diagnosis comes up with it)
 alive(){ docker exec "$C" bash -lc \
   "source /opt/ros/noetic/setup.bash; source /work/config/ros_env.sh; rosnode list 2>/dev/null | grep -qx $NODE"; }
 if alive; then
-  echo ">> restarting monitor (reloads config)"
+  echo ">> restarting observe stack (reloads config)"
   docker exec "$C" pkill -INT -f "$MON" 2>/dev/null || true   # no death-wait: relaunch bumps the old name
 fi
 docker exec "$C" bash -lc \
-  "source /opt/ros/noetic/setup.bash; source /work/config/ros_env.sh; rosparam delete $NODE" >/dev/null 2>&1 || true
+  "source /opt/ros/noetic/setup.bash; source /work/config/ros_env.sh; \
+   rosparam delete /flight_safety_monitor; rosparam delete /flight_safety_diagnosis" >/dev/null 2>&1 || true
 docker exec -d "$C" bash /work/modules/control/flight-safety/run_monitor.sh
 for _ in $(seq 1 14); do alive && break; sleep 0.5; done
 if alive; then
@@ -49,8 +50,9 @@ else
   exit 1
 fi
 # (2) rqt_runtime_monitor GUI (reads /diagnostics raw) via the shared headless-VNC launcher.
-# NOT restarted — rqt_runtime_monitor reads /diagnostics LIVE, so it reflects the monitor's new
-# config automatically; re-running just re-attaches (fast). (For a truly fresh rqt that also
+# Shows the L1 diagnosis layer (geofence/consistency + vrpn/mavros in-node). NOT restarted —
+# rqt reads /diagnostics LIVE so it reflects the new config; re-running just re-attaches (fast).
+# (The L2 verdict is /flight_safety/fault; L3 state is /flight_safety/state.) (For a truly fresh rqt that also
 # drops stale entries, use `stop` then start.) Invoke as an rqt plugin, NOT `rqt_runtime_monitor`
 # (that exe is in lib/, rosrun-style, not on PATH).
 exec "$HERE/_vnc_gui.sh" "$DN" "$VNC" "$WEB" monitor \

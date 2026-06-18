@@ -1,6 +1,6 @@
 name: flight-safety
 group: control
-description: Flight-safety monitoring + reaction (VRPN/RC fault -> hold/land/kill, geofence, control MUX). Source lives in the risk-aware workspace (sibling of risk_aware_planning), so it builds there and gets mavros_msgs for free.
+description: Layered flight safety — L1 per-subsystem diagnosis (incl. geofence) -> /diagnostics, L2 monitor (worst fault) -> /flight_safety/fault, L3 response/mux (manual + severity -> normal/land/kill). Plus an estimator MUX (run_vision_mux.sh) that selects mocap-vs-vio -> /mavros/vision_pose/pose. Source lives in the risk-aware workspace (sibling of risk_aware_planning), so it builds there and gets mavros_msgs for free.
 
 needs: [planner/risk-aware]     # flight_safety builds in ws/risk-aware; uses mavros_msgs
 
@@ -8,7 +8,10 @@ deps:
   apt:
     - ros-noetic-diagnostic-updater
     - ros-noetic-rqt-runtime-monitor   # /diagnostics GUI for scripts/utility_diagnostic.sh
+    - ros-noetic-topic-tools           # mux for run_vision_mux.sh (estimator mux)
 
 clone: clone.sh
-run: [run_monitor.sh]           # observe-only by default. run_safety.sh (KILL authority) = manual.
-provides: [flight-safety]
+# observe-only by default. run_safety.sh (KILL authority) + run_vision_mux.sh (estimator mux,
+# REQUIRED for /mavros/vision_pose/pose) = started manually/intentionally.
+run: [run_monitor.sh]
+provides: [flight-safety, vision-pose]
