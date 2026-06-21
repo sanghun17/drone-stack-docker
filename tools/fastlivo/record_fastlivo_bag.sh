@@ -57,7 +57,9 @@ TOPICS="$CAM /camera/imu /camera/color/camera_info /camera/extrinsics/depth_to_c
 echo "[record] checking the input topics are actually publishing…"
 miss=0
 for t in $CAM /camera/imu /camera/color/camera_info "$GT"; do
-  if timeout 4 rostopic hz "$t" >/dev/null 2>&1; then
+  # `rostopic echo -n 1` exits 0 once ONE msg arrives; `rostopic hz` never exits
+  # so `timeout` would always 124 -> every topic falsely MISS even at 10Hz.
+  if timeout 4 rostopic echo -n 1 --noarr "$t" >/dev/null 2>&1; then
     echo "   OK   $t"
   else
     echo "   MISS $t   (not publishing — recording will capture nothing for it)"; miss=1

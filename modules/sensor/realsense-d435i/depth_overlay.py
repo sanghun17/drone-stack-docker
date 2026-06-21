@@ -53,7 +53,12 @@ class DepthOverlay:
         self.alpha = float(rospy.get_param("~alpha", 0.45))   # 0=invisible 1=opaque
         self.stride = int(rospy.get_param("~point_stride", 2))  # draw every Nth point
         self.K = None            # (fx, fy, cx, cy) of the COLOR camera
-        self.R = self.t = None   # depth->color extrinsics
+        # depth->color extrinsics; default identity so projection works from
+        # camera_info alone (D435i baseline ~14mm is negligible). on_extr refines
+        # it when the latched /extrinsics msg arrives — but a -s-clipped replay that
+        # skips that latched msg still overlays (just without the 14mm correction).
+        self.R = np.eye(3, dtype=np.float32)
+        self.t = np.zeros(3, dtype=np.float32)
         self.subs, self.sync = [], None
 
         # TURBO LUT, index 255 = near = red (more intuitive than far = red).

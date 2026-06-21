@@ -7,6 +7,7 @@ __M="roslaunch flight_safety safety.launch"
 __NODES="flight_safety_(diagnosis|monitor|response)|vision_pose_mux"
 __killall(){ docker exec "$__C" pkill -INT -f "$__M"    >/dev/null 2>&1
              docker exec "$__C" pkill      -f "$__NODES" >/dev/null 2>&1
+             docker exec "$__C" pkill      -f "fs_led_node.py" >/dev/null 2>&1   # SIGTERM -> node blanks the LED on exit
              docker exec "$__C" pkill      -f "rqt_runtime_monitor" >/dev/null 2>&1; }   # GUI window; shared VNC infra spared
 
 if [ ! -f /.dockerenv ]; then
@@ -25,7 +26,10 @@ if [ ! -f /.dockerenv ]; then
 fi
 set -e
 source /opt/ros/noetic/setup.bash
-source /work/ws/risk-aware/devel/setup.bash
+source /work/ws/flight-safety/devel/setup.bash --extend   # flight_safety pkg + Fault/FlightState msgs
+source /work/ws/risk-aware/devel/setup.bash --extend      # mavros_msgs (vendored in risk-aware), runtime only
 source /work/config/ros_env.sh
 source /work/modules/ensure_roscore.sh
+# status LED (control_lane -> APA102), separate process so a GPIO stall can't touch the safety loop
+taskset -c "${CPUS_POOL}" python3 /work/modules/control/flight-safety/fs_led_node.py >/tmp/fs_led.log 2>&1 &
 exec taskset -c "${CPUS_POOL:?config/ros_env.sh not sourced}" roslaunch flight_safety safety.launch

@@ -75,7 +75,8 @@ fi
 # the app, on this display — confirm by a real window (not pgrep, which zombies fool)
 if ! app_up; then
   source /opt/ros/noetic/setup.bash
-  [ -f /work/ws/risk-aware/devel/setup.bash ] && source /work/ws/risk-aware/devel/setup.bash
+  [ -f /work/ws/flight-safety/devel/setup.bash ] && source /work/ws/flight-safety/devel/setup.bash --extend
+  [ -f /work/ws/risk-aware/devel/setup.bash ] && source /work/ws/risk-aware/devel/setup.bash --extend
   [ -f /work/config/ros_env.sh ] && source /work/config/ros_env.sh
   export XDG_RUNTIME_DIR=/tmp/runtime-root; mkdir -p "$XDG_RUNTIME_DIR"; chmod 700 "$XDG_RUNTIME_DIR"
   # rviz is ~2.3 cores of llvmpipe software GL — pool + nice +10 ($T above).

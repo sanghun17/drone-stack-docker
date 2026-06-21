@@ -38,10 +38,12 @@ export ROS_PACKAGE_PATH="/work/modules/sensor/realsense-d435i${ROS_PACKAGE_PATH:
 
 LAUNCH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/mapping_d435i_replay.launch"
 BAG=""; RATE=1.0; OUT=""; CONFIG=""; CAMCALIB=""; TRACKER="pure"
-PAIRED=false; GUARD=false; WITHCLOUD=0
+PAIRED=false; GUARD=false; WITHCLOUD=0; START=""; DUR=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --rate)        RATE="$2"; shift 2;;
+    --start)       START="$2"; shift 2;;   # rosbag play -s : skip to SEC (e.g. start fast-livo mid-flight)
+    --duration)    DUR="$2"; shift 2;;     # rosbag play -u : play only SEC (quick A/B on takeoff window)
     --out)         OUT="$2"; shift 2;;
     --config)      CONFIG="$2"; shift 2;;
     --cam-calib)   CAMCALIB="$2"; shift 2;;
@@ -89,8 +91,8 @@ rosbag record --lz4 -O "$OUT" $REC_TOPICS >/tmp/replay_rec.log 2>&1 &
 RP=$!
 sleep 1
 
-echo "[replay] playing the bag (--clock)…"
-rosbag play --clock --rate "$RATE" "$BAG"
+echo "[replay] playing the bag (--clock)…${START:+ start@${START}s}"
+rosbag play --clock --rate "$RATE" ${START:+-s "$START"} ${DUR:+-u "$DUR"} "$BAG"
 sleep 2   # let the last frames flush through the node + recorder
 
 echo "[replay] done — stopping nodes."

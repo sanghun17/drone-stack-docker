@@ -2,7 +2,7 @@ name: optitrack
 group: odometry
 description: OptiTrack mocap pose via vrpn_client_ros (ros-drivers fork, kinetic-devel — ROS1, builds clean on noetic). Publishes /vrpn_client_node/<Tracker>/pose + in-node /diagnostics (link/rate/dropout/freeze via flight_safety StreamDiagnostic). Server IP from config/stack.env OPTITRACK_SERVER.
 
-needs: [control/flight-safety]   # vrpn_client_ros #includes flight_safety/stream_diagnostic.h (built in ws/risk-aware first)
+needs: [control/flight-safety]   # vrpn_client_ros #includes flight_safety/stream_diagnostic.h (built in ws/flight-safety first)
 
 deps:
   apt:

@@ -25,3 +25,10 @@ __pycache__/
 
 # profiling output dumped by jax_main_node_ros_new.py --profiling_* (pkl + png)
 /profiling_results/
+
+# rosbags + eval outputs (large; regenerable) — never commit these
+*.bag
+*.bag.active
+/flight_logs/
+tools/fastlivo/rerun_eval/*.rrd
+tools/fastlivo/rerun_eval/*.tum
