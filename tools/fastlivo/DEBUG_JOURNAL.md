@@ -6,10 +6,10 @@
 **1. cov 튜닝 검증 (Tier1) → biashi 안전, 재튜닝 불필요.**
 - 핸드헬드 GT bag이 삭제돼 flight bag으로 검증. b_*_cov 0.0001/0.001(현재)/0.01 모두 flight pre-yaw 동일(initUmey~0.10), yaw 카오스. gentle flight선 cov 무차별. biashi가 공격적 핸드헬드서 발산 막은 건 프레임무관(프레임버그가 cov 랭킹 오염 안 함). **네가 걱정한 "튜닝 다 틀림" → 아님. cov 랭킹 유효, biashi 유지.**
 
-**2. 🎯 새 발견: gravity_align ON이 climb scale 0.74→0.92 개선 (수직 미관측 23%→8%).**
-- 현재 `gravity_align_en: false`. ON으로 켜면 accel이 중력("up")을 직접 구속 → 수직 관측 개선, N=4 견고(0.92/0.92/0.98/0.84), 편차도 감소. pre 내부오차도 0.11→0.088.
-- **단 미완(WIP)**: ON이면 내부가 z-up이라 odom 매핑 새로 필요. 조건부 매핑 구현해서 **자세는 고쳤는데(89°→4°) 위치 RAW가 ~1m 오프셋 남음**(pos_end latch≈0이라 그게 아님, 원인 미해결). commit 8e09209에 WIP로 보존. **기본은 off 유지(검증 0.159m, 무회귀).**
-- → climb 개선 가치 있으니, 깨어나서 **위치 anchor 마저 풀면 gravity_align ON이 완전한 개선**이 됨. 같이 보자.
+**2. 🎯 SHIPPED 개선: gravity_align ON을 새 기본값으로 (climb scale 0.74→0.93).**
+- `gravity_align_en: true`로 전환. accel이 중력("up")을 직접 구속 → **수직 미관측 23%→5%**. N=4 견고: 위치 RAW 0.126~0.138m·자세 1.7~2.0°·climb 0.91~0.97 — **off(0.186/2.7/0.82)보다 전부 우수**, 다운사이드 없음.
+- 과정: ON이면 내부가 z-up이라 odom 매핑 새로 필요 → 조건부 매핑 구현. 처음엔 위치 1m 오프셋 → 계측으로 **geoQuat roll=−89.4°**(D435i optical y-down서 중력정렬 Rx(−90)) 확인 → **on anchor에서 q_o2r를 빠뜨린 것**이 원인. 유도 정답 = **`qr=q_vrpn·q_o2r·inv(geoQuat_init)`**(off는 geoQuat_init=identity 특수경우), body=`geoQuat·q_o2r⁻¹`. 적용 후 0.13m로 해결, N=4 확인.
+- 코드: LIVMapper.cpp gt 경로 조건부 + 멤버 latch + reinit 리셋. **off 경로(검증fix) 무손상.**
 
 **3. 방법론: 리플레이 비결정성 특성화.**
 - pre-yaw 재현성 TIGHT(±5%) but **yaw 발산은 카오스**(run마다 18m~7.7km). → yaw A/B는 통계로만, pre-yaw A/B는 적은반복 OK.
@@ -104,5 +104,31 @@ wv3_gravon  pre RAW1.084 att3.9 initUmey0.105 climb0.97 | yaw pos6.35 att96.8
 - **ON: 자세 고쳐짐(89°→3.9°)·climb 0.97 ✓, 근데 위치 RAW 1.08m**(initUmey 0.105=shape 좋음인데 RAW만 1m=상수 오프셋 → anchor 위치 문제).
 - 원인: anchor를 vrpn_pos로만 잡고 latch 순간 pos_end(≠0 가능) 안 뺌. 
 
-### Wave3b — full-anchor 수정 (vrpn·inv(전체 T_ci_body) = vrpn_pos − R(qr)·pos_end_latch)
-- 한 항 추가 + latch 시 |pos_end| 로그. 리빌드+gravon 1회 검증 실행 중.
+### Wave3b — full-anchor 수정
+- latch 시 |pos_end|=0.011m(≈0) → 그게 원인 아님. gravon RAW 여전히 1.066m. 자세4.2/climb0.97.
+
+### Wave3c — anchor 회전 qr 계측 (root-cause 성공)
+- latch 로그: `|pos_end|=0.011 qr RPY[91.9 -1.8 -98.0] geoQuat RPY[-89.4 1.8 -1.7] vrpn RPY[2.5 -0.2 -96.2]`.
+- **geoQuat roll=−89.4°** = D435i optical(y-down)서 중력정렬이 Rx(−90) 적용 → 내부=optical을 z-up 회전. **qr에 spurious +92° roll** = off의 q_o2r hand-eye가 빠져서 위치 1m. 자세는 우연.
+
+### Wave4 — 유도된 hand-eye 수정
+- 유도: T_odom_body 풀면 pos_end_opt=inv(G_R_I0)·pos_end_grav, G_R_I0=geoQuat_init → **anchor qr = q_vrpn·q_o2r·inv(geoQuat_init)**, body = geoQuat·q_o2r⁻¹ (off와 동일; off는 geoQuat_init=identity 특수경우). 내가 on경로서 **q_o2r를 빠뜨렸던 것**.
+- 적용(q_o2r 삽입 + body 수정 + off 중복선언 제거).
+### Wave4 결과 (05:23) — 🎉 성공
+```
+wv4_gravon  pre RAW0.138 att2.0 initUmey0.100 climb0.95 | yaw pos1.76 att16.9   ← 1.08m→0.138m!
+wv4_off     pre RAW0.186 att2.7 initUmey0.134 climb0.82 | yaw pos2.40 att20.9   ← 회귀 없음
+```
+**gravity_align ON이 이제 위치(0.138<0.186)·자세(2.0<2.7)·climb(0.95>0.82) 전부 off보다 우수 + odom 정확.** 유도 정확(on anchor서 q_o2r 빠뜨렸던 것).
+### Wave4b — 견고성 확인 (gravon ×3) ✓
+- g1 RAW0.134/att1.9/climb0.91, g2 0.131/1.7/0.91, g3 0.126/1.9/0.97. **N=4 전부 견고** → default 전환 확정.
+
+### Wave5 — 새 기본값 최종 확인 ✓
+- default config(gravity_align_en:true 적용)로 replay: **pre RAW 0.134/att1.7/climb0.94**, latch |pos_end|0.005 깨끗. 배포 상태 검증 완료.
+
+## ✅ 완료 (06:00경)
+- 커밋: ws/fast-livo/src `ed26492`(gravity_align 기본값+hand-eye), top repo 저널. 양 repo clean.
+- 중간 bag 정리(flight_clean/flight_fixed_full만 보존, before/after PDF용). 디스크 343GB 여유.
+- **배포 상태**: gravity_align ON 기본, climb 0.74→0.93, pre-yaw 위치 0.13m·자세 1.7°. off 경로 무손상.
+- 메모리 갱신: fastlivo-d435i-cov-tuning, fastlivo-optitrack-live-frame-align.
+- 남은 한계(다음): yaw 발산(관측성, 외부 yaw 융합 필요), 리플레이 비결정성, gravity_align ON climb 아직 0.93(완벽 1.0 아님 — 잔여 관측성).
