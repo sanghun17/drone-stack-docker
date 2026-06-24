@@ -1,0 +1,125 @@
+common:
+  img_topic: "/camera/color/image_raw_10hz"      # 10Hz throttle in d435i.launch (full-rate: /camera/color/image_raw)
+  lid_topic: "/camera/depth/color/points_10hz"   # 10Hz throttle in d435i.launch; PointCloud2 from aligned depth
+  imu_topic: "/camera/imu"  # Combined IMU topic (gyro + accel)
+  img_en: 1
+  lidar_en: 1
+  ros_driver_bug_fix: false
+  # --- Online camera intrinsics ---------------------------------------------
+  # At startup FAST-LIVO grabs ONE CameraInfo msg from cam_info_topic in C++
+  # (ros::topic::waitForMessage in LIVMapper::initializeComponents) and builds the
+  # camera model from it, so intrinsics always match whatever resolution the camera
+  # actually came up at. Falls back to camera_d435i.yaml if no msg within timeout.
+  # NOTE: img_topic above is the 10Hz throttle, but camera_info is full-rate and
+  # NOT throttled -> point cam_info_topic at the un-throttled /camera/color/camera_info.
+  online_intrinsics_en: true
+  cam_info_topic: "/camera/color/camera_info"
+  cam_info_timeout: 5.0
+
+# ===========================================================================
+# Intel RealSense D435i  (serial 923322070596) on Jetson Orin AGX
+# Use with camera_d435i.yaml (intrinsics @640x480, captured 2026-06-01).
+#
+# HARDWARE NOTE: when captured, the camera was behind the Orin's onboard
+# Realtek USB hub. depth+color stream OK at 640x480, but the IMU
+# (/camera/imu) and the RGB pointcloud (/camera/depth/color/points) do NOT
+# flow through the hub ("Motion Module force pause", control_transfer EAGAIN).
+# FAST-LIVO needs IMU + pointcloud → connect the D435i to a DIRECT root USB3
+# port (bypass the hub) before running this. See jetson-port-spec.md §camera.
+# ===========================================================================
+
+extrin_calib:
+  # IMU<-Depth (Lid_offset_to_IMU). VERIFIED 2026-06-22 against rs-enumerate-devices -c
+  # on S/N 923322070596: == -(Depth->Gyro/Accel = [-0.00552,0.0051,0.01174]) to full
+  # precision, rotation identity. Factory model-constant lever arm.
+  extrinsic_T: [0.00552, -0.0051, -0.01174]
+  extrinsic_R: [1, 0, 0, 0, 1, 0, 0, 0, 1]
+  # Color->Depth (Rcl/Pcl). From rs-enumerate-devices -c "Color To Depth" on
+  # S/N 923322070596 (2026-06-22). The inverse (Depth->Color) was
+  #   R = [0.999978, 0.00659742, 0.00021399, -0.00659736, 0.999978, -0.000301692,
+  #        -0.000215976, 0.000300274, 1],  t = [0.01438551, 9.43e-05, 0.00042120]
+  #   (baseline 14.4mm). Rcl/Pcl below ARE that "Color To Depth" block verbatim.
+  Rcl: [0.999978,   -0.00659736, -0.000215976,
+        0.00659742,  0.999978,    0.000300274,
+        0.00021399, -0.000301692, 1.0]
+  Pcl: [-0.0143844867125154, -0.000189328260603361, -0.000424247875344008]
+
+time_offset:
+  imu_time_offset: 0.0
+  img_time_offset: 0.0
+  exposure_time_init: 0.0
+
+preprocess:
+  point_filter_num: 1    # decim3 cloud ~10.7k pts/frame ~0.6x Mid360 -> keep all (was 10)
+  filter_size_surf: 0.1  # match author avia (was 0.25)
+  lidar_type: 4  # 0: Standard PointCloud2, 1: Livox
+  scan_line: 1
+  blind: 0.2  # Minimum depth (D435i min-Z ~0.105m; 0.2 is conservative)
+
+vio:
+  max_iterations: 5
+  outlier_threshold: 1000
+  img_point_cov: 1000
+  patch_size: 8
+  patch_pyrimid_level: 4
+  normal_en: true
+  raycast_en: false
+  inverse_composition_en: false
+  exposure_estimate_en: true
+  inv_expo_cov: 0.1
+
+imu:
+  imu_en: true
+  imu_int_frame: 30
+  # Initial values - need Allan variance calibration
+  acc_cov: 0.5
+  gyr_cov: 0.3
+  b_acc_cov: 0.001       # bias random-walk INFLATED for stability (was 0.0001) -> stops divergence
+  b_gyr_cov: 0.001       # (Allan physical RW ~1.2e-4 but filter needs inflated; small acc/gyr_cov destabilize)
+
+lio:
+  max_iterations: 5
+  dept_err: 0.02
+  beam_err: 0.05
+  dept_err_rel: 0.02       # 0=off (Livox-style flat depth cov). >0 adds range-proportional depth noise for D435i stereo: range_var += (dept_err_rel*range)^2
+  min_eigen_value: 0.0025
+  voxel_size: 0.5
+  max_layer: 2
+  max_points_num: 50
+  layer_init_num: [5, 5, 5, 5, 5]
+
+local_map:
+  map_sliding_en: false
+  half_map_size: 100
+  sliding_thresh: 8
+
+uav:
+  imu_rate_odom: false
+  gravity_align_en: true   # 2026-06-22: improves takeoff climb scale 0.74->0.93 (accel constrains vertical); gt_odom mapping handled (LIVMapper)
+
+publish:
+  dense_map_en: true
+  pub_effect_point_en: true
+  pub_plane_en: false
+  pub_scan_num: 1
+  blind_rgb_points: 0.0
+
+evo:
+  seq_name: "d435i_test"
+  pose_output_en: false
+
+pcd_save:
+  pcd_save_en: false
+  colmap_output_en: false
+  filter_size_pcd: 0.15
+  interval: -1
+
+debug:
+  fusion_log: true
+# Body(=marker) hand-eye extrinsic — fixed calibration (mirrors fast_livo/config/d435i.yaml).
+# Needed so replay publishes /aft_mapped_to_body + /aft_mapped_to_optitrack (GT-anchored).
+body_calib:
+  enable: true
+  q_cam2body_xyzw: [0.4947, -0.5015, 0.5079, -0.4957]
+  t_cam2body: [0.07685, 0.02273, 0.03045]
+  gt_avg_sec: 3.0
