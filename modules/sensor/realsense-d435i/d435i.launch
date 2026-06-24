@@ -36,12 +36,14 @@
     <arg name="unite_imu_method"        value="linear_interpolation"/>
     <arg name="initial_reset"           value="true"/>  <!-- HW-reset on start: wakes the stuck D435i motion module so /camera/imu actually streams -->
     <!-- Post-processing chain. realsense2_camera applies a FIXED order regardless of list order:
-         decimation(3) -> [depth->disparity] -> spatial -> temporal -> [disparity->depth] -> pointcloud.
-         `disparity` listed once => the wrapper auto-pairs disparity_start/end, so spatial+temporal
-         run in the DISPARITY domain (their default smooth_delta is tuned there). hole_filling
-         omitted (hallucinates depth-discontinuity gaps). temporal smooths per-pixel flicker but
-         blends ~3 past frames (~200ms) -> drop `temporal` if the map smears under fast yaw. -->
-    <arg name="filters"                 value="decimation,disparity,spatial,temporal,pointcloud"/>
+         decimation(3) -> [depth->disparity] -> spatial -> [disparity->depth] -> pointcloud.
+         `disparity` listed once => the wrapper auto-pairs disparity_start/end, so spatial
+         runs in the DISPARITY domain (its default smooth_delta is tuned there). hole_filling
+         omitted (hallucinates depth-discontinuity gaps). temporal DROPPED: it blends ~3 past
+         frames (~200ms) and smears the map under fast yaw on a moving drone. To re-add it but
+         keep it weak, put `temporal` back here and add a dynparam node setting
+         /camera/temporal filter_smooth_alpha ~0.9 + holes_fill 0 (like set_decimation below). -->
+    <arg name="filters"                 value="decimation,disparity,spatial,pointcloud"/>
     <arg name="allow_no_texture_points" value="false"/>  <!-- drop no-color points (FOV/occlusion) instead of black -->
 
     <arg name="enable_sync"             value="true"/>
@@ -99,6 +101,24 @@
        dynparam blocks-until-ready; "decimation" must be in <filters> above. -->
   <node pkg="dynamic_reconfigure" type="dynparam" name="set_decimation"
         args="set /camera/decimation filter_magnitude 3"/>
+
+  <!-- RGB manual exposure to kill motion blur. The D435i color imager is a ROLLING
+       shutter (depth/IR are global) so it smears under fast motion; the default
+       exposure 166 == 16.6ms (~1/60s) is left long because color runs at 15Hz here
+       (66ms budget). We force a short fixed exposure so the visual frames fast-livo
+       photometric-tracks stay sharp. EXPOSURE UNIT = 100us per UVC count, so 66 ~=
+       6.6ms (~1/150s); push toward 40 (~4ms, ~1/250s) for sharper/darker, raise gain
+       (max 128) to recover brightness without adding blur. This only attacks EXPOSURE blur; the rolling-shutter
+       SKEW that remains is coupled to FPS (librealsense#3554, HW counter limit) and
+       only improves by raising color_fps (15->30). ORDER MATTERS: auto-exposure must
+       be disabled BEFORE setting manual exposure (AE overwrites it every frame),
+       so AE-off + gain are chained in launch-prefix and exposure is the node's own
+       set -> guaranteed sequential in ONE reconfigure client (parallel dynparam
+       nodes would race). dynparam blocks-until-ready. Re-enable live with:
+       rosrun dynamic_reconfigure dynparam set /camera/rgb_camera enable_auto_exposure true -->
+  <node pkg="dynamic_reconfigure" type="dynparam" name="set_rgb_exposure"
+        args="set /camera/rgb_camera exposure 66"
+        launch-prefix="bash -c 'rosrun dynamic_reconfigure dynparam set /camera/rgb_camera enable_auto_exposure false &amp;&amp; rosrun dynamic_reconfigure dynparam set /camera/rgb_camera gain 112 &amp;&amp; exec &quot;$0&quot; &quot;$@&quot;'"/>
 
   <!-- Depth-noise debug view: cloud projected on the color image, distance-
        colored (red=near) -> /camera/depth_overlay. Computes NOTHING until
