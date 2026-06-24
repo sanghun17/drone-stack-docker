@@ -14,6 +14,7 @@ modules:
   - planner/risk-aware    # apt+pip lists churn with planner dev -> below the heavy layers
   - control/mavros
   - control/flight-safety  # all-in-one (observe+response/KILL+estimator mux) -> scripts/control_flight-safety.sh
+  - control/local-controller  # velocity control bridge (JAX -> mavros) -> scripts/control_local-controller.sh (needs mavros+flight-safety up)
   # Both GUIs pull utility/gui-vnc (Xvfb+VNC) via `needs:`.
   - utility/rviz          # rviz       -> scripts/utility_rviz.sh
   - utility/rqt           # rqt + plugins -> scripts/utility_rqt.sh
