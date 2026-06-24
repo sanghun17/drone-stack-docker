@@ -4,7 +4,7 @@
 # Actuation gated by require_armed. Ctrl-C kills all of it.
 __C=drone-stack-d435i-voxblox
 __M="roslaunch flight_safety safety.launch"
-__NODES="flight_safety_(diagnosis|monitor|response)|vision_pose_mux"
+__NODES="flight_safety_(diagnosis|monitor|response)|vision_pose_mux|robot_odom_relay"
 __killall(){ docker exec "$__C" pkill -INT -f "$__M"    >/dev/null 2>&1
              docker exec "$__C" pkill      -f "$__NODES" >/dev/null 2>&1
              docker exec "$__C" pkill      -f "fs_led_node.py" >/dev/null 2>&1   # SIGTERM -> node blanks the LED on exit

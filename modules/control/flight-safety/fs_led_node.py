@@ -1,32 +1,65 @@
 #!/usr/bin/env python3
-"""flight_safety status LED: /flight_safety/state .control_lane -> APA102 color.
+"""flight_safety status LED: /flight_safety/state + RC (kill ch9 + mode ch7) + setpoint -> APA102.
 
-Launched (backgrounded) by this module's run.sh as a SEPARATE process from the
-KILL-authority response node, so a GPIO hiccup can never stall the 50 Hz safety
-loop. Runs inside the privileged container (-> /dev/gpiochip0; FlightState on path).
-LED goes OFF when no fresh state arrives, so a down/absent flight_safety reads dark.
+Launched (backgrounded) by this module's run.sh as a SEPARATE process from the KILL-authority
+response node, so a GPIO hiccup can never stall the 50 Hz safety loop. Runs inside the privileged
+container (-> /dev/gpiochip0; msgs on path). A single APA102 shows one color at a time, so a
+two-color state is rendered by ALTERNATING the two colors (a 2-color blink).
+
+Inputs, each its own freshness:
+  - /mavros/rc/in read DIRECTLY (own pipeline; works even if flight_safety/response is down):
+      * MANUAL KILL switch  = ch9 (RC_MAP_KILL_SW=9), >KILL_US engaged
+      * FLIGHT MODE selector = ch7 (RC_MAP_FLTMODE 6-slot), >MODE_OFFB_US = offboard slot (top)
+  - /mavros/setpoint_raw/local : is offboard actually being COMMANDED? (fresh vs stale)
+  - /flight_safety/state : control_lane (+ mode) -- the autonomous decision
+
+Color scheme (priority top-down):
+  s/w (auto) KILL  (lane==KILL, no manual switch)         -> RED solid          (FAULT force-disarm, terminal)
+  manual KILL + RC offboard                               -> RED <-> GREEN      (killed; would resume offboard)
+  manual KILL + RC not-offboard (position/other)          -> RED <-> BLUE       (killed; would resume position)
+  RC offboard, FC NOT offboard (offboard-loss failsafe)   -> GREEN <-> BLUE     (dropped to Position on its own)
+  NORMAL (offboard) + setpoint fresh                      -> GREEN solid        (autonomous, commanded)
+  NORMAL (offboard) + no setpoint                         -> GREEN blink        (offboard starving)
+  MANUAL  mode==POSCTL                                    -> BLUE solid         (pilot position hold)
+  MANUAL  other manual mode (att/alt)                     -> BLUE blink         (less-assisted, caution)
+  LAND                                                    -> AMBER <-> GREEN    (emergency descend via offboard)
+  nothing fresh                                           -> OFF                (down/absent stack reads dark)
 
 Wiring (40-pin J30): APA102 DI->pin19, CI->pin23, VCC->pin2 (5V), GND->pin6.
-Colors below are plain edits — no image rebuild needed to change them.
+Colors below are plain edits -- no image rebuild needed to change them.
 """
+import os
 import rospy
 import Jetson.GPIO as GPIO
 from flight_safety.msg import FlightState
+from mavros_msgs.msg import RCIn, PositionTarget
+from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus
 
 DATA, CLK = 19, 23      # BOARD pins -> APA102 DI / CI
 BRIGHT = 8              # 0..31
-TIMEOUT = 1.0           # s without a message -> LED off
 RENDER_HZ = 20.0
-BLINK_HZ = 4.0          # amber LAND blink rate (full on/off cycles per second)
+TIMEOUT = 1.0           # s without /flight_safety/state -> lane unknown
+RC_TIMEOUT = 1.0        # s without /mavros/rc/in -> kill/mode pipeline unknown
+SP_TIMEOUT = 0.5        # s without a setpoint -> offboard "no command"
+DIAG_TIMEOUT = 3.0      # debug mirror: /diagnostics ticks ~1Hz, so a tight window flickers green<->off
 
-# control_lane -> (r, g, b, blink)
-COLORS = {
-    "NORMAL": (0, 255, 0, False),    # green  solid  = offboard, healthy
-    "MANUAL": (0, 0, 255, False),    # blue   solid  = pilot owns the vehicle
-    "LAND":   (255, 80, 0, True),    # amber  blink  = emergency descend in progress
-    "KILL":   (255, 0, 0, False),    # red    solid  = force-disarm, terminal
-}
-OFF = (0, 0, 0, False)
+KILL_CHANNEL = 8        # /mavros/rc/in idx for RC ch9 (RC_MAP_KILL_SW=9)
+KILL_US = 1500          # ch9 above this = manual kill engaged (measured 2011 on / 988 off)
+MODE_CHANNEL = 6        # /mavros/rc/in idx for RC ch7 (RC_MAP_FLTMODE=7), 6-slot mode selector
+MODE_OFFB_US = 1900     # ch7 above this = offboard slot (top, slot6=COM_FLTMODE6=7); measured 2011 offboard
+SETPOINT_TOPIC = "/mavros/setpoint_raw/local"   # matches response.yaml setpoint_out
+
+# blink rates (full on/off cycles per second); 0.0 == solid
+KILL_MODE_HZ = 4.0      # manual kill: RED <-> mode color
+FAILSAFE_HZ = 2.0       # offboard-loss fallback: GREEN <-> BLUE
+NORMAL_NODATA_HZ = 2.0  # offboard but no setpoint stream: GREEN <-> off
+MANUAL_BLINK_HZ = 2.0   # less-assisted manual mode: BLUE <-> off
+LAND_HZ = 2.0           # emergency descend (executed via offboard): AMBER <-> GREEN
+
+SOLID_BLUE_MODES = {"POSCTL"}   # manual modes shown as SOLID blue (else caution blink)
+
+RED, GREEN, BLUE, AMBER = (255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 80, 0)
+OFF = (0, 0, 0)
 
 
 def _byte(b):
@@ -49,22 +82,102 @@ def _show(r, g, b):
 
 class LedNode(object):
     def __init__(self):
-        self.lane = None
-        self.last = None
-        rospy.Subscriber("/flight_safety/state", FlightState, self._cb, queue_size=1)
+        self.state = None
+        self.state_last = None
+        self.kill_high = False
+        self.mode_offb = False
+        self.rc_last = None
+        self.sp_last = None
+        # TEMP DEBUG: mirror one /diagnostics source straight to the LED (bypass lane logic),
+        # so you can carry the drone by hand and watch e.g. geofence color change with NO
+        # armed/OFFBOARD/response needed. Enable: FS_LED_DEBUG_DIAG=geofence (env) or
+        # rosparam ~debug_diag. Empty = normal control_lane behavior.
+        self.debug_diag = rospy.get_param("~debug_diag", os.environ.get("FS_LED_DEBUG_DIAG", ""))
+        self.diag = None        # (level, message) of the matched source
+        self.diag_last = None
+        rospy.Subscriber("/flight_safety/state", FlightState, self._state_cb, queue_size=1)
+        rospy.Subscriber("/mavros/rc/in", RCIn, self._rc_cb, queue_size=1)
+        rospy.Subscriber(SETPOINT_TOPIC, PositionTarget, self._sp_cb, queue_size=1)
+        if self.debug_diag:
+            rospy.Subscriber("/diagnostics", DiagnosticArray, self._diag_cb, queue_size=10)
+            rospy.logwarn("[fs_led] DEBUG: mirroring /diagnostics '%s' to LED "
+                          "(OK=green WARN=amber ERROR=red, lost=red blink)", self.debug_diag)
         rospy.Timer(rospy.Duration(1.0 / RENDER_HZ), self._render)
 
-    def _cb(self, m):
-        self.lane = m.control_lane
-        self.last = rospy.Time.now()
+    def _diag_cb(self, arr):
+        for st in arr.status:
+            if self.debug_diag in st.name:
+                self.diag = (st.level, st.message)
+                self.diag_last = rospy.Time.now()
+                break
+
+    def _state_cb(self, m):
+        self.state = m
+        self.state_last = rospy.Time.now()
+
+    def _rc_cb(self, m):
+        ch = m.channels
+        self.kill_high = KILL_CHANNEL < len(ch) and ch[KILL_CHANNEL] > KILL_US
+        self.mode_offb = MODE_CHANNEL < len(ch) and ch[MODE_CHANNEL] > MODE_OFFB_US
+        self.rc_last = rospy.Time.now()
+
+    def _sp_cb(self, _m):
+        self.sp_last = rospy.Time.now()
+
+    def _fresh(self, stamp, timeout):
+        return stamp is not None and (rospy.Time.now() - stamp).to_sec() < timeout
+
+    def _decide_diag(self):
+        """TEMP DEBUG: show the matched /diagnostics source level directly."""
+        if not self._fresh(self.diag_last, DIAG_TIMEOUT) or self.diag is None:
+            return OFF, OFF, 0.0                          # source absent -> dark
+        level, msg = self.diag
+        if level == DiagnosticStatus.OK:
+            return GREEN, GREEN, 0.0                      # geofence INSIDE
+        if level == DiagnosticStatus.WARN:
+            return AMBER, AMBER, 0.0                      # APPROACHING
+        if "pose" in msg.lower():
+            return RED, OFF, 2.0                          # lost track (no pose) -> red blink
+        return RED, RED, 0.0                              # OUTSIDE -> red solid
+
+    def _decide(self):
+        """Return (colorA, colorB, blink_hz): alternate A/B at blink_hz; 0 hz = solid A."""
+        if self.debug_diag:
+            return self._decide_diag()
+        rc = self._fresh(self.rc_last, RC_TIMEOUT)
+
+        # 1. manual kill switch -- independent RC pipeline, highest priority
+        if rc and self.kill_high:
+            return RED, (GREEN if self.mode_offb else BLUE), KILL_MODE_HZ
+
+        if not self._fresh(self.state_last, TIMEOUT) or self.state is None:
+            return OFF, OFF, 0.0
+        lane, mode = self.state.control_lane, self.state.mode
+
+        # 2. s/w (auto) kill -- manual already handled above, so lane==KILL here is our force-disarm
+        if lane == "KILL":
+            return RED, RED, 0.0
+
+        # 3. offboard-loss failsafe: RC still asks offboard but FC dropped to another mode
+        if rc and self.mode_offb and mode != "OFFBOARD":
+            return GREEN, BLUE, FAILSAFE_HZ
+
+        # 4. control lane
+        if lane == "NORMAL":
+            sp = self._fresh(self.sp_last, SP_TIMEOUT)
+            return GREEN, OFF, 0.0 if sp else NORMAL_NODATA_HZ
+        if lane == "MANUAL":
+            return BLUE, OFF, 0.0 if mode in SOLID_BLUE_MODES else MANUAL_BLINK_HZ
+        if lane == "LAND":
+            return AMBER, GREEN, LAND_HZ
+        return OFF, OFF, 0.0
 
     def _render(self, _evt):
-        now = rospy.Time.now()
-        fresh = self.last is not None and (now - self.last).to_sec() < TIMEOUT
-        r, g, b, blink = COLORS.get(self.lane, OFF) if fresh else OFF
-        if blink and int(now.to_sec() * BLINK_HZ * 2) % 2:
-            r = g = b = 0
-        _show(r, g, b)
+        a, b, hz = self._decide()
+        if hz > 0 and int(rospy.Time.now().to_sec() * hz * 2) % 2:
+            _show(*b)
+        else:
+            _show(*a)
 
 
 if __name__ == "__main__":
