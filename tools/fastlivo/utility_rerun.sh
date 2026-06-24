@@ -23,21 +23,31 @@ fi
 docker start "$C" >/dev/null 2>&1
 
 # stop any running rerun server (the slim image has no procps -> scan /proc, kill by cmdline)
+# SIGKILL the old server (SIGTERM was too slow -> it held :9090 and the new bind failed), excluding
+# our own shell, then wait for the ports to actually release before the next bind.
 stop_rerun(){ docker exec "$C" bash -lc '
-  for p in /proc/[0-9]*; do c=$(tr "\0" " " < "$p/cmdline" 2>/dev/null) || continue
-    case "$c" in *rerun*serve-web*) kill "${p##*/}" 2>/dev/null;; esac; done' 2>/dev/null || true; }
+  me=$$
+  for p in /proc/[0-9]*; do pid=${p##*/}; [ "$pid" = "$me" ] && continue
+    c=$(tr "\0" " " < "$p/cmdline" 2>/dev/null) || continue
+    case "$c" in *serve-web*) kill -9 "$pid" 2>/dev/null;; esac; done
+  for i in $(seq 1 10); do ss -tln 2>/dev/null | grep -qE ":9090|:9876" || break; sleep 0.5; done' 2>/dev/null || true; }
 
 if [ "$1" = "--stop" ]; then stop_rerun; echo ">> rerun server stopped."; exit 0; fi
-stop_rerun; sleep 1
+stop_rerun
 
-RRD="${1:-/work/tools/fastlivo/rerun_eval/eval.rrd}"
-case "$RRD" in /*) ;; *) RRD="/work/tools/fastlivo/$RRD";; esac
-docker exec "$C" test -f "$RRD" || { echo "no such .rrd in container: $RRD"; exit 1; }
+# accept one OR several .rrd (multiple => they show as separate SOURCES/recordings in the viewer)
+[ $# -eq 0 ] && set -- /work/tools/fastlivo/rerun_eval/eval.rrd
+RRDS=""
+for r in "$@"; do
+  case "$r" in /*) ;; *) r="/work/tools/fastlivo/$r";; esac
+  docker exec "$C" test -f "$r" || { echo "no such .rrd in container: $r"; exit 1; }
+  RRDS="$RRDS '$r'"
+done
 
 # serve LAN-facing; --cors-allow-origin '*' lets the browser (a different origin) pull the gRPC stream.
 docker exec -d "$C" bash -lc "cd /work/tools/fastlivo/rerun_eval && \
   exec rerun --serve-web --bind 0.0.0.0 --web-viewer-port $WEB_PORT --port $GRPC_PORT \
-             --cors-allow-origin '*' '$RRD' >/tmp/rerun_serve.log 2>&1"
+             --cors-allow-origin '*' $RRDS >/tmp/rerun_serve.log 2>&1"
 
 for i in $(seq 1 20); do
   ss -tlnp 2>/dev/null | grep -q ":$WEB_PORT" && ss -tlnp 2>/dev/null | grep -q ":$GRPC_PORT" && break; sleep 0.5
@@ -48,5 +58,5 @@ done
 IP=$(ip route get 1.1.1.1 2>/dev/null | awk '{print $7; exit}'); [ -n "$IP" ] || IP=$(hostname -I 2>/dev/null | awk '{print $1}')
 echo ">> rerun viewer is up (headless, served from '$C'). Open in any BROWSER — zero install:"
 echo ">>     http://${IP:-<this-host-ip>}:$WEB_PORT?url=rerun%2Bhttp%3A%2F%2F${IP}%3A$GRPC_PORT%2Fproxy"
-echo ">> serving: ${RRD#/work/}   | rendering runs in your browser | close the tab anytime, re-run to reattach"
+echo ">> serving:$(echo "$RRDS" | sed "s|/work/||g")   | rendering runs in your browser | close the tab anytime, re-run to reattach"
 echo ">> stop:    tools/fastlivo/utility_rerun.sh --stop"

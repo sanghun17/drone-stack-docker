@@ -38,7 +38,7 @@ export ROS_PACKAGE_PATH="/work/modules/sensor/realsense-d435i${ROS_PACKAGE_PATH:
 
 LAUNCH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/mapping_d435i_replay.launch"
 BAG=""; RATE=1.0; OUT=""; CONFIG=""; CAMCALIB=""; TRACKER="pure"
-PAIRED=false; GUARD=false; WITHCLOUD=0; START=""; DUR=""
+PAIRED=false; GUARD=false; WITHCLOUD=0; INTERNAL=0; START=""; DUR=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --rate)        RATE="$2"; shift 2;;
@@ -51,6 +51,7 @@ while [ $# -gt 0 ]; do
     --paired-drop) PAIRED=true; shift;;
     --odom-guard)  GUARD=true; shift;;
     --with-cloud)  WITHCLOUD=1; shift;;
+    --internal)    INTERNAL=1; shift;;   # also record FAST-LIVO2 internal-health topics (effective LiDAR pts + visual submap pts)
     -*)            echo "unknown opt: $1" >&2; exit 2;;
     *)             BAG="$1"; shift;;
   esac
@@ -64,8 +65,9 @@ LARGS="paired_drop:=$PAIRED odom_guard:=$GUARD"
 [ -n "$CAMCALIB" ] && LARGS="$LARGS cam_calib:=$CAMCALIB"
 
 GT="/vrpn_client_node/${TRACKER}/pose"
-REC_TOPICS="/aft_mapped_to_init /aft_mapped_to_odom /path $GT /tf /tf_static"
+REC_TOPICS="/aft_mapped_to_init /aft_mapped_to_body /aft_mapped_to_optitrack /path $GT /tf /tf_static"
 [ "$WITHCLOUD" = 1 ] && REC_TOPICS="$REC_TOPICS /cloud_registered"
+[ "$INTERNAL" = 1 ]  && REC_TOPICS="$REC_TOPICS /cloud_effected /cloud_visual_sub_map_before"
 
 LP=""; RP=""
 shutdown(){ for p in "$RP" "$LP"; do [ -n "$p" ] && kill -INT "$p" 2>/dev/null; done

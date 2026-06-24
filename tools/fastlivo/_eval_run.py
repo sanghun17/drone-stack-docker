@@ -17,6 +17,8 @@ with Rosbag1Reader(Path(BAG)) as r:
     gt = file_interface.read_bag_trajectory(r, "/vrpn_client_node/pure/pose")
     od = file_interface.read_bag_trajectory(r, "/aft_mapped_to_odom")
     ai = file_interface.read_bag_trajectory(r, "/aft_mapped_to_init")
+from _eval_offset import correct_est_offset  # est stamp=ros::Time::now() lags GT by processing latency
+od, _o = correct_est_offset(gt, od); ai, _a = correct_est_offset(gt, ai)
 
 
 def att_mean(g, e):
