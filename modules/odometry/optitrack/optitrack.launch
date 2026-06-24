@@ -21,16 +21,8 @@
     </rosparam>
   </node>
 
-  <!-- tracker pose -> /vision_pose/mocap @30Hz (a MUX INPUT, not vision_pose directly — the
-       vision-pose-mux module selects mocap-vs-vio for /mavros/vision_pose/pose). Relayed VERBATIM;
-       verify Motive-axis vs ENU alignment before arming (VERIFY-BEFORE-FLIGHT). -->
-  <arg name="tracker" default="pure"/>
-  <arg name="out" default="/vision_pose/mocap"/>
-  <node pkg="topic_tools" type="throttle" name="vision_pose_throttle" output="screen"
-        launch-prefix="taskset -c $(env CPUS_POOL)"
-        args="messages /vrpn_client_node/$(arg tracker)/pose 30.0 $(arg out)"/>
-  <!-- prints the first relayed pose once, then exits -->
-  <node pkg="rostopic" type="rostopic" name="vision_pose_announce" output="screen"
-        launch-prefix="taskset -c $(env CPUS_POOL)"
-        args="echo -n1 $(arg out)/pose/position"/>
+  <!-- vrpn_client_node only. The tracker pose /vrpn_client_node/pure/pose is consumed DIRECTLY by the
+       flight-safety estimator mux (vision_pose_mux.launch, mocap input) -> /mavros/vision_pose/pose. No
+       throttle/relay here: the mux subscribes to pure/pose as-is (100Hz, = update_frequency above). EKF2
+       now sees mocap at 100Hz (was 30Hz via the old throttle). Verify Motive-axis vs ENU before arming. -->
 </launch>
