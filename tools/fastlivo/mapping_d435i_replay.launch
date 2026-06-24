@@ -24,12 +24,27 @@
         args="0 0 0 0.5 -0.5 0.5 -0.5 odom camera_init 100"/>
 
   <rosparam command="load" file="$(arg config)"/>
+  <!-- REPLAY FIX: force static intrinsics. The online path does
+       ros::topic::waitForMessage<CameraInfo>(.., ros::Duration(5s)) in the LIVMapper
+       ctor BEFORE /aft_mapped_to_init is advertised. That timeout is measured on the
+       ROS clock (sim time), and the harness gates rosbag-play (the only /clock source)
+       on that advertise -> frozen clock -> the 5s wait never elapses -> deadlock.
+       In replay no CameraInfo is ever published anyway, so this always fell back to
+       cam_calib (camera_d435i.yaml); disabling it just skips the deadlocking wait. -->
+  <param name="common/online_intrinsics_en" value="false"/>
   <param name="common/cam_calib_file" value="$(arg cam_calib)"/>
   <param name="debug/verbose" value="false"/>
 
   <!-- no taskset/nice: offline replay is not competing with a live camera, so the
        CPU-fence rationale from mapping_d435i.launch does not apply. -->
-  <node pkg="fast_livo" type="fastlivo_mapping" name="laserMapping" output="screen"/>
+  <node pkg="fast_livo" type="fastlivo_mapping" name="laserMapping" output="screen">
+    <!-- REPLAY FIX (cont.): online_intrinsics is off above, so the ctor's fallback that
+         did `rosparam load cam_calib /laserMapping` no longer runs. Load the static
+         intrinsics into this node's private ns here so loadFromRosNs("laserMapping") finds
+         cam_model/cam_fx/... — identical to the intrinsics the online path always fell back
+         to in replay (no CameraInfo on the bag). -->
+    <rosparam command="load" file="$(arg cam_calib)"/>
+  </node>
 
   <node pkg="fast_livo" type="smart_static_tf_bridge.py" name="smart_tf_bridge" output="log">
     <param name="parent" value="aft_mapped"/>

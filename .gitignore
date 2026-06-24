@@ -32,3 +32,10 @@ __pycache__/
 /flight_logs/
 tools/fastlivo/rerun_eval/*.rrd
 tools/fastlivo/rerun_eval/*.tum
+
+# FAST-LIVO tuning: per-config generated yamls + binary parquet are regenerable (configs by
+# _tuneN_parallel.sh from the base, parquet by build_master.py). Keep scripts + tune_master.csv.
+tools/fastlivo/_t[0-9]*_*.yaml
+tools/fastlivo/_vrf*.yaml
+tools/fastlivo/_vrfo_*.bag
+tools/fastlivo/tune_master.parquet
