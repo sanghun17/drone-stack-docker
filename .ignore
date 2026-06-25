@@ -1,0 +1,6 @@
+# Search-tool ignore (ripgrep / fd / ag / silver-searcher) — NOT read by git.
+# .gitignore blanket-excludes /ws/ (the component repos there are separate gits, cloned by
+# setup.sh) which also makes search tools skip the source. Re-include ws/ for search ONLY:
+# git keeps ignoring it (git never reads this file); .ignore outranks .gitignore for these tools.
+# Build artifacts under ws/ stay excluded by the global build/ devel/ logs/ __pycache__/ rules.
+!/ws/

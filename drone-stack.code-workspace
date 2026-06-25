@@ -1,0 +1,15 @@
+{
+  // Multi-root workspace: the main repo gitignores /ws/ (component repos are cloned by each
+  // module's clone.sh and are fully regenerable), which greys them out + drops them from search.
+  // Mounting each component repo as its OWN root makes Cursor use THAT repo's .gitignore (source
+  // visible, only its build artifacts hidden) instead of the parent /ws/ block -- searchable,
+  // indexed, un-greyed -- with the parent's git tracking left untouched. Open this file, not the folder.
+  "folders": [
+    { "name": "drone-stack",   "path": "." },
+    { "name": "flight_safety", "path": "ws/flight-safety/src/flight_safety" },
+    { "name": "risk_aware",    "path": "ws/risk-aware/src/risk_aware_planning" },
+    { "name": "fast-livo",     "path": "ws/fast-livo/src" },
+    { "name": "optitrack",     "path": "ws/optitrack/src/vrpn_client_ros" },
+    { "name": "allan",         "path": "ws/allan/src/allan_variance_ros" }
+  ]
+}
