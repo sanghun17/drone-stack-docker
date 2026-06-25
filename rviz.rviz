@@ -8,10 +8,10 @@ Panels:
         - /Status1
         - /Sensor1
         - /Sensor1/PointCloud_RGB1
-        - /Sensor1/PointCloud_RGB1/Status1
         - /Estimation1/FastLivo_Odometry1/Shape1
         - /Voxblox1/Voxblox_Bbox1
-      Splitter Ratio: 0.3565768599510193
+        - /Jax1
+      Splitter Ratio: 0.44215530157089233
     Tree Height: 241
   - Class: rviz/Selection
     Name: Selection
@@ -30,7 +30,7 @@ Panels:
   - Class: rviz/Time
     Name: Time
     SyncMode: 0
-    SyncSource: Image_Depth
+    SyncSource: ""
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -274,8 +274,16 @@ Visualization Manager:
     - Class: rviz/Group
       Displays:
         - Class: rviz/MarkerArray
+          Enabled: true
+          Marker Topic: /local_planner/goal_pose
+          Name: Jax_Goal_Pose
+          Namespaces:
+            goal_pose: true
+          Queue Size: 100
+          Value: true
+        - Class: rviz/MarkerArray
           Enabled: false
-          Marker Topic: /planner/sampled_trajectories/safe
+          Marker Topic: /local_planner/sampled_trajectories/safe
           Name: Jax_Sample_Safe_Traj
           Namespaces:
             {}
@@ -283,7 +291,7 @@ Visualization Manager:
           Value: false
         - Class: rviz/MarkerArray
           Enabled: false
-          Marker Topic: /planner/sampled_trajectories/unsafe
+          Marker Topic: /local_planner/sampled_trajectories/unsafe
           Name: Jax_Sample_Unsafe_Traj
           Namespaces:
             {}
@@ -291,18 +299,19 @@ Visualization Manager:
           Value: false
         - Class: rviz/MarkerArray
           Enabled: true
-          Marker Topic: /planner/optimal_trajectory
+          Marker Topic: /local_planner/optimal_trajectory
           Name: Jax_Optimal_Traj
           Namespaces:
-            {}
+            optimal_trajectory: true
+            optimal_trajectory_fov: true
           Queue Size: 100
           Value: true
         - Class: rviz/MarkerArray
           Enabled: true
-          Marker Topic: /planner/uncertainty_risk
+          Marker Topic: /local_planner/uncertainty_risk
           Name: Jax_Optimal_Uncertainty
           Namespaces:
-            {}
+            uncertainty_risk_best: true
           Queue Size: 100
           Value: true
       Enabled: true
@@ -364,7 +373,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 9.983250617980957
+      Distance: 8.170679092407227
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -372,17 +381,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 1.8858617544174194
-        Y: -0.7226678729057312
-        Z: 0.05368375405669212
+        X: 0.9995913505554199
+        Y: -0.4244024455547333
+        Z: -0.11265905201435089
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5597963929176331
+      Pitch: 0.6497964262962341
       Target Frame: <Fixed Frame>
-      Yaw: 3.255434989929199
+      Yaw: 1.8054348230361938
     Saved: ~
 Window Geometry:
   Displays:
@@ -406,5 +415,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1600
-  X: 0
-  Y: 10
+  X: -1
+  Y: -10

@@ -45,4 +45,5 @@ export XLA_PYTHON_CLIENT_MEM_FRACTION="${XLA_PYTHON_CLIENT_MEM_FRACTION:-0.1}"
 export PYTHONUNBUFFERED=1   # 로그 즉시 출력 (파이프/리다이렉트에서도)
 
 # CPUS_POOL (config/ros_env.sh): stay OFF camera cores 0-1 (uvc watchdog, see run_voxblox.sh).
-exec taskset -c "${CPUS_POOL:?config/ros_env.sh not sourced}" python3 "${JAX}" --gpu 0 --planner motion_primitives --mode exploration "$@"
+# /imu:=/mavros/imu/data — node hardcodes /imu for omega_z; remap to the FCU IMU here.
+exec taskset -c "${CPUS_POOL:?config/ros_env.sh not sourced}" python3 "${JAX}" --gpu 0 --planner motion_primitives --mode exploration /imu:=/mavros/imu/data "$@"

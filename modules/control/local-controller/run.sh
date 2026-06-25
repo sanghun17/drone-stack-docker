@@ -1,7 +1,7 @@
 #!/bin/bash
 # control/local-controller: velocity control bridge (control_bridge.py, `local_controller`
-# pkg). /jax/optimal_trajectory -> PD velocity -> /mavros/setpoint_raw/local. Loads the real
-# scenario config (/system/control=mavros, odom_topic=/robot/odom) first. Commands are DISABLED
+# pkg). /jax/optimal_trajectory -> PD velocity -> /mavros/setpoint_raw/local. control=mavros +
+# odom=/robot/odom are hardcoded in control_bridge (no scenario). Commands are DISABLED
 # by default -- call /control_bridge/toggle_running "data: true" to actually send. Needs
 # control/mavros + control/flight-safety (for /robot/odom) up first. Ctrl-C stops the node;
 # the shared roscore is left alone.
@@ -29,9 +29,7 @@ source /work/ws/risk-aware/devel/setup.bash
 source /work/config/ros_env.sh   # ROS_MASTER_URI / ROS_IP / CPUS_* — single source, edit-and-go
 source /work/modules/ensure_roscore.sh   # master up on $ROS_MASTER_PORT — TCP probe, not a blind sleep 4
 
-# scenario config -> /system/* (control=mavros, odom_topic=/robot/odom). Idempotent: safe even
-# if a planner launch already loaded it (rosparam load is last-write-wins, same file).
-bash /work/ws/risk-aware/src/risk_aware_planning/mav_active_3d_planning/local_planner_mpc/config/load_config.sh real
+# No scenario load: control_bridge hardcodes control=mavros + odom=/robot/odom.
 
 # CPUS_POOL (config/ros_env.sh): stay OFF camera cores 0-1 / fast-livo cores 2-3.
 exec taskset -c "${CPUS_POOL:?config/ros_env.sh not sourced}" rosrun local_controller control_bridge.py "$@"
