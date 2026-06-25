@@ -28,12 +28,10 @@ Color scheme (priority top-down):
 Wiring (40-pin J30): APA102 DI->pin19, CI->pin23, VCC->pin2 (5V), GND->pin6.
 Colors below are plain edits -- no image rebuild needed to change them.
 """
-import os
 import rospy
 import Jetson.GPIO as GPIO
 from flight_safety.msg import FlightState
 from mavros_msgs.msg import RCIn, PositionTarget
-from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus
 
 DATA, CLK = 19, 23      # BOARD pins -> APA102 DI / CI
 BRIGHT = 8              # 0..31
@@ -41,7 +39,6 @@ RENDER_HZ = 20.0
 TIMEOUT = 1.0           # s without /flight_safety/state -> lane unknown
 RC_TIMEOUT = 1.0        # s without /mavros/rc/in -> kill/mode pipeline unknown
 SP_TIMEOUT = 0.5        # s without a setpoint -> offboard "no command"
-DIAG_TIMEOUT = 3.0      # debug mirror: /diagnostics ticks ~1Hz, so a tight window flickers green<->off
 
 KILL_CHANNEL = 8        # /mavros/rc/in idx for RC ch9 (RC_MAP_KILL_SW=9)
 KILL_US = 1500          # ch9 above this = manual kill engaged (measured 2011 on / 988 off)
@@ -88,28 +85,10 @@ class LedNode(object):
         self.mode_offb = False
         self.rc_last = None
         self.sp_last = None
-        # TEMP DEBUG: mirror one /diagnostics source straight to the LED (bypass lane logic),
-        # so you can carry the drone by hand and watch e.g. geofence color change with NO
-        # armed/OFFBOARD/response needed. Enable: FS_LED_DEBUG_DIAG=geofence (env) or
-        # rosparam ~debug_diag. Empty = normal control_lane behavior.
-        self.debug_diag = rospy.get_param("~debug_diag", os.environ.get("FS_LED_DEBUG_DIAG", ""))
-        self.diag = None        # (level, message) of the matched source
-        self.diag_last = None
         rospy.Subscriber("/flight_safety/state", FlightState, self._state_cb, queue_size=1)
         rospy.Subscriber("/mavros/rc/in", RCIn, self._rc_cb, queue_size=1)
         rospy.Subscriber(SETPOINT_TOPIC, PositionTarget, self._sp_cb, queue_size=1)
-        if self.debug_diag:
-            rospy.Subscriber("/diagnostics", DiagnosticArray, self._diag_cb, queue_size=10)
-            rospy.logwarn("[fs_led] DEBUG: mirroring /diagnostics '%s' to LED "
-                          "(OK=green WARN=amber ERROR=red, lost=red blink)", self.debug_diag)
         rospy.Timer(rospy.Duration(1.0 / RENDER_HZ), self._render)
-
-    def _diag_cb(self, arr):
-        for st in arr.status:
-            if self.debug_diag in st.name:
-                self.diag = (st.level, st.message)
-                self.diag_last = rospy.Time.now()
-                break
 
     def _state_cb(self, m):
         self.state = m
@@ -127,23 +106,8 @@ class LedNode(object):
     def _fresh(self, stamp, timeout):
         return stamp is not None and (rospy.Time.now() - stamp).to_sec() < timeout
 
-    def _decide_diag(self):
-        """TEMP DEBUG: show the matched /diagnostics source level directly."""
-        if not self._fresh(self.diag_last, DIAG_TIMEOUT) or self.diag is None:
-            return OFF, OFF, 0.0                          # source absent -> dark
-        level, msg = self.diag
-        if level == DiagnosticStatus.OK:
-            return GREEN, GREEN, 0.0                      # geofence INSIDE
-        if level == DiagnosticStatus.WARN:
-            return AMBER, AMBER, 0.0                      # APPROACHING
-        if "pose" in msg.lower():
-            return RED, OFF, 2.0                          # lost track (no pose) -> red blink
-        return RED, RED, 0.0                              # OUTSIDE -> red solid
-
     def _decide(self):
         """Return (colorA, colorB, blink_hz): alternate A/B at blink_hz; 0 hz = solid A."""
-        if self.debug_diag:
-            return self._decide_diag()
         rc = self._fresh(self.rc_last, RC_TIMEOUT)
 
         # 1. manual kill switch -- independent RC pipeline, highest priority
