@@ -16,7 +16,12 @@ if [ ! -f /.dockerenv ]; then
   __TT=$([ -t 1 ] && echo -it || echo -i)
   # Ctrl+C here -> SIGINT the node INSIDE the container (docker exec doesn't forward it
   # reliably). roscore left alone — shared master other modules use.
-  __M="control_bridge.py"
+  # stage1(raw JAX, default)=control_bridge.py ; stage2(b-spline)=ours_mavros_stack ; pos_step(tau)=ours_pos_step
+  case "${1:-}" in
+    pos_cmd|stage2) __M="ours_mavros_stack" ;;
+    pos_step|tau)   __M="ours_pos_step" ;;
+    *)              __M="control_bridge.py" ;;
+  esac
   cleanup(){ docker exec "$__C" pkill -INT -f "$__M" >/dev/null 2>&1; }
   trap 'cleanup; exit 130' INT TERM HUP
   docker exec $__TT "$__C" bash "/work/${__S#$__R/}" "$@"; __rc=$?
@@ -32,4 +37,11 @@ source /work/modules/ensure_roscore.sh   # master up on $ROS_MASTER_PORT — TCP
 # No scenario load: control_bridge hardcodes control=mavros + odom=/robot/odom.
 
 # CPUS_POOL (config/ros_env.sh): stay OFF camera cores 0-1 / fast-livo cores 2-3.
-exec taskset -c "${CPUS_POOL:?config/ros_env.sh not sourced}" rosrun local_controller control_bridge.py "$@"
+# stage1 (raw JAX velocity, default) vs stage2 (b-spline: jax_to_mixtraj + traj_server +
+# control_bridge[pos_cmd]). NEVER both — both publish /local_controller/setpoint_raw/local.
+__T="taskset -c ${CPUS_POOL:?config/ros_env.sh not sourced}"
+case "${1:-}" in
+  pos_cmd|stage2) shift; exec $__T roslaunch local_controller ours_mavros_stack.launch "$@" ;;
+  pos_step|tau)   shift; exec $__T roslaunch local_controller ours_pos_step.launch "$@" ;;
+  *)              exec $__T rosrun local_controller control_bridge.py "$@" ;;
+esac

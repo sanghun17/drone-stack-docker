@@ -6,7 +6,6 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /Sensor1
         - /Sensor1/PointCloud_RGB1
         - /Estimation1/FastLivo_Odometry1/Shape1
         - /Voxblox1/Voxblox_Bbox1
@@ -307,13 +306,13 @@ Visualization Manager:
           Queue Size: 100
           Value: true
         - Class: rviz/MarkerArray
-          Enabled: true
+          Enabled: false
           Marker Topic: /local_planner/uncertainty_risk
           Name: Jax_Optimal_Uncertainty
           Namespaces:
-            uncertainty_risk_best: true
+            {}
           Queue Size: 100
-          Value: true
+          Value: false
       Enabled: true
       Name: Jax
     - Class: rviz/TF
@@ -373,7 +372,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 8.170679092407227
+      Distance: 6.7849016189575195
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -381,17 +380,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0.9995913505554199
-        Y: -0.4244024455547333
-        Z: -0.11265905201435089
+        X: 0.5325033664703369
+        Y: -0.7767758369445801
+        Z: 0.06305412948131561
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6497964262962341
+      Pitch: 0.8897966146469116
       Target Frame: <Fixed Frame>
-      Yaw: 1.8054348230361938
+      Yaw: 1.7404351234436035
     Saved: ~
 Window Geometry:
   Displays:
@@ -415,5 +414,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1600
-  X: -1
-  Y: -10
+  X: -4
+  Y: -70
