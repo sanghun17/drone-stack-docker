@@ -35,9 +35,12 @@ def eval_yaw(coef, dur, t):
 
 trajs = []        # list of dicts: t_abs, pos(N,3), vel(N,3), yaw(N), yawrate(N), tid
 od_t, od_pos, od_vel, od_yaw, od_wz = [], [], [], [], []
+ms = []           # /mavros/state (t_recv, mode) — OFFBOARD 구간 음영용
 
 b = rosbag.Bag(bagf)
-for topic, m, t in b.read_messages(topics=['/planning/trajectory', '/robot/odom']):
+for topic, m, t in b.read_messages(topics=['/planning/trajectory', '/robot/odom', '/mavros/state']):
+    if topic == '/mavros/state':
+        ms.append((t.to_sec(), m.mode)); continue
     if topic == '/planning/trajectory':
         deg = m.bspline_degree
         knots = np.array(m.knots)
@@ -67,6 +70,19 @@ b.close()
 
 t_ref = min(trajs[0]['t0'], od_t[0])
 od_rel = [x - t_ref for x in od_t]
+
+# OFFBOARD 구간 (t_ref 기준 상대시각) — 배경 음영용
+ob_spans = []
+_open = None
+for tt, mode in ms:
+    rel = tt - t_ref
+    if mode == 'OFFBOARD' and _open is None:
+        _open = rel
+    elif mode != 'OFFBOARD' and _open is not None:
+        ob_spans.append((_open, rel)); _open = None
+if _open is not None and od_rel:
+    ob_spans.append((_open, od_rel[-1]))
+print(f"OFFBOARD 구간: {[(round(s,1), round(e,1)) for s, e in ob_spans]}")
 cmap = plt.get_cmap('jet')
 nT = len(trajs)
 for i, tr in enumerate(trajs):
@@ -82,6 +98,8 @@ AXC = ['tab:red', 'tab:green', 'tab:blue', 'tab:purple']   # current 축색 (x/y
 
 
 def draw(ax, getter, od_vals, ylabel, axc, mark=True):
+    for s, e in ob_spans:
+        ax.axvspan(s, e, color='0.80', alpha=0.45, zorder=0)   # OFFBOARD 음영
     ax.plot(od_rel, od_vals, '-', color=axc, lw=1.6, zorder=5, label='current(odom)')
     for tr in trajs:
         v = getter(tr)
@@ -101,8 +119,9 @@ def make_fig(title, getters, od_series, ylabels, fname):
     handles = [Line2D([0], [0], color='k', ls='-', label='current(odom)'),
                Line2D([0], [0], color='0.4', ls=':', label='trajectory (full horizon)'),
                Line2D([0], [0], marker='o', color='0.4', ls='', label='traj start'),
-               Line2D([0], [0], marker='x', color='0.4', ls='', label='traj end')]
-    axs[0].legend(handles=handles, ncol=4, fontsize=9, loc='upper right')
+               Line2D([0], [0], marker='x', color='0.4', ls='', label='traj end'),
+               Line2D([0], [0], color='0.80', lw=8, alpha=0.45, label='OFFBOARD')]
+    axs[0].legend(handles=handles, ncol=5, fontsize=9, loc='upper right')
     fig.tight_layout()
     p = f'{OUTDIR}/{fname}'
     fig.savefig(p, dpi=110); print('saved', p)
