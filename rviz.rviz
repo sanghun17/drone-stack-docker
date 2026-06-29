@@ -7,9 +7,9 @@ Panels:
         - /Global Options1
         - /Status1
         - /Sensor1/PointCloud_RGB1
+        - /Estimation1
         - /Estimation1/FastLivo_Odometry1/Shape1
         - /Voxblox1/Voxblox_Bbox1
-        - /Jax1
       Splitter Ratio: 0.44215530157089233
     Tree Height: 241
   - Class: rviz/Selection
@@ -29,7 +29,7 @@ Panels:
   - Class: rviz/Time
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: Image_Depth
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -157,7 +157,7 @@ Visualization Manager:
             Shaft Length: 0.5
             Shaft Radius: 0.10000000149011612
             Value: Arrow
-          Topic: /aft_mapped_to_odom
+          Topic: /aft_mapped_to_body_imu_propagated
           Unreliable: false
           Value: true
         - Alpha: 1
@@ -265,7 +265,8 @@ Visualization Manager:
           Marker Topic: /planner/bbox
           Name: Voxblox_Bbox
           Namespaces:
-            {}
+            sdf_map_bbox: true
+            target_bbox: true
           Queue Size: 100
           Value: true
       Enabled: true
@@ -372,7 +373,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 6.7849016189575195
+      Distance: 6.84683895111084
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -388,9 +389,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.8897966146469116
+      Pitch: 0.8497964143753052
       Target Frame: <Fixed Frame>
-      Yaw: 1.7404351234436035
+      Yaw: 0.3654344081878662
     Saved: ~
 Window Geometry:
   Displays:
@@ -414,5 +415,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1600
-  X: -4
-  Y: -70
+  X: -5
+  Y: 19
