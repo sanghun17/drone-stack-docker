@@ -1,6 +1,6 @@
 name: spconv
 group: compute
-description: cumm 0.4.11 + spconv 2.3.6 from source (CUDA 11.4 / Orin sm_87). For epoch_680 map_encoder + C++ sparse_vfe.
+description: cumm 0.4.11 + spconv 2.3.6 AOT wheels (CUDA 11.4 / Orin sm_87). For epoch_680 map_encoder + C++ sparse_vfe.
 
 needs: [compute/torch]      # spconv builds against torch
 
@@ -10,7 +10,16 @@ env:
   CUMM_CUDA_ARCH_LIST: "8.7"
 
 deps:
-  pip: [pccm, ccimport, pybind11, ninja, wheel]
-  source: [install.sh]      # cumm + spconv git source builds
+  pip: [pccm, ccimport, pybind11, ninja, wheel]   # build-time codegen + runtime `import spconv` (build.py imports pccm)
+  source: [install.sh]      # cumm + spconv: prefer baked AOT wheels, else build from source
+
+assets: [wheels]            # baked AOT wheels install.sh reads (bind-mounted into its RUN)
 
 provides: [spconv, cumm]
+
+# NOTE: install.sh prefers baked AOT wheels at modules/compute/spconv/wheels/{cumm,spconv}-*.whl
+# (cp38-aarch64, kernels precompiled into core_cc). They ARE git-tracked — a fresh clone installs
+# spconv in seconds. Without them (or SPCONV_MODE=source) it builds from source (nvcc sm_87, ~17min).
+# WHY AOT wheel, not `pip install -e`: editable made spconv/build.py re-run the pccm kernel codegen on
+# every import (~38s planner-startup stall); the baked wheel skips it → ~10s import, no runtime JIT.
+# Build reads the wheels via a transient bind-mount, so they are never baked into the image.
