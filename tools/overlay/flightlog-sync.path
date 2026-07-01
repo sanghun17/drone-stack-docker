@@ -1,0 +1,12 @@
+# Watches flight_logs for recorder_node's <base>.ready markers and triggers the sync.
+# Install (host): sudo cp tools/overlay/flightlog-sync.{path,service} /etc/systemd/system/
+#                 sudo systemctl daemon-reload && sudo systemctl enable --now flightlog-sync.path
+[Unit]
+Description=Watch flight_logs for finished flight bags to rsync to the ml PC
+
+[Path]
+PathExistsGlob=/home/hmcl/drone-stack-docker/flight_logs/*.ready
+Unit=flightlog-sync.service
+
+[Install]
+WantedBy=multi-user.target
