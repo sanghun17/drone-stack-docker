@@ -37,15 +37,18 @@ def eval_yaw(coef, dur, t):
 trajs = []        # list of dicts: t_abs, pos(N,3), vel(N,3), yaw(N), yawrate(N), tid
 od_t, od_pos, od_vel, od_yaw, od_wz = [], [], [], [], []
 ms = []           # /mavros/state (t_recv, mode) — OFFBOARD 경계용
+fs = []           # /flight_safety/state (t_recv, control_lane) — 자율(NORMAL) 구간용
 goals = []        # (t_abs, (gx, gy, gz), gyaw) — /local_planner/goal_pose
 sp_t, sp_pos, sp_vel, sp_yaw, sp_wz = [], [], [], [], []   # /local_controller/setpoint_raw/local (명령)
 
 b = rosbag.Bag(bagf)
 for topic, m, t in b.read_messages(topics=[
-        '/planning/trajectory', '/robot/odom', '/mavros/state',
+        '/planning/trajectory', '/robot/odom', '/mavros/state', '/flight_safety/state',
         '/local_planner/goal_pose', '/local_controller/setpoint_raw/local']):
     if topic == '/mavros/state':
         ms.append((t.to_sec(), m.mode)); continue
+    if topic == '/flight_safety/state':
+        fs.append((t.to_sec(), m.control_lane)); continue
     if topic == '/local_controller/setpoint_raw/local':
         sp_t.append(t.to_sec())
         sp_pos.append((m.position.x, m.position.y, m.position.z))
@@ -106,6 +109,22 @@ if _open is not None and od_rel:
     ob_spans.append((_open, od_rel[-1]))
 print(f"OFFBOARD 구간: {[(round(s,1), round(e,1)) for s, e in ob_spans]}")
 
+# 자율(NORMAL) 구간 — 배경 음영용 (emergency LAND/KILL은 OFFBOARD라도 제외)
+norm_spans = []
+_open = None
+for tt, lane in fs:
+    rel = tt - t_ref
+    if lane == 'NORMAL' and _open is None:
+        _open = rel
+    elif lane != 'NORMAL' and _open is not None:
+        norm_spans.append((_open, rel)); _open = None
+if _open is not None and od_rel:
+    norm_spans.append((_open, od_rel[-1]))
+emerg = [fs[i][0] - t_ref for i in range(1, len(fs))            # NORMAL -> LAND/KILL 전이
+         if fs[i - 1][1] == 'NORMAL' and fs[i][1] in ('LAND', 'KILL')]
+bg_spans = norm_spans if norm_spans else ob_spans              # 배경 기준 (NORMAL 우선)
+print(f"NORMAL 구간: {[(round(s,1), round(e,1)) for s, e in norm_spans]}  emergency@{[round(e,1) for e in emerg]}")
+
 # goal 세그먼트 (변경마다 분할) — 배경 음영 + step 라인용
 goal_segs = []    # (rel_start, rel_end, goal_xyz, goal_yaw)
 if goals:
@@ -137,18 +156,20 @@ SPC = 'magenta'    # setpoint 색
 
 
 def draw(ax, getter, od_vals, goal_vals, sp_vals, ylabel, axc, mark=True):
-    if goal_segs:                                          # goal 세그먼트별 배경 (OFFBOARD 구간만)
+    if goal_segs:                                          # goal 세그먼트별 배경 (NORMAL 자율 구간만)
         for i, (s, e, g, gy) in enumerate(goal_segs):
-            for os, oe in ob_spans:
+            for os, oe in bg_spans:
                 a, b = max(s, os), min(e, oe)
                 if b > a:
                     ax.axvspan(a, b, color=GPAL[i % len(GPAL)], alpha=0.6, zorder=0)
-    else:                                                  # goal 없으면 OFFBOARD 음영(구버전)
-        for s, e in ob_spans:
+    else:                                                  # goal 없으면 NORMAL 음영
+        for s, e in bg_spans:
             ax.axvspan(s, e, color='0.80', alpha=0.45, zorder=0)
-    for s, e in ob_spans:                                  # OFFBOARD 경계 = 세로 점선
+    for s, e in ob_spans:                                  # OFFBOARD 경계 = 회색 세로 점선
         ax.axvline(s, color='0.25', ls='--', lw=1.0, alpha=0.7, zorder=1)
         ax.axvline(e, color='0.25', ls='--', lw=1.0, alpha=0.7, zorder=1)
+    for em in emerg:                                       # emergency(LAND/KILL) 발동 = 빨간 세로선
+        ax.axvline(em, color='red', ls='-', lw=1.3, alpha=0.7, zorder=1.5)
     ax.plot(od_rel, od_vals, '-', color=axc, lw=1.7, zorder=5, label='current(odom)')
     if sp_vals is not None and sp_rel:                     # 명령 setpoint = 축색 점선
         ax.plot(sp_rel, sp_vals, ':', color=axc, lw=1.8, zorder=4.5, label='setpoint(cmd)')
@@ -167,9 +188,9 @@ def make_fig(title, getters, od_series, goal_series, sp_series, ylabels, fname):
     fig, axs = plt.subplots(4, 1, figsize=(13, 11), sharex=True)
     for r in range(4):
         draw(axs[r], getters[r], od_series[r], goal_series[r], sp_series[r], ylabels[r], AXC[r])
-    top = axs[0].get_ylim()[1]                             # goal 값 라벨 (OFFBOARD 보이는 구간 중심)
+    top = axs[0].get_ylim()[1]                             # goal 값 라벨 (NORMAL 보이는 구간 중심)
     for s, e, g, gy in goal_segs:
-        vis = [(max(s, os), min(e, oe)) for os, oe in ob_spans if min(e, oe) > max(s, os)]
+        vis = [(max(s, os), min(e, oe)) for os, oe in bg_spans if min(e, oe) > max(s, os)]
         if not vis:
             continue
         axs[0].text((vis[0][0] + vis[-1][1]) / 2, top, f'({g[0]:.1f},{g[1]:.1f},{g[2]:.1f})',
@@ -182,8 +203,9 @@ def make_fig(title, getters, od_series, goal_series, sp_series, ylabels, fname):
                Line2D([0], [0], color='0.4', ls=':', label='trajectory (full horizon)'),
                Line2D([0], [0], marker='o', color='0.4', ls='', label='traj start'),
                Line2D([0], [0], marker='x', color='0.4', ls='', label='traj end'),
-               Line2D([0], [0], color='0.25', ls='--', label='OFFBOARD edge')]
-    axs[0].legend(handles=handles, ncol=7, fontsize=7, loc='upper right')
+               Line2D([0], [0], color='0.25', ls='--', label='OFFBOARD edge'),
+               Line2D([0], [0], color='red', ls='-', label='emergency(LAND/KILL)')]
+    axs[0].legend(handles=handles, ncol=8, fontsize=7, loc='upper right')
     fig.tight_layout()
     p = f'{OUTDIR}/{fname}'
     fig.savefig(p, dpi=110); print('saved', p)
