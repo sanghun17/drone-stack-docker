@@ -1,5 +1,14 @@
 # CLAUDE.md
 
+## Orchestration (필독)
+
+메인 에이전트는 지휘만 한다: 계획, 작업 분배, 중요한 결정, 결과 종합.
+실제 구현은 서브 에이전트에 위임한다: 무거운 추론은 `deep-reasoner`(Opus), 일반 구현은 `default-worker`(Sonnet), 잡무는 `task-worker`(Haiku).
+
+직접 처리 / 위임 기준과 라우팅 상세:
+
+@.claude/rules/orchestration.md
+
 Jetson AGX Orin (and x86) drone-autonomy stack, ROS Noetic. Modular: each module declares its
 own deps; a "stack" composes them into ONE Docker image + ONE container. Human overview: README.md.
 Design: docs/MODULARIZATION.md, docs/MODULE_SCHEMA.md.
