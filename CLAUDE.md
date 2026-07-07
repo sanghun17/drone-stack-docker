@@ -24,6 +24,16 @@ Design: docs/MODULARIZATION.md, docs/MODULE_SCHEMA.md.
   shell out to cat/sed/heredoc to read or edit anything under ws/.
 - **Cursor**: open `drone-stack.code-workspace` (multi-root) — each component repo is mounted as its
   own root so it's searchable / indexed / un-greyed despite the parent's `/ws/` ignore.
+- **Reuse existing scripts before hand-rolling a docker/ROS command.** This repo has one already for
+  almost everything: `setup.sh <cmd> <stack>` (clone/up/build-ws/run/sh/down/ls), each module's own
+  `run.sh` / `build_ws.sh` / `clone.sh` (correct sourcing order, CPU affinity via `taskset`, container
+  entry + cleanup traps already baked in), `tools/` (host analysis/eval), `docs/` (architecture). A
+  hand-rolled `docker exec ... catkin build <pkgs>` or `docker exec ... roslaunch ...` skips whatever
+  the real script does beyond the obvious call — e.g. `build-ws` re-asserts
+  `-DCMAKE_BUILD_TYPE=RelWithDebInfo` every run (voxblox corrupts the heap under `-O0`/Debug — a real
+  past incident) and builds the whole workspace instead of a hand-picked package list that can
+  silently skip a stale downstream package. Quick one-off commands while iterating are fine; the
+  final check before calling work done should go through the real script.
 
 ## Layout
 
