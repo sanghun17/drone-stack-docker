@@ -47,10 +47,9 @@
   </node>
 
   <node pkg="fast_livo" type="smart_static_tf_bridge.py" name="smart_tf_bridge" output="log">
-    <param name="parent" value="aft_mapped"/>
-    <param name="child"  value="camera_imu_optical_frame"/>
-    <param name="x" value="0.0"/> <param name="y" value="0.0"/> <param name="z" value="0.0"/>
-    <param name="qx" value="0.0"/> <param name="qy" value="0.0"/> <param name="qz" value="0.0"/> <param name="qw" value="1.0"/>
+    <rosparam param="bridges">
+      - {parent: aft_mapped, child: camera_imu_optical_frame}
+    </rosparam>
   </node>
 
   <group if="$(arg paired_drop)">
