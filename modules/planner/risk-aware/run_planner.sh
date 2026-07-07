@@ -1,5 +1,5 @@
 #!/bin/bash
-# planner/risk-aware: exploration planner bring-up (real_planning.launch) =
+# planner/risk-aware: exploration planner bring-up (exploration_planner_d435i.launch) =
 # mav_active_3d_planning exploration + odom relay + bbox params.
 # Voxblox is SEPARATE: run run_voxblox.sh alongside this (mapping and planner
 # are independent launches, mirroring the ml/sim structure). Needs camera + fast-livo.
@@ -16,7 +16,7 @@ if [ ! -f /.dockerenv ]; then
   # Ctrl+C here -> stop the launch INSIDE the container too. docker exec does not
   # reliably forward SIGINT, so do it explicitly: SIGINT roslaunch (clean node
   # teardown). roscore is left alone — it's the shared master other modules use.
-  __M="roslaunch active_3d_planning_app_reconstruction real_planning.launch"
+  __M="roslaunch active_3d_planning_app_reconstruction exploration_planner_d435i.launch"
   cleanup(){ docker exec "$__C" pkill -INT -f "$__M" >/dev/null 2>&1; }
   trap 'cleanup; exit 130' INT TERM HUP
   docker exec $__TT "$__C" bash "/work/${__S#$__R/}" "$@"; __rc=$?
@@ -29,4 +29,4 @@ source /work/ws/risk-aware/devel/setup.bash
 source /work/config/ros_env.sh   # ROS_MASTER_URI / ROS_IP — single source, edit-and-go
 source /work/modules/ensure_roscore.sh   # master up on $ROS_MASTER_PORT — TCP probe, not a blind sleep 4
 # CPUS_POOL (config/ros_env.sh): stay OFF camera cores 0-1 (uvc watchdog, see run_voxblox.sh).
-exec taskset -c "${CPUS_POOL:?config/ros_env.sh not sourced}" roslaunch active_3d_planning_app_reconstruction real_planning.launch "$@"
+exec taskset -c "${CPUS_POOL:?config/ros_env.sh not sourced}" roslaunch active_3d_planning_app_reconstruction exploration_planner_d435i.launch "$@"
