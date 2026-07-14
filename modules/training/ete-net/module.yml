@@ -1,0 +1,80 @@
+name: ete-net
+group: training
+description: >
+  ETE-Net (uncertainty_predictor) training container. group=training (not "ml" --
+  renamed 2026-07-14: the group axis is role-based (sensor/odometry/planner/control/
+  compute/utility), and "ml" was a technology name that also reads ambiguously
+  against inference/deployment, which would also be "ml"). Training is ROS-free (see
+  docs/ETE_TRAIN_GPU_HOSTS.md dependency audit -- rosbag/rospy only appear in the lazy
+  Stage-0 raw-bag-to-pkl path and offline eval tools, never in train.py's call chain
+  when caches already exist). Pulls compute/torch + compute/spconv (amd64_sm120 combo
+  for Blackwell) but does NOT need sensor/odometry/planner/control modules. `base`
+  (ROS Noetic) is still installed because the schema always includes it, but is unused
+  here -- see stacks/ete-train-5090.yml for the minimal module list this actually needs.
+
+needs: [compute/torch, compute/spconv]
+
+deps:
+  pip:
+    # --ignore-installed: confirmed on a real amd64/ubuntu20.04 build 2026-07-14 --
+    # without it, pip's attempt to upgrade the apt-provided PyYAML 5.3.1 (distutils-
+    # installed, pulled in transitively by some apt package on the base image) to
+    # 6.0.1 hard-fails with "Cannot uninstall PyYAML 5.3.1 ... distutils installed
+    # project". `-I`/`--ignore-installed` sidesteps the uninstall entirely (installs
+    # 6.0.1 alongside/over it in site-packages instead of trying to remove the apt
+    # one first) -- safe here since nothing else on the image needs the apt PyYAML.
+    - --ignore-installed
+    - PyYAML==6.0.1
+    - scipy==1.10.1
+    - tensorboard==2.14.0
+    - tensorboardX==2.6.2.2
+    - tqdm
+    - matplotlib
+    # scikit-learn: found missing 2026-07-14 on a real parity-run attempt --
+    # dataset/data_prefetcher.py imports sklearn.model_selection.GroupShuffleSplit
+    # (train/val split), not caught by the earlier static import-grep audit because
+    # it's used inside a function body, not a top-level `import sklearn` line.
+    # Version matches the ML desktop's actual pinned version (`pip freeze`).
+    - scikit-learn==0.24.0
+  # numpy is pinned by compute/torch's install.sh already (1.24.3, both arches) --
+  # deliberately not re-listed here to avoid a second, possibly-conflicting resolve.
+  # No amd64_sm120 combo needed for this module: none of these packages vary by GPU
+  # micro-arch (only CUDA-linked packages like torch/spconv do) -- included as the
+  # "doesn't need the new dimension" counter-example to compute/spconv's combo usage.
+
+# Live checkout bind-mount, NOT a clone.sh + pinned-branch clone (unlike
+# planner/risk-aware) -- this is an active training-code iteration host, not a pinned
+# deploy target, so we want whatever's actually on disk (uncommitted WIP included).
+# ${RISK_AWARE_PLANNING_SRC} = the risk-aware_planning repo's `src/` directory on THIS
+# host (set in config/stack.env).
+#
+# CORRECTED 2026-07-14 (real ete-train-2080ti run on the ml desktop): the mount
+# TARGET must be the EXACT absolute path `/home/ml/risk-aware_planning/src` -- NOT an
+# arbitrary container path like the previously-used `/work/ws/ete-train/...`. This is
+# a DIFFERENT constraint than the mav_active_3d_planning-sibling one below: the
+# ete_net config YAMLs (config/ablation/*.yaml) bake in ABSOLUTE host paths for
+# `data.data_dir` / `intermediate_dir` / `final_dir` / `v22_sim_windows_dir` (e.g.
+# `/home/ml/risk-aware_planning/src/uncertainty_predictor/data/data_final`) --
+# confirmed via a real `integrity_check.py` run inside the container: it hard-failed
+# with FileNotFoundError against that literal absolute path when mounted anywhere
+# else, even though the sibling-relative jax_mppi_params.py resolution (below)
+# worked fine regardless of mount point. On THIS host that's trivial (mount at the
+# same absolute path the data already lives at). On a genuinely different remote
+# host (5090/4090, different username/home dir), this means you must either
+# replicate `/home/ml/risk-aware_planning/src` as the literal container path
+# regardless of that host's own directory conventions, or edit the ablation
+# configs' data paths per-host -- replicating the path is simpler and is what
+# RISK_AWARE_PLANNING_SRC below assumes; see docs/ETE_TRAIN_GPU_HOSTS.md.
+#
+# Separately (still true): the mount TARGET must keep uncertainty_predictor/ and
+# mav_active_3d_planning/ as siblings, because ete_net/utils/config.py resolves
+# mav_active_3d_planning/local_planner_mpc purely relative to its own __file__ (4
+# levels up) -- no $HOME / no absolute-path fallback (removed from config.py
+# 2026-07-14). This mount transitively brings in uncertainty_predictor/data and
+# uncertainty_predictor/outputs too (same tree) -- no separate data/outputs mount
+# needed unless a host keeps bulk data on different storage from the code checkout.
+mounts:
+  - "${RISK_AWARE_PLANNING_SRC}:/home/ml/risk-aware_planning/src"
+
+run: [train.sh]
+provides: [ete-net-training]

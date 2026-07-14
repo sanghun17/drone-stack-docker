@@ -2,10 +2,27 @@ name: base
 group: base
 description: Architecture module — CUDA/L4T base image + ROS Noetic + common toolchain. Always included.
 
-# Arch-specific base image (FROM). arm64 = NVIDIA Jetson L4T+CUDA; amd64 TBD (x86 CUDA).
+# Arch-specific base image (FROM). arm64 = NVIDIA Jetson L4T+CUDA; amd64 = x86 CUDA
+# devel, itself further split by gpu_arch combo key (see tools/gen_dockerfile_compose.py
+# -- combo key `<arch>_<gpu_arch>` is tried first, falls back to the plain `<arch>` key).
 base_image:
   arm64: nvcr.io/nvidia/l4t-jetpack:r35.4.1
-  # amd64: nvidia/cuda:11.4.3-cudnn8-devel-ubuntu20.04   # FILL when an x86 host is wired
+  # amd64 (no gpu_arch combo match) filled 2026-07-14 for the ete-train-5090 stack
+  # (RTX 5090 / Blackwell / sm_120, needs CUDA 12.8+ for nvcc to know about sm_120 at
+  # all). ubuntu20.04 (not 22.04) chosen deliberately so ROS Noetic's official apt
+  # repo (focal-only) still installs unmodified below -- confirmed nvidia/cuda ships a
+  # 12.8.1-devel-ubuntu20.04 amd64 tag.
+  amd64: nvidia/cuda:12.8.1-devel-ubuntu20.04
+  # amd64_sm89 filled 2026-07-14 for the ete-train-4090 stack (RTX 4090 / Ada / sm_89,
+  # driver 535.183 on that host -> only runs CUDA<=12.2 containers per NVIDIA's
+  # driver/CUDA compat table, so the amd64-default CUDA 12.8 image above would refuse
+  # to run). Picked 12.2.2 over 12.1.1 (both confirmed to exist for amd64 via `docker
+  # buildx imagetools inspect`) -- newest line still within the driver's ceiling.
+  amd64_sm89: nvidia/cuda:12.2.2-devel-ubuntu20.04
+  # amd64_sm75 filled 2026-07-14 for the ete-train-2080ti stack (ML desktop itself,
+  # RTX 2080 Ti x3 usable / sm_75, driver 535.261 -> same CUDA<=12.2 ceiling as the
+  # 4090/driver-535.183 host -- reuses the identical amd64_sm89 image value.
+  amd64_sm75: nvidia/cuda:12.2.2-devel-ubuntu20.04
 
 env:
   ROS_DISTRO: noetic

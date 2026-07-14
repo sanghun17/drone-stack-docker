@@ -1,6 +1,15 @@
 name: spconv
 group: compute
-description: cumm 0.4.11 + spconv 2.3.6 AOT wheels (CUDA 11.4 / Orin sm_87). For epoch_680 map_encoder + C++ sparse_vfe.
+description: >
+  arm64 (Orin, sm_87): cumm 0.4.11 + spconv 2.3.6 AOT wheels (CUDA 11.4). For
+  epoch_680 map_encoder + C++ sparse_vfe -- see the NOTE at the bottom of this file
+  for why AOT (not editable) wheels. amd64 sm_120 (RTX 5090/Blackwell): wheel first
+  (spconv-cu120, see deps.amd64_sm120 below), falls back to a from-source cumm+spconv
+  build targeting sm_120 in install.sh if no wheel bakes it in. amd64 sm_89 (RTX 4090,
+  driver 535.183 -> CUDA<=12.2 containers): spconv-cu120 wheel is well-covered for
+  sm_89 -- hard-required (no source-build fallback, no allow_pip_fail); a failure
+  there means something real is broken. sm_75 (RTX 2080 Ti, ML desktop itself, driver
+  535.261): same policy as sm_89 -- spconv-cu120 also covers Turing.
 
 needs: [compute/torch]      # spconv builds against torch
 
@@ -8,12 +17,37 @@ env:
   CUDA_HOME: /usr/local/cuda
   PATH: /usr/local/cuda/bin:${PATH}
   CUMM_CUDA_ARCH_LIST: "8.7"
+  # NOTE: this env is unconditional (module.yml `env:` isn't arch/gpu_arch-scoped,
+  # only `deps:` is — see docs/MODULE_SCHEMA.md). It's the arm64/sm_87 build value;
+  # install.sh overrides it internally (`export CUMM_CUDA_ARCH_LIST=...`) for its own
+  # amd64/sm_120 source-build fallback, so this baked ENV is stale-but-harmless on
+  # amd64 images (only read at cumm/spconv build time, never at runtime).
 
 deps:
   pip: [pccm, ccimport, pybind11, ninja, wheel]   # build-time codegen + runtime `import spconv` (build.py imports pccm)
-  source: [install.sh]      # cumm + spconv: prefer baked AOT wheels, else build from source
+  source: [install.sh]      # arm64: prefer baked AOT wheels, else build from source. amd64: combo-key wheel try / source build, see install.sh.
+  # --- (cpu_arch)_(gpu_arch) combo keys (new schema, 2026-07-14) ---
+  # `allow_pip_fail` is read PER COMBO (not module-wide) — see tools/gen_dockerfile_compose.py.
+  amd64_sm120:
+    # spconv-cu120 may not exist / may not cover sm_120 SASS at all -- spconv-cu118
+    # ==2.3.6 predates Blackwell entirely (see docs/ETE_TRAIN_GPU_HOSTS.md) -- so this is
+    # soft: allowed to fail, and install.sh's source-build fallback runs instead (it
+    # re-checks `import spconv.pytorch` before deciding to build).
+    pip: [spconv-cu120]
+    allow_pip_fail: true
+  amd64_sm89:
+    # RTX 4090 / driver 535.183 (CUDA<=12.2 containers). sm_89 (Ada) is well-covered
+    # by published spconv wheels -- hard-required, no source-build fallback attempted
+    # (install.sh only source-builds when TARGETARCH=amd64 AND the wheel import still
+    # fails AND allow_pip_fail was set for that combo; sm_89 has neither).
+    pip: [spconv-cu120]
+  amd64_sm75:
+    # RTX 2080 Ti / driver 535.261 (CUDA<=12.2 containers, same ceiling as sm_89).
+    # sm_75 (Turing) is well-covered by published spconv wheels too -- same hard-fail
+    # policy as amd64_sm89.
+    pip: [spconv-cu120]
 
-assets: [wheels]            # baked AOT wheels install.sh reads (bind-mounted into its RUN)
+assets: [wheels]            # baked AOT wheels install.sh reads (bind-mounted into its RUN, arm64 only)
 
 provides: [spconv, cumm]
 
@@ -23,3 +57,6 @@ provides: [spconv, cumm]
 # WHY AOT wheel, not `pip install -e`: editable made spconv/build.py re-run the pccm kernel codegen on
 # every import (~38s planner-startup stall); the baked wheel skips it → ~10s import, no runtime JIT.
 # Build reads the wheels via a transient bind-mount, so they are never baked into the image.
+# This AOT-wheel mechanism is arm64/Orin-only (no aarch64/cu114 wheels exist upstream, hence baking
+# our own); amd64 hosts use published spconv-cuXXX wheels from PyPI instead (the amd64_smXX combo
+# keys above), with a from-source fallback only where noted (sm_120).

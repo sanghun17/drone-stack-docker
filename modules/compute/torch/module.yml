@@ -1,6 +1,14 @@
 name: torch
 group: compute
-description: PyTorch 2.1.0. Ships libtorch (torch/lib + cmake) that voxblox C++ links against.
+description: >
+  arm64 (Jetson Orin): PyTorch 2.1.0, ships libtorch (torch/lib + cmake) that voxblox
+  C++ links against. amd64, branched by GPU_ARCH inside install.sh (see there for why
+  this stays imperative rather than a deps.<combo>.pip entry -- torch needs a custom
+  --index-url, which the declarative deps.pip list can't express): sm_120 (RTX 5090/
+  Blackwell) = official PyTorch cu128 wheels, also upgrades the image's python3 to
+  3.11 since cu128 wheels need >=3.9 and that base_image ships 3.8. sm_89 (RTX 4090)
+  / sm_75 (RTX 2080 Ti), both driver-535-capped hosts = PyTorch cu121 wheels, no
+  python upgrade needed (cu121 supports 3.8 natively).
 
 deps:
   # torch wheel links these at runtime (not in the L4T base)

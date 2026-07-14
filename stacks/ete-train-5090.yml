@@ -1,0 +1,15 @@
+# ete-train-5090 — ETE-Net training only, on a standalone RTX 5090 (amd64/Blackwell)
+# box. No ROS-dependent sensor/odometry/planner/control modules: training reads
+# pre-generated caches (data_final/data_intermediate) and never touches ROS/rosbag
+# (see docs/ETE_TRAIN_GPU_HOSTS.md dependency audit). `base` is always included by the
+# schema (ROS Noetic gets installed as a side effect, unused here -- see
+# modules/base/module.yml's amd64 note); the modules actually selected below are just
+# the compute + ml layers.
+arch: [amd64]
+gpu_arch: sm120   # RTX 5090 / Blackwell. Selects each module's deps.amd64_sm120 combo
+                  # key (currently: compute/spconv's wheel-first pip try) -- see
+                  # docs/MODULE_SCHEMA.md for the (cpu_arch, gpu_arch) mechanism.
+modules:
+  - compute/torch    # amd64 branch: python3.11 shim (cu128 wheels need >=3.9) + PyTorch cu128
+  - compute/spconv   # amd64_sm120 combo: spconv-cu120 wheel try, else source build (sm_120 arch list)
+  - training/ete-net

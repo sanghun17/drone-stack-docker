@@ -1,0 +1,21 @@
+# ete-train-2080ti — ETE-Net training on THIS machine (ml desktop, RTX 2080 Ti x3
+# usable / Turing / sm_75), driver 535.261 (caps this build at CUDA<=12.2 containers,
+# same ceiling as the 4090/driver-535.183 host -- see modules/base/module.yml's
+# amd64_sm75 base_image note, which reuses the amd64_sm89 image value as-is). Same
+# module composition as ete-train-5090.yml / ete-train-4090.yml; only gpu_arch
+# differs, routing every module's deps/base_image combo-key lookups to the sm_75
+# variants (see docs/ETE_TRAIN_GPU_HOSTS.md).
+#
+# NOTE: this host has a dead GPU at PCI bus 1A:00.0 (NVML can't enumerate it) sitting
+# alongside the usable cards -- `docker run --gpus all` / a bare `count: N` device
+# reservation can fail or nondeterministically pick the dead card. Always address a
+# specific GPU by UUID (`nvidia-smi -L`) when running this stack -- see
+# docs/ETE_TRAIN_GPU_HOSTS.md's 2080ti section for the exact invocation.
+arch: [amd64]
+gpu_arch: sm75   # RTX 2080 Ti / Turing, driver 535.261. Selects amd64_sm75 combo keys:
+                 # modules/base (CUDA 12.2 base image), compute/torch (cu121 wheels,
+                 # no python upgrade), compute/spconv (spconv-cu120, hard-required).
+modules:
+  - compute/torch    # amd64/sm75 branch in install.sh: PyTorch cu121, stock python3.8
+  - compute/spconv   # amd64_sm75 combo: spconv-cu120 wheel, hard-required (no source-build fallback)
+  - training/ete-net

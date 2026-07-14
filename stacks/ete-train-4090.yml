@@ -1,0 +1,14 @@
+# ete-train-4090 — ETE-Net training only, on a standalone RTX 4090 (amd64/Ada/sm_89)
+# box, driver 535.183 (caps this build at CUDA<=12.2 containers -- see
+# modules/base/module.yml's amd64_sm89 base_image note). Same module composition as
+# ete-train-5090.yml (kept as-is for a future actual Blackwell host); only the
+# gpu_arch differs, which routes every module's deps/base_image combo-key lookups to
+# the sm_89 variants instead (see docs/ETE_TRAIN_GPU_HOSTS.md).
+arch: [amd64]
+gpu_arch: sm89   # RTX 4090 / Ada, driver 535.183. Selects amd64_sm89 combo keys:
+                 # modules/base (CUDA 12.2 base image), compute/torch (cu121 wheels,
+                 # no python upgrade), compute/spconv (spconv-cu120, hard-required).
+modules:
+  - compute/torch    # amd64/sm89 branch in install.sh: PyTorch cu121, stock python3.8
+  - compute/spconv   # amd64_sm89 combo: spconv-cu120 wheel, hard-required (no source-build fallback)
+  - training/ete-net
