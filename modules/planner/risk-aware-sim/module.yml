@@ -64,7 +64,10 @@ deps:
 workspace: /work/ws/risk-aware
 mounts:
   - "${RISK_AWARE_PLANNING_SRC}:/work/ws/risk-aware/src/risk_aware_planning"
-  # 호스트 소스빌드 python 스택(torch 2.2.0a0 ABI=1 + spconv 2.3.6 + cumm 등,
+  # 호스트 소스빌드 python 스택(torch 2.2.0a0 ABI=1 + spconv 2.3.6 + cumm + jax/jaxlib
+  # 0.4.13+cuda11 + nvidia cu11 런타임 + *_cu118.libs — 전부 cu11로 통일된 호스트 패리티.
+  # jaxlib까지 호스트 것인 이유: 컨테이너 cuda12 jaxlib은 cudnn 8.9 요구인데 torch가
+  # cu11 cudnn 8.7을 프리로드해 한 프로세스 공존 불가(2026-07-25 검증② 3라운드 실증).
   # ws/sim-host-python에 rsync 스테이징): jax 노드는 한 프로세스에서 python torch와
   # cxx11 libvoxblox(_voxblox_ros_python)를 같이 로드하므로 SONAME 충돌 없이 되려면
   # 둘 다 '같은' torch여야 한다 (pip ABI=0 torch론 불가 — 2026-07-25 검증② 실증).
