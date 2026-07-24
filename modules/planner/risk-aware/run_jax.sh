@@ -26,12 +26,9 @@ source /opt/ros/noetic/setup.bash
 source /work/ws/risk-aware/devel/setup.bash
 source /work/config/ros_env.sh   # ROS_MASTER_URI / ROS_IP — single source, edit-and-go
 
-# local_planner_mpc/ is not a catkin pkg; the node resolves itself via this symlink.
-[ -e "${HOME}/risk-aware_planning/src" ] || {
-  mkdir -p "${HOME}/risk-aware_planning"
-  ln -s /work/ws/risk-aware/src/risk_aware_planning "${HOME}/risk-aware_planning/src"
-}
-JAX="${HOME}/risk-aware_planning/src/mav_active_3d_planning/local_planner_mpc/jax_main_node_ros_new.py"
+# local_planner_mpc/ is not a catkin pkg; the node resolves itself relative to
+# __file__, so it runs fine directly out of the /work tree (no symlink needed).
+JAX="/work/ws/risk-aware/src/risk_aware_planning/mav_active_3d_planning/local_planner_mpc/jax_main_node_ros_new.py"
 
 source /work/modules/ensure_roscore.sh   # master up on $ROS_MASTER_PORT — TCP probe, not a blind sleep 4
 

@@ -46,35 +46,35 @@ deps:
 # planner/risk-aware) -- this is an active training-code iteration host, not a pinned
 # deploy target, so we want whatever's actually on disk (uncommitted WIP included).
 # ${RISK_AWARE_PLANNING_SRC} = the risk-aware_planning repo's `src/` directory on THIS
-# host (set in config/stack.env).
+# host (set in config/stack.env) -- points at the new canonical tree
+# (drone-stack-docker/ws/risk-aware/src/risk_aware_planning), NOT the retired
+# ~/risk-aware_planning checkout.
 #
-# CORRECTED 2026-07-14 (real ete-train-2080ti run on the ml desktop): the mount
-# TARGET must be the EXACT absolute path `/home/ml/risk-aware_planning/src` -- NOT an
-# arbitrary container path like the previously-used `/work/ws/ete-train/...`. This is
-# a DIFFERENT constraint than the mav_active_3d_planning-sibling one below: the
-# ete_net config YAMLs (config/ablation/*.yaml) bake in ABSOLUTE host paths for
-# `data.data_dir` / `intermediate_dir` / `final_dir` / `v22_sim_windows_dir` (e.g.
-# `/home/ml/risk-aware_planning/src/uncertainty_predictor/data/data_final`) --
-# confirmed via a real `integrity_check.py` run inside the container: it hard-failed
-# with FileNotFoundError against that literal absolute path when mounted anywhere
-# else, even though the sibling-relative jax_mppi_params.py resolution (below)
-# worked fine regardless of mount point. On THIS host that's trivial (mount at the
-# same absolute path the data already lives at). On a genuinely different remote
-# host (5090/4090, different username/home dir), this means you must either
-# replicate `/home/ml/risk-aware_planning/src` as the literal container path
-# regardless of that host's own directory conventions, or edit the ablation
-# configs' data paths per-host -- replicating the path is simpler and is what
-# RISK_AWARE_PLANNING_SRC below assumes; see docs/ETE_TRAIN_GPU_HOSTS.md.
+# UPDATED 2026-07-25 (경로 동적화 Phase 2b): the mount TARGET no longer needs to be
+# the exact absolute path the data lives at -- ete_net/config/ete_train_config.yaml's
+# `data.final_dir` / `intermediate_dir` / `v22_sim_windows_dir` now read `${DATA_ROOT}`
+# (expanded by ete_net/utils/config.py, halts loudly if unset) instead of a baked
+# `/home/ml/risk-aware_planning/...` literal, so code and data are mounted
+# independently below. Kept the code mount TARGET as the old absolute path anyway
+# (train.sh still `cd`s there) -- no functional requirement forces it now, this is
+# just the path of least churn.
 #
-# Separately (still true): the mount TARGET must keep uncertainty_predictor/ and
-# mav_active_3d_planning/ as siblings, because ete_net/utils/config.py resolves
-# mav_active_3d_planning/local_planner_mpc purely relative to its own __file__ (4
-# levels up) -- no $HOME / no absolute-path fallback (removed from config.py
-# 2026-07-14). This mount transitively brings in uncertainty_predictor/data and
-# uncertainty_predictor/outputs too (same tree) -- no separate data/outputs mount
-# needed unless a host keeps bulk data on different storage from the code checkout.
+# The mount TARGET must still keep uncertainty_predictor/ and mav_active_3d_planning/
+# as siblings, because ete_net/utils/config.py resolves mav_active_3d_planning/
+# local_planner_mpc purely relative to its own __file__ (4 levels up) -- no $HOME /
+# no absolute-path fallback.
+#
+# Data mount is separate now: ${ETE_DATA_DIR} (host, config/stack.env) -> the
+# uncertainty_predictor/data/ slot inside the code mount target (overlays it), with
+# container env DATA_ROOT pointed at the same path so ete_train_config.yaml's
+# ${DATA_ROOT} expansion resolves. Move ETE_DATA_DIR in stack.env if data is ever
+# relocated off the retired ~/risk-aware_planning tree -- no code change needed.
 mounts:
   - "${RISK_AWARE_PLANNING_SRC}:/home/ml/risk-aware_planning/src"
+  - "${ETE_DATA_DIR}:/home/ml/risk-aware_planning/src/uncertainty_predictor/data"
+
+env:
+  DATA_ROOT: /home/ml/risk-aware_planning/src/uncertainty_predictor/data
 
 run: [train.sh]
 provides: [ete-net-training]
