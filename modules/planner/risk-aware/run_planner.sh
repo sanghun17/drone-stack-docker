@@ -29,4 +29,12 @@ source /work/ws/risk-aware/devel/setup.bash
 source /work/config/ros_env.sh   # ROS_MASTER_URI / ROS_IP — single source, edit-and-go
 source /work/modules/ensure_roscore.sh   # master up on $ROS_MASTER_PORT — TCP probe, not a blind sleep 4
 # CPUS_POOL (config/ros_env.sh): stay OFF camera cores 0-1 (uvc watchdog, see run_voxblox.sh).
-exec taskset -c "${CPUS_POOL:?config/ros_env.sh not sourced}" roslaunch active_3d_planning_app_reconstruction exploration_planner_d435i.launch "$@"
+# tee stdout -> flight_logs: the planner's verbose per-replan blocks ([select]
+# child values, expansion stats like select_samples_unobs) are std::cout only —
+# NOT in /rosout, so the flight bag never captures them. This log is the primary
+# post-flight evidence for value/gain tuning debugging (pairs with the bag by
+# timestamp). flight_logs/ is gitignored like the bags.
+__PLOG="/work/flight_logs/planner_stdout_$(date +%F_%H-%M-%S).log"
+echo "[run_planner] tee planner stdout -> $__PLOG"
+set -o pipefail
+taskset -c "${CPUS_POOL:?config/ros_env.sh not sourced}" roslaunch active_3d_planning_app_reconstruction exploration_planner_d435i.launch "$@" 2>&1 | tee "$__PLOG"
