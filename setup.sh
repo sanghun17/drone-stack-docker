@@ -15,7 +15,10 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck disable=SC1091
-[ -f "$ROOT/config/stack.env" ] && source "$ROOT/config/stack.env"
+# set -a: stack.env 값을 export — clone.sh 등 자식 프로세스(bash modules/*/clone.sh)가
+# RISK_AWARE_BRANCH 등을 실제로 받게 한다. (export 없이는 자식이 못 봐 clone.sh 기본값이
+# 조용히 이겨 왔음 — 기본값==stack.env 값이라 가려져 있던 잠재버그, 2026-07-25 수리)
+[ -f "$ROOT/config/stack.env" ] && { set -a; source "$ROOT/config/stack.env"; set +a; }
 PORT="${ROS_MASTER_PORT:-11311}"
 
 ARCH=$(uname -m); case "$ARCH" in aarch64) ARCH=arm64;; x86_64) ARCH=amd64;; esac
