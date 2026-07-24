@@ -21,3 +21,24 @@ python3 -m pip install --no-cache-dir "airsim==1.8.1"
 mkdir -p /opt/torch_shim/torch/utils
 printf 'cmake_prefix_path = "/opt/host-py/torch/share/cmake"\n' > /opt/torch_shim/torch/utils/__init__.py
 printf '' > /opt/torch_shim/torch/__init__.py
+
+# host-torch(cu11 빌드)의 CUDA-11 런타임(.so)들 — 링크 타임(ld의 needed-by-needed
+# 해석)과 C++ 노드 런타임(dlopen) 모두 ldconfig 검색경로에 있어야 한다. 마운트라
+# 빌드 시점엔 경로가 비어 있지만 conf는 문자열이므로 미리 등록해 둔다.
+for d in /opt/host-py/nvidia/*/lib /opt/host-py/torch/lib /opt/host-py/cumm_cu118.libs /opt/host-py/spconv_cu118.libs; do echo "$d"; done > /etc/ld.so.conf.d/zz-host-py-cuda11.conf
+# glob이 빌드 시점에 안 풀리므로 리터럴로도 보강
+cat > /etc/ld.so.conf.d/zz-host-py-cuda11.conf <<'EOF'
+/opt/host-py/nvidia/cublas/lib
+/opt/host-py/nvidia/cuda_cupti/lib
+/opt/host-py/nvidia/cuda_nvrtc/lib
+/opt/host-py/nvidia/cuda_runtime/lib
+/opt/host-py/nvidia/cudnn/lib
+/opt/host-py/nvidia/cufft/lib
+/opt/host-py/nvidia/curand/lib
+/opt/host-py/nvidia/cusolver/lib
+/opt/host-py/nvidia/cusparse/lib
+/opt/host-py/torch/lib
+/opt/host-py/cumm_cu118.libs
+/opt/host-py/spconv_cu118.libs
+EOF
+ldconfig || true
