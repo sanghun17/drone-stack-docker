@@ -28,4 +28,8 @@ source /work/ws/risk-aware/devel/setup.bash
 source /work/config/sim.env       # ROS_MASTER_HOST/IP/HOSTNAME=192.168.50.12 — BEFORE ros_env.sh
 source /work/config/ros_env.sh    # ROS_MASTER_URI / ROS_IP — single source, edit-and-go
 source /work/modules/ensure_roscore.sh   # master up on $ROS_MASTER_PORT — TCP probe, not a blind sleep 4 (host roscore is expected to already answer here)
+# eval_data_node의 data_directory 기본값 = $(find app_reconstruction)/data — 산출물
+# 출력 디렉토리라 fresh clone엔 없음(호스트 구트리엔 과거 런들이 만들어 둠). 없으면
+# rate_server가 required라 launch 전체가 죽는다 (2026-07-25 검증② 실증) → 보장 생성.
+mkdir -p /work/ws/risk-aware/src/risk_aware_planning/mav_active_3d_planning/active_3d_planning_app_reconstruction/data
 exec roslaunch active_3d_planning_app_reconstruction runtime_evaluator.launch algorithm:=ours "$@"

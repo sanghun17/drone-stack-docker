@@ -9,16 +9,15 @@ set -e
 python3 -m pip install --no-cache-dir "msgpack-rpc-python==0.4.1"
 python3 -m pip install --no-cache-dir "airsim==1.8.1"
 
-# ── libtorch cxx11-ABI (C++ 전용) ─────────────────────────────────────────────
-# voxblox 계열 C++는 -D_GLIBCXX_USE_CXX11_ABI=1 로 컴파일된다 (voxblox CMakeLists 하드코딩,
-# ml 호스트의 소스빌드 torch 2.2.0(ABI=1)에 맞춘 것). 그런데 x86 pip torch 휠(2.1.2+cu121)은
-# ABI=0 → glog/torch 심볼 미스매치로 링크 실패 (2026-07-25 sim-x86 첫 build-ws 실증).
-# 해법: python 쪽은 pip torch 유지(파이썬 확장은 ABI 무관), C++ 링크만 공식 cxx11-ABI
-# libtorch를 쓴다. build_ws.sh가 /opt/torch_shim(PYTHONPATH)으로 각 CMakeLists의
-# `import torch.utils` cmake-prefix 트릭을 /opt/libtorch로 돌린다 (트리 무수정).
-cd /opt
-curl -sfL -o lt.zip "https://download.pytorch.org/libtorch/cu121/libtorch-cxx11-abi-shared-with-deps-2.2.2%2Bcu121.zip"
-unzip -q lt.zip && rm lt.zip
+# ── torch shim: C++ 링크를 호스트-torch(/opt/host-py, ABI=1)로 통일 ──────────────
+# voxblox 계열 C++는 -D_GLIBCXX_USE_CXX11_ABI=1 하드코딩(호스트 소스빌드 torch 전제),
+# pip torch 휠은 ABI=0 → 링크 실패. 게다가 jax 노드는 한 python 프로세스에서 python
+# torch와 libvoxblox(_voxblox_ros_python)를 동시 로드하므로 SONAME(libc10.so 등) 충돌
+# 때문에 '별도 libtorch' 방식도 불가 (2026-07-25 검증② 실증) — python과 C++ 모두
+# 같은 torch여야 한다. 해법: 호스트 소스빌드 torch를 module.yml이 /opt/host-py로
+# 마운트(sim.env가 PYTHONPATH prepend), build_ws.sh가 이 shim(PYTHONPATH)으로 각
+# CMakeLists의 `import torch.utils` cmake-prefix 트릭을 /opt/host-py/torch로 돌린다.
+# (마운트는 컨테이너 런타임에만 존재 — 이 shim은 경로 문자열만 담으므로 빌드시 생성 OK)
 mkdir -p /opt/torch_shim/torch/utils
-printf 'cmake_prefix_path = "/opt/libtorch/share/cmake"\n' > /opt/torch_shim/torch/utils/__init__.py
+printf 'cmake_prefix_path = "/opt/host-py/torch/share/cmake"\n' > /opt/torch_shim/torch/utils/__init__.py
 printf '' > /opt/torch_shim/torch/__init__.py
