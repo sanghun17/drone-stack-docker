@@ -30,6 +30,14 @@ deps:
     - python3-future
     - libdw-dev
     - ros-noetic-control-toolbox
+    # ↓ sim 전용 추가 (2026-07-25 첫 build-ws 실증): jetson d435i 스택에선 ros-base
+    #   베이스이미지·control/mavros 모듈이 공급하던 것들 — sim은 bare CUDA 베이스 +
+    #   mavros 모듈 없음이라 여기서 직접. (ws 트리가 vendored mavros를 포함해 catkin이
+    #   빌드는 함 — 런타임엔 미사용이지만 전체 트리 빌드 보존이 동작보존에 안전)
+    - ros-noetic-angles          # mavros cmake find_package(angles)
+    - libgeographic-dev          # mavros FindGeographicLib
+    - geographiclib-tools
+    - libyaml-cpp-dev            # yaml_cpp_catkin util 링크(-lyaml-cpp)
   # JAX MPPI node python deps (jax_main_node_ros_new.py + time_profiler + viz/IO).
   # airsim (so3_control_bridge.py:25,202 RPC client)은 여기 pip 리스트가 아니라
   # install.sh에서 설치 — airsim의 setup.py가 메타데이터 생성 시점에 자기 패키지를
