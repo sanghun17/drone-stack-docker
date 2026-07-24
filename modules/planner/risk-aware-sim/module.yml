@@ -30,16 +30,17 @@ deps:
     - python3-future
     - libdw-dev
     - ros-noetic-control-toolbox
-  # JAX MPPI node python deps (jax_main_node_ros_new.py + time_profiler + viz/IO) +
-  # airsim (so3_control_bridge.py RPC client, see host conda env this replaces —
-  # so3_control_bridge.py:25,202 only needs the `airsim` pip package itself, 1.8.1).
+  # JAX MPPI node python deps (jax_main_node_ros_new.py + time_profiler + viz/IO).
+  # airsim (so3_control_bridge.py:25,202 RPC client)은 여기 pip 리스트가 아니라
+  # install.sh에서 설치 — airsim의 setup.py가 메타데이터 생성 시점에 자기 패키지를
+  # import해서 msgpackrpc가 '먼저 설치돼' 있어야 함(같은 pip 호출로는 불가, 2단계 필수).
   pip:
     - matplotlib
     - pyquaternion
     - open3d
     - tqdm
     - trimesh
-    - airsim==1.8.1
+  source: [install.sh]
 
 # source + workspace live under the repo at ws/risk-aware (-> /work/ws/risk-aware) —
 # the SAME physical tree planner/risk-aware and training/ete-net use, bind-mounted
