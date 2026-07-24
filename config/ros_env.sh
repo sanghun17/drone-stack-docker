@@ -3,11 +3,18 @@
 # Edit a value here and it takes effect IMMEDIATELY: this file is mounted into
 # the container (/work/config/ros_env.sh), and every shell + run script sources
 # it. No image rebuild, no container recreate — just save and re-run.
+#
+# ${VAR:-default} everywhere (2026-07-25, sim-x86): lets a caller (e.g. sim run
+# scripts, via config/sim.env sourced BEFORE this file) override these by
+# exporting them first, without touching the jetson-deploy defaults below —
+# a plain `source ros_env.sh` with nothing pre-exported is byte-identical to
+# before this change.
 # ─────────────────────────────────────────────────────────────────────────
-export ROS_MASTER_HOST=192.168.50.36     # ← Jetson's LAN IP. Change here if it moves.
-export ROS_MASTER_PORT=11311
+export ROS_MASTER_HOST="${ROS_MASTER_HOST:-192.168.50.36}"     # ← Jetson's LAN IP. Change here if it moves.
+export ROS_MASTER_PORT="${ROS_MASTER_PORT:-11311}"
 export ROS_MASTER_URI="http://${ROS_MASTER_HOST}:${ROS_MASTER_PORT}"
-export ROS_IP="${ROS_MASTER_HOST}"       # advertise on the LAN so other machines can subscribe
+export ROS_IP="${ROS_IP:-$ROS_MASTER_HOST}"       # advertise on the LAN so other machines can subscribe
+export ROS_HOSTNAME="${ROS_HOSTNAME:-$ROS_IP}"    # 신설 — sim.env sets this explicitly (192.168.50.12)
 
 # ─────────────────────────────────────────────────────────────────────────
 # CPU core map (Jetson Orin, 12 cores) — the SINGLE source of truth.

@@ -1,0 +1,20 @@
+name: fast-livo-sim
+group: odometry
+description: >
+  FAST-LIVO2 (visual/LiDAR-inertial odometry), AirSim/UE4 sim variant. The `ml`
+  branch diverges from `jetson-orin-agx` (mapping_simulator_openvins.launch only
+  exists there; the two branches have diverged 20 vs 15 commits — see
+  sim_stack_design.md decision 0.1) so it lives in its OWN workspace
+  (ws/fast-livo-sim, not ws/fast-livo) to avoid a merge. Sophus dep baked into the
+  image, same as odometry/fast-livo; fast_livo itself is built in-container from the
+  bind-mounted source workspace.
+
+deps:
+  source: [install.sh]      # Sophus a621ff (libSophus.so + sophus/se3.h) — identical to odometry/fast-livo
+
+# source + workspace live under the repo at ws/fast-livo-sim (-> /work/ws/fast-livo-sim),
+# cloned by `setup.sh clone` (pinned to FASTLIVO_SIM_BRANCH, default `ml`).
+workspace: /work/ws/fast-livo-sim
+clone: clone.sh
+run: [run.sh]
+provides: [odometry, odom-tf]

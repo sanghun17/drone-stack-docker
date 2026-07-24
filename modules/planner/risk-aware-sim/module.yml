@@ -1,0 +1,53 @@
+name: risk-aware-sim
+group: planner
+description: >
+  Risk-aware exploration planner, AirSim/UE4 sim variant — voxblox (uncertainty TSDF)
+  + mav_active_3d_planning exploration + JAX MPPI local planner + SO(3) control
+  bridge. Built in-container from the SAME live tree the ete-train-* stacks use
+  (${RISK_AWARE_PLANNING_SRC}, bind-mounted — not cloned, unlike planner/risk-aware's
+  pinned-branch deploy checkout: sim iterates on the same uncommitted WIP dev tree).
+
+needs: [compute/torch, compute/spconv, compute/jax]   # torch/spconv (model) + jax (MPPI)
+
+deps:
+  # build deps for the ETH-ASL workspace: catkin_grpc builds grpc from source
+  # (rsync/libtool/autotools/ssl/zlib), protobuf_catkin builds protobuf from source.
+  # Identical to planner/risk-aware's apt list — same catkin workspace tree.
+  apt:
+    - rsync
+    - libtool
+    - autoconf
+    - automake
+    - pkg-config
+    - zlib1g-dev
+    - libssl-dev
+    - libtbb-dev
+    - ros-noetic-tf-conversions
+    - ros-noetic-tf2-geometry-msgs
+    - ros-noetic-interactive-markers
+    - ros-noetic-geographic-msgs
+    - ros-noetic-nlopt
+    - python3-future
+    - libdw-dev
+    - ros-noetic-control-toolbox
+  # JAX MPPI node python deps (jax_main_node_ros_new.py + time_profiler + viz/IO) +
+  # airsim (so3_control_bridge.py RPC client, see host conda env this replaces —
+  # so3_control_bridge.py:25,202 only needs the `airsim` pip package itself, 1.8.1).
+  pip:
+    - matplotlib
+    - pyquaternion
+    - open3d
+    - tqdm
+    - trimesh
+    - airsim==1.8.1
+
+# source + workspace live under the repo at ws/risk-aware (-> /work/ws/risk-aware) —
+# the SAME physical tree planner/risk-aware and training/ete-net use, bind-mounted
+# from RISK_AWARE_PLANNING_SRC (not cloned by this module: no clone.sh here).
+workspace: /work/ws/risk-aware
+mounts:
+  - "${RISK_AWARE_PLANNING_SRC}:/work/ws/risk-aware/src/risk_aware_planning"
+  - "${SIM_RISK_AWARE_ASSETS}:${SIM_RISK_AWARE_ASSETS}"   # model weights (external, large) — host-identical absolute path (checkpoint config resolves it verbatim)
+
+run: [run_voxblox.sh, run_exploration.sh, run_jax.sh, run_eval.sh, run_so3.sh]
+provides: [voxblox-map, exploration, jax-mppi, so3-control]

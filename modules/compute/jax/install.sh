@@ -2,6 +2,9 @@
 # compute/jax: jaxlib 0.4.13 (baked wheel default, else source) + jax + flax/optax.
 # Ported from pure-jetson-stack Dockerfile `jax` stage. No aarch64 pip wheel for 0.4.13.
 set -e
+
+case "${TARGETARCH:-arm64}" in
+arm64)
 WHEELS=/modules/compute/jax/wheels
 JAXLIB_MODE="${JAXLIB_MODE:-wheel}"
 XLA_COMMIT=12de6ec958419b57be248d0acd2d9f757e71748c
@@ -24,6 +27,26 @@ if [ "$JAXLIB_MODE" = "source" ] || ! ls "$WHEELS"/jaxlib-*.whl >/dev/null 2>&1;
 fi
 
 python3 -m pip install --no-cache-dir "$WHEELS"/jaxlib-*.whl
+;;
+amd64)
+  # amd64/sm75 (RTX 2080 Ti, ml desktop itself — sim-x86's only amd64 GPU combo today).
+  # jax==0.4.13 needs a matching jaxlib CUDA build; unlike arm64 there's no aarch64-gap
+  # to work around, so pull the published wheel straight off jax's own release index
+  # (never PyPI proper for the CUDA builds) instead of building from source. base_image
+  # for amd64_sm75 is CUDA 12.2 (modules/base/module.yml) -> the cuda12.cudnn89 jaxlib
+  # build is the correct pairing (NOT cuda11.cudnn86 -- that's what the HOST itself
+  # happens to run via `pip show jaxlib` (0.4.13+cuda11.cudnn86), a leftover/separate
+  # host env pairing that predates this container's CUDA 12.2 base and is not the
+  # target here). Confirmed present (2026-07-25) at cp38 (this base_image's stock
+  # python3.8, no python-version shim needed -- same reasoning as compute/torch's
+  # sm75/sm89 branch):
+  #   https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+  #   -> jaxlib-0.4.13+cuda12.cudnn89-cp38-cp38-manylinux2014_x86_64.whl
+  python3 -m pip install --no-cache-dir \
+    "jaxlib==0.4.13+cuda12.cudnn89" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+  ;;
+esac
+
 python3 -m pip install --no-cache-dir "jax==0.4.13"
 python3 -c "import jaxlib, jax; print('jaxlib+jax OK', jaxlib.__version__, jax.__version__)"
 

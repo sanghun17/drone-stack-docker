@@ -185,7 +185,7 @@ def gen_dockerfile(mods, arch, gpu_arch, env):
     return "\n".join(L) + "\n"
 
 
-def gen_compose(mods, arch, stack, env):
+def gen_compose(mods, arch, stack, env, gpu_uuids_key="GPU_UUIDS"):
     image = "drone-stack:%s" % stack
     mounts, runs = [], []
     for m in mods:
@@ -256,7 +256,16 @@ def gen_compose(mods, arch, stack, env):
     # So: when GPU_UUIDS is set, use that legacy path instead of a device
     # reservation; when unset (5090/4090 hosts, no known dead-GPU issue), keep the
     # device-reservation form exactly as before.
-    gpu_uuids = [u.strip() for u in (env.get("GPU_UUIDS") or "").split(",") if u.strip()]
+    #
+    # gpu_uuids_key (optional, stacks/*.yml `gpu_uuids_env:`, added 2026-07-25 for
+    # sim-x86): lets a stack read its GPU UUID list from a DIFFERENT config/stack.env
+    # key than the shared `GPU_UUIDS` (which the ete-train-* amd64 stacks use, set
+    # per-invocation via shell export -- see that key's own comment in stack.env).
+    # sim-x86 needs its own fixed value (SIM_GPU_UUIDS) baked into stack.env without
+    # touching GPU_UUIDS's blank-by-default, export-at-invocation convention. Defaults
+    # to "GPU_UUIDS" (see this function's signature) -- a stack that never sets
+    # `gpu_uuids_env:` gets byte-identical behavior to before this parameter existed.
+    gpu_uuids = [u.strip() for u in (env.get(gpu_uuids_key) or "").split(",") if u.strip()]
     if arch == "amd64" and gpu_uuids:
         doc["services"]["dev"]["runtime"] = "nvidia"
         doc["services"]["dev"]["environment"].append("NVIDIA_VISIBLE_DEVICES=%s" % ",".join(gpu_uuids))
@@ -300,7 +309,8 @@ def main():
     outdir = os.path.join(ROOT, ".build", a.stack)
     os.makedirs(outdir, exist_ok=True)
     open(os.path.join(outdir, "Dockerfile"), "w").write(gen_dockerfile(mods, arch, gpu_arch, env))
-    open(os.path.join(outdir, "compose.yml"), "w").write(gen_compose(mods, arch, a.stack, env))
+    gpu_uuids_key = stack.get("gpu_uuids_env") or "GPU_UUIDS"
+    open(os.path.join(outdir, "compose.yml"), "w").write(gen_compose(mods, arch, a.stack, env, gpu_uuids_key))
     open(os.path.join(outdir, "modules.txt"), "w").write("\n".join(m["_path"] for m in mods) + "\n")
 
     print("stack '%s' arch=%s%s  modules: %s" % (
