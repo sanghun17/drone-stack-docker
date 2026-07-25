@@ -66,7 +66,7 @@ exit 0, 전 과정 실관측 완료. 그 사이 이미 돌고 있던 `DEPLOY1_s4
 ## 사용법
 
 ```
-/media/im/ETE4090/scripts/trainq/trainq_add.sh v23_C7 v23_C7.yaml 42          # 잡 제출 (name config.yaml seed [prio] [mem])
+/media/im/ETE4090/scripts/trainq/trainq_add.sh v23_C7 v23_C7.yaml 42          # 잡 제출 (name config.yaml seed [prio] [mem] [--force]) -- 이름이 이미 큐에 있으면 거부(exit 1); --force로만 우회
 python3 /media/im/ETE4090/scripts/trainq/trainq_manager.py --lanes-total 2 --reserve-lanes 0 > /media/im/ETE4090/outputs/trainq/manager.log 2>&1 &   # 매니저 기동 (백그라운드)
 /media/im/ETE4090/scripts/trainq/trainq_status.sh                              # 상태 표
 ```
@@ -86,6 +86,19 @@ python3 /media/im/ETE4090/scripts/trainq/trainq_manager.py --lanes-total 2 --res
 - **raycast mem 클래스**: `mem=raycast`인 잡은 (`--lanes-total`에서 `--reserve-lanes`를 뺀) trainq 관리 lane 중 2개를 점유한다(메모리 무거운 잡, GPU 코-스케줄 금지 정책과 정합). 일반 잡은 1 lane.
 - **멱등성**: 이미 `uncertainty_predictor/outputs/ete_net_v2_<name>/checkpoints/best_val.pth`가 있는 name은 재기동 시 자동 skip(done 마킹). 큐를 지우지 않고 재기동해도 안전.
 - **epochs 오버라이드 없음**: `train.sh`가 `--epochs`를 안 받는다. 짧게 돌려야 하면 `training.num_epochs`/`best_val_min_epoch`/`save_every`를 낮춘 임시 config를 만들 것(커밋 금지) — `config/ablation/v23_trainq_smoke.yaml`이 예시.
+- **⚠ 이름 재사용 = 조용한 폐기 (2026-07-26 실제 사고, 수정됨)**: `QueueStore.sync()`는 이름이
+  이미 non-pending(done/running/failed)으로 메모리에 있으면 같은 이름의 새 disk 엔트리를
+  절대 재채택하지 않는다 — 이건 "이미 학습된 이름은 재학습 안 함" 멱등성 설계 그대로다
+  (바꾸지 않았다). 문제는 예전엔 이게 **완전히 조용했다**는 것: `trainq_add.sh`는 "queued"라고
+  exit 0 찍고, `skipped_precompleted` 카운터도 안 오르고(그 경로는 `_skip_precompleted`가 아니라
+  `sync()` 안이라), 로그에도 흔적이 없었다. 실제 사고: 옛 캠페인과 같은 이름(`CHRr27_s42` 등)으로
+  arm 3개를 재제출했더니 전부 no-op — `trainq_status.sh`를 제출 목록과 diff해서 겨우 발견했다.
+  지금은 **2단 방어**: ① `trainq_add.sh`가 제출 시점에 같은 이름이 이미 큐에 있으면 (상태
+  무관하게, `pending`이어도) **거부**하고 exit 1 — `--force`로만 우회 가능. ② 그래도(`--force`나
+  구버전 호출로) 충돌이 발생하면 `QueueStore.sync()`가 폐기하면서 매니저 stdout 로그에
+  `[trainq] WARNING: ignoring resubmitted '<name>' ...`을 찍는다(최초 1회만 — 그 다음 사이클부턴
+  디스크에 이미 옛 내용으로 덮어써져 있어 재경보 안 함). **동작 자체는 안 바뀌었다** — 여전히
+  기존 항목이 이긴다, 다른 이름으로 다시 제출할 것.
 
 ## 매니저 기동법
 
@@ -134,6 +147,25 @@ exit 코드로 오케스트레이터가 각성해야 하는 상황:
    존재만으로는 "학습 중"과 "막 끝남"을 구분 못 해서 `_skip_precompleted`도 못 씀). 실제로
    그 잡이 끝나면(로그의 "Training Complete!" 확인) `queue.jsonl`에서 그 줄을 수동으로
    `done`/`ts_end`로 고치고, 그 시점에 `--reserve-lanes`를 다시 낮춰 재기동할 것.
+
+⚠ **2026-07-26 실수 기록 (재발 방지용)**: `--reserve-lanes` 계산에 **재기동 시점에 살아있는
+모든 살아남은 잡을 다** 넣어야 한다 — 하나라도 빠뜨리면 새 매니저가 그만큼 lane을 실제보다
+많게 착각해 **과다 배차**한다. 실제로 겪음: `DNoff_nosw_s42`(예약 슬롯)만 회수하려고
+`--lanes-total 2 --reserve-lanes 0`으로 재기동했는데, 그 순간 `auxoff_nosw_s42`도 (이전
+재기동에서 이미) trainq 추적 밖의 "살아남은 잡"이었다는 걸 깜빡했다 — `auxoff_nosw_s42`
+몫도 예약했어야 하는데 `--reserve-lanes 0`으로 기동해서 새 매니저가 lane 2개를 몽땅 새
+pending arm 2개(`CHRr27_gnfix_s42`, `GNAUXw05r27_gnfix_s42`)에 배차, 그 결과
+`auxoff_nosw_s42` + 새 잡 2개 = **GPU에서 3-way 동시 학습**이 잠깐 벌어졌다(config 중복은
+아니었음 — "같은 config 두 벌"과는 다른 문제). 학습 중이던 잡을 죽이는 건 금지라 그대로
+뒀고(GPU 메모리 여유상 OOM은 없었음, 속도만 저하), `auxoff_nosw_s42`가 먼저 끝나면서
+자연히 2-lane으로 수렴했다 — **restart를 한 번 더 해서 "고치려" 하지 말 것**: 이미 살아있는
+CHR/GNAUX도 그 restart 시점엔 또 "추적 밖 생존 잡"이 되므로 같은 실수를 반복하기 쉽다(그리고
+`--reserve-lanes`는 `--lanes-total`을 넘을 수 없어 "3개 다 예약"조차 CLI로 표현이 안 된다).
+**check list**: 재기동 직전엔 반드시 `trainq_status.sh`의 `running` 목록 + (그 재기동 자체가
+살려낸) 추적 밖 생존 잡까지 전부 세어서 `--reserve-lanes`에 넣을 것. 과다 배차가 이미
+벌어졌다면: 죽이지 말고, 그 매니저의 `lanes_free`가 0인 동안은 추가 배차가 없다는 걸
+확인하고, 초과분(가장 먼저 끝날 살아남은 잡)이 자연 종료되길 기다렸다가 그 잡의 큐 항목만
+수동 패치하는 쪽이 재기동보다 안전하다.
 
 ## 결과 위치
 

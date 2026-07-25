@@ -18,17 +18,23 @@ in every generated Dockerfile (the `assets: [wheels]` bind-mount is unconditiona
 not `src-abi1`-specific) would fail to resolve its source path and break the build
 for ALL stacks that include `compute/torch`, not just sim-x86.
 
-On a fresh clone / new host that needs `TORCH_VARIANT=src-abi1`, re-fetch the wheel
-from wherever it's archived (host-local only today, see below) and hardlink or copy
-it into this directory as `torch-2.2.2-cp38-cp38-linux_x86_64.whl` before building
-`sim-x86`.
+On a fresh clone / new host that needs `TORCH_VARIANT=src-abi1`, run
+`stage_from_archive.sh` (this directory) — it reads `TORCH_WHEEL_ARCHIVE_DIR`
+(`config/stack.env`, override per-host via `config/stack.env.local` — **not** by
+editing the tracked default, same pull-conflict reasoning as `ETE_DATA_DIR`) and
+hardlinks/copies the wheel in from there, verifying md5 either way. Run it before
+`setup.sh build/up` on any stack using the variant.
 
-## Current location (host-local, not archived elsewhere)
+## Current archive locations (host-local, `TORCH_WHEEL_ARCHIVE_DIR` per host)
 
-`/home/ml/risk_aware_assets/wheels_x86/torch-2.2.2-cp38-cp38-linux_x86_64.whl` on the
-`ml` desktop. This directory's copy is a **hardlink** to that file (same filesystem,
-`/dev/nvme0n1p5` — confirmed via `df`), so it costs 0 extra disk. If you `cp` instead
-of `ln` on a future refresh, remember that wastes another 274MB.
+| host | `TORCH_WHEEL_ARCHIVE_DIR` | relationship to this dir's copy |
+|---|---|---|
+| `ml` desktop | `/home/ml/risk_aware_assets/wheels_x86/` | **hardlink** (same fs, `/dev/nvme0n1p5` — confirmed via `df`), 0 extra disk |
+| `im` (10.74.23.213), `/media/im/ETE4090` SSD | `/media/im/ETE4090/wheels_x86/` (a copy of the build output `torch-build/pytorch/dist/torch-2.2.2-cp38-cp38-linux_x86_64.whl`, same md5) | **hardlink** (same fs, `/dev/sda1`), 0 extra disk |
+
+If you `cp` instead of `ln` on a future refresh on either host, remember that wastes
+another 274MB — `stage_from_archive.sh` tries `ln` first and only falls back to `cp`
+across filesystems.
 
 ## Rebuild procedure
 
@@ -109,3 +115,15 @@ Considered and rejected for now (orchestrator decision, 2026-07-25) — the whee
 stays host-local (`/home/ml/risk_aware_assets/wheels_x86/`) with this README as the
 reproduction record, rather than paying for LFS storage/bandwidth. Revisit if this
 needs to travel to another host (4090/5090) without manual re-copy.
+
+## 2026-07-26: torch unification investigation (sim-x86 wheel reused for ete-train)
+
+Same wheel, same md5, now also staged on `im` (`/media/im/ETE4090/wheels_x86/`, copied
+from the `torch-build` container's own output — see the archive table above) to test
+whether `ete-train-*`'s pip cu121 torch can be replaced by this ABI=1 build too, which
+would let `install.sh`'s `TORCH_VARIANT=src-abi1` branch become the ONLY sm89/sm75
+path and delete the `build_env:` scoping mechanism entirely (`tools/gen_dockerfile_
+compose.py`) instead of opting a stack in. See `docs/ETE_TRAIN_GPU_HOSTS.md`'s
+"torch unification" section for the file:line change list, the `ete-train-4090-abi1`
+test-tag build/verification results, and the swap/rollback procedure for the LIVE
+`ete-train-4090`/`ete-train-2080ti` stacks (not touched by this investigation).

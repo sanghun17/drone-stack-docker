@@ -1,0 +1,25 @@
+# ete-train-4090-abi1 — 2026-07-26 TEST TAG, torch-unification investigation. NOT the
+# live training stack (that stays `ete-train-4090` / `drone-stack-ete-train-4090`,
+# untouched by this file). Identical module list to stacks/ete-train-4090.yml, only
+# difference is `build_env: TORCH_VARIANT: src-abi1` (same technique sim-x86 uses,
+# see stacks/sim-x86.yml + modules/compute/torch/install.sh) -- swaps the pip
+# `torch==2.1.2+cu121` (ABI=0) wheel for the source-built `torch-2.2.2` (ABI=1,
+# CUDA-unbundled) wheel already validated on sim-x86 (sm_75) and now also staged on
+# `im` for sm_89 (see modules/compute/torch/wheels/README.md's archive table +
+# stage_from_archive.sh). Goal: if this passes the same validation gates as the pip
+# wheel, `TORCH_VARIANT=src-abi1` can become install.sh's ONLY sm89/sm75 path and this
+# stack file (+ sim-x86's build_env line) can be deleted -- see
+# docs/ETE_TRAIN_GPU_HOSTS.md's "torch unification" section for the full plan,
+# validation results, and swap/rollback procedure for the live ete-train-4090/
+# ete-train-2080ti stacks. Delete this file once that decision is made either way.
+arch: [amd64]
+gpu_arch: sm89   # same combo key as ete-train-4090.yml -- see that file's comments
+build_env:
+  TORCH_VARIANT: src-abi1   # compute/torch install.sh: source-built torch 2.2.2 (ABI=1,
+                             # CUDA-unbundled) instead of the pip cu121 (ABI=0) wheel.
+                             # Run modules/compute/torch/wheels/stage_from_archive.sh
+                             # on this host BEFORE building -- the wheel is git-untracked.
+modules:
+  - compute/torch    # amd64/sm89 branch, src-abi1 sub-branch (see build_env above)
+  - compute/spconv   # amd64_sm89 combo: spconv-cu120 wheel, hard-required (no source-build fallback)
+  - training/ete-net

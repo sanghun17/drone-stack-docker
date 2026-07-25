@@ -285,6 +285,204 @@ Keep target-host runs in a separate table from the 2080 Ti ablation campaign
 keep 5090 runs separate from 4090 runs if both stacks ever get used -- only compare
 relative trends (does arm X still beat arm Y), not raw loss values, across machines.
 
+## torch unification investigation (2026-07-26)
+
+Goal (orchestrator decision, 2026-07-26): drone-stack-docker currently builds torch
+TWO different ways -- `ete-train-*`/most stacks get the stock pip `torch==2.1.2+cu121`
+wheel (ABI=0, bundles its own CUDA/cuDNN), while `sim-x86` needs a **source-built**
+`torch==2.2.2` wheel (ABI=1, CUDA-unbundled -- required because sim-x86 runs C++
+(voxblox) and Python torch in the SAME process, and pip's ABI=0 wheel doesn't link
+against gcc-9's default ABI=1 C++ symbols). This split created a `build_env:` stack
+axis (`tools/gen_dockerfile_compose.py`) that exists ONLY to scope the variant to one
+stack. If the same ABI=1 wheel can also serve `ete-train-*` with no regression, that
+axis can be deleted entirely -- one torch build for the whole repo. Tonight's scope
+(explicitly NOT the live-container swap -- see "Swap procedure" below): prepare a
+reusable wheel-distribution path, build a NEW-TAG test image, and validate it with a
+throwaway container, WITHOUT touching `drone-stack-ete-train-4090`/`ete-train-2080ti`.
+
+### 1. Exactly what removing `build_env:` requires (file:line, as of this session)
+
+- **`modules/compute/torch/install.sh`** -- the `sm89|sm75)` case (lines 20-105) wraps
+  the ABI=1 body in `if [ "${TORCH_VARIANT:-}" = "src-abi1" ]; then ... else ... fi`
+  (line 48 `if` / lines 69-72 `else` + pip cu121 install + `fi`). Deleting the `if`
+  line and the `else`-block (keeping only the src-abi1 body, lines 49-68, unconditional)
+  makes ABI=1 the ONLY sm89/sm75 path.
+- **`stacks/sim-x86.yml`** lines 19-25 (`build_env: {TORCH_VARIANT: src-abi1}` +
+  comment) become dead weight once src-abi1 is unconditional -- delete.
+- **`tools/gen_dockerfile_compose.py`** -- the `build_env` plumbing itself (module
+  docstring lines 21-30, `gen_dockerfile(..., build_env=None)` signature, the
+  `for k, v in (build_env or {}).items(): envs += ...` loop at ~205-212, and
+  `build_env = stack.get("build_env") or {}` in `main()` at ~337-339) becomes UNUSED
+  (sim-x86 was its only consumer) but is harmless to leave -- it's inert plumbing, not
+  a functional branch. Delete only for cleanup, not required for the branch to
+  disappear (the branch that matters is install.sh's `if/else`, above).
+- **`modules/compute/torch/wheels/README.md`** and **`modules/compute/torch/module.yml`**
+  description -- both currently describe the conditional (`UNLESS the stack sets
+  build_env...`); rewrite once unconditional.
+- **`docs/ETE_TRAIN_GPU_HOSTS.md`** -- the per-stack table's "CUDA container line" /
+  torch-variant references (top of this file) need a line noting torch is now the
+  ABI=1 source wheel, shared with sim-x86 -- also update the "Do not mix GPU-arch
+  numbers" caveat to ALSO cover "before/after this swap" (see the cuDNN finding below,
+  which changes numerics for anything using `nn.GRU`/cuDNN-backed ops, though nothing
+  in the current campaign does -- see §4).
+- **NOT required to change**: `stacks/ete-train-4090.yml` / `ete-train-2080ti.yml` /
+  `ete-train-5090.yml` themselves -- once install.sh's default flips, they inherit the
+  new wheel automatically (that's the whole point of removing the axis). Their comments
+  referencing "PyTorch cu121, stock python3.8" become stale and should be updated at
+  swap time.
+
+### 2. Wheel distribution path (prepared tonight, not yet used by the live stacks)
+
+Reused sim-x86's existing pattern (`modules/compute/torch/wheels/` + `assets: [wheels]`
+bind-mount, already unconditional in `module.yml` -- so `ete-train-*` builds already
+had access to the mount mechanism, just never had a wheel file there) instead of
+inventing a new one, per the `risk_aware_assets`-style "external storage + copy/hardlink
+in" convention:
+
+- **New tracked var**: `config/stack.env`'s `TORCH_WHEEL_ARCHIVE_DIR` -- the per-host
+  canonical archive dir the wheel is fetched from (274MB, git-untracked, can't live in
+  the repo -- see `wheels/README.md`). Tracked default is `ml`'s own path
+  (`/home/ml/risk_aware_assets/wheels_x86`); **any host whose archive differs overrides
+  via `config/stack.env.local`** (untracked) -- NOT by editing the tracked line, per the
+  `ETE_DATA_DIR` pull-conflict incident this same file already documents.
+- **New script**: `modules/compute/torch/wheels/stage_from_archive.sh` -- reads
+  `TORCH_WHEEL_ARCHIVE_DIR`, hardlinks (falls back to copy across filesystems) the
+  wheel into `modules/compute/torch/wheels/`, md5-verifies, idempotent. Run once per
+  host before `setup.sh build/up` on any stack using `TORCH_VARIANT=src-abi1`.
+- **Archive locations set up tonight** (both hardlinks, 0 extra disk beyond the one real
+  274MB copy per host):
+  | host | `TORCH_WHEEL_ARCHIVE_DIR` | source of the copy |
+  |---|---|---|
+  | `ml` desktop | `/home/ml/risk_aware_assets/wheels_x86/` | pre-existing (sim-x86's original wheel) |
+  | `im` (`/media/im/ETE4090`) | `/media/im/ETE4090/wheels_x86/` | copied from `torch-build/pytorch/dist/torch-2.2.2-cp38-cp38-linux_x86_64.whl` (the preserved build-container output) -- md5 `b090688066a81b756c7800f5b03eecce`, byte-identical to `ml`'s copy |
+  `config/stack.env.local` on `im` now also carries `TORCH_WHEEL_ARCHIVE_DIR=/media/im/ETE4090/wheels_x86` (alongside the pre-existing `ETE_DATA_DIR` line).
+
+### 3. Test build: host, tag, and the 6-gate verification
+
+**Built on `im`** (not `ml`) -- deliberately, because the whole point is validating
+the wheel on the SAME GPU micro-arch (`sm_89`, RTX 4090) that `ete-train-4090` actually
+uses; `ml`'s 2080 Ti (`sm_75`) already validates the `sm_75` half of this wheel
+indirectly via the running `sim-x86` stack. Used the existing `DOCKER_HOST=unix:///tmp/
+docker-ssd.sock` daemon (im's ONLY docker daemon in practice -- it already hosts the
+live `drone-stack-ete-train-4090` container, not a build-only side channel as an
+earlier README implied) with `DOCKER_BUILD_OPTS=--network=host` (that daemon has no
+bridge network), both already wired into `setup.sh`.
+
+New stack file **`stacks/ete-train-4090-abi1.yml`** (test tag, NOT committed) --
+identical module list to `ete-train-4090.yml` + `build_env: {TORCH_VARIANT: src-abi1}`
+(same technique as sim-x86). Built via `./setup.sh build ete-train-4090-abi1` ->
+`drone-stack:ete-train-4090-abi1` (14GB, vs the live `drone-stack:ete-train-4090`'s
+15.9GB, untouched, verified same image ID before/after). Verified via **`docker run
+--rm`** one-off containers only -- no `setup.sh up`, no compose, nothing persistent.
+`torch-build` container and the wheel originals were not touched.
+
+Regression check first: regenerated all 5 existing stacks' Dockerfiles
+(`d435i-voxblox`, `ete-train-2080ti`, `ete-train-4090`, `ete-train-5090`, `sim-x86`) and
+diffed byte-for-byte against pre-change output -- **all 5 unchanged**, confirming the
+new stack file and `stage_from_archive.sh` are fully additive.
+
+**6-gate results (all on `im`, real RTX 4090, `drone-stack:ete-train-4090-abi1`):**
+
+1. **ABI=1**: `torch._C._GLIBCXX_USE_CXX11_ABI is True` -- **PASS**.
+2. **LAPACK**: `torch.__config__.show()` contains `LAPACK_INFO=open` -- **PASS**.
+3. **CPU qr**: `torch.linalg.qr(torch.randn(4,4))` runs on CPU -- **PASS** (this is the
+   exact op that killed the jax node in the 2026-07-25 LAPACK incident, see
+   `modules/compute/torch/wheels/README.md`).
+4. **CUDA-unbundled / system link**: `torch/lib/` has only 10 torch-owned `.so` files
+   (727MB total, vs the pip wheel's 3.6GB with bundled CUDA/cuDNN) -- **PASS**, no
+   bundled CUDA runtime. **BUT the "ELF NEEDED libcudnn.so.8" half of this gate does
+   NOT hold as originally assumed** -- see the new finding in §4 below.
+5. **spconv**: `spconv.pytorch.SubMConv3d` forward pass on real CUDA (RTX 4090) --
+   **PASS**, `spconv forward OK: torch.Size([100, 16])`.
+6. **`import ete_net`**: with `PYTHONPATH=/opt/ros/noetic/lib/python3/dist-packages`
+   (per `modules/training/ete-net/train.sh`'s existing convention) -- **PASS**.
+
+### 4. New finding this session: the wheel has `USE_CUDNN=OFF`, not "shared cuDNN"
+
+The 2026-07-25 sim-x86 design doc (`scratchpad/torch_abi1_integration_plan.md`)
+inspected this SAME wheel and concluded `libtorch_cuda.so` NEEDs `libcudnn.so.8`
+(readelf), so the plan was "install ONE system `libcudnn8` and torch+jax share it."
+**Re-checked tonight on the actual built image, and that's not what's in the shipped
+wheel**: `readelf -d libtorch_cuda.so` lists NO `libcudnn` entry at all, `torch.__config__.show()`
+reports `USE_CUDNN=OFF`, and `torch.backends.cudnn.is_available()` is `False` /
+`torch.backends.cudnn.version()` is `None`. Contrast: the live `ete-train-4090`
+container's pip torch (`2.1.2+cu121`) has `cudnn.is_available()=True`,
+`version()=8902`. So **this wheel doesn't share a cuDNN instance with anything -- it
+has no cuDNN support compiled in at all.** (This is also consistent with sim-x86's
+actual shipped design ending up different from that plan doc too -- the later commits
+kept a separate host-mounted `jax`/`jaxlib` with its own CUDA-11 cuDNN via
+`/opt/host-py`, rather than the plan's "one shared cuDNN" architecture.)
+
+**Practical impact for ete_net, checked tonight**: grepped
+`uncertainty_predictor/src/ete_net/model/` for cuDNN-dependent `torch.nn` ops --
+exactly one: `nn.GRU` (`ete_network.py:618`, `latent_gru`, "v2.3 arm K-a"), gated by
+`config.latent_recurrence_enabled` which **defaults to `False`** and is not set `True`
+by any config under `ete_net/config/ablation/` today (checked via grep) -- so it's
+dormant across the entire current trainq campaign, including `DEPLOY1_*`. The other
+heavy compute path (`spconv`'s sparse convs) is cuDNN-independent by construction
+(confirmed earlier: `ldd` on spconv's compiled extension shows only `libcudart`, no
+`libtorch`/cuDNN linkage) -- unaffected either way. **Net assessment: no measured
+regression risk for any config running today, but this is a real, previously
+undocumented gap** -- if any future arm sets `latent_recurrence_enabled: true`, it will
+run the GRU via PyTorch's non-cuDNN CUDA fallback (functionally correct, not
+benchmarked for speed) instead of cuDNN's fused RNN kernels. **Not benchmarked
+tonight** (would need an actual A/B epoch-time run, out of scope for a same-night
+prep-only pass) -- flag as an open item before promoting this wheel as the ete-train
+default, specifically for any config that turns that flag on.
+
+### 5. Training impact (im's live queue, measured before/during/after the build)
+
+No slowdown attributable to the build. Baseline (`02:30`-`02:35`, 3 concurrent lanes):
+77-97ms/batch, GPU busy 92-99% (from the trainer's own `[Profile]` log line). During
+the ~13-minute build (base-image apt install dominated -- ~880 packages, uncached
+because `build_env` changes every module's RUN cache key, same one-time cost the
+ORIGINAL `ete-train-4090` build already paid once): GPU util stayed 60-100%, load
+average 5.9-7.7 (baseline was 6.5-7.7) -- no anomaly. Two jobs (`auxoff_nosw_s42`
+600/600, `CHRr27_gnfix_s42` 120/120) completed NATURALLY mid-build (confirmed via their
+own "Training Complete!" log lines matching their configured epoch counts) -- the
+resulting GPU-util dip to 42-67% was trainq's normal queue rotation (2-lane operation,
+matching the `trainq` SKILL.md's own documented "81%util/2-lane" baseline), not a build
+effect. Post-build, both active lanes (`GNAUXw05r28_gnfix_s42`, `DNoffAuxoff_nosw_s42`)
+continued at 61-97ms/batch / 86-96% GPU busy -- same range as the pre-build baseline.
+Disk: 64GB free before -> 57GB free after (new image ~7GB of non-shared layers), well
+above the 20GB abort threshold throughout.
+
+### 6. Swap procedure (NOT done tonight) and rollback
+
+**Prerequisites before swapping the LIVE `ete-train-4090`/`ete-train-2080ti` stacks**:
+(a) resolve or explicitly accept the §4 cuDNN/GRU gap (at minimum: keep
+`latent_recurrence_enabled: false` until benchmarked, or benchmark it first); (b) an
+actual epoch-time A/B on a real training run (this session only checked op-level
+correctness + spconv, not measured end-to-end training throughput under the new wheel);
+(c) re-validate the `~3.87` 2080 Ti / 4090 baseline losses aren't disturbed beyond the
+existing `+-0.2` cross-build tolerance this doc already documents (different torch
+build = different cuDNN/cuBLAS kernel versions = expected small numeric drift, same
+caveat as the original pip-torch-vs-bare-metal comparison in the "real build +
+validation" section above).
+
+**Swap steps** (once the above are cleared, on each host in turn -- do NOT do this
+while that host's `ete-train-*` container has jobs running; `im`'s `trainq` in
+particular tracks lane counts across the ACTUAL running docker containers, restarting
+one out from under it will orphan lanes, see the `trainq` SKILL.md's `--reserve-lanes`
+warnings):
+1. Apply the `install.sh`/`stacks/sim-x86.yml`/generator cleanup from §1.
+2. Run `modules/compute/torch/wheels/stage_from_archive.sh` on that host (already done
+   on `ml` and `im` tonight).
+3. `./setup.sh build ete-train-4090` (etc) -- rebuilds `drone-stack:ete-train-4090`
+   in place, new content, same tag.
+4. `docker tag drone-stack:ete-train-4090 drone-stack:ete-train-4090-pre-abi1` BEFORE
+   `setup.sh up` -- rollback anchor (same pattern the sim-x86 conversion plan used).
+5. `./setup.sh up ete-train-4090` -- recreates the container (kills whatever's running
+   in it; only do this between queue-empty windows, coordinate via `trainq_status.sh`).
+6. Re-run the 6 gates (§3) + a short real training smoke (a few epochs of an existing
+   config) before resuming the real campaign.
+
+**Rollback**: `docker tag drone-stack:ete-train-4090-pre-abi1 drone-stack:ete-train-4090
+&& ./setup.sh up ete-train-4090` -- byte-identical to the pre-swap image, no rebuild
+needed. Delete `stacks/ete-train-4090-abi1.yml` (the test-tag stack file) once the
+decision is made either way -- it was only for tonight's isolated test, see its own
+header comment.
+
 ## Files touched by this migration
 
 ### 2026-07-14, initial (5090-targeted)
@@ -402,3 +600,38 @@ relative trends (does arm X still beat arm Y), not raw loss values, across machi
   comment. `config/stack.env` had no module-path references to update. Re-verified
   backward compatibility (byte-identical `d435i-voxblox --arch arm64` diff) and
   regenerated `ete-train-2080ti` cleanly after the rename.
+
+### 2026-07-26, torch-unification prep (see "torch unification investigation" section above for full detail)
+- `config/stack.env` — added `TORCH_WHEEL_ARCHIVE_DIR` (per-host archive dir for the
+  sim-x86 ABI=1 wheel, tracked default = `ml`'s path, per-host override via
+  `config/stack.env.local`, same convention `ETE_DATA_DIR` already established).
+- `modules/compute/torch/wheels/stage_from_archive.sh` (new) — idempotent, md5-verified
+  hardlink/copy of the wheel from `TORCH_WHEEL_ARCHIVE_DIR` into this directory.
+- `modules/compute/torch/wheels/README.md` — documented the archive-dir mechanism
+  (table of known host archive locations: `ml`, `im`) and this investigation.
+- `stacks/ete-train-4090-abi1.yml` (new, test tag only, not committed) — same modules
+  as `ete-train-4090.yml` + `build_env: {TORCH_VARIANT: src-abi1}`.
+- `im`: staged the wheel at `/media/im/ETE4090/wheels_x86/` (copied from the preserved
+  `torch-build/pytorch/dist/` output, md5-verified identical to `ml`'s copy), hardlinked
+  into the checkout, added `TORCH_WHEEL_ARCHIVE_DIR` to `config/stack.env.local`. Built
+  `drone-stack:ete-train-4090-abi1` (14GB) via the existing `DOCKER_HOST=unix:///tmp/
+  docker-ssd.sock` + `DOCKER_BUILD_OPTS=--network=host` path already wired into
+  `setup.sh` — did NOT touch `drone-stack:ete-train-4090`/`drone-stack-ete-train-4090`
+  (verified same image ID before/after) or `torch-build`.
+- **No `install.sh`/`stacks/sim-x86.yml`/generator changes yet** — §1's `build_env`
+  removal is analysis-only tonight, deliberately not applied (would flip the LIVE
+  `ete-train-4090`/`ete-train-2080ti` stacks' torch on their next rebuild, out of
+  scope until the §6 prerequisites are met).
+- **New finding, not in the original sim-x86 plan**: the wheel has `USE_CUDNN=OFF` (no
+  cuDNN support at all, not "shares one cuDNN instance" as `scratchpad/
+  torch_abi1_integration_plan.md` assumed from a static `readelf` reading) — see §4.
+  No measured impact on the current trainq campaign (the only cuDNN-dependent op,
+  `nn.GRU` behind `latent_recurrence_enabled`, defaults off and unused by every
+  ablation config today) but flagged as an open item before promoting this wheel as
+  the ete-train default.
+- All 6 validation gates (ABI=1, LAPACK, CPU qr, CUDA-unbundled, spconv, `import
+  ete_net`) — **PASS** on `im`, real RTX 4090. Regenerated + diffed all 5 pre-existing
+  stacks' Dockerfiles — byte-identical (fully additive change). Training impact:
+  none measured (GPU util/batch-time before/during/after the build all within the
+  pre-existing baseline range; two jobs' natural mid-build completions were
+  independently confirmed via their own "Training Complete!" logs, not build-related).
