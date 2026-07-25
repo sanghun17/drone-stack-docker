@@ -56,7 +56,20 @@ case "$cmd" in
          echo ">> container drone-stack-$stack up. start nodes: ./setup.sh run $stack <module>" ;;
   run)   need_stack; mod="${3:?need <module> e.g. sensor/realsense-d435i}"
          [ -f "$ROOT/modules/$mod" ] || mod="$mod/run.sh"   # allow dir or explicit script
-         docker exec -it "drone-stack-$stack" bash -lc \
+         # `docker exec` does NOT inherit the caller's environment, so a module run
+         # script that reads env vars (training/ete-net/run.sh needs ETE_CONFIG, and
+         # halts via `:?` without it — no silent default, by project convention) would
+         # always halt when invoked through here. Forward the ones the caller actually
+         # exported; RUN_ENV adds arbitrary extra names, e.g.
+         #   ETE_CONFIG=config/ablation/v23_P1_DEPLOY1.yaml ./setup.sh run ete-train-4090 training/ete-net
+         #   RUN_ENV="MY_VAR OTHER" MY_VAR=1 ./setup.sh run <stack> <module>
+         # (2026-07-26: found on im — the working command had to be a hand-written
+         # `docker exec -e ...`, which is exactly what this script exists to replace.)
+         envargs=()
+         for v in ETE_CONFIG ETE_SEED ${RUN_ENV:-}; do
+           [ -n "${!v+x}" ] && envargs+=(-e "$v")
+         done
+         docker exec -it ${envargs[@]+"${envargs[@]}"} "drone-stack-$stack" bash -lc \
            "source /opt/ros/noetic/setup.bash; export ROS_MASTER_URI=http://localhost:$PORT; bash /work/modules/$mod" ;;
   sh)    need_stack; docker exec -it "drone-stack-$stack" bash ;;
   down)  need_stack; docker compose -f "$(CF)" down ;;
