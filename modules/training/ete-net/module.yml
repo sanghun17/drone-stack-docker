@@ -79,7 +79,11 @@ deps:
 # regression: those configs need updating to the new stage1/stage2/... paths, which is
 # out of scope for this mount/env-alignment change.
 mounts:
-  - "${RISK_AWARE_PLANNING_SRC}:/home/ml/risk-aware_planning/src"
+  # 코드는 마운트하지 않는다 — clone.sh 가 ws/risk-aware/src/risk_aware_planning 으로
+  # git clone 하고, dsd 루트가 컨테이너에 /work 로 마운트되므로 /work/ws/... 로 자동
+  # 노출된다 (fast-livo 등 다른 모듈과 동일한 패턴). 이전에는 ${RISK_AWARE_PLANNING_SRC}
+  # 라는 임의의 호스트 절대경로를 마운트했는데, 그건 배포 스택이 이미 clone 해둔 트리가
+  # 있는 머신에서만 성립해서 학습 전용 호스트(im)에서 깨졌다. (2026-07-25)
   - "${ETE_DATA_DIR}:/home/ml/data"
 
 env:

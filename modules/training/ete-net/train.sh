@@ -25,5 +25,5 @@ set -e
 : "${ETE_CONFIG:?set ETE_CONFIG to a config path relative to ete_net/, e.g. config/ablation/v23_F.yaml}"
 
 export PYTHONPATH="/opt/ros/noetic/lib/python3/dist-packages${PYTHONPATH:+:$PYTHONPATH}"
-cd /home/ml/risk-aware_planning/src/uncertainty_predictor/src
+cd /work/ws/risk-aware/src/risk_aware_planning/uncertainty_predictor/src
 exec python3 -m ete_net.train --config "ete_net/$ETE_CONFIG" ${ETE_SEED:+--seed "$ETE_SEED"}
