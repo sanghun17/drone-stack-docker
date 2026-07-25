@@ -16,6 +16,13 @@
 arch: [amd64]
 gpu_arch: sm75
 gpu_uuids_env: SIM_GPU_UUIDS
+build_env:
+  TORCH_VARIANT: src-abi1   # compute/torch install.sh: source-built torch 2.2.2 (ABI=1,
+                             # CUDA-unbundled) instead of the pip cu121 (ABI=0) wheel --
+                             # see modules/compute/torch/install.sh for the full rationale.
+                             # Scoped to THIS stack only: ete-train-2080ti shares the same
+                             # amd64_sm75 combo key but has no build_env, so it keeps pip
+                             # cu121 (see tools/gen_dockerfile_compose.py's build_env note).
 modules:
   - compute/torch          # amd64/sm75 branch — hours to build, keep at the top
   - compute/spconv

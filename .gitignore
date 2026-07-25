@@ -10,6 +10,13 @@ Dockerfile.*.generated
 # NOTE: modules/compute/jax/wheels/*.whl IS tracked (the reused jaxlib artifact —
 # avoids the multi-hour jaxlib-from-source rebuild). Intentionally NOT ignored.
 
+# modules/compute/torch/wheels/*.whl is NOT tracked, unlike the jax wheel above —
+# it's 274MB, over GitHub's 100MB push limit. Kept host-local
+# (/home/ml/risk_aware_assets/wheels_x86/, hardlinked in) instead; the directory's
+# README.md IS tracked (see that file for rebuild provenance) so the dir survives a
+# fresh clone and the assets: [wheels] bind-mount doesn't break every stack's build.
+modules/compute/torch/wheels/*.whl
+
 # ROS / build artifacts
 build/
 devel/

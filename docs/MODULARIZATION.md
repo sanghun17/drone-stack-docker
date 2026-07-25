@@ -65,7 +65,12 @@ stacks/d435i-voxblox.yml         modules/<group>/<name>/
 - **`tools/gen_dockerfile_compose.py`** `<stack> [--arch]`: resolve module order (base + stack list +
   transitive `needs`), union deps for the arch, emit `FROM base_image[arch]` then one
   `RUN` block per module (its apt → pip → source install.sh). Emits a single `dev` compose
-  service with merged mounts.
+  service with merged mounts. A stack may also set `gpu_arch:` (GPU micro-arch, e.g.
+  `sm75`) to pick `deps.<cpu_arch>_<gpu_arch>` combo keys, and/or `build_env:` (a
+  `{KEY: value}` map) to pass extra install.sh-only env vars scoped to just that stack
+  (e.g. sim-x86's `TORCH_VARIANT: src-abi1`) without those vars leaking into other
+  stacks that share the same `gpu_arch` — both build-time-only, no effect on the
+  running container.
 - **`setup.sh`** `{gen|build|up|run|sh|down|ls} <stack>`: **native build per host arch**
   (`uname` → arm64/amd64; no buildx — build amd64 on the x86 host later). `up` = gen +
   build + start the idle container; `run <stack> <module>` execs a module's `run.sh` inside it.

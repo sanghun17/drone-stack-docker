@@ -13,37 +13,3 @@ python3 -m pip install --no-cache-dir "airsim==1.8.1"
 # --no-deps: numpy 등 기존 스택 재해석 방지.
 python3 -m pip install --no-cache-dir --no-deps "opencv-python-headless==4.9.0.80"
 python3 -m pip uninstall -y opencv-contrib-python 2>/dev/null || true
-
-# ── torch shim: C++ 링크를 호스트-torch(/opt/host-py, ABI=1)로 통일 ──────────────
-# voxblox 계열 C++는 -D_GLIBCXX_USE_CXX11_ABI=1 하드코딩(호스트 소스빌드 torch 전제),
-# pip torch 휠은 ABI=0 → 링크 실패. 게다가 jax 노드는 한 python 프로세스에서 python
-# torch와 libvoxblox(_voxblox_ros_python)를 동시 로드하므로 SONAME(libc10.so 등) 충돌
-# 때문에 '별도 libtorch' 방식도 불가 (2026-07-25 검증② 실증) — python과 C++ 모두
-# 같은 torch여야 한다. 해법: 호스트 소스빌드 torch를 module.yml이 /opt/host-py로
-# 마운트(sim.env가 PYTHONPATH prepend), build_ws.sh가 이 shim(PYTHONPATH)으로 각
-# CMakeLists의 `import torch.utils` cmake-prefix 트릭을 /opt/host-py/torch로 돌린다.
-# (마운트는 컨테이너 런타임에만 존재 — 이 shim은 경로 문자열만 담으므로 빌드시 생성 OK)
-mkdir -p /opt/torch_shim/torch/utils
-printf 'cmake_prefix_path = "/opt/host-py/torch/share/cmake"\n' > /opt/torch_shim/torch/utils/__init__.py
-printf '' > /opt/torch_shim/torch/__init__.py
-
-# host-torch(cu11 빌드)의 CUDA-11 런타임(.so)들 — 링크 타임(ld의 needed-by-needed
-# 해석)과 C++ 노드 런타임(dlopen) 모두 ldconfig 검색경로에 있어야 한다. 마운트라
-# 빌드 시점엔 경로가 비어 있지만 conf는 문자열이므로 미리 등록해 둔다.
-for d in /opt/host-py/nvidia/*/lib /opt/host-py/torch/lib /opt/host-py/cumm_cu118.libs /opt/host-py/spconv_cu118.libs; do echo "$d"; done > /etc/ld.so.conf.d/zz-host-py-cuda11.conf
-# glob이 빌드 시점에 안 풀리므로 리터럴로도 보강
-cat > /etc/ld.so.conf.d/zz-host-py-cuda11.conf <<'EOF'
-/opt/host-py/nvidia/cublas/lib
-/opt/host-py/nvidia/cuda_cupti/lib
-/opt/host-py/nvidia/cuda_nvrtc/lib
-/opt/host-py/nvidia/cuda_runtime/lib
-/opt/host-py/nvidia/cudnn/lib
-/opt/host-py/nvidia/cufft/lib
-/opt/host-py/nvidia/curand/lib
-/opt/host-py/nvidia/cusolver/lib
-/opt/host-py/nvidia/cusparse/lib
-/opt/host-py/torch/lib
-/opt/host-py/cumm_cu118.libs
-/opt/host-py/spconv_cu118.libs
-EOF
-ldconfig || true

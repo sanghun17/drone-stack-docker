@@ -12,6 +12,9 @@ description: >
   535.261): same policy as sm_89 -- spconv-cu120 also covers Turing.
 
 needs: [compute/torch]      # spconv builds against torch
+# spconv/cumm's C++ extension does NOT link libtorch (ldd: libcudart only) -- torch
+# ABI is irrelevant to it, so compute/torch's src-abi1 variant (sim-x86) needs no
+# corresponding spconv change (2026-07-25 ldd real-build check).
 
 env:
   CUDA_HOME: /usr/local/cuda

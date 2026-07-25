@@ -45,8 +45,31 @@ case "${TARGETARCH:-arm64}" in
         # (backtracking resolver) handles this fine -- so upgrade pip first.
         python3 -m pip install --no-cache-dir --upgrade pip
         python3 -m pip install --no-cache-dir "numpy==1.24.3"
-        python3 -m pip install --no-cache-dir \
-          torch==2.1.2 torchvision==0.16.2 torchaudio==2.1.2 --index-url https://download.pytorch.org/whl/cu121
+        if [ "${TORCH_VARIANT:-}" = "src-abi1" ]; then
+          # 호스트 소스빌드 torch 2.2.2 (ABI=1, cuda12.2/cudnn8.9.7, sm_75+sm_89).
+          # WHY: pip cu121 휠은 ABI=0 + cuDNN 자체번들 → (a) voxblox C++(gcc-9 기본 ABI=1)와
+          #      심볼 불일치 (b) 같은 프로세스의 jaxlib(cudnn89 dlopen)와 cuDNN 이중로드.
+          #      소스 휠은 ABI=1 + CUDA 미번들 → 베이스 이미지 CUDA 12.2 + 시스템 cuDNN 하나를 공유.
+          WHL=$(ls /modules/compute/torch/wheels/torch-2.2.2-cp38-cp38-linux_x86_64.whl 2>/dev/null | head -1)
+          [ -n "$WHL" ] || { echo "ERROR: TORCH_VARIANT=src-abi1 이지만 modules/compute/torch/wheels/ 에 휠이 없다. (git 미추적 274MB — README.md 참조)" >&2; exit 1; }
+          # cuDNN 8.9.7: 휠의 libtorch_cuda.so가 DT_NEEDED libcudnn.so.8 (번들 안 함).
+          # 버전은 휠 빌드 시점 cuDNN과 동일, jaxlib 0.4.13+cuda12.cudnn89 요구와도 일치.
+          apt-get update && apt-get install -y --no-install-recommends libcudnn8=8.9.7.29-1+cuda12.2 \
+            && rm -rf /var/lib/apt/lists/*
+          python3 -m pip install --no-cache-dir "$WHL"
+          # torch.compile(jax_main_node_ros_new.py:976-990) 백엔드. 소스 휠은 triton을 의존성에
+          # 안 넣으므로 명시 설치 — 없으면 '첫 forward'에서 터진다(설치 검증은 통과).
+          python3 -m pip install --no-cache-dir "triton==2.2.0"
+          # C++ 노드(roslaunch, LD_LIBRARY_PATH 없음)의 libtorch 해석 안전망. torch .so만 있는
+          # 디렉터리라 시스템 CUDA를 가릴 위험 없음.
+          echo /usr/local/lib/python3.8/dist-packages/torch/lib > /etc/ld.so.conf.d/zz-torch.conf && ldconfig
+          python3 -c "import torch; assert torch.compiled_with_cxx11_abi(), 'ABI != 1'; print('ABI=1 OK')"
+          # torchvision/torchaudio는 설치하지 않는다 — 소스 트리 import 0건, 게다가 pip 휠은
+          # ABI=0 torch 전제로 libtorch를 링크하므로 ABI=1 torch에서 심볼 불일치 위험.
+        else
+          python3 -m pip install --no-cache-dir \
+            torch==2.1.2 torchvision==0.16.2 torchaudio==2.1.2 --index-url https://download.pytorch.org/whl/cu121
+        fi
         ;;
       sm120|*)
         # Filled 2026-07-14 for ete-train-5090 (RTX 5090 / Blackwell / sm_120). Official
