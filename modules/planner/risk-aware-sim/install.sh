@@ -8,6 +8,11 @@
 set -e
 python3 -m pip install --no-cache-dir "msgpack-rpc-python==0.4.1"
 python3 -m pip install --no-cache-dir "airsim==1.8.1"
+# airsim 전이 의존으로 딸려오는 opencv-contrib-python 5.x가 cv_bridge cv2_to_imgmsg를
+# KeyError: 16 으로 깨뜨림 (2026-07-25 sensor-pub 컨테이너화 실증) → 4.9 headless로 강제 핀.
+# --no-deps: numpy 등 기존 스택 재해석 방지.
+python3 -m pip install --no-cache-dir --no-deps "opencv-python-headless==4.9.0.80"
+python3 -m pip uninstall -y opencv-contrib-python 2>/dev/null || true
 
 # ── torch shim: C++ 링크를 호스트-torch(/opt/host-py, ABI=1)로 통일 ──────────────
 # voxblox 계열 C++는 -D_GLIBCXX_USE_CXX11_ABI=1 하드코딩(호스트 소스빌드 torch 전제),

@@ -45,6 +45,8 @@ deps:
     - ros-noetic-urdf
     - ros-noetic-xacro
     - ros-noetic-rviz                 # voxblox_rviz_plugin 빌드 (jetson 이미지와 동일)
+    - ros-noetic-depth-image-proc     # point_cloud_xyzrgb nodelet — 없으면 '무음' 로드실패로
+                                      # /voxel_grid/output 데이터 0 (2026-07-25 sensor-pub 컨테이너화 실증)
     - unzip                           # install.sh libtorch 압축해제
   # JAX MPPI node python deps (jax_main_node_ros_new.py + time_profiler + viz/IO).
   # airsim (so3_control_bridge.py:25,202 RPC client)은 여기 pip 리스트가 아니라
@@ -75,5 +77,5 @@ mounts:
   - "${SIM_HOST_PY}:/opt/host-py"
   - "${SIM_RISK_AWARE_ASSETS}:${SIM_RISK_AWARE_ASSETS}"   # model weights (external, large) — host-identical absolute path (checkpoint config resolves it verbatim)
 
-run: [run_voxblox.sh, run_exploration.sh, run_jax.sh, run_eval.sh, run_so3.sh]
-provides: [voxblox-map, exploration, jax-mppi, so3-control]
+run: [run_voxblox.sh, run_exploration.sh, run_jax.sh, run_eval.sh, run_so3.sh, run_sensor_pub.sh, run_init_sim.sh]
+provides: [voxblox-map, exploration, jax-mppi, so3-control, sensor-pub, init-sim]
