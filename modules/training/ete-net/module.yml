@@ -64,17 +64,26 @@ deps:
 # local_planner_mpc purely relative to its own __file__ (4 levels up) -- no $HOME /
 # no absolute-path fallback.
 #
-# Data mount is separate now: ${ETE_DATA_DIR} (host, config/stack.env) -> the
-# uncertainty_predictor/data/ slot inside the code mount target (overlays it), with
-# container env DATA_ROOT pointed at the same path so ete_train_config.yaml's
-# ${DATA_ROOT} expansion resolves. Move ETE_DATA_DIR in stack.env if data is ever
-# relocated off the retired ~/risk-aware_planning tree -- no code change needed.
+# Data mount is separate now: ${ETE_DATA_DIR} (host, config/stack.env) -> a plain
+# /home/ml/data mount target, with container env DATA_ROOT pointed at the same path
+# so ete_train_config.yaml's ${DATA_ROOT} expansion resolves. Move ETE_DATA_DIR in
+# stack.env if data is ever relocated again -- no code change needed.
+#
+# UPDATED 2026-07-25 (정본 레이아웃 통합, DATA_MAP.md): ${ETE_DATA_DIR} now points at
+# the whole /home/ml/data canonical tree (raw/stage1/stage2 tiers), not the old flat
+# uncertainty_predictor/data/ dir -- so the mount target changed from
+# .../uncertainty_predictor/data (which implied the old flat layout) to a plain
+# /home/ml/data, and DATA_ROOT follows it. Any ete_train_config.yaml key still written
+# as ${DATA_ROOT}/data_final/... (old flat-dir convention) now resolves to a path that
+# doesn't exist under the tiered tree and halts loudly on load -- intentional, not a
+# regression: those configs need updating to the new stage1/stage2/... paths, which is
+# out of scope for this mount/env-alignment change.
 mounts:
   - "${RISK_AWARE_PLANNING_SRC}:/home/ml/risk-aware_planning/src"
-  - "${ETE_DATA_DIR}:/home/ml/risk-aware_planning/src/uncertainty_predictor/data"
+  - "${ETE_DATA_DIR}:/home/ml/data"
 
 env:
-  DATA_ROOT: /home/ml/risk-aware_planning/src/uncertainty_predictor/data
+  DATA_ROOT: /home/ml/data
 
 run: [train.sh]
 provides: [ete-net-training]
