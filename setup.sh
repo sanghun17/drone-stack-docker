@@ -66,7 +66,7 @@ case "$cmd" in
          # (2026-07-26: found on im — the working command had to be a hand-written
          # `docker exec -e ...`, which is exactly what this script exists to replace.)
          envargs=()
-         for v in ETE_CONFIG ETE_SEED ${RUN_ENV:-}; do
+         for v in ETE_CONFIG ETE_SEED ETE_OUTPUT_DIR ${RUN_ENV:-}; do
            [ -n "${!v+x}" ] && envargs+=(-e "$v")
          done
          docker exec -it ${envargs[@]+"${envargs[@]}"} "drone-stack-$stack" bash -lc \

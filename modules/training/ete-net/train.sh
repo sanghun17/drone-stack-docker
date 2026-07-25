@@ -12,6 +12,13 @@
 # risk-aware_planning: config parameters must halt, not silently fall back, when
 # unset -- see risk-aware_planning/src's CLAUDE.md).
 #
+# ETE_OUTPUT_DIR (optional, 2026-07-26): mirrors the existing optional ETE_SEED
+# pattern exactly -- unset behavior is byte-identical to before (train.py picks
+# a fresh timestamped outputs/ete_net_v2_<timestamp> dir, train.py:136-138).
+# Added for trainq (scripts/trainq/trainq_manager.py on im's SSD), which needs a
+# predictable, name-keyed output dir per queued job to detect "already trained"
+# on restart and to locate checkpoints/best_val.pth after a run finishes.
+#
 # PYTHONPATH + `-m ete_net.train` (not `cd ete_net && python3 train.py`): confirmed
 # on a real container run 2026-07-14 -- `import ete_net` transitively imports
 # dataset/data_processor/pointcloud_sequence_processor.py, which does a top-level
@@ -26,4 +33,4 @@ set -e
 
 export PYTHONPATH="/opt/ros/noetic/lib/python3/dist-packages${PYTHONPATH:+:$PYTHONPATH}"
 cd /work/ws/risk-aware/src/risk_aware_planning/uncertainty_predictor/src
-exec python3 -m ete_net.train --config "ete_net/$ETE_CONFIG" ${ETE_SEED:+--seed "$ETE_SEED"}
+exec python3 -m ete_net.train --config "ete_net/$ETE_CONFIG" ${ETE_SEED:+--seed "$ETE_SEED"} ${ETE_OUTPUT_DIR:+--output_dir "$ETE_OUTPUT_DIR"}
