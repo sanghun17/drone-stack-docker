@@ -36,8 +36,19 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def load_env(path):
     env = dict(os.environ)
-    if os.path.isfile(path):
-        for line in open(path):
+    # `<path>.local` is an untracked per-host override that WINS over the tracked
+    # file. Without it every host has to edit config/stack.env itself, which makes
+    # a tracked file permanently dirty and conflicts on every pull -- im hit exactly
+    # that with ETE_DATA_DIR (2026-07-26) on a checkout that is supposed to be
+    # pull-only. Read the override FIRST: setdefault is first-writer-wins, so the
+    # real environment still beats both, then .local, then the shared defaults.
+    # (The shell side is handled inside stack.env itself, which sources its own
+    # .local at the end -- so setup.sh and the in-container run.sh's need no change.
+    # That sourcing line has no "=" so the loop below skips it, as intended.)
+    for p in (path + ".local", path):
+        if not os.path.isfile(p):
+            continue
+        for line in open(p):
             line = line.strip()
             if not line or line.startswith("#") or "=" not in line:
                 continue

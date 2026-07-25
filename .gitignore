@@ -49,3 +49,6 @@ tools/fastlivo/_t[0-9]*_*.yaml
 tools/fastlivo/_vrf*.yaml
 tools/fastlivo/_vrfo_*.bag
 tools/fastlivo/tune_master.parquet
+
+# per-host override for config/stack.env (see that file's footer)
+config/stack.env.local
