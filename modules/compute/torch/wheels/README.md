@@ -30,16 +30,46 @@ it into this directory as `torch-2.2.2-cp38-cp38-linux_x86_64.whl` before buildi
 `/dev/nvme0n1p5` — confirmed via `df`), so it costs 0 extra disk. If you `cp` instead
 of `ln` on a future refresh, remember that wastes another 274MB.
 
-## Verification values (recorded 2026-07-25, re-check after any rebuild)
+## Rebuild procedure
+
+**`build_wheel.sh` in this directory is the recipe.** Run it instead of following prose —
+it encodes the pins and the traps, and its VERIFY stage refuses to emit a wheel that
+fails any of them. Needs only Docker (no GPU; it just compiles).
+
+## Verification values (current wheel, 2026-07-25 — re-check after any rebuild)
 
 ```
 file:   torch-2.2.2-cp38-cp38-linux_x86_64.whl
-size:   274,632,467 bytes
-md5:    2b10119bfe234efaa5fa68fcd5a77042
+size:   274,300,059 bytes
+md5:    b090688066a81b756c7800f5b03eecce
 python: cp38 (3.8.10)
 torch._C._GLIBCXX_USE_CXX11_ABI      == True
 torch._C._cuda_getArchFlags()        == "sm_75 sm_89"
+torch.__config__.show()               BLAS_INFO=open, LAPACK_INFO=open
+torch.linalg.qr(torch.randn(4,4))     runs on CPU   <-- see the LAPACK incident below
 ```
+
+## ⚠ The LAPACK incident (2026-07-25) — why the verification list has that last line
+
+The first wheel built that day (`md5 2b10119b…`, 274,632,467 bytes) was built by hand in a
+container that had **no BLAS development package**, so PyTorch silently fell back to Eigen
+and `USE_LAPACK` was never set. The wheel looked fine: correct version, ABI=1, correct
+arch list, CUDA unbundled — it passed the image smoke test *and* the 4-way
+torch/voxblox/spconv/jax coexistence gate.
+
+It failed only in the E2E run, where the jax node died during model construction:
+
+```
+RuntimeError: Calling torch.geqrf on a CPU tensor requires compiling PyTorch with LAPACK.
+  nn.init.orthogonal_() -> torch.linalg.qr()   (KineticEncoder._init_weights)
+```
+
+CPU `qr` failed while CUDA `qr` worked, so nothing that touched the GPU noticed. The fix was
+`libopenblas-dev` (BLAS **and** LAPACK) in the build container, then a full rebuild.
+
+Lessons now encoded in `build_wheel.sh`: install `libopenblas-dev`, set `BLAS=OpenBLAS`,
+assert `USE_LAPACK`, and **actually run a CPU `torch.linalg.qr`** — the build flags alone
+were not enough to catch this.
 
 ## Build provenance
 
