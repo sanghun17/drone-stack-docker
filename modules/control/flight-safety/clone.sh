@@ -9,10 +9,4 @@ REPO="${SAFETY_REPO:-git@github.com:sanghun17/flight_safety.git}"
 BRANCH="${SAFETY_BRANCH:-main}"
 LEGACY="$ROOT/ws/risk-aware/src/flight_safety"   # pre-split home; drop it so risk-aware stops building a duplicate
 [ -d "$LEGACY" ] && { echo ">> removing legacy flight_safety under risk-aware"; rm -rf "$LEGACY"; }
-if [ -d "$DST/.git" ]; then
-  echo ">> flight_safety exists -> fetch + checkout $BRANCH"
-  git -C "$DST" fetch origin "$BRANCH" && git -C "$DST" checkout "$BRANCH"
-else
-  mkdir -p "$ROOT/ws/flight-safety/src"
-  git clone -b "$BRANCH" "$REPO" "$DST"
-fi
+bash "$ROOT/modules/_common/clone_repo.sh" "$DST" "$REPO" "$BRANCH"

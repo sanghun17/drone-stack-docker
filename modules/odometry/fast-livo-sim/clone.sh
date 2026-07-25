@@ -17,14 +17,11 @@ VIKIT_REPO="${VIKIT_REPO:-https://github.com/xuankuzcr/rpg_vikit.git}"
 VIKIT_COMMIT="${VIKIT_COMMIT:-6c886c8}"   # = ml 호스트 ~/fast_livo2/src/rpg_vikit 현행 (behavior-preserving pin)
 
 mkdir -p "$SRC"
+bash "$ROOT/modules/_common/clone_repo.sh" "$SRC/FAST-LIVO2" "$REPO" "$BRANCH"
 
-if [ -d "$SRC/FAST-LIVO2/.git" ]; then
-  echo ">> fast_livo (sim) exists -> fetch + checkout $BRANCH"
-  git -C "$SRC/FAST-LIVO2" fetch origin "$BRANCH" && git -C "$SRC/FAST-LIVO2" checkout "$BRANCH"
-else
-  git clone -b "$BRANCH" "$REPO" "$SRC/FAST-LIVO2"
-fi
-
+# rpg_vikit is pinned to a COMMIT, not a branch, so it doesn't fit the branch-based
+# helper above (fetch <ref> + checkout <ref> where ref is a branch name) -- kept as its
+# own fetch-everything-then-checkout-the-commit logic, unchanged from before extraction.
 if [ -d "$SRC/rpg_vikit/.git" ]; then
   echo ">> rpg_vikit exists -> fetch + checkout $VIKIT_COMMIT"
   git -C "$SRC/rpg_vikit" fetch origin && git -C "$SRC/rpg_vikit" checkout "$VIKIT_COMMIT"
