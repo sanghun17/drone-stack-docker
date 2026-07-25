@@ -52,14 +52,18 @@ ssh jetson "docker exec drone-stack-d435i-voxblox <command>"    # 컨테이너 �
 컨테이너에 대화식으로 들어가야 하면 손으로 `docker exec -it`를 조립하지 말고 dsd
 스크립트를 쓴다: `ssh jetson "cd ~/drone-stack-docker && ./setup.sh sh d435i-voxblox"`.
 
-## Deploy + build loop (커밋 없이 빠른 반복)
+## Deploy + build loop (커밋·푸시 → pull 수렴 → 빌드)
 
 1. ml PC에서 코드 수정 (Edit 도구)
-2. 빌드:
+2. ml에서 커밋 + `git push origin main`. `scripts/deploy_to_jetson.sh`는 ml 워킹트리가
+   dirty하거나 로컬 HEAD가 origin/main에 없으면 이 시점에서 즉시 중단한다 — pull-only
+   규율을 강제하는 지점이 여기다. rsync 우회 경로는 없다.
+3. 빌드:
    - 빠른 반복(패키지 지정, catkin config는 기존 것 재사용 — 이미 RelWithDebInfo로
      구성돼 있다는 전제): `/home/ml/drone-stack-docker/ws/risk-aware/src/risk_aware_planning/scripts/deploy_to_jetson.sh --build <pkgs>`
-     — 워킹트리를 rsync(.git 제외)하고 jetson 컨테이너(`drone-stack-d435i-voxblox`)
-     안에서 `catkin build <pkgs>` 실행.
+     — jetson에서 `git pull --ff-only origin main` 실행 후 ml/jetson HEAD SHA가
+     같은지 검증하고, jetson 컨테이너(`drone-stack-d435i-voxblox`) 안에서
+     `catkin build <pkgs>` 실행. (`--build` 없이 실행하면 pull + 수렴 검증만 하고 끝난다.)
    - 처음 빌드하거나 catkin config가 의심스러우면(예: voxblox가 Debug/-O0로 잘못
      구성돼 heap이 깨지는 사고 재발 방지) dsd 스크립트로 전체 재확정:
      `ssh jetson "cd ~/drone-stack-docker && ./setup.sh build-ws d435i-voxblox"`
@@ -70,12 +74,15 @@ ssh jetson "docker exec drone-stack-d435i-voxblox <command>"    # 컨테이너 �
      재확정하며 build_ws.sh가 있는 모듈만 순서대로 빌드한다. 손으로
      `docker exec ... catkin build`를 조립하지 말 것 — sourcing 순서/cmake 재확정이
      스크립트에 이미 들어 있다.
-3. jetson에서 노드 재시작: `ssh jetson "cd ~/drone-stack-docker && ./setup.sh run d435i-voxblox <module>"`
+4. jetson에서 노드 재시작: `ssh jetson "cd ~/drone-stack-docker && ./setup.sh run d435i-voxblox <module>"`
    (예: `planner/risk-aware`, `odometry/fast-livo`, `sensor/realsense-d435i`) 또는
    기존 tmux 세션이 떠 있다면 위 ssh/tmux capture-pane 패턴으로 로그만 확인. 동작 확인.
-4. 검증되면 ml에서 커밋 + `git push origin main`, jetson은
-   `ssh jetson "cd ~/drone-stack-docker/ws/risk-aware/src/risk_aware_planning && git stash && git pull --ff-only origin main"`
-   (rsync로 dirty해진 트리는 stash/checkout으로 정리 — 어차피 ml 사본이다)
+
+복구 경로 (정상 경로 아님): jetson에 어쩌다 로컬 변경이 생겨(직접 편집 등 규율 위반)
+`git pull --ff-only`가 거부되면 —
+`ssh jetson "cd ~/drone-stack-docker/ws/risk-aware/src/risk_aware_planning && git stash && git pull --ff-only origin main"`
+로 정리한다 (jetson 로컬 변경은 규율 위반 산물이므로 버려도 되는 사본이다). **정상 경로는
+항상 stash 없는 `git pull --ff-only`**이며, `deploy_to_jetson.sh`가 매번 그 경로로 수렴시킨다.
 
 ## Guardrails 재적용
 
