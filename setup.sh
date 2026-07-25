@@ -23,6 +23,15 @@ PORT="${ROS_MASTER_PORT:-11311}"
 
 ARCH=$(uname -m); case "$ARCH" in aarch64) ARCH=arm64;; x86_64) ARCH=amd64;; esac
 
+# Extra `docker build` options. Symmetric with build_wheel.sh's DOCKER_RUN_OPTS —
+# needed on a host whose docker daemon has no bridge network (e.g. im's dedicated
+# DOCKER_HOST=unix:///tmp/docker-ssd.sock, `--bridge=none --iptables=false`): without
+# a network, the generated Dockerfile's RUN steps (apt/pip/git) can't reach anything,
+# so that host must build with DOCKER_BUILD_OPTS="--network=host" (2026-07-25,
+# ete-train-4090). Empty by default = byte-identical to the pre-existing `docker
+# build` invocation below.
+: "${DOCKER_BUILD_OPTS:=}"
+
 cmd="${1:-help}"; stack="${2:-}"
 need_stack(){ [ -n "$stack" ] || { echo "need <stack> (see stacks/)"; exit 1; }; }
 # the generated Dockerfile uses BuildKit `RUN --mount` (modules/ is bind-mounted at
@@ -40,9 +49,9 @@ case "$cmd" in
   gen)   need_stack; gen ;;
   build) need_stack; need_buildx; gen
          echo ">> docker build (native $ARCH) -> drone-stack:$stack"
-         docker build -f "$(DF)" -t "drone-stack:$stack" "$ROOT" ;;
+         docker build $DOCKER_BUILD_OPTS -f "$(DF)" -t "drone-stack:$stack" "$ROOT" ;;
   up)    need_stack; need_buildx; gen
-         docker build -f "$(DF)" -t "drone-stack:$stack" "$ROOT"
+         docker build $DOCKER_BUILD_OPTS -f "$(DF)" -t "drone-stack:$stack" "$ROOT"
          docker compose -f "$(CF)" up -d
          echo ">> container drone-stack-$stack up. start nodes: ./setup.sh run $stack <module>" ;;
   run)   need_stack; mod="${3:?need <module> e.g. sensor/realsense-d435i}"
