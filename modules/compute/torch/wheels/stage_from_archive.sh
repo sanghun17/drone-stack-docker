@@ -1,7 +1,8 @@
 #!/bin/bash
 # compute/torch/wheels: stage the source-built ABI=1 torch wheel into THIS directory
-# from this host's archive copy, before `setup.sh build/up` on any stack that sets
-# `build_env: {TORCH_VARIANT: src-abi1}` (see install.sh's sm89|sm75 branch). This
+# from this host's archive copy, before `setup.sh build/up` on any amd64 sm89/sm75
+# stack (compute/torch install.sh's sm89|sm75 branch -- unconditional as of
+# 2026-07-26, previously opt-in via `build_env: {TORCH_VARIANT: src-abi1}`). This
 # directory is BuildKit's `assets: [wheels]` bind-mount source (module.yml) -- the
 # wheel itself is git-untracked (274MB > GitHub's 100MB limit, see README.md), so a
 # fresh checkout / new host has nothing here but this script + README.md until this

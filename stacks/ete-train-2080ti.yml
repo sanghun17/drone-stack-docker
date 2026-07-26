@@ -16,6 +16,8 @@ gpu_arch: sm75   # RTX 2080 Ti / Turing, driver 535.261. Selects amd64_sm75 comb
                  # modules/base (CUDA 12.2 base image), compute/torch (cu121 wheels,
                  # no python upgrade), compute/spconv (spconv-cu120, hard-required).
 modules:
-  - compute/torch    # amd64/sm75 branch in install.sh: PyTorch cu121, stock python3.8
+  - compute/torch    # amd64/sm75 branch in install.sh: source-built torch 2.2.2 (ABI=1),
+                      # stock python3.8 -- unified with sim-x86's wheel 2026-07-26, see
+                      # docs/ETE_TRAIN_GPU_HOSTS.md's "torch unification" section
   - compute/spconv   # amd64_sm75 combo: spconv-cu120 wheel, hard-required (no source-build fallback)
   - training/ete-net

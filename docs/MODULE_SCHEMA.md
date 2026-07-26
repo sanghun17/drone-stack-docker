@@ -45,12 +45,12 @@ provides: [camera]              # capability tag (for docs / future validation)
   arch key is arch-agnostic.
 - **`install.sh`** (optional, in the module dir) holds complex/source builds; listed by
   name under `deps.source`. It gets `TARGETARCH` in env (and `GPU_ARCH`, when the
-  stack sets `gpu_arch:`). A stack may also declare `build_env:` (a `{KEY: value}`
-  map in `stacks/*.yml`) to pass extra env vars to every module's `install.sh`
-  invocation -- build-time only, not baked into the image as `ENV`. Used e.g. by
-  `stacks/sim-x86.yml`'s `TORCH_VARIANT: src-abi1` to scope a torch variant to that
-  one stack without a new `(cpu_arch, gpu_arch)` combo key that other stacks sharing
-  the same `gpu_arch` would also pick up (see `tools/gen_dockerfile_compose.py`).
+  stack sets `gpu_arch:`). (A `build_env:` stack-scoped extra-env-var mechanism existed
+  here 2026-07-25 to 2026-07-26 -- used by `stacks/sim-x86.yml`'s `TORCH_VARIANT:
+  src-abi1` to scope a torch variant to one stack without a new `(cpu_arch, gpu_arch)`
+  combo key -- removed once that variant became `compute/torch/install.sh`'s
+  unconditional sm89/sm75 default; see docs/ETE_TRAIN_GPU_HOSTS.md's "torch
+  unification" section.)
 - **`run.sh`** must be idempotent-ish and foreground (so Ctrl-C stops the node); it
   sources the workspace + sets `ROS_MASTER_URI` (helper provided).
 - Keep manifests **declarative**; push imperative steps into `install.sh` / `run.sh`.

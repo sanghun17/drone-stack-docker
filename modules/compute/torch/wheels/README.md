@@ -1,14 +1,28 @@
-# `compute/torch/wheels/` — sim-x86 source-build torch (ABI=1)
+# `compute/torch/wheels/` — source-build torch (ABI=1), the sm89/sm75 default
 
 This directory carries `torch-2.2.2-cp38-cp38-linux_x86_64.whl`, the source-built
-PyTorch used by `TORCH_VARIANT=src-abi1` (currently only `stacks/sim-x86.yml`, via
-`build_env:` — see `tools/gen_dockerfile_compose.py`). It replaces the stock pip
-`torch==2.1.2+cu121` (ABI=0, bundles its own CUDA/cuDNN) with a build compiled
-`_GLIBCXX_USE_CXX11_ABI=1` and CUDA-unbundled, so it links cleanly against the
-voxblox C++ stack (gcc-9's default ABI on Ubuntu 20.04 is already ABI=1) and shares
-a single system `libcudnn.so.8` with jaxlib in-process instead of shadowing it.
-See `modules/compute/torch/install.sh`'s `src-abi1` branch for the install-time
-rationale (comments there cover the ABI/cuDNN reasoning in full).
+PyTorch installed by `modules/compute/torch/install.sh`'s `sm89|sm75` branch —
+unconditional as of 2026-07-26 (every amd64 stack pinned to `gpu_arch: sm89` or
+`sm75`: `sim-x86`, `ete-train-4090`, `ete-train-2080ti`). Before 2026-07-26 this was
+opt-in per stack via `build_env: {TORCH_VARIANT: src-abi1}` (originally only
+`stacks/sim-x86.yml`) — see docs/ETE_TRAIN_GPU_HOSTS.md's "torch unification"
+section for the validation that preceded making it the default. It replaces the
+stock pip `torch==2.1.2+cu121` (ABI=0, bundles its own CUDA/cuDNN) with a build
+compiled `_GLIBCXX_USE_CXX11_ABI=1` and CUDA-unbundled, so it links cleanly against
+the voxblox C++ stack (gcc-9's default ABI on Ubuntu 20.04 is already ABI=1).
+See `modules/compute/torch/install.sh`'s `sm89|sm75` branch for the install-time
+rationale (comments there cover the ABI reasoning in full).
+
+**cuDNN correction (2026-07-26)**: this wheel is `USE_CUDNN=OFF` at runtime (no
+`libcudnn` `NEEDED` entry in `libtorch_cuda.so`, `torch.backends.cudnn.is_available()
+== False`) — it does NOT share a system `libcudnn.so.8` with jaxlib in-process, as an
+earlier version of this doc claimed from a static `readelf` reading. See "Build
+provenance" below for how a `USE_CUDNN=1` build *request* ended up producing a
+`USE_CUDNN=OFF` wheel. Practical impact: `ete_net`'s only cuDNN-dependent op
+(`nn.GRU`, gated by `latent_recurrence_enabled`, default `False`, unset by every
+ablation config as of 2026-07-26) silently falls back to PyTorch's non-cuDNN CUDA
+kernel if that flag is ever turned on — functionally correct, not benchmarked for
+speed.
 
 **The wheel itself is NOT git-tracked** (274,632,467 bytes > GitHub's 100MB push
 limit — unlike `modules/compute/jax/wheels/*.whl`, which IS small enough to track).
@@ -18,7 +32,7 @@ in every generated Dockerfile (the `assets: [wheels]` bind-mount is unconditiona
 not `src-abi1`-specific) would fail to resolve its source path and break the build
 for ALL stacks that include `compute/torch`, not just sim-x86.
 
-On a fresh clone / new host that needs `TORCH_VARIANT=src-abi1`, run
+On a fresh clone / new host building any amd64 sm89/sm75 stack, run
 `stage_from_archive.sh` (this directory) — it reads `TORCH_WHEEL_ARCHIVE_DIR`
 (`config/stack.env`, override per-host via `config/stack.env.local` — **not** by
 editing the tracked default, same pull-conflict reasoning as `ETE_DATA_DIR`) and
@@ -100,6 +114,12 @@ were not enough to catch this.
   BUILD_TYPE=Release
   USE_CUDA=1 USE_CUDNN=1 USE_NCCL=1 USE_MKL=OFF USE_MKLDNN=ON
   ```
+  **`USE_CUDNN=1` here is the requested flag, not the outcome** — re-checked
+  2026-07-26 against the actual built wheel and it shipped `USE_CUDNN=OFF` (no
+  cuDNN dev headers in the `torch-build` container at build time, so cmake silently
+  disabled cuDNN support rather than failing — the same "silent fallback" shape as
+  the LAPACK incident below, just not caught by a build-time assertion this time).
+  See the "cuDNN correction" note above the archive table.
 - **Pitfalls hit during the build (repeat these if rebuilding)**:
   1. **`cmake==3.27.9` pin is required.** Newer/older cmake in the build container
      produced failures during the PyTorch source build — pin exactly this version
@@ -116,14 +136,13 @@ stays host-local (`/home/ml/risk_aware_assets/wheels_x86/`) with this README as 
 reproduction record, rather than paying for LFS storage/bandwidth. Revisit if this
 needs to travel to another host (4090/5090) without manual re-copy.
 
-## 2026-07-26: torch unification investigation (sim-x86 wheel reused for ete-train)
+## 2026-07-26: torch unification — swap done (sim-x86 wheel now also the ete-train default)
 
-Same wheel, same md5, now also staged on `im` (`/media/im/ETE4090/wheels_x86/`, copied
-from the `torch-build` container's own output — see the archive table above) to test
-whether `ete-train-*`'s pip cu121 torch can be replaced by this ABI=1 build too, which
-would let `install.sh`'s `TORCH_VARIANT=src-abi1` branch become the ONLY sm89/sm75
-path and delete the `build_env:` scoping mechanism entirely (`tools/gen_dockerfile_
-compose.py`) instead of opting a stack in. See `docs/ETE_TRAIN_GPU_HOSTS.md`'s
-"torch unification" section for the file:line change list, the `ete-train-4090-abi1`
-test-tag build/verification results, and the swap/rollback procedure for the LIVE
-`ete-train-4090`/`ete-train-2080ti` stacks (not touched by this investigation).
+Same wheel, same md5, staged on `im` (`/media/im/ETE4090/wheels_x86/`, copied from the
+`torch-build` container's own output — see the archive table above). After the
+`ete-train-4090-abi1` test-tag validated 6 gates on real RTX 4090 hardware, this
+became `install.sh`'s unconditional sm89/sm75 path (the `build_env:`/`TORCH_VARIANT`
+scoping mechanism and the test-tag stack file were both removed) — `ete-train-4090`
+and `ete-train-2080ti` now build the same wheel `sim-x86` does. See
+`docs/ETE_TRAIN_GPU_HOSTS.md`'s "torch unification" section for the file:line change
+list, validation results, and the (now-applied) swap procedure.

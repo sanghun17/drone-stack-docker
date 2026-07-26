@@ -6,11 +6,11 @@ docker infra. Two target hosts exist so far, differing only in `gpu_arch` (which
 routes each module's `deps.<cpu_arch>_<gpu_arch>` / `base_image.<cpu_arch>_<gpu_arch>`
 combo-key lookups — see `docs/MODULE_SCHEMA.md`):
 
-| stack | host GPU | driver constraint | CUDA container line |
-|---|---|---|---|
-| `stacks/ete-train-5090.yml` | RTX 5090 (Blackwell, sm_120) | none known | `nvidia/cuda:12.8.1-devel-ubuntu20.04` |
-| `stacks/ete-train-4090.yml` | RTX 4090 (Ada, sm_89) | driver 535.183 -> CUDA<=12.2 containers only | `nvidia/cuda:12.2.2-devel-ubuntu20.04` |
-| `stacks/ete-train-2080ti.yml` | RTX 2080 Ti x3 (Turing, sm_75) -- the ML desktop itself | driver 535.261 -> CUDA<=12.2 containers only (same ceiling as the 4090 host) | `nvidia/cuda:12.2.2-devel-ubuntu20.04` (reuses `amd64_sm89`'s value) |
+| stack | host GPU | driver constraint | CUDA container line | torch |
+|---|---|---|---|---|
+| `stacks/ete-train-5090.yml` | RTX 5090 (Blackwell, sm_120) | none known | `nvidia/cuda:12.8.1-devel-ubuntu20.04` | official pip cu128 wheel (unaffected by the sm89/sm75 unification below) |
+| `stacks/ete-train-4090.yml` | RTX 4090 (Ada, sm_89) | driver 535.183 -> CUDA<=12.2 containers only | `nvidia/cuda:12.2.2-devel-ubuntu20.04` | source-built torch 2.2.2 (ABI=1, CUDA-unbundled) — since 2026-07-26, same wheel `sim-x86` uses (see "torch unification" section) |
+| `stacks/ete-train-2080ti.yml` | RTX 2080 Ti x3 (Turing, sm_75) -- the ML desktop itself | driver 535.261 -> CUDA<=12.2 containers only (same ceiling as the 4090 host) | `nvidia/cuda:12.2.2-devel-ubuntu20.04` (reuses `amd64_sm89`'s value) | source-built torch 2.2.2 (ABI=1, CUDA-unbundled) — since 2026-07-26, same wheel `sim-x86` uses (see "torch unification" section) |
 
 `ete-train-2080ti` is the only one of the three that has actually been **built and run end-to-end on real hardware** (2026-07-14, on the ML desktop itself -- see the "2026-07-14, ete-train-2080ti real build + validation" section below). The 5090/4090 stacks share the same code paths and generator machinery but their GPU-arch-specific bits (torch/spconv combos, base images) remain unverified on real Blackwell/Ada hardware.
 
@@ -284,6 +284,13 @@ Keep target-host runs in a separate table from the 2080 Ti ablation campaign
 (`risk-aware_planning/src/uncertainty_predictor/outputs/v23_final_table.md`), AND
 keep 5090 runs separate from 4090 runs if both stacks ever get used -- only compare
 relative trends (does arm X still beat arm Y), not raw loss values, across machines.
+**Also apply this before/after the 2026-07-26 torch unification** (see below):
+`ete-train-4090`/`ete-train-2080ti` now build a numerically different torch (source
+2.2.2/ABI=1/USE_CUDNN=OFF vs the old pip 2.1.2+cu121/ABI=0/cuDNN-bundled) — different
+cuDNN/cuBLAS kernel versions (and here, cuDNN presence at all) are expected to produce
+small non-bit-identical loss drift at the same seed/config/data, same caveat as the
+original pip-torch-vs-bare-metal comparison above. Don't compare pre-2026-07-26 and
+post-2026-07-26 loss numbers as if they came from the same torch build.
 
 ## torch unification investigation (2026-07-26)
 
@@ -483,6 +490,122 @@ needed. Delete `stacks/ete-train-4090-abi1.yml` (the test-tag stack file) once t
 decision is made either way -- it was only for tonight's isolated test, see its own
 header comment.
 
+## torch unification -- swap executed (2026-07-26, continued)
+
+The §6 prerequisites were re-checked and cleared same-day: (a) re-grepped the full
+`uncertainty_predictor/` tree (not just `config/ablation/`) for
+`latent_recurrence_enabled` -- zero configs set it `true`, and zero other
+cuDNN-dependent ops exist beyond the already-identified `nn.GRU` (also checked for
+`nn.LSTM`/`nn.RNN`/other `cudnn`-touching calls -- only `torch.backends.cudnn.benchmark
+= True` in `trainer_engine.py`, a harmless flag-set that's a no-op with no cuDNN
+backend present). (b)/(c) epoch-time A/B and loss-baseline re-validation were
+explicitly deferred to the real training campaign resuming post-swap (not blocking --
+`im`'s queue was already empty, see below) rather than a dedicated pre-swap benchmark
+run.
+
+**Applied §1's cleanup** (`install.sh`'s `if/else` removed, made the src-abi1 body
+unconditional for the `sm89|sm75` case; `stacks/sim-x86.yml`'s `build_env:` block
+removed; `tools/gen_dockerfile_compose.py`'s `build_env` plumbing removed entirely --
+docstring, `gen_dockerfile(..., build_env=...)` param, the per-RUN env-var loop, and
+`main()`'s extraction; `stacks/ete-train-4090-abi1.yml` deleted, its module-list/
+build_env content absorbed into `ete-train-4090.yml` needing no changes of its own;
+`stacks/ete-train-4090.yml`/`ete-train-2080ti.yml` comments updated to say
+"source-built torch 2.2.2 (ABI=1)" instead of "PyTorch cu121"; `wheels/README.md` and
+`module.yml`'s description rewritten for the unconditional default; two factually
+stale inline comments in `install.sh`'s `sm89|sm75` branch corrected in place -- the
+old "shares one system cuDNN with jaxlib" / "wheel DT_NEEDED libcudnn.so.8" claims,
+both proven wrong by the §4 finding, replaced with the corrected USE_CUDNN=OFF
+explanation and a note that the `apt-get libcudnn8` install there is actually for
+`compute/jax` (sim-x86), not torch itself).
+
+**Regenerated + diffed all 5 pre-existing stacks again post-cleanup** (same method as
+§3): `d435i-voxblox` (arm64, on the real jetson host), `ete-train-2080ti`,
+`ete-train-4090`, `ete-train-5090` -- all **byte-identical** Dockerfile/compose.yml,
+pre- vs post-cleanup. `sim-x86` differs in exactly the expected way: `TORCH_VARIANT=
+src-abi1` disappears from every module's `RUN` env-var line (it used to be injected
+into ALL of sim-x86's modules via the now-deleted `build_env:` mechanism, not just
+`compute/torch`'s) -- no other line changed. This confirms the cleanup is
+behavior-preserving for every stack except the intended sm89/sm75 torch swap itself
+(which doesn't show up in Dockerfile text at all -- `install.sh` is bind-mounted, not
+baked in, so the wheel-selection change is invisible to a Dockerfile diff and can only
+be checked by actually building + running the image, done next).
+
+**Executed on `im` (the real target, RTX 4090)**: tagged `drone-stack:ete-train-4090`
+-> `drone-stack:ete-train-4090-pre-abi1` (rollback anchor) before touching anything.
+Confirmed `im`'s `trainq` queue was empty first (`trainq_status.sh`: manager
+`alive=False`, `exit_reason=queue exhausted`, `lanes: 0/2 occupied`, GPU 0% util, no
+live python process in the container besides unreaped `<defunct>` zombies) -- a safe
+window per the warning above. `./setup.sh build ete-train-4090` (`DOCKER_HOST=unix:///
+tmp/docker-ssd.sock DOCKER_BUILD_OPTS=--network=host`) rebuilt the image (14GB, down
+from the old pip-torch image's 15.9GB -- matches the `ete-train-4090-abi1` test tag's
+size exactly). Re-ran all 6 gates from §3 against the freshly built image via
+throwaway `docker run --rm` containers (not yet the live container) -- **all 6 PASS**,
+including a real `import ete_net` (mount target corrected to the module's current
+`/work/ws/risk-aware/src/risk_aware_planning/uncertainty_predictor/src` layout --
+that module was refactored 2026-07-25 to bind-mount the whole repo at `/work` instead
+of a dedicated `RISK_AWARE_PLANNING_SRC` mount, see `training/ete-net/module.yml`).
+`./setup.sh up ete-train-4090` then recreated the live container; confirmed via
+`docker exec ... python3 -c "import torch; ..."` inside the now-running
+`drone-stack-ete-train-4090` that it's actually serving `torch 2.2.2`, `ABI=1`,
+`cuda available: True`.
+
+**Training smoke** (item 3's explicit ask, using the existing disposable
+`config/ablation/v23_trainq_smoke.yaml` -- `final_dirs` point at `stage2/bulk` +
+`stage2/targeted`, NOT `stage2/probe`, `num_epochs: 3`): first attempt hit
+`KeyError: 'min_delta'` in `EarlyStopping` callback setup -- a **pre-existing config
+gap unrelated to the torch swap** (this smoke config predates a `training.min_delta`
+key every real ablation config already has; would have failed identically on the old
+torch too). Fixed by adding `min_delta: 0.001` to that disposable config (matches
+every real config's value) -- not a code change, config-only, and the file's own
+header already says "NOT committed, NOT used for any real ablation." Re-ran: data
+loaded (39,833 samples), model built (127,432 params), `torch.compile` applied to
+3 submodules (confirms `triton` -- the ABI=1 wheel's non-bundled `torch.compile`
+backend -- also works), 3 epochs completed, **"Training Complete!"**, best val loss
+4.0446 at epoch 2, checkpoints saved each epoch. No cuDNN-related errors or warnings.
+Output (`ete_net_v2_torch_swap_smoke/`) and the run log were deleted afterward
+(disposable, matches the smoke config's own "disposable" framing).
+
+**Other hosts** (item 4): `im`'s SSH checkout was 12 commits behind `main`
+(`1942b57`, predating this investigation's own prep commit `b233de8`) but every
+torch-related file on it was already byte-identical to `b233de8`'s committed content
+(diffed directly) -- so this session's edits were `rsync`'d on top (not `git pull`,
+per the no-commit/no-push constraint on this task) and applied cleanly. Same
+situation independently confirmed on the actual **jetson** robot (`hmcl@192.168.50.36`,
+also at `1942b57`): `rsync`'d the same file set, ran `./setup.sh gen d435i-voxblox`
+for real (arm64, on the actual hardware) -- **byte-identical** Dockerfile/compose.yml
+to the pre-change baseline, confirming the amd64-only cleanup is a genuine no-op for
+arm64 -- then `git checkout --` the tracked files and `rm`'d the one new untracked
+file to leave jetson's tree exactly as found (this task doesn't own landing the
+change there, only verifying it doesn't break `gen`). `ml`'s own `sim-x86` and
+`ete-train-2080ti` containers were left running untouched throughout (`./setup.sh gen`
+only writes `.build/`, never touches the Docker daemon) -- both stacks' `gen` passed
+cleanly via the real `./setup.sh gen <stack>` entrypoint.
+
+**`TORCH_WHEEL_ARCHIVE_DIR` per host**: `ml` already has it (tracked default in
+`config/stack.env`, `/home/ml/risk_aware_assets/wheels_x86/`, wheel already staged
+there from before -- `sim-x86` needed it already) -- no action needed even once
+`ete-train-2080ti` is eventually rebuilt (deferred, see below). `im` has it via
+`config/stack.env.local` (`/media/im/ETE4090/wheels_x86/`), wheel staged, used above.
+**jetson needs nothing** -- arm64's `install.sh` branch never reads
+`TORCH_VARIANT`/the wheels mount at all (confirmed structurally, and now empirically
+via the byte-identical `gen` diff above), so `TORCH_WHEEL_ARCHIVE_DIR` is irrelevant
+there and `stage_from_archive.sh` should never be run on that host.
+
+**Deliberately NOT done this session** (explicit scope limits): `ml`'s own
+`ete-train-2080ti` image was NOT rebuilt/swapped -- its live container was off-limits
+this session (a different task was actively using `sim-x86` concurrently on the same
+host, and `ete-train-2080ti` was separately called out as untouchable). It's ready
+whenever that container has a safe window: the wheel is already staged, `gen` already
+confirmed clean, and the same `install.sh` code path (`sm89|sm75`, shared with
+`ete-train-4090`) already validated on real Ada hardware above -- Turing (`sm_75`) is
+additionally already indirectly validated by the fact that `sim-x86` (also `sm_75`,
+same wheel, same `nvidia-smi` GPUs on this exact host) has been running it in
+production. Swap steps: same as this section's `im` procedure, substituting
+`ete-train-2080ti` for `ete-train-4090` and using `GPU_UUIDS`/`CONTAINER_USER` per
+this doc's existing 2080ti-specific notes above (dead GPU at PCI `1a:00.0`).
+`sim-x86` itself needed no rebuild at all -- it was already running this exact wheel;
+only its Dockerfile lost a now-redundant env var it never used to see a value change.
+
 ## Files touched by this migration
 
 ### 2026-07-14, initial (5090-targeted)
@@ -635,3 +758,73 @@ header comment.
   none measured (GPU util/batch-time before/during/after the build all within the
   pre-existing baseline range; two jobs' natural mid-build completions were
   independently confirmed via their own "Training Complete!" logs, not build-related).
+
+### 2026-07-26, torch-unification swap (see "torch unification -- swap executed" section above for full detail)
+- `modules/compute/torch/install.sh` — removed the `if [ "${TORCH_VARIANT:-}" =
+  "src-abi1" ]; then ... else ... fi` wrapper in the `sm89|sm75` case; the source-built
+  ABI=1 wheel body is now unconditional (the old `else` branch, stock pip
+  `torch==2.1.2+cu121`, is gone). Also corrected two comments proven wrong by §4 (the
+  "shares one system cuDNN with jaxlib" / "wheel DT_NEEDED libcudnn.so.8" claims) and
+  trimmed/labeled the now-historical cu121 pip-resolution-incident paragraph as such.
+- `modules/compute/torch/module.yml` — description rewritten: no longer describes the
+  wheel as conditional on `build_env`.
+- `stacks/sim-x86.yml` — removed the `build_env: {TORCH_VARIANT: src-abi1}` block
+  (4 lines + comment); `compute/torch` module-list comment updated to say why it's
+  still first (unchanged reason, worded for the new unconditional default).
+- `stacks/ete-train-4090.yml`, `stacks/ete-train-2080ti.yml` — `compute/torch`
+  module-list comment updated from "PyTorch cu121, stock python3.8" to "source-built
+  torch 2.2.2 (ABI=1), stock python3.8" + a pointer to this section. No functional
+  change needed (per §1's original analysis) — these stacks inherit the new
+  `install.sh` default automatically.
+- `stacks/ete-train-4090-abi1.yml` — deleted (test-tag stack, absorbed into
+  `ete-train-4090.yml` now that its content is the unconditional default).
+- `tools/gen_dockerfile_compose.py` — removed the `build_env` dimension entirely:
+  docstring paragraph, `gen_dockerfile(..., build_env=None)` parameter, the per-`RUN`
+  env-var-injection loop, and `main()`'s `build_env = stack.get("build_env") or {}`
+  extraction + the arg it was threaded through. Regenerating every stack after this
+  produces byte-identical output except `sim-x86` (which loses the now-dead
+  `TORCH_VARIANT=src-abi1` env var from its `RUN` lines — the value that env var
+  carried is now baked into `install.sh` unconditionally instead).
+- `modules/compute/torch/wheels/README.md` — rewritten for the unconditional default
+  (title, opening paragraph, archive-locations framing); added a "cuDNN correction"
+  callout (this wheel does NOT share a system cuDNN with jaxlib — it has none) and a
+  matching note under "Build provenance" explaining the `USE_CUDNN=1` build *request*
+  vs. the `USE_CUDNN=OFF` actual *outcome* (silent fallback, no cuDNN dev headers in
+  the build container at build time — same shape as the LAPACK incident documented
+  just below it, this time not caught by a build-time assertion); updated the closing
+  "torch unification investigation" note to say the swap is done, not pending.
+- `modules/compute/torch/wheels/stage_from_archive.sh` — header comment updated from
+  "before any stack that sets `build_env: {TORCH_VARIANT: src-abi1}`" to "before any
+  amd64 sm89/sm75 stack" (unconditional now).
+- `im` (`10.74.23.213`, RTX 4090): rsync'd the above files on top of its checkout
+  (which was 12 commits behind `main` but byte-identical to this session's pre-edit
+  baseline on every torch-related file — confirmed by diff before syncing), deleted
+  its local `stacks/ete-train-4090-abi1.yml`. Tagged `drone-stack:ete-train-4090` ->
+  `drone-stack:ete-train-4090-pre-abi1` (rollback anchor). Rebuilt
+  `drone-stack:ete-train-4090` (14GB, was 15.9GB) via `./setup.sh build ete-train-4090`
+  with the existing `DOCKER_HOST`/`DOCKER_BUILD_OPTS` path. Re-ran all 6 §3 gates
+  against the new image (throwaway containers) — all PASS. Confirmed `trainq`'s queue
+  was empty (manager dead, `queue exhausted`, 0/2 lanes, GPU idle) before
+  `./setup.sh up ete-train-4090` recreated the live container. Ran a 3-epoch training
+  smoke (`config/ablation/v23_trainq_smoke.yaml`, `stage2/bulk`+`stage2/targeted`, NOT
+  `stage2/probe`) — fixed a pre-existing (torch-swap-unrelated) `KeyError: 'min_delta'`
+  in that disposable config by adding the same `min_delta: 0.001` every real ablation
+  config already has, then re-ran to completion: "Training Complete!", best val loss
+  4.0446 at epoch 2, `torch.compile` + `triton` confirmed working. Deleted the smoke
+  run's disposable output/log afterward.
+- `jetson` (`hmcl@192.168.50.36`, arm64): rsync'd the same file set (also 12 commits
+  behind `main`, also byte-identical pre-edit), ran `./setup.sh gen d435i-voxblox` for
+  real on the actual hardware — byte-identical Dockerfile/compose.yml to the
+  pre-change baseline (confirms the amd64-only cleanup is a true no-op for arm64) —
+  then `git checkout --`'d the tracked files and removed the one new untracked file to
+  leave jetson's checkout exactly as found (this task verifies, doesn't land, the
+  change there).
+- `ml` (this session's own host): regenerated + diffed `sim-x86`/`ete-train-2080ti`
+  (already-committed-equivalent content, byte-identical results) and confirmed
+  `./setup.sh gen sim-x86` / `./setup.sh gen ete-train-2080ti` pass via the real CLI
+  entrypoint without touching either running container (`gen` never calls the Docker
+  daemon). **`ete-train-2080ti`'s live container was deliberately NOT rebuilt/swapped
+  this session** (explicitly out of scope, off-limits alongside the concurrently-used
+  `sim-x86`) — ready whenever it has a safe window (wheel already staged at the
+  tracked-default `TORCH_WHEEL_ARCHIVE_DIR`, `gen` already clean, same `install.sh`
+  code path already validated on real hardware above).

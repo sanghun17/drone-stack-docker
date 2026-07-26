@@ -7,14 +7,14 @@ description: >
   --index-url, which the declarative deps.pip list can't express): sm_120 (RTX 5090/
   Blackwell) = official PyTorch cu128 wheels, also upgrades the image's python3 to
   3.11 since cu128 wheels need >=3.9 and that base_image ships 3.8. sm_89 (RTX 4090)
-  / sm_75 (RTX 2080 Ti), both driver-535-capped hosts = PyTorch cu121 wheels, no
-  python upgrade needed (cu121 supports 3.8 natively) -- UNLESS the stack sets
-  `build_env: {TORCH_VARIANT: src-abi1}` (currently only sim-x86), in which case the
-  sm_89/sm_75 branch instead installs the host-source-built torch 2.2.2 wheel from
-  wheels/ (ABI=1, CUDA-unbundled, shares the base image's system libcudnn8 with
-  jaxlib instead of shadowing it with a bundled cuDNN -- see install.sh for the full
-  rationale). That wheel is git-untracked (274MB, host-local only) -- see
-  wheels/README.md for its provenance/rebuild procedure.
+  / sm_75 (RTX 2080 Ti), both driver-535-capped hosts = the host-source-built torch
+  2.2.2 wheel from wheels/ (ABI=1, CUDA-unbundled, USE_CUDNN=OFF -- see install.sh for
+  the full rationale), unconditionally as of 2026-07-26 (previously opt-in per stack
+  via `build_env: {TORCH_VARIANT: src-abi1}`, now the only sm_89/sm_75 path; the
+  stock pip cu121/ABI=0 wheel it replaced is gone). That wheel is git-untracked
+  (274MB, host-local only) -- see wheels/README.md for its provenance/rebuild
+  procedure and modules/compute/torch/wheels/stage_from_archive.sh to stage it on a
+  new host (needs `TORCH_WHEEL_ARCHIVE_DIR`, config/stack.env).
 
 deps:
   # torch wheel links these at runtime (not in the L4T base)

@@ -18,16 +18,11 @@ top of the existing `deps.<cpu_arch>` — see `arch_merged()`. If a stack does N
 and generation is byte-identical to before this change — verified by diffing
 d435i-voxblox's generated Dockerfile/compose.yml pre/post this patch.
 
-build_env dimension (added 2026-07-25, backward compatible): a stack may declare a
-`build_env:` map of extra KEY=VALUE pairs (e.g. sim-x86's `TORCH_VARIANT: src-abi1`)
-that get appended to EVERY module's `install.sh` RUN invocation, alongside the
-existing TARGETARCH/GPU_ARCH env vars. This scopes a variant to one stack without
-adding a new (cpu_arch, gpu_arch) combo key that other stacks sharing the same
-gpu_arch (e.g. ete-train-2080ti, also amd64_sm75) would also pick up. Build-time
-only — never baked as an image `ENV`, so it has zero effect on the running
-container. A stack with no `build_env:` gets an empty dict, so generation is
-byte-identical to before this change (verified by diffing all other stacks'
-generated Dockerfiles pre/post).
+(2026-07-25 to 2026-07-26: a `build_env:` dimension briefly existed here to scope
+sim-x86's source-built ABI=1 torch wheel to one stack without touching the shared
+(cpu_arch, gpu_arch) combo keys — removed 2026-07-26 once that wheel became
+compute/torch's unconditional sm89/sm75 default, see docs/ETE_TRAIN_GPU_HOSTS.md's
+"torch unification" section.)
 """
 import os, sys, argparse, yaml
 
@@ -115,7 +110,7 @@ def arch_merged(deps, arch, gpu_arch, kind):
     return out
 
 
-def gen_dockerfile(mods, arch, gpu_arch, env, build_env=None):
+def gen_dockerfile(mods, arch, gpu_arch, env):
     base_mod = mods[0]
     base_images = base_mod.get("base_image") or {}
     # combo key first (e.g. `amd64_sm89` for a driver-535-capped 4090 host that needs
@@ -202,14 +197,6 @@ def gen_dockerfile(mods, arch, gpu_arch, env, build_env=None):
             envs = "TARGETARCH=%s" % arch
             if gpu_arch:
                 envs += " GPU_ARCH=%s" % gpu_arch
-            # build_env (optional, stacks/*.yml `build_env:`): extra install.sh-only env
-            # vars, e.g. sim-x86's TORCH_VARIANT=src-abi1 -- scopes a variant to ONE
-            # stack without touching the (cpu_arch, gpu_arch) combo keys other stacks
-            # share (see compute/torch/install.sh). Build-time only -- never baked as
-            # an image `ENV`, so it has zero runtime effect. A stack with no `build_env:`
-            # gets an empty dict here -> this loop is a no-op -> byte-identical output.
-            for k, v in (build_env or {}).items():
-                envs += " %s=%s" % (k, v)
             L.append("RUN %s \\\n    %s bash /modules/%s/%s" % (mnt, envs, path, s))
         L.append("")
     return "\n".join(L) + "\n"
@@ -334,14 +321,11 @@ def main():
         sys.exit("ERROR: arch %s not in stack's supported %s" % (arch, arches))
     # gpu_arch: CLI override > stack.yml `gpu_arch:` > None (no GPU-variant deps used).
     gpu_arch = a.gpu_arch or stack.get("gpu_arch")
-    # build_env: stack.yml `build_env:` > {} (no extra install.sh env vars). See
-    # gen_dockerfile()'s comment at its use site for why this is build-time-only.
-    build_env = stack.get("build_env") or {}
 
     mods = resolve_order(stack.get("modules") or [])
     outdir = os.path.join(ROOT, ".build", a.stack)
     os.makedirs(outdir, exist_ok=True)
-    open(os.path.join(outdir, "Dockerfile"), "w").write(gen_dockerfile(mods, arch, gpu_arch, env, build_env))
+    open(os.path.join(outdir, "Dockerfile"), "w").write(gen_dockerfile(mods, arch, gpu_arch, env))
     gpu_uuids_key = stack.get("gpu_uuids_env") or "GPU_UUIDS"
     open(os.path.join(outdir, "compose.yml"), "w").write(gen_compose(mods, arch, a.stack, env, gpu_uuids_key))
     open(os.path.join(outdir, "modules.txt"), "w").write("\n".join(m["_path"] for m in mods) + "\n")
