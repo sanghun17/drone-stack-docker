@@ -1,5 +1,5 @@
 #!/bin/bash
-# planner/risk-aware: voxblox uncertainty mapping (uncertainty_voxblox_d435i.launch). MAPPING ONLY.
+# planner/risk-aware-deploy: voxblox uncertainty mapping (uncertainty_voxblox_d435i.launch). MAPPING ONLY.
 # Needs camera + fast-livo (transforms the cloud into the FAST-LIVO odom frame).
 # Run this ALONGSIDE run_planner.sh — voxblox (mapping) and the planner are
 # separate launches (ml/sim structure). Order is flexible; topics late-bind.

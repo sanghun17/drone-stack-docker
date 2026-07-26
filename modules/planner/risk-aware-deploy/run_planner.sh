@@ -1,5 +1,5 @@
 #!/bin/bash
-# planner/risk-aware: exploration planner bring-up (exploration_planner_d435i.launch) =
+# planner/risk-aware-deploy: exploration planner bring-up (exploration_planner_d435i.launch) =
 # mav_active_3d_planning exploration + odom relay + bbox params.
 # Voxblox is SEPARATE: run run_voxblox.sh alongside this (mapping and planner
 # are independent launches, mirroring the ml/sim structure). Needs camera + fast-livo.

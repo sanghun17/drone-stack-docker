@@ -43,7 +43,7 @@ deps:
   # "doesn't need the new dimension" counter-example to compute/spconv's combo usage.
 
 # Live checkout bind-mount, NOT a clone.sh + pinned-branch clone (unlike
-# planner/risk-aware) -- this is an active training-code iteration host, not a pinned
+# planner/risk-aware-deploy) -- this is an active training-code iteration host, not a pinned
 # deploy target, so we want whatever's actually on disk (uncommitted WIP included).
 # ${RISK_AWARE_PLANNING_SRC} = the risk-aware_planning repo's `src/` directory on THIS
 # host (set in config/stack.env) -- points at the new canonical tree

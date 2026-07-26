@@ -2,7 +2,7 @@ name: flight-safety
 group: control
 description: Layered flight safety — L1 per-subsystem diagnosis (incl. geofence) -> /diagnostics, L2 monitor (worst fault) -> /flight_safety/fault, L3 response/mux (manual + severity -> normal/land/kill), plus an estimator MUX that selects mocap-vs-vio -> /mavros/vision_pose/pose. All four come up at once via run.sh. Builds standalone in its own workspace (ws/flight-safety) — deps are all noetic; it also exports stream_diagnostic.h, consumed at build by optitrack's vrpn_client_ros. mavros_msgs is needed only at runtime (Python) and is overlaid from the risk-aware workspace (where mavros is vendored).
 
-needs: [planner/risk-aware]     # runtime only: mavros_msgs (vendored in risk-aware), overlaid at run time
+needs: [planner/risk-aware-deploy]     # runtime only: mavros_msgs (vendored in risk-aware), overlaid at run time
 
 deps:
   apt:

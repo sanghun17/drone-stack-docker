@@ -43,8 +43,8 @@ Design: docs/MODULARIZATION.md, docs/MODULE_SCHEMA.md.
 - `modules/<group>/<name>/` — one module = one image's contribution: `module.yml` (deps apt/pip/source
   + mounts + run, arch-aware), `install.sh` (optional source builds), `run.sh` (launch its ROS nodes),
   `clone.sh` (fetch its src repo), `config/`. Groups: base, compute(jax/torch/spconv),
-  control(flight-safety/local-controller/mavros), odometry(fast-livo/optitrack), planner(risk-aware),
-  sensor(realsense-d435i), utility(gui-vnc/rqt/rviz).
+  control(flight-safety/local-controller/mavros), odometry(fast-livo/optitrack),
+  planner(risk-aware-deploy/risk-aware-sim), sensor(realsense-d435i), utility(gui-vnc/rqt/rviz).
 - `ws/<module>/` — per-module catkin workspace. `src/<pkg>` = a SEPARATE git repo (own remote+branch,
   cloned by that module's clone.sh). `build/ devel/ logs/` = artifacts. `/ws/` is gitignored in MAIN.
 - `tools/` host analysis/eval · `config/` shared ros_env.sh + stack.env · `scripts/` · `flight_logs/` (bags, gitignored).

@@ -16,7 +16,7 @@ ml 트리에 적용 후 커밋한다.
 코드 정본: `/home/ml/drone-stack-docker/ws/risk-aware/src/risk_aware_planning/`
 (별도 git repo, branch main). jetson 클론: 같은 상대경로,
 `~/drone-stack-docker/ws/risk-aware/src/risk_aware_planning/` (dsd `d435i-voxblox`
-스택의 `planner/risk-aware` 모듈이 여기를 `/work/ws/risk-aware` 아래로 바인드마운트).
+스택의 `planner/risk-aware-deploy` 모듈이 여기를 `/work/ws/risk-aware` 아래로 바인드마운트).
 
 ## Connectivity
 
@@ -68,14 +68,14 @@ ssh jetson "docker exec drone-stack-d435i-voxblox <command>"    # 컨테이너 �
      구성돼 heap이 깨지는 사고 재발 방지) dsd 스크립트로 전체 재확정:
      `ssh jetson "cd ~/drone-stack-docker && ./setup.sh build-ws d435i-voxblox"`
      — 이 스택의 모든 모듈(`compute/torch`, `compute/spconv`, `compute/jax`,
-     `odometry/fast-livo`, `sensor/realsense-d435i`, `planner/risk-aware`,
+     `odometry/fast-livo`, `sensor/realsense-d435i`, `planner/risk-aware-deploy`,
      `control/mavros`, `control/flight-safety`, `control/local-controller`,
      `utility/rviz`, `utility/rqt`, `odometry/optitrack`)를 `-DCMAKE_BUILD_TYPE=RelWithDebInfo`로
      재확정하며 build_ws.sh가 있는 모듈만 순서대로 빌드한다. 손으로
      `docker exec ... catkin build`를 조립하지 말 것 — sourcing 순서/cmake 재확정이
      스크립트에 이미 들어 있다.
 4. jetson에서 노드 재시작: `ssh jetson "cd ~/drone-stack-docker && ./setup.sh run d435i-voxblox <module>"`
-   (예: `planner/risk-aware`, `odometry/fast-livo`, `sensor/realsense-d435i`) 또는
+   (예: `planner/risk-aware-deploy`, `odometry/fast-livo`, `sensor/realsense-d435i`) 또는
    기존 tmux 세션이 떠 있다면 위 ssh/tmux capture-pane 패턴으로 로그만 확인. 동작 확인.
 
 복구 경로 (정상 경로 아님): jetson에 어쩌다 로컬 변경이 생겨(직접 편집 등 규율 위반)

@@ -1,5 +1,5 @@
 #!/bin/bash
-# planner/risk-aware: JAX MPPI local planner (jax_main_node_ros_new.py). GPU (jax 0.4.13).
+# planner/risk-aware-deploy: JAX MPPI local planner (jax_main_node_ros_new.py). GPU (jax 0.4.13).
 # Consumes /planner/command/trajectory + /robot/odom + voxblox map -> /jax/optimal_trajectory.
 # Needs run_planner.sh up first. First run ~80s (JAX JIT).
 

@@ -21,7 +21,7 @@ stacks/d435i-voxblox.yml          modules/<group>/<name>/
     - base                          run.sh       # launch this module's ROS node(s)
     - sensor/realsense-d435i        config/      # calib / params
     - odometry/fast-livo
-    - planner/risk-aware    →  setup.sh: union(deps) → Dockerfile → buildx → 1 image → 1 container
+    - planner/risk-aware-deploy →  setup.sh: union(deps) → Dockerfile → buildx → 1 image → 1 container
 ```
 
 ## Three layers of modularity

@@ -1,5 +1,9 @@
-name: risk-aware
+name: risk-aware-deploy
 group: planner
+# Renamed risk-aware -> risk-aware-deploy (2026-07-26): "risk-aware" alone read as the
+# "default" with risk-aware-sim looking like a derivative, when the two are actually
+# symmetric deploy targets of the SAME repo/branch (see clone.sh) that differ only in
+# which launch files they run. -deploy/-sim makes that symmetry explicit.
 description: Risk-aware exploration planner — voxblox (uncertainty TSDF) + mav_active_3d_planning exploration + JAX MPPI local planner. Built in-container from ${PLANNER_SRC}.
 
 needs: [compute/torch, compute/spconv, compute/jax]   # torch/spconv (model) + jax (MPPI)

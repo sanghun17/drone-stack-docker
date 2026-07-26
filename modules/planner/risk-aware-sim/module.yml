@@ -4,7 +4,7 @@ description: >
   Risk-aware exploration planner, AirSim/UE4 sim variant — voxblox (uncertainty TSDF)
   + mav_active_3d_planning exploration + JAX MPPI local planner + SO(3) control
   bridge. Built in-container from the SAME live tree the ete-train-* stacks use
-  (${RISK_AWARE_PLANNING_SRC}, bind-mounted — not cloned, unlike planner/risk-aware's
+  (${RISK_AWARE_PLANNING_SRC}, bind-mounted — not cloned, unlike planner/risk-aware-deploy's
   pinned-branch deploy checkout: sim iterates on the same uncommitted WIP dev tree).
 
 needs: [compute/torch, compute/spconv, compute/jax]   # torch/spconv (model) + jax (MPPI)
@@ -12,7 +12,7 @@ needs: [compute/torch, compute/spconv, compute/jax]   # torch/spconv (model) + j
 deps:
   # build deps for the ETH-ASL workspace: catkin_grpc builds grpc from source
   # (rsync/libtool/autotools/ssl/zlib), protobuf_catkin builds protobuf from source.
-  # Identical to planner/risk-aware's apt list — same catkin workspace tree.
+  # Identical to planner/risk-aware-deploy's apt list — same catkin workspace tree.
   apt:
     - rsync
     - libtool
@@ -60,7 +60,7 @@ deps:
   source: [install.sh]
 
 # source + workspace live under the repo at ws/risk-aware (-> /work/ws/risk-aware) —
-# the SAME physical tree planner/risk-aware and training/ete-net use. Populated by this
+# the SAME physical tree planner/risk-aware-deploy and training/ete-net use. Populated by this
 # module's own clone.sh (RISK_AWARE_BRANCH), like every other source-bearing module.
 # 코드 마운트는 없다: dsd 루트가 /work 로 마운트되므로 ws/ 는 자동 노출된다.
 workspace: /work/ws/risk-aware

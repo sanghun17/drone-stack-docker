@@ -55,7 +55,7 @@ stacks/d435i-voxblox.yml         modules/<group>/<name>/
   modules:                         install.sh   # complex/source builds (referenced via deps.source)
     - sensor/realsense-d435i       run*.sh      # launch the module's ROS node(s)
     - odometry/fast-livo
-    - planner/risk-aware   ──►  tools/gen_dockerfile_compose.py  ──►  .build/<stack>/Dockerfile  + compose.yml
+    - planner/risk-aware-deploy   ──►  tools/gen_dockerfile_compose.py  ──►  .build/<stack>/Dockerfile  + compose.yml
                                    (base always first; `needs:` resolved deps-first;
                                     deps unioned arch-aware & de-duped → one image)
 ```
@@ -80,7 +80,7 @@ stacks/d435i-voxblox.yml         modules/<group>/<name>/
 ./setup.sh up  d435i-voxblox                       # one image + one container
 ./setup.sh run d435i-voxblox sensor/realsense-d435i  # start the camera node
 ./setup.sh run d435i-voxblox odometry/fast-livo
-./setup.sh run d435i-voxblox planner/risk-aware/run_planner.sh
+./setup.sh run d435i-voxblox planner/risk-aware-deploy/run_planner.sh
 ```
 
 ---
@@ -90,7 +90,8 @@ stacks/d435i-voxblox.yml         modules/<group>/<name>/
 - ✅ **Engine**: `tools/gen_dockerfile_compose.py` + `setup.sh` ({clone|gen|build|up|build-ws|run|sh|down}). Native per-arch build.
 - ✅ **d435i-voxblox modules** (faithful port of the pure-jetson Dockerfile + run scripts):
   `base` (l4t-jetpack + ROS Noetic), `sensor/realsense-d435i`, `odometry/fast-livo` (Sophus
-  a621ff), `compute/{torch,spconv,jax}`, `planner/risk-aware`. `stacks/d435i-voxblox.yml`.
+  a621ff), `compute/{torch,spconv,jax}`, `planner/risk-aware-deploy` (renamed from `planner/risk-aware`
+  2026-07-26 to read symmetric with `planner/risk-aware-sim`). `stacks/d435i-voxblox.yml`.
 - ✅ **Clone-based + per-module workspaces**: `setup.sh clone` runs each module's `clone.sh`
   (git clone the component @ jetson-orin-agx into `ws/<module>/src`, gitignored). The jaxlib
   wheel (76M) is git-**tracked** in `modules/compute/jax/wheels/` — the only reused artifact.

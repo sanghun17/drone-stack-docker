@@ -2,7 +2,7 @@
 # Fetch the risk_aware_planning source into the planner workspace (pinned branch).
 # Run by `setup.sh clone <stack>`.
 #
-# Destination is the SAME tree modules/planner/risk-aware and modules/training/ete-net
+# Destination is the SAME tree modules/planner/risk-aware-deploy and modules/training/ete-net
 # use. That is deliberate: risk_aware_planning is ONE repo on ONE branch
 # (RISK_AWARE_BRANCH, unified to main 2026-07-25), and sim vs deploy differ only in
 # which launch files they start -- not in code. So a host that runs several of these
