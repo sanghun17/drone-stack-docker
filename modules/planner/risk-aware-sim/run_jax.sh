@@ -36,6 +36,13 @@ source /work/modules/ensure_roscore.sh   # master up on $ROS_MASTER_PORT — TCP
 export XLA_PYTHON_CLIENT_MEM_FRACTION="${XLA_PYTHON_CLIENT_MEM_FRACTION:-0.3}"
 export PYTHONUNBUFFERED=1   # flush logs immediately (even through pipes/redirects)
 
-# localization: gt (default, no VIO running -> ros_communicator.py remaps onto
-# /gt_odom) or vio (FAST-LIVO's /aft_mapped_to_body_imu_propagated, no remap needed).
+# localization: gt (default, no VIO running) or vio (FAST-LIVO, ml fork). It selects the
+# /robot/odom source INSIDE airsim_gt_odom_publisher.py — gt mirrors /gt_odom, vio relays
+# /LIVO2/imu_propagate rotated world->body. Either way /robot/odom twist is BODY frame,
+# which is the frame ETE-Net context[0:3] is trained in (2026-07-26: stage2 end-to-end
+# body corr 0.923 vs world -0.269). It does NOT select a jax remap.
+# NOTE: sim has no /aft_mapped_to_body_imu_propagated at all — that is the JETSON
+# FAST-LIVO fork's topic name (ws/fast-livo LIVMapper.cpp:322); the ml fork used here
+# advertises /LIVO2/imu_propagate (ws/fast-livo-sim LIVMapper.cpp:290). Any comment,
+# remap or subscriber in the sim path claiming otherwise is wrong and silently dead.
 exec roslaunch local_controller ours_jax.launch gpu:=1 planner:=motion_primitives localization:="${LOC:-gt}" "$@"
