@@ -254,6 +254,18 @@ def gen_compose(mods, arch, stack, env, gpu_uuids_key="GPU_UUIDS"):
         # HOME, which breaks things that need to write a cache dir (matplotlib font
         # cache, etc). /tmp is always writable regardless of uid.
         doc["services"]["dev"]["environment"].append("HOME=/tmp")
+        # ...and no passwd entry also means `pwd.getpwuid(os.getuid())` raises KeyError.
+        # Python's getpass.getuser() checks USER/LOGNAME/LNAME/USERNAME env FIRST and only
+        # falls back to the pwd db, so setting USER/LOGNAME is enough — no image change.
+        # 2026-07-26, found on a real ml ete-train-2080ti run: torch.compile's inductor
+        # calls getpass.getuser() to name its cache dir, so ANY config with compile_* on
+        # (e.g. every v23_P1_* ablation) crashes with `KeyError: getpwuid(): uid not found`
+        # the moment CONTAINER_USER is set. Latent since CONTAINER_USER was introduced
+        # (2026-07-14) -- unrelated to that day's torch swap, inductor behaved the same on
+        # the previous torch. The value is cosmetic (only names a cache dir); "user" keeps
+        # it uid-agnostic so this stays correct whatever CONTAINER_USER is set to.
+        doc["services"]["dev"]["environment"].append("USER=user")
+        doc["services"]["dev"]["environment"].append("LOGNAME=user")
     # amd64 has no nvidia-docker "runtime" shorthand wired the way arm64/L4T does;
     # use the standard compose device-reservation form instead so amd64 GPU stacks
     # (e.g. ete-train-5090) actually get the GPU. Purely additive — arm64 output is
