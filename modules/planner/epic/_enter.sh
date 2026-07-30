@@ -18,7 +18,16 @@
 # they only ever had one stack):
 #   DSD_CONTAINER=drone-stack-epic-x86-gpu ./modules/planner/epic/run_epic.sh
 if [ ! -f /.dockerenv ]; then
-  __C="${DSD_CONTAINER:-drone-stack-epic-x86}"
+  # Default flipped to the GPU stack 2026-07-30. MARSIM's opengl_render_node and
+  # RViz both need hardware GL: on the mesa/llvmpipe (CPU) path the renderer only
+  # reached 3.6 Hz against a 10 Hz target and lost LIOInterface's 10 s
+  # waitForMessage race, so the planner never initialised. The epic-x86 image was
+  # removed from this host once epic-x86-gpu was verified. Leaving the old default
+  # here was actively harmful: ensure_roscore's sibling ensure_container.sh
+  # recreates a MISSING container, so a bare run_*.sh would silently rebuild the
+  # deleted CPU image instead of failing. Set DSD_CONTAINER=drone-stack-epic-x86
+  # to go back to the CPU stack (e.g. a laptop with no NVIDIA GPU).
+  __C="${DSD_CONTAINER:-drone-stack-epic-x86-gpu}"
   __S="$(cd "$(dirname "${BASH_SOURCE[1]}")" && pwd)/$(basename "${BASH_SOURCE[1]}")"
   __R="$(cd "$(dirname "$__S")/../../.." && pwd)"
   source "$__R/modules/ensure_container.sh"   # recreate $__C if missing / stale-mounted (repo moved)
