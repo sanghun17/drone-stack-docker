@@ -24,5 +24,13 @@
 # DSD_CONTAINER as above (or use `./setup.sh run epic-x86-gpu <script>`, which
 # execs inside the right container anyway).
 arch: [amd64]
+# gpu_arch: sm89 — set 2026-07-30 for THIS desktop (3x RTX 2080 Ti, driver
+# 535.261.03). Per NVIDIA's driver/CUDA compat table the 535 line runs
+# CUDA<=12.2 containers, so the amd64 default above (nvidia/cuda:12.8.1) would
+# refuse to start. sm89 selects base's amd64_sm89 = 12.2.2-devel-ubuntu20.04.
+# The key names the image tier, not the card's real arch (2080 Ti is Turing
+# sm_75) — EPIC ships no CUDA code, so only the runtime/driver ceiling matters.
+# Drop this line again on a host with a driver new enough for 12.8.
+gpu_arch: sm89
 modules:
   - planner/epic

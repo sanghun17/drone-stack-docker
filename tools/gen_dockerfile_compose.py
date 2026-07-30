@@ -237,7 +237,26 @@ def gen_compose(mods, arch, stack, env, gpu_uuids_key="GPU_UUIDS", gpu=True):
                 # config/ros_env.sh (mounted), so the IP is edit-and-go with no recreate.
                 "environment": [
                     "DISPLAY=${DISPLAY:-:0}",
-                ],
+                ]
+                # NVIDIA_DRIVER_CAPABILITIES: the nvidia/cuda base images ship
+                # "compute,utility", which does NOT make the runtime inject the
+                # driver's GL stack (libGLX_nvidia / libEGL_nvidia). Without
+                # "graphics,display" a GPU container still runs CUDA and
+                # nvidia-smi fine, but glxinfo reports llvmpipe /
+                # "Accelerated: no" and every GL client falls back to mesa
+                # software rendering on the CPU. That is what made MARSIM's
+                # opengl_render_node crawl at 3.6 Hz against a 10 Hz target on
+                # epic-x86-gpu (confirmed 2026-07-30).
+                # Set here rather than as a module `env:` on purpose: `env:`
+                # becomes a Dockerfile ENV emitted ahead of that module's apt
+                # layer, so changing it invalidates the whole (very slow) apt
+                # install. Compose env reaches the runtime hook identically and
+                # only costs a container recreate.
+                # Harmless for compute-only GPU stacks (ete-train-*): extra
+                # capabilities just mount a few more driver libs. Not emitted at
+                # all for `gpu: false` stacks, which have no nvidia runtime.
+                + (["NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics,display"]
+                   if gpu else []),
                 "command": ["sleep", "infinity"],
             }
         }
