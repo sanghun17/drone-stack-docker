@@ -110,5 +110,5 @@ mounts:
   # Flight bags for bag_replay.launch, read-only — replay never writes here.
   - "${EPIC_BAGS_DIR}:/bags:ro"
 
-run: [run_livox.sh, run_fastlio.sh, run_mavros.sh, run_tf_relay.sh, run_epic.sh, run_replay.sh]
+run: [run_livox.sh, run_fastlio.sh, run_mavros.sh, run_tf_relay.sh, run_epic.sh, run_replay.sh, run_view.sh]
 provides: [lidar, odometry, exploration, epic-planner]
