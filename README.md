@@ -9,7 +9,7 @@ modules** you assemble per run.
 
 | role | remote | branch |
 |------|--------|--------|
-| Docker environment | `https://github.com/sanghun17/drone-stack-docker.git` | `epic-stack-module` |
+| Docker environment | `https://github.com/sanghun17/drone-stack-docker.git` | `main` |
 | EPIC source | `https://github.com/kimhyoon/EPIC-stack.git` | `feat/early-finish-and-viewpoint-diagnostics` |
 
 ## Idea: declare modules → one image, one container
