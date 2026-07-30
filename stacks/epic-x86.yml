@@ -1,4 +1,5 @@
-# epic-x86 — EPIC LiDAR exploration stack (kimhyoon/EPIC-stack @ donghyuck) on an
+# epic-x86 — EPIC LiDAR exploration stack
+# (kimhyoon/EPIC-stack @ feat/early-finish-and-viewpoint-diagnostics) on an
 # x86 desktop/laptop with NO NVIDIA GPU. Replaces the standalone epic_ws/docker
 # compose setup; everything the image needs is declared in modules/planner/epic's
 # module.yml, so a fresh host only ever runs `docker build` — nothing is installed
@@ -20,7 +21,7 @@
 # stacks need. See modules/base/module.yml for why the base image must NOT be one
 # that already ships the ROS apt repo.
 #
-#   ./setup.sh clone    epic-x86     # EPIC-stack@donghyuck -> ws/epic
+#   ./setup.sh clone    epic-x86     # EPIC-stack@feat/early-finish-and-viewpoint-diagnostics -> ws/epic
 #   ./setup.sh up       epic-x86     # gen + docker build + container (idle)
 #   ./setup.sh build-ws epic-x86     # catkin build in the container
 #   ./setup.sh run      epic-x86 planner/epic/run_epic.sh

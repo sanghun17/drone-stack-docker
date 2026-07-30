@@ -14,6 +14,6 @@ set -e
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 DST="$ROOT/ws/epic"
 REPO="${EPIC_REPO:-https://github.com/kimhyoon/EPIC-stack.git}"
-BRANCH="${EPIC_BRANCH:-donghyuck}"
+BRANCH="${EPIC_BRANCH:-feat/early-finish-and-viewpoint-diagnostics}"
 
 bash "$ROOT/modules/_common/clone_repo.sh" "$DST" "$REPO" "$BRANCH"

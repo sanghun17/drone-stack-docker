@@ -1,7 +1,8 @@
 name: epic
 group: planner
 description: >
-  EPIC LiDAR exploration stack (kimhyoon/EPIC-stack @ donghyuck) — MID360/ML-X
+  EPIC LiDAR exploration stack (kimhyoon/EPIC-stack @
+  feat/early-finish-and-viewpoint-diagnostics) — MID360/ML-X
   livox driver + FAST_LIO odometry + EPIC global/local planner (MINCO/GCOPTER) +
   px4_ctrl_bridge to MAVROS, plus the MARSIM simulator. One catkin workspace
   (ws/epic), cloned by this module's clone.sh and built in-container by

@@ -5,6 +5,13 @@ that unifies the old `pure-jetson-stack` (D435i + voxblox + risk-aware planner) 
 `drone-exploration-stack` (Livox Mid-360 + EPIC + MAVROS) into **interchangeable
 modules** you assemble per run.
 
+## Repository branches
+
+| role | remote | branch |
+|------|--------|--------|
+| Docker environment | `https://github.com/sanghun17/drone-stack-docker.git` | `epic-stack-module` |
+| EPIC source | `https://github.com/kimhyoon/EPIC-stack.git` | `feat/early-finish-and-viewpoint-diagnostics` |
+
 ## Idea: declare modules → one image, one container
 
 - **A `stack` (`stacks/*.yml`) just lists the modules you want** + the target arch.
@@ -65,7 +72,7 @@ declared in `modules/planner/epic/module.yml`, so a fresh machine only ever runs
 `docker build` — nothing is installed into a running container.
 
 ```bash
-./setup.sh clone    epic-x86      # kimhyoon/EPIC-stack @ donghyuck -> ws/epic
+./setup.sh clone    epic-x86      # kimhyoon/EPIC-stack @ feat/early-finish-and-viewpoint-diagnostics -> ws/epic
 ./setup.sh up       epic-x86      # gen + docker build + container (idle)
 ./setup.sh build-ws epic-x86      # catkin build in the container
 ```
