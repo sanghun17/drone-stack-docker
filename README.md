@@ -46,7 +46,9 @@ right wheels/SDK (e.g. NVIDIA Jetson torch wheel vs x86 CUDA torch).
   plugin into `~/.docker/cli-plugins/docker-buildx` (arm64 asset from
   <https://github.com/docker/buildx/releases>). `./setup.sh build` checks for it and tells
   you how if it's missing.
-- NVIDIA Container Runtime (on Jetson it ships with JetPack).
+- NVIDIA Container Runtime (on Jetson it ships with JetPack). **Not** needed for
+  `epic-x86`, which declares `gpu: false` — that stack runs on a host with no
+  NVIDIA GPU at all.
 
 ## Usage (target)
 
@@ -56,8 +58,55 @@ right wheels/SDK (e.g. NVIDIA Jetson torch wheel vs x86 CUDA torch).
 ./setup.sh run d435i-voxblox sensor/realsense-d435i   # or: ./scripts/sensor_realsense-d435i.sh
 ```
 
+## EPIC LiDAR exploration on x86 (`epic-x86`)
+
+Replaces the standalone `epic_ws/docker` compose setup. Every image dependency is
+declared in `modules/planner/epic/module.yml`, so a fresh machine only ever runs
+`docker build` — nothing is installed into a running container.
+
+```bash
+./setup.sh clone    epic-x86      # kimhyoon/EPIC-stack @ donghyuck -> ws/epic
+./setup.sh up       epic-x86      # gen + docker build + container (idle)
+./setup.sh build-ws epic-x86      # catkin build in the container
+```
+
+Bring-up on real hardware, one per terminal, in this order:
+
+```bash
+./modules/planner/epic/run_livox.sh        # MID360 driver
+./modules/planner/epic/run_fastlio.sh      # LIO odometry
+./modules/planner/epic/run_mavros.sh       # PX4 bridge
+./modules/planner/epic/run_tf_relay.sh     # TF + odom relays (before the planner)
+./modules/planner/epic/run_epic.sh --rviz  # the planner itself
+```
+
+Offline instead — replay a flight bag through the live planner (plays only EPIC's
+inputs, so `/planning/*` is recomputed and comparable to the recording):
+
+```bash
+./modules/planner/epic/run_replay.sh /bags/<flight>.bag rate:=0.5
+```
+
+Set before first use, in `config/stack.env` (or an untracked `config/stack.env.local`):
+`EPIC_BAGS_DIR` (mounted read-only at `/bags`), `FCU_URL`, and `EPIC_BUILD_MODE`
+(`sim` = MARSIM + ML-X emulation, `onboard` = real ML-X; it is a CMake flag, so
+changing it means re-running `build-ws`).
+
+`epic-x86-gpu` is the same stack for a host that has an NVIDIA GPU — CUDA base
+image and the compose GPU wiring, for hardware GL in RViz/MARSIM. EPIC's own code
+contains no CUDA, so the workspace builds identically either way.
+
 ## Status
 
 Bootstrapping. See `docs/MODULE_SCHEMA.md` for the manifest spec. The two legacy
 stacks (`~/pure-jetson-stack`, `~/drone-exploration-stack`) are kept intact for
 reference until `d435i-voxblox` and `lidar-epic` are reproduced here and verified.
+
+`epic-x86` / `epic-x86-gpu` (2026-07-30) are the `lidar-epic` replacement. Verified
+so far: generation is correct, and generating the five pre-existing stacks is
+byte-identical to before the change (`base`'s new `amd64_nogpu` key and the
+generator's new `gpu:` key are both additive). **The image build itself has NOT been
+run yet** — the host it was authored on has no `buildx`. First `./setup.sh up
+epic-x86` on a real machine is the outstanding check; the apt/pip lists are ported
+from the working `epic_ws/docker` image but were re-split against `ubuntu:20.04`
+plus `ros-noetic-desktop-full`, so expect to fix package names there if anything.

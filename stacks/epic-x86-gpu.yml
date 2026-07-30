@@ -1,0 +1,28 @@
+# epic-x86-gpu — same EPIC stack as epic-x86, for an x86 host that DOES have an
+# NVIDIA GPU. Identical module list; only the base image and the compose GPU
+# wiring differ.
+#
+# Use this one when you want hardware GL for RViz / MARSIM's renderer through the
+# NVIDIA driver instead of mesa on an iGPU. EPIC itself contains no CUDA code, so
+# nothing in the workspace builds differently — this is purely about the container
+# seeing the GPU.
+#
+# No `gpu_arch:` and no `gpu:` key, so the defaults apply:
+#   * base image  -> base's plain `amd64` key = nvidia/cuda:12.8.1-devel-ubuntu20.04
+#   * compose     -> the amd64 device reservation (or NVIDIA_VISIBLE_DEVICES when
+#                    GPU_UUIDS is set in config/stack.env)
+# If the host's driver is too old for CUDA 12.8 (the 535 line caps at 12.2 — see
+# base's amd64_sm89 comment), add `gpu_arch: sm89` here to pick the 12.2.2 image.
+# The CUDA base is just Ubuntu 20.04 + the NVIDIA runtime as far as EPIC cares.
+#
+#   ./setup.sh clone    epic-x86-gpu
+#   ./setup.sh up       epic-x86-gpu
+#   ./setup.sh build-ws epic-x86-gpu
+#   DSD_CONTAINER=drone-stack-epic-x86-gpu ./modules/planner/epic/run_epic.sh --rviz
+#
+# NOTE the run scripts default to the epic-x86 container name; export
+# DSD_CONTAINER as above (or use `./setup.sh run epic-x86-gpu <script>`, which
+# execs inside the right container anyway).
+arch: [amd64]
+modules:
+  - planner/epic

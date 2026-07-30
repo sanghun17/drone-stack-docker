@@ -1,0 +1,114 @@
+name: epic
+group: planner
+description: >
+  EPIC LiDAR exploration stack (kimhyoon/EPIC-stack @ donghyuck) — MID360/ML-X
+  livox driver + FAST_LIO odometry + EPIC global/local planner (MINCO/GCOPTER) +
+  px4_ctrl_bridge to MAVROS, plus the MARSIM simulator. One catkin workspace
+  (ws/epic), cloned by this module's clone.sh and built in-container by
+  build_ws.sh — same pattern as odometry/fast-livo.
+
+  Ported from the standalone epic_ws/docker setup (which itself was adapted from
+  sanghun17/drone-exploration-stack/docker). That image used
+  osrf/ros:noetic-desktop-full as its FROM; here the desktop package set is an
+  ordinary apt dep instead, so this module composes with the shared `base`
+  module (ROS repo + rosdep) on top of whichever base_image the stack's arch /
+  gpu_arch selects. Two stacks use it: epic-x86 (no NVIDIA GPU, ubuntu:20.04
+  base) and epic-x86-gpu (CUDA base, for a host that has one).
+
+deps:
+  apt:
+    # ── ROS desktop set ──────────────────────────────────────────────────
+    # Replaces the old osrf/ros:noetic-desktop-full FROM. This tree is GUI/sim
+    # heavy (MARSIM + RViz + rviz_plugins + full PCL/OpenCV/tf), so the meta
+    # package is genuinely the right unit — hand-listing its closure drifts.
+    - ros-noetic-desktop-full
+    # ── build toolchain / general utilities ──────────────────────────────
+    - patch                       # install.sh applies the Livox-SDK2 patch
+    - iputils-ping
+    - net-tools
+    - iproute2
+    - usbutils
+    - sudo
+    - vim
+    - tmux
+    - less
+    # ── C++ deps of the planner + mapping packages ───────────────────────
+    - libeigen3-dev
+    - libpcl-dev
+    - libyaml-cpp-dev
+    - libfmt-dev
+    - libopencv-dev
+    - libarmadillo-dev           # pose_utils / uav_utils
+    - qtbase5-dev                # rviz_plugins
+    - libomp-dev                 # OpenMP in FAST_LIO / lidar_map
+    - libapr1-dev
+    # ── GeographicLib: mavros link dep + runtime datasets ────────────────
+    - libgeographic-dev
+    - geographiclib-tools
+    # ── catkin / python tooling ──────────────────────────────────────────
+    - python3-catkin-tools
+    - python3-rosdep
+    - python3-osrf-pycommon
+    - python3-pip
+    # ── ROS packages the tree find_package()s explicitly ─────────────────
+    - ros-noetic-pcl-ros
+    - ros-noetic-pcl-conversions
+    - ros-noetic-eigen-conversions
+    - ros-noetic-cv-bridge
+    - ros-noetic-image-transport
+    - ros-noetic-cmake-modules
+    - ros-noetic-rviz
+    - ros-noetic-geometry
+    - ros-noetic-tf2-geometry-msgs
+    - ros-noetic-tf2-sensor-msgs
+    - ros-noetic-topic-tools
+    - ros-noetic-dynamic-reconfigure
+    - ros-noetic-message-filters
+    - ros-noetic-rqt
+    - ros-noetic-rqt-common-plugins
+    # ── MAVROS (apt, NOT vendored) ───────────────────────────────────────
+    # Unlike control/mavros (whose mavros is vendored inside ws/risk-aware),
+    # EPIC's px4_ctrl_bridge links against the apt mavros_msgs and the flight
+    # scripts roslaunch the apt mavros px4.launch. So install it here.
+    - ros-noetic-mavlink
+    - ros-noetic-mavros
+    - ros-noetic-mavros-extras
+    - ros-noetic-mavros-msgs
+    # ── OpenGL / X11: MARSIM local_sensing GPU renderer + RViz ───────────
+    - libglew-dev
+    - libglfw3-dev
+    - libgl1-mesa-dev
+    - libglu1-mesa-dev
+    - libgl1-mesa-dri
+    - mesa-utils
+    - x11-apps
+    - xauth
+    - dbus-x11
+    - libxkbcommon-x11-0
+    - libxcb-xinerama0
+
+  pip:
+    - numpy
+    - matplotlib
+    - scipy
+    - pyyaml
+    - rospkg
+
+  source:
+    - install.sh                 # patched Livox-SDK2 + GeographicLib geoids
+
+# install.sh needs the Livox patch bind-mounted into its build step. Declaring it
+# here (rather than mounting all of modules/) keeps the layer's BuildKit cache key
+# tied to just this script + patch — see gen_dockerfile_compose.py's CACHE note.
+assets:
+  - patches/livox-sdk2-mid360s-devtype.patch
+
+workspace: /work/ws/epic
+
+mounts:
+  - "/dev:/dev"                              # MID360 (UDP NIC) + PX4 FCU serial
+  # Flight bags for bag_replay.launch, read-only — replay never writes here.
+  - "${EPIC_BAGS_DIR}:/bags:ro"
+
+run: [run_livox.sh, run_fastlio.sh, run_mavros.sh, run_tf_relay.sh, run_epic.sh, run_replay.sh]
+provides: [lidar, odometry, exploration, epic-planner]

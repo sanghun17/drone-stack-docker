@@ -23,6 +23,19 @@ base_image:
   # RTX 2080 Ti x3 usable / sm_75, driver 535.261 -> same CUDA<=12.2 ceiling as the
   # 4090/driver-535.183 host -- reuses the identical amd64_sm89 image value.
   amd64_sm75: nvidia/cuda:12.2.2-devel-ubuntu20.04
+  # amd64_nogpu added for the epic-x86 stack (EPIC LiDAR exploration — a pure
+  # CPU/OpenGL ROS stack: no CUDA anywhere in the tree, and the target host may
+  # have no NVIDIA GPU at all, in which case every image above simply refuses to
+  # run). `nogpu` is not a real GPU micro-arch, it's the sentinel that selects
+  # this key through the SAME `<arch>_<gpu_arch>` lookup — no generator change
+  # needed, and it pairs with `gpu: false` in the stack file to drop the compose
+  # GPU wiring too. Plain ubuntu:20.04 (not osrf/ros:noetic-desktop-full, which
+  # is what the standalone epic_ws/docker image used as its FROM): base's
+  # install.sh below adds the ROS apt repo itself, and a base image that ALREADY
+  # ships that repo makes apt fail with "Conflicting values set for option
+  # Signed-By" the moment install.sh writes its own ros.list for the same suite.
+  # The desktop package set is an ordinary apt dep in planner/epic instead.
+  amd64_nogpu: ubuntu:20.04
 
 env:
   ROS_DISTRO: noetic

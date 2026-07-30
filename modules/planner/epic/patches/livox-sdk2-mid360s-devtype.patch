@@ -1,0 +1,16 @@
+--- a/sdk_core/device_manager.cpp
++++ b/sdk_core/device_manager.cpp
+@@ -538,6 +538,13 @@
+     return;
+   }
+ 
++  // Mid-360S reports dev_type=35; normalize to Mid-360 (9) before the cfg-map
++  // lookup, otherwise the detection is dropped here and never reaches the
++  // command handler (livox_ros_driver2 issue #240).
++  if (detection_data->dev_type == kLivoxLidarTypeMid360s) {
++    detection_data->dev_type = kLivoxLidarTypeMid360;
++  }
++
+   if (type_lidars_cfg_map_.find(detection_data->dev_type) == type_lidars_cfg_map_.end()) {
+     return;
+   }

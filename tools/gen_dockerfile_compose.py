@@ -202,7 +202,7 @@ def gen_dockerfile(mods, arch, gpu_arch, env):
     return "\n".join(L) + "\n"
 
 
-def gen_compose(mods, arch, stack, env, gpu_uuids_key="GPU_UUIDS"):
+def gen_compose(mods, arch, stack, env, gpu_uuids_key="GPU_UUIDS", gpu=True):
     image = "drone-stack:%s" % stack
     mounts, runs = [], []
     for m in mods:
@@ -223,7 +223,14 @@ def gen_compose(mods, arch, stack, env, gpu_uuids_key="GPU_UUIDS"):
                 "container_name": "drone-stack-%s" % stack,
                 "network_mode": "host",
                 "privileged": True,
-                "runtime": "nvidia" if arch == "arm64" else None,
+                # gpu=False (stacks/*.yml `gpu: false`) drops ALL GPU wiring — the
+                # arm64 `runtime: nvidia` here and the amd64 device-reservation /
+                # NVIDIA_VISIBLE_DEVICES paths further down. Needed for a stack whose
+                # host has no NVIDIA GPU (epic-x86): compose refuses to START a
+                # container whose device reservation cannot be satisfied, so the
+                # amd64 default below would make an otherwise-fine CPU stack undeployable.
+                # Defaults to True -> byte-identical output for every existing stack.
+                "runtime": "nvidia" if (gpu and arch == "arm64") else None,
                 "working_dir": "/work",
                 "volumes": ["../..:/work"] + mounts,
                 # ROS_MASTER_URI / ROS_IP are NOT set here on purpose — they live in
@@ -295,7 +302,9 @@ def gen_compose(mods, arch, stack, env, gpu_uuids_key="GPU_UUIDS"):
     # to "GPU_UUIDS" (see this function's signature) -- a stack that never sets
     # `gpu_uuids_env:` gets byte-identical behavior to before this parameter existed.
     gpu_uuids = [u.strip() for u in (env.get(gpu_uuids_key) or "").split(",") if u.strip()]
-    if arch == "amd64" and gpu_uuids:
+    if not gpu:
+        pass                        # `gpu: false` — no runtime, no reservation (see above)
+    elif arch == "amd64" and gpu_uuids:
         doc["services"]["dev"]["runtime"] = "nvidia"
         doc["services"]["dev"]["environment"].append("NVIDIA_VISIBLE_DEVICES=%s" % ",".join(gpu_uuids))
         doc["services"]["dev"]["environment"].append("NVIDIA_DRIVER_CAPABILITIES=all")
@@ -339,7 +348,11 @@ def main():
     os.makedirs(outdir, exist_ok=True)
     open(os.path.join(outdir, "Dockerfile"), "w").write(gen_dockerfile(mods, arch, gpu_arch, env))
     gpu_uuids_key = stack.get("gpu_uuids_env") or "GPU_UUIDS"
-    open(os.path.join(outdir, "compose.yml"), "w").write(gen_compose(mods, arch, a.stack, env, gpu_uuids_key))
+    # `gpu:` (optional, stacks/*.yml) — set false for a stack that must run on a host
+    # with no NVIDIA GPU. Defaults true, so every pre-existing stack is unaffected.
+    gpu = stack.get("gpu", True)
+    open(os.path.join(outdir, "compose.yml"), "w").write(
+        gen_compose(mods, arch, a.stack, env, gpu_uuids_key, gpu))
     open(os.path.join(outdir, "modules.txt"), "w").write("\n".join(m["_path"] for m in mods) + "\n")
 
     print("stack '%s' arch=%s%s  modules: %s" % (
