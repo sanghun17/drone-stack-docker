@@ -42,6 +42,11 @@ export ROS_HOSTNAME="${ROS_HOSTNAME:-$ROS_IP}"    # 신설 — sim.env sets this
 #   launch files :  launch-prefix="taskset -c $(env CPUS_FASTLIVO)"
 #                   ($(env) errors at roslaunch parse time if unset; everything
 #                   is launched via its run.sh wrapper, which sources this file)
-export CPUS_CAMERA="0,1"
-export CPUS_FASTLIVO="2,3"
-export CPUS_POOL="4-11"
+# The "${VAR:-default}" form is required, not cosmetic: this file is sourced
+# AFTER the per-stack env (config/epic.env etc.), which is documented to
+# override by pre-exporting. Bare assignments here silently discarded that —
+# epic.env's "CPU pinning: OFF for EPIC" block was dead for exactly this reason,
+# so EPIC's roscore kept landing on the Jetson's 4-11 pool on a desktop.
+export CPUS_CAMERA="${CPUS_CAMERA:-0,1}"
+export CPUS_FASTLIVO="${CPUS_FASTLIVO:-2,3}"
+export CPUS_POOL="${CPUS_POOL:-4-11}"
