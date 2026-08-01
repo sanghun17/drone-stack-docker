@@ -30,9 +30,9 @@ source /work/config/sim.env       # ROS_MASTER_HOST/IP/HOSTNAME=192.168.50.12 �
 source /work/config/ros_env.sh    # ROS_MASTER_URI / ROS_IP — single source, edit-and-go
 source /work/modules/ensure_roscore.sh   # master up on $ROS_MASTER_PORT — TCP probe, not a blind sleep 4 (host roscore is expected to already answer here)
 
-# Jetson 통합 메모리와 무관 — ml desktop discrete GPU. Same conservative fraction as
-# the real deploy's run_jax.sh (315 primitives × 7 steps -> real need is sub-GB;
-# RESOURCE_EXHAUSTED fails loudly if this is ever too low, no silent misbehavior).
+# Jetson 통합 메모리와 무관하지만 deploy와 같은 allocator 동작을 사용해 실행
+# 경로에 따른 성능 차이를 없앤다. 반드시 Python/JAX import보다 먼저 적용한다.
+export XLA_PYTHON_CLIENT_PREALLOCATE="${XLA_PYTHON_CLIENT_PREALLOCATE:-false}"
 export XLA_PYTHON_CLIENT_MEM_FRACTION="${XLA_PYTHON_CLIENT_MEM_FRACTION:-0.3}"
 export PYTHONUNBUFFERED=1   # flush logs immediately (even through pipes/redirects)
 

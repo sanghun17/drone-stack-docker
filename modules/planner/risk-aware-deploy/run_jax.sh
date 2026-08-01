@@ -41,8 +41,9 @@ rosparam load /work/ws/risk-aware/src/risk_aware_planning/mav_active_3d_planning
 # 사전할당해 voxblox/fast-livo가 질식한다 (planner_base.py는 setdefault라 이 값이 이김).
 # 실측 2026-06-10 (PREALLOCATE=false, 운영 60s): 노드 전체 RSS 4.2GB(torch 모델 포함)
 # → JAX 실수요는 수백 MB. 315 primitives × 7 steps라 원래 MB 단위가 정상.
-# 0.3 × 29GB ≈ 8.7GB — 실수요(수백 MB)의 넉넉한 여유. 모자라면 RESOURCE_EXHAUSTED로 즉사하므로
-# 조용한 오작동은 없음 (그때 이 값만 올리면 됨).
+# 선할당은 끄고 필요한 만큼만 늘린다. MEM_FRACTION은 allocator의 상한 여유로
+# 유지한다. 이 export들은 반드시 Python/JAX import보다 먼저 적용되어야 한다.
+export XLA_PYTHON_CLIENT_PREALLOCATE="${XLA_PYTHON_CLIENT_PREALLOCATE:-false}"
 export XLA_PYTHON_CLIENT_MEM_FRACTION="${XLA_PYTHON_CLIENT_MEM_FRACTION:-0.3}"
 export PYTHONUNBUFFERED=1   # 로그 즉시 출력 (파이프/리다이렉트에서도)
 
