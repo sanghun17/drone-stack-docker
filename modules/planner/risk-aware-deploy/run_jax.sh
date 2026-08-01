@@ -32,10 +32,12 @@ JAX="/work/ws/risk-aware/src/risk_aware_planning/mav_active_3d_planning/local_pl
 
 source /work/modules/ensure_roscore.sh   # master up on $ROS_MASTER_PORT — TCP probe, not a blind sleep 4
 
-# jax's ConfigManager reads /planning/shared/* (planning_config.yaml). Normally the
-# exploration planner loads it; load it here too so jax runs standalone (e.g. driven
-# by test_path_pub --topic planner). Idempotent: same file the planner loads.
-rosparam load /work/ws/risk-aware/src/risk_aware_planning/mav_active_3d_planning/local_planner_mpc/config/planning_config.yaml
+# Stage 3 configuration ownership:
+# - JAX reads and validates config/planning.yaml directly at process startup.
+# - The exploration/controller launches synchronously load that same file below
+#   /planning_config for their ROS/C++ consumers.
+# Do not publish another copy here: run_jax.sh must also work standalone without
+# owning or racing the shared ROS parameter tree.
 
 # Jetson 통합 메모리: "GPU 메모리" = RAM 전체(~29GB). 코드 기본값 0.8이면 ~24GB를
 # 사전할당해 voxblox/fast-livo가 질식한다 (planner_base.py는 setdefault라 이 값이 이김).
