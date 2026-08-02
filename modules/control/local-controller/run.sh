@@ -1,10 +1,9 @@
 #!/bin/bash
-# control/local-controller: velocity control bridge (control_bridge.py, `local_controller`
-# pkg). /jax/optimal_trajectory -> PD velocity -> /mavros/setpoint_raw/local. control=mavros +
-# odom=/robot/odom are hardcoded in control_bridge (no scenario). Commands are DISABLED
-# by default -- call /control_bridge/toggle_running "data: true" to actually send. Needs
-# control/mavros + control/flight-safety (for /robot/odom) up first. Ctrl-C stops the node;
-# the shared roscore is left alone.
+# control/local-controller: verified real-flight stack.
+# /jax/optimal_trajectory -> B-spline traj_server -> /planning/pos_cmd ->
+# control_bridge -> flight_safety MUX -> MAVROS/PX4. Commands are DISABLED by
+# default -- call /control_bridge/toggle_running "data: true" to send. Needs
+# control/mavros + control/flight-safety first. Ctrl-C leaves the shared roscore up.
 
 # (host) auto-enter the dsd container; (inside) run the node.
 if [ ! -f /.dockerenv ]; then
@@ -16,11 +15,10 @@ if [ ! -f /.dockerenv ]; then
   __TT=$([ -t 1 ] && echo -it || echo -i)
   # Ctrl+C here -> SIGINT the node INSIDE the container (docker exec doesn't forward it
   # reliably). roscore left alone — shared master other modules use.
-  # stage1(raw JAX, default)=control_bridge.py ; stage2(b-spline)=ours_mavros_stack ; pos_step(tau)=ours_pos_step
+  # Normal execution has one path. pos_step/tau is the only diagnostic mode.
   case "${1:-}" in
-    pos_cmd|stage2) __M="ours_mavros_stack" ;;
     pos_step|tau)   __M="ours_pos_step" ;;
-    *)              __M="control_bridge.py" ;;
+    *)              __M="ours_mavros_stack" ;;
   esac
   cleanup(){ docker exec "$__C" pkill -INT -f "$__M" >/dev/null 2>&1; }
   trap 'cleanup; exit 130' INT TERM HUP
@@ -34,14 +32,11 @@ source /work/ws/risk-aware/devel/setup.bash
 source /work/config/ros_env.sh   # ROS_MASTER_URI / ROS_IP / CPUS_* — single source, edit-and-go
 source /work/modules/ensure_roscore.sh   # master up on $ROS_MASTER_PORT — TCP probe, not a blind sleep 4
 
-# No scenario load: control_bridge hardcodes control=mavros + odom=/robot/odom.
+# Numeric/runtime settings come from planning.yaml through the control launch.
 
 # CPUS_POOL (config/ros_env.sh): stay OFF camera cores 0-1 / fast-livo cores 2-3.
-# stage1 (raw JAX velocity, default) vs stage2 (b-spline: jax_to_mixtraj + traj_server +
-# control_bridge[pos_cmd]). NEVER both — both publish /local_controller/setpoint_raw/local.
 __T="taskset -c ${CPUS_POOL:?config/ros_env.sh not sourced}"
 case "${1:-}" in
-  pos_cmd|stage2) shift; exec $__T roslaunch local_controller ours_mavros_stack.launch "$@" ;;
   pos_step|tau)   shift; exec $__T roslaunch local_controller ours_pos_step.launch "$@" ;;
-  *)              exec $__T rosrun local_controller control_bridge.py "$@" ;;
+  *)              exec $__T roslaunch local_controller ours_mavros_stack.launch "$@" ;;
 esac
