@@ -205,6 +205,14 @@ Visualization Manager:
           Reference Frame: odom
           Show Trail: false
           Value: true
+        - Class: rviz/MarkerArray
+          Enabled: true
+          Marker Topic: /robot/odom_history
+          Name: Actual_Flight_History
+          Namespaces:
+            actual_odometry: true
+          Queue Size: 100
+          Value: true
       Enabled: true
       Name: Estimation
     - Class: rviz/Group
