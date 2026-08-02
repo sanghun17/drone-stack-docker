@@ -1,7 +1,7 @@
 #!/bin/bash
 # control/mavros: MAVROS bridge to the PX4 flight controller (px4.launch).
-# Params (fcu_url, gcs_url) live in px4.launch; fcu_url falls back to $FCU_URL from
-# config/stack.env via optenv. mavros is built in the risk-aware workspace (ws/risk-aware).
+# Connection values live in config/stack.env and are passed to px4.launch via
+# exported FCU_URL/GCS_URL. mavros is built in the risk-aware workspace.
 
 # (host) auto-enter the dsd container; (inside) run the node.
 if [ ! -f /.dockerenv ]; then
@@ -24,13 +24,16 @@ fi
 set -e
 source /opt/ros/noetic/setup.bash
 source /work/ws/risk-aware/devel/setup.bash
-[ -f /work/config/stack.env ] && source /work/config/stack.env   # FCU_URL
+[ -f /work/config/stack.env ] && source /work/config/stack.env
 source /work/config/ros_env.sh   # ROS_MASTER_URI / ROS_IP — single source, edit-and-go
-[ -n "${FCU_URL:-}" ] && export FCU_URL   # let px4.launch read it via $(optenv FCU_URL ...); value lives in the launch
+: "${FCU_URL:?FCU_URL missing from /work/config/stack.env}"
+: "${GCS_URL:?GCS_URL missing from /work/config/stack.env}"
+export FCU_URL GCS_URL           # px4.launch reads both via $(optenv ...)
 
 source /work/modules/ensure_roscore.sh   # master up on $ROS_MASTER_PORT — TCP probe, not a blind sleep 4
 
-# px4.launch = PX4-flavoured MAVROS. All params (fcu_url, gcs_url) are managed IN
-# px4.launch — never pass them inline here (roslaunch silently ignores empty `arg:=`).
+# px4.launch = PX4-flavoured MAVROS. Never pass connection args inline here;
+# roslaunch silently ignores empty `arg:=`, while the required env checks above
+# fail loudly before the FCU bridge starts.
 # CPUS_POOL (config/ros_env.sh): stay OFF camera cores 0-1 (uvc watchdog protection).
 exec taskset -c "${CPUS_POOL:?config/ros_env.sh not sourced}" roslaunch mavros px4.launch "$@"
