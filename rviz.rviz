@@ -6,14 +6,9 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /Sensor1/PointCloud_RGB1
-        - /Estimation1
         - /Estimation1/FastLivo_Odometry1/Shape1
-        - /Voxblox1
-        - /Voxblox1/Voxblox_Trajectory1
         - /Voxblox1/Voxblox_Trajectory1/Namespaces1
         - /Voxblox1/Voxblox_Bbox1/Namespaces1
-        - /Jax1
         - /Jax1/Jax_Optimal_Traj1/Namespaces1
         - /Jax1/Jax_Optimal_Uncertainty_Weighted1/Namespaces1
       Splitter Ratio: 0.5061538219451904
@@ -171,7 +166,7 @@ Visualization Manager:
           Axes Radius: 0.10000000149011612
           Class: rviz/Pose
           Color: 255; 25; 0
-          Enabled: true
+          Enabled: false
           Head Length: 0.30000001192092896
           Head Radius: 0.10000000149011612
           Name: Mavros_Localposition
@@ -181,7 +176,7 @@ Visualization Manager:
           Shape: Arrow
           Topic: /mavros/local_position/pose
           Unreliable: false
-          Value: true
+          Value: false
         - Alpha: 1
           Axes Length: 1
           Axes Radius: 0.10000000149011612
@@ -224,10 +219,10 @@ Visualization Manager:
           Marker Topic: /planner/planner_node/trajectory_visualization
           Name: Voxblox_Trajectory
           Namespaces:
-            completed_trajectory: false
+            completed_trajectory: true
             text_best: false
             text_candidate: false
-            text_lookahead: false
+            text_lookahead: true
             trajectories_best: false
             trajectories_candidate: false
             trajectories_lookahead: true
@@ -293,15 +288,13 @@ Visualization Manager:
           Use rainbow: true
           Value: true
         - Class: rviz/MarkerArray
-          Enabled: true
+          Enabled: false
           Marker Topic: /planner/planner_node/bbox
           Name: Voxblox_Bbox
           Namespaces:
-            gain_evaluation_bbox: true
-            mapping_bbox: true
-            planning_bbox: true
+            {}
           Queue Size: 100
-          Value: true
+          Value: false
       Enabled: true
       Name: Voxblox
     - Class: rviz/Group
@@ -332,40 +325,37 @@ Visualization Manager:
           Queue Size: 100
           Value: false
         - Class: rviz/MarkerArray
-          Enabled: false
+          Enabled: true
           Marker Topic: /local_planner/optimal_trajectory
           Name: Jax_Optimal_Traj
           Namespaces:
-            {}
+            optimal_trajectory: true
+            optimal_trajectory_fov: true
           Queue Size: 100
-          Value: false
+          Value: true
         - Class: rviz/MarkerArray
-          Enabled: false
+          Enabled: true
           Marker Topic: /local_planner/uncertainty_risk
           Name: Jax_Optimal_Uncertainty_Weighted
           Namespaces:
-            {}
+            uncertainty_raw_best: false
+            uncertainty_raw_goal_only: false
+            uncertainty_risk_best: true
+            uncertainty_risk_goal_only: false
+            uncertainty_safety_boundary_best: true
           Queue Size: 100
-          Value: false
+          Value: true
+        - Class: rviz/MarkerArray
+          Enabled: true
+          Marker Topic: /jax/dead_zone_boxes
+          Name: Dead_bbox
+          Namespaces:
+            dead_zone_boxes: true
+            dead_zone_boxes_text: true
+          Queue Size: 100
+          Value: true
       Enabled: true
       Name: Jax
-    - Class: rviz/TF
-      Enabled: false
-      Filter (blacklist): ""
-      Filter (whitelist): ""
-      Frame Timeout: 15
-      Frames:
-        All Enabled: false
-      Marker Alpha: 1
-      Marker Scale: 1
-      Name: TF
-      Show Arrows: true
-      Show Axes: true
-      Show Names: true
-      Tree:
-        {}
-      Update Interval: 0
-      Value: false
     - Class: rviz/Group
       Displays:
         - Class: rviz/Marker
@@ -373,35 +363,39 @@ Visualization Manager:
           Marker Topic: /flight_safety/geofence
           Name: Safety_Geofence
           Namespaces:
-            geofence: true
+            {}
           Queue Size: 100
           Value: true
-      Enabled: true
+      Enabled: false
       Name: Flight_Safety
-    - Class: rviz/Image
+    - Class: rviz/Group
+      Displays:
+        - Class: rviz/Image
+          Enabled: false
+          Image Topic: /recorder_cam1/image_raw
+          Max Value: 1
+          Median window: 5
+          Min Value: 0
+          Name: Recorder_Cam1
+          Normalize Range: true
+          Queue Size: 2
+          Transport Hint: compressed
+          Unreliable: false
+          Value: false
+        - Class: rviz/Image
+          Enabled: true
+          Image Topic: /recorder_cam2/image_raw
+          Max Value: 1
+          Median window: 5
+          Min Value: 0
+          Name: Recorder_Cam2
+          Normalize Range: true
+          Queue Size: 2
+          Transport Hint: compressed
+          Unreliable: false
+          Value: true
       Enabled: false
-      Image Topic: /recorder_cam1/image_raw
-      Max Value: 1
-      Median window: 5
-      Min Value: 0
-      Name: Recorder_Cam1
-      Normalize Range: true
-      Queue Size: 2
-      Transport Hint: compressed
-      Unreliable: false
-      Value: false
-    - Class: rviz/Image
-      Enabled: false
-      Image Topic: /recorder_cam2/image_raw
-      Max Value: 1
-      Median window: 5
-      Min Value: 0
-      Name: Recorder_Cam2
-      Normalize Range: true
-      Queue Size: 2
-      Transport Hint: compressed
-      Unreliable: false
-      Value: false
+      Name: Experiment
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -430,7 +424,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 4.388312816619873
+      Distance: 6.027304649353027
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -438,23 +432,23 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 1.024419903755188
-        Y: -0.1386113166809082
-        Z: 0.4073110818862915
+        X: 0.414004921913147
+        Y: 0.25463956594467163
+        Z: 1.1161144971847534
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.2247952222824097
+      Pitch: 1.139796495437622
       Target Frame: <Fixed Frame>
-      Yaw: 1.4954416751861572
+      Yaw: 1.4904414415359497
     Saved: ~
 Window Geometry:
   Displays:
-    collapsed: false
+    collapsed: true
   Height: 845
-  Hide Left Dock: false
+  Hide Left Dock: true
   Hide Right Dock: false
   Image_Depth:
     collapsed: false
@@ -462,7 +456,7 @@ Window Geometry:
     collapsed: false
   Image_RGB:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd00000004000000000000028c00000296fc020000000dfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005d00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afc0000003e00000296000000cb00fffffffa000000010100000002fb0000002a0049006d006100670065005f00440065007000740068005f00500072006f006a006500630074006500640000000000ffffffff000000e700fffffffb000000100044006900730070006c00610079007301000000000000026d0000015600fffffffc00000216000000be0000000000fffffffaffffffff0100000003fb0000001a005200650063006f0072006400650072005f00430061006d00320000000000ffffffff000000b400fffffffb0000001a005200650063006f0072006400650072005f00430061006d00310000000000ffffffff000000b400fffffffb000000120049006d006100670065005f0052004700420000000000000002790000009800fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fc0000018f000000ad0000000000fffffffa000000000100000001fb0000002a0049006d006100670065005f00440065007000740068005f00500072006f006a006500630074006500640100000000ffffffff0000000000000000fb0000000c00430061006d006500720061000000026d000000c10000000000000000fb000000160049006d006100670065005f004400650070007400680000000205000000e70000001600fffffffb000000160054006500730074006200650064005f00430061006d000000021a000000ba0000000000000000000000010000010f000002a9fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003e000002a9000000a500fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000640000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000064000000056fc0100000002fb0000000800540069006d00650100000000000006400000033700fffffffb0000000800540069006d00650100000000000004500000000000000000000003ae0000029600000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000004000000000000028c00000296fc020000000dfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005d00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afc0000003e000002960000000000fffffffaffffffff0100000002fb0000002a0049006d006100670065005f00440065007000740068005f00500072006f006a006500630074006500640000000000ffffffff000000e700fffffffb000000100044006900730070006c00610079007300000000000000026d0000015600fffffffc000002a1000000330000000000fffffffaffffffff0100000003fb0000001a005200650063006f0072006400650072005f00430061006d00320000000000ffffffff000000b400fffffffb0000001a005200650063006f0072006400650072005f00430061006d00310000000000ffffffff000000b400fffffffb000000120049006d006100670065005f0052004700420000000000000002790000009800fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fc0000018f000000ad0000000000fffffffa000000000100000001fb0000002a0049006d006100670065005f00440065007000740068005f00500072006f006a006500630074006500640100000000ffffffff0000000000000000fb0000000c00430061006d006500720061000000026d000000c10000000000000000fb000000160049006d006100670065005f004400650070007400680000000205000000e70000001600fffffffb000000160054006500730074006200650064005f00430061006d000000021a000000ba0000000000000000000000010000010f000002a9fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003e000002a9000000a500fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000640000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000064000000056fc0100000002fb0000000800540069006d00650000000000000006400000033700fffffffb0000000800540069006d00650100000000000004500000000000000000000006400000031a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730000000000ffffffff0000000000000000
   Recorder_Cam1:
     collapsed: false
   Recorder_Cam2:
@@ -476,5 +470,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1600
-  X: -2
-  Y: 13
+  X: -4
+  Y: 12
