@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Host-side flight->ml sync. recorder_node (in the container) finalizes a flight bag,
 # renames it to match its webcam mp4, and drops a <base>.ready marker in flight_logs.
-# This scans those markers and rsyncs <base>.bag + the current webcam_extrinsics.json +
-# rviz.rviz to ml:recordings/<base>/ (next to the 5 MP mp4) so the ml side can render.
+# This scans those markers and rsyncs <base>.bag + <base>.runtime_manifest.yaml +
+# the current webcam_extrinsics.json + rviz.rviz to ml:recordings/<base>/ (next
+# to the 5 MP mp4) so analysis has both sensor data and exact runtime provenance.
 #
 # Idempotent: on success the .ready marker is renamed to a .synced breadcrumb (failure -> keep .ready,
 # retry next run). The breadcrumb lets recorder_node's boot self-heal tell synced bags from orphans.
@@ -29,7 +30,14 @@ for marker in "${markers[@]}"; do
   bag="$LOGS/$base.bag"
   if [ ! -f "$bag" ]; then echo "[sync] $base: no bag -> drop stale marker"; rm -f "$marker"; continue; fi
   dest="$ML_RECORDINGS/$base"
-  files=("$bag"); for f in "$EXTRINSICS" "$RVIZ_CFG"; do [ -f "$f" ] && files+=("$f"); done
+  manifest="$LOGS/$base.runtime_manifest.yaml"
+  files=("$bag")
+  if [ -f "$manifest" ]; then
+    files+=("$manifest")
+  else
+    echo "[sync] $base: runtime manifest missing (legacy/partial session); syncing bag anyway" >&2
+  fi
+  for f in "$EXTRINSICS" "$RVIZ_CFG"; do [ -f "$f" ] && files+=("$f"); done
   if $SSH "$ML" "mkdir -p '$dest'" 2>/dev/null && rsync -a -e "$SSH" "${files[@]}" "$ML:$dest/"; then
     echo "[sync] $base -> $ML:$dest/ ($(printf '%s ' "${files[@]##*/}"))"
     mv -f "$marker" "${marker%.ready}.synced"   # breadcrumb: recorder_node self-heal skips .synced bags

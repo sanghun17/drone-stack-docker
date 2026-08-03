@@ -12,6 +12,12 @@ The **overlay video itself is rendered on the ml PC** (it stores the original 5 
 recording). This dir only produces the calibration (`webcam_intrinsics.json`,
 `webcam_extrinsics.json`) and captures the synchronized data.
 
+For normal ARM-triggered flights, `flight_safety_recorder` also creates
+`<flight>.runtime_manifest.yaml`.  `flightlog_sync.sh` transfers it into the
+same recording directory as the bag and camera files, providing one readable
+start/end snapshot of ROS parameters, source configs, git state, and model
+artifact hashes for later analysis.
+
 Three frames: **O** OptiTrack world · **W** webcam · plus the drone **B**ody and its
 **C**amera (D435i), used only for the marker extrinsic. Host-only deps: `cv2` (4.2,
 legacy aruco API), `numpy`, `rosbag`.
