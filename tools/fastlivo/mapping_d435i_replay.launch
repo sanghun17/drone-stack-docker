@@ -3,15 +3,19 @@
        (no camera, no flight). Driven by tools/fastlivo/replay_fastlivo.sh, which
        starts this launch, then plays the bag with rosbag clock publishing.
 
-       use_sim_time is MANDATORY: the node stamps /aft_mapped_to_init with
-       ros::Time::now() (LIVMapper.cpp:1359), NOT the sensor stamp. Only under
-       sim time does that stamp track bag time, so the estimate lands on the same
-       clock as the ground-truth (vrpn) recorded in the bag -> eval can align them. -->
+       use_sim_time remains mandatory for timers/TF and every auxiliary node to
+       share the bag clock.  Sensor-epoch estimator outputs themselves are
+       stamped from last_lio_update_time so callback latency cannot move a pose
+       along the evaluation timeline. -->
   <param name="/use_sim_time" value="true"/>
 
   <!-- swap in an edited copy to A/B a calibration change (extrinsics / time_offset /
        imu cov) without rebuilding, via replay_fastlivo.sh config:=<file> -->
   <arg name="config"     default="$(find fast_livo)/config/d435i.yaml"/>
+  <!-- Optional sparse override loaded AFTER the complete production config.
+       This keeps A/B files tiny and prevents a candidate from accidentally
+       omitting a production parameter. -->
+  <arg name="overlay"    default=""/>
   <arg name="cam_calib"  default="$(find fast_livo)/config/camera_d435i.yaml"/>
   <!-- true: bag holds RAW /camera/color/image_raw + /camera/depth/color/points,
        regenerate the 10Hz pair here (identical to the live d435i.launch decimation).
@@ -24,6 +28,9 @@
         args="0 0 0 0.5 -0.5 0.5 -0.5 odom camera_init 100"/>
 
   <rosparam command="load" file="$(arg config)"/>
+  <group if="$(eval arg('overlay') != '')">
+    <rosparam command="load" file="$(arg overlay)"/>
+  </group>
   <!-- REPLAY FIX: force static intrinsics. The online path does
        ros::topic::waitForMessage<CameraInfo>(.., ros::Duration(5s)) in the LIVMapper
        ctor BEFORE /aft_mapped_to_init is advertised. That timeout is measured on the
