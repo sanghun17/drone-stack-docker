@@ -21,9 +21,15 @@ modules/compute/torch/wheels/*.whl
 build/
 devel/
 logs/
+.catkin_tools/
 __pycache__/
 *.pyc
 *.pyo
+
+# One-off agent/runtime work directories.  Durable conclusions belong in docs/;
+# large reproducible evaluations stay host-local next to their runner.
+/.tmp_*/
+tools/fastlivo/_campaign_*/
 
 # 에이전트/디버깅 작업물 (설계 문서·원자료 덤프). 보존할 가치가 생기면 docs/로 승격.
 /scratchpad/
