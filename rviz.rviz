@@ -354,6 +354,14 @@ Visualization Manager:
             dead_zone_boxes_text: true
           Queue Size: 100
           Value: true
+        - Class: rviz/MarkerArray
+          Enabled: true
+          Marker Topic: /jax/dead_zone_frustum
+          Name: Dead_Frustum_Scale
+          Namespaces:
+            dead_zone_frustum: true
+          Queue Size: 100
+          Value: true
       Enabled: true
       Name: Jax
     - Class: rviz/Group
