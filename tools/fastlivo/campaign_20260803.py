@@ -29,7 +29,7 @@ import signal
 import subprocess
 import sys
 import time
-from typing import Dict, Iterable, List, Sequence, Tuple
+from typing import Dict, Iterable, List, Mapping, Sequence, Tuple
 
 import cv2
 import numpy as np
@@ -70,9 +70,67 @@ TOPIC_EST = "/aft_mapped_to_optitrack"
 KEEP_TOPICS = {TOPIC_CLOUD, TOPIC_IMU, TOPIC_INFO, TOPIC_GT}
 
 
-def source_bag(flight_id: str) -> Path:
-    stem = f"flight_2026-08-03_{flight_id}"
-    return RECORDINGS / stem / f"{stem}.bag"
+def _legacy_spec() -> Dict[str, object]:
+    sessions = []
+    for flight_id in SELECTED:
+        stem = f"flight_2026-08-03_{flight_id}"
+        sessions.append({
+            "id": flight_id,
+            "condition": "legacy",
+            "source": RECORDINGS / stem / f"{stem}.bag",
+            "split": "development" if flight_id in DEVELOPMENT else "validation",
+        })
+    return {
+        "campaign": "fastlivo_2026-08-03",
+        "sessions": sessions,
+        "excluded": {
+            "01-15-25": "1-second recording; insufficient initialization/evaluation",
+            "04-26-56_good1": "byte-identical duplicate of 04-26-56",
+        },
+    }
+
+
+def load_spec(path: Path | None) -> Dict[str, object]:
+    if path is None:
+        return _legacy_spec()
+    document = json.loads(path.read_text())
+    recordings_root = Path(document.get("recordings_root", RECORDINGS))
+    sessions = []
+    seen = set()
+    for raw in document.get("sessions", []):
+        row = dict(raw)
+        flight_id = str(row["id"])
+        if flight_id in seen:
+            raise ValueError(f"duplicate session id in {path}: {flight_id}")
+        seen.add(flight_id)
+        source = Path(row["source"])
+        if not source.is_absolute():
+            source = recordings_root / source
+        split = str(row["split"])
+        if split not in {"development", "validation"}:
+            raise ValueError(f"invalid split for {flight_id}: {split}")
+        sessions.append({
+            "id": flight_id,
+            "condition": str(row.get("condition", "unspecified")),
+            "source": source,
+            "split": split,
+        })
+    if not sessions:
+        raise ValueError(f"campaign spec has no sessions: {path}")
+    return {
+        "campaign": str(document.get("campaign", path.stem)),
+        "sessions": sessions,
+        "excluded": dict(document.get("excluded", {})),
+        "spec_path": str(path.resolve()),
+    }
+
+
+def session_index(spec: Mapping[str, object]) -> Dict[str, Mapping[str, object]]:
+    return {str(row["id"]): row for row in spec["sessions"]}
+
+
+def source_bag(spec: Mapping[str, object], flight_id: str) -> Path:
+    return Path(session_index(spec)[flight_id]["source"])
 
 
 def canonical_bag(root: Path, flight_id: str) -> Path:
@@ -203,14 +261,17 @@ def prepare_one(src: Path, dst: Path, overwrite: bool = False) -> Dict[str, obje
     }
 
 
-def prepare(root: Path, ids: Sequence[str], overwrite: bool) -> None:
+def prepare(root: Path, spec: Mapping[str, object], ids: Sequence[str],
+            overwrite: bool) -> None:
     root.mkdir(parents=True, exist_ok=True)
+    by_id = session_index(spec)
     rows = []
     for i, flight_id in enumerate(ids, 1):
         print(f"[prepare {i}/{len(ids)}] {flight_id}", flush=True)
-        row = prepare_one(source_bag(flight_id), canonical_bag(root, flight_id), overwrite)
+        row = prepare_one(source_bag(spec, flight_id), canonical_bag(root, flight_id), overwrite)
         row["flight_id"] = flight_id
-        row["split"] = "development" if flight_id in DEVELOPMENT else "validation"
+        row["condition"] = by_id[flight_id]["condition"]
+        row["split"] = by_id[flight_id]["split"]
         rows.append(row)
         print("  pairs={}/{} ({:.2%}) canonical={:.1f} MiB".format(
             row.get("paired_count", row["counts"].get(TOPIC_CLOUD, 0)),
@@ -218,14 +279,13 @@ def prepare(root: Path, ids: Sequence[str], overwrite: bool) -> None:
             row.get("pair_ratio", 1.0),
             canonical_bag(root, flight_id).stat().st_size / (1 << 20)), flush=True)
     manifest = {
-        "campaign": "fastlivo_2026-08-03",
+        "campaign": spec["campaign"],
         "created_unix": time.time(),
-        "selected": list(SELECTED), "development": list(DEVELOPMENT),
-        "validation": list(VALIDATION),
-        "excluded": {
-            "01-15-25": "1-second recording; insufficient initialization/evaluation",
-            "04-26-56_good1": "byte-identical duplicate of 04-26-56",
-        },
+        "selected": [str(row["id"]) for row in spec["sessions"]],
+        "development": _ids_for_group("dev", spec),
+        "validation": _ids_for_group("validation", spec),
+        "excluded": spec.get("excluded", {}),
+        "spec_path": spec.get("spec_path"),
         "bags": rows,
     }
     path = root / "manifest.json"
@@ -315,8 +375,12 @@ def score_bag(path: Path, source_path: Path | None = None) -> Dict[str, object]:
     return row
 
 
-def _ids_for_group(group: str) -> Sequence[str]:
-    return {"dev": DEVELOPMENT, "validation": VALIDATION, "all": SELECTED}[group]
+def _ids_for_group(group: str, spec: Mapping[str, object]) -> List[str]:
+    sessions = spec["sessions"]
+    if group == "all":
+        return [str(row["id"]) for row in sessions]
+    split = "development" if group == "dev" else "validation"
+    return [str(row["id"]) for row in sessions if row["split"] == split]
 
 
 def runtime_path(host_path: Path) -> str:
@@ -348,7 +412,8 @@ def run_replay(cmd: List[str], log_path: Path, timeout_s: float) -> int:
             return 124
 
 
-def run_campaign(root: Path, group: str, tag: str, config: Path | None,
+def run_campaign(root: Path, spec: Mapping[str, object], group: str, tag: str,
+                 config: Path | None,
                  overlay: Path | None,
                  rate: float, repeat: int, force: bool,
                  selected_ids: Sequence[str] | None = None) -> None:
@@ -361,7 +426,9 @@ def run_campaign(root: Path, group: str, tag: str, config: Path | None,
     run_root.mkdir(parents=True, exist_ok=True)
     rows: List[Dict[str, object]] = []
     for rep in range(1, repeat + 1):
-        for flight_id in (selected_ids or _ids_for_group(group)):
+        for flight_id in (selected_ids or _ids_for_group(group, spec)):
+            if flight_id not in session_index(spec):
+                raise ValueError(f"unknown session id: {flight_id}")
             src = canonical_bag(root, flight_id)
             out = run_root / f"{flight_id}_r{rep}.bag"
             log = run_root / f"{flight_id}_r{rep}.log"
@@ -406,11 +473,13 @@ def _write_rows(run_root: Path, rows: List[Dict[str, object]]) -> None:
         writer.writerows(rows)
 
 
-def evaluate_paths(root: Path, paths: Sequence[Path], out: Path | None) -> None:
+def evaluate_paths(root: Path, spec: Mapping[str, object], paths: Sequence[Path],
+                   out: Path | None) -> None:
     rows = []
+    selected = _ids_for_group("all", spec)
     for path in paths:
         # Campaign outputs are named <flight-id>_rN.bag.
-        flight_id = next((x for x in SELECTED if x in path.name), None)
+        flight_id = next((x for x in selected if x in path.name), None)
         src = canonical_bag(root, flight_id) if flight_id else None
         row = score_bag(path, src)
         row["flight_id"] = flight_id
@@ -424,6 +493,9 @@ def evaluate_paths(root: Path, paths: Sequence[Path], out: Path | None) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=DEFAULT_ROOT)
+    parser.add_argument(
+        "--spec", type=Path,
+        help="external JSON session catalog; omitted preserves the 2026-08-03 campaign")
     sub = parser.add_subparsers(dest="command", required=True)
 
     prep = sub.add_parser("prepare")
@@ -439,7 +511,7 @@ def main() -> None:
     run.add_argument("--repeat", type=int, default=1)
     run.add_argument("--force", action="store_true")
     run.add_argument(
-        "--ids", nargs="+", choices=SELECTED,
+        "--ids", nargs="+",
         help="targeted rerun subset (development tuning or promoted worst-case repeats)")
 
     ev = sub.add_parser("evaluate")
@@ -448,15 +520,16 @@ def main() -> None:
 
     args = parser.parse_args()
     root = args.root.resolve()
+    spec = load_spec(args.spec.resolve() if args.spec else None)
     if args.command == "prepare":
-        prepare(root, _ids_for_group(args.group), args.overwrite)
+        prepare(root, spec, _ids_for_group(args.group, spec), args.overwrite)
     elif args.command == "run":
-        run_campaign(root, args.group, args.tag,
+        run_campaign(root, spec, args.group, args.tag,
                      args.config.resolve() if args.config else None,
                      args.overlay.resolve() if args.overlay else None,
                      args.rate, args.repeat, args.force, args.ids)
     elif args.command == "evaluate":
-        evaluate_paths(root, args.bags, args.out)
+        evaluate_paths(root, spec, args.bags, args.out)
 
 
 if __name__ == "__main__":

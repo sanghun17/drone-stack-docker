@@ -1,0 +1,34 @@
+{
+  "campaign": "fastlivo_2026-08-04_05_safety_modes",
+  "recordings_root": "/home/ml/webcam_recorder/recordings",
+  "split_rule": "Before replay outcomes: acquisition ordinals 0 and 2 per mode (1 and 3 for one-based pure_wodz) are development; every other session is locked validation.",
+  "sessions": [
+    {"id": "pw1_20260804_052639", "condition": "pure_wodz", "split": "development", "source": "pure_wodz_2026-08-04_05-26-39_1/flight_2026-08-04_05-26-39.bag"},
+    {"id": "pw2_20260804_052845", "condition": "pure_wodz", "split": "validation", "source": "pure_wodz_flight_2026-08-04_05-28-45_2/flight_2026-08-04_05-28-45.bag"},
+    {"id": "pw3_20260804_053018", "condition": "pure_wodz", "split": "development", "source": "pure_wodz_flight_2026-08-04_05-30-18_3/flight_2026-08-04_05-30-18.bag"},
+    {"id": "pw4_20260804_053223", "condition": "pure_wodz", "split": "validation", "source": "pure_wodz_flight_2026-08-04_05-32-23_4/flight_2026-08-04_05-32-23.bag"},
+
+    {"id": "p0_20260804_211027", "condition": "pure", "split": "development", "source": "pure_flight_2026-08-04_21-10-27_0/flight_2026-08-04_21-10-27.bag"},
+    {"id": "p1_20260804_212926", "condition": "pure", "split": "validation", "source": "pure_flight_2026-08-04_21-29-26_1/flight_2026-08-04_21-29-26.bag"},
+    {"id": "p2_20260804_213328", "condition": "pure", "split": "development", "source": "pure_flight_2026-08-04_21-33-28_2/flight_2026-08-04_21-33-28.bag"},
+    {"id": "p3_20260804_213519", "condition": "pure", "split": "validation", "source": "pure_flight_2026-08-04_21-35-19_3/flight_2026-08-04_21-35-19.bag"},
+    {"id": "p4_20260805_014624", "condition": "pure", "split": "validation", "source": "pure_flight_2026-08-05_01-46-24_4/flight_2026-08-05_01-46-24.bag"},
+    {"id": "p5_20260805_014854", "condition": "pure", "split": "validation", "source": "pure_flight_2026-08-05_01-48-54_5/flight_2026-08-05_01-48-54.bag"},
+    {"id": "p6_20260805_015028", "condition": "pure", "split": "validation", "source": "pure_flight_2026-08-05_01-50-28_6/flight_2026-08-05_01-50-28.bag"},
+
+    {"id": "pm0_20260805_020030", "condition": "pure_mean", "split": "development", "source": "pure_mean_flight_2026-08-05_02-00-30_0/flight_2026-08-05_02-00-30.bag"},
+    {"id": "pm1_20260805_020346", "condition": "pure_mean", "split": "validation", "source": "pure_mean_flight_2026-08-05_02-03-46_1/flight_2026-08-05_02-03-46.bag"},
+    {"id": "pm2_20260805_020515", "condition": "pure_mean", "split": "development", "source": "pure_mean_flight_2026-08-05_02-05-15_2/flight_2026-08-05_02-05-15.bag"},
+    {"id": "pm3_20260805_020742", "condition": "pure_mean", "split": "validation", "source": "pure_mean_flight_2026-08-05_02-07-42_3/flight_2026-08-05_02-07-42.bag"},
+    {"id": "pm4_20260805_020904", "condition": "pure_mean", "split": "validation", "source": "pure_mean_flight_2026-08-05_02-09-04_4/flight_2026-08-05_02-09-04.bag"},
+    {"id": "pm5_20260805_021139", "condition": "pure_mean", "split": "validation", "source": "pure_mean_flight_2026-08-05_02-11-39_5/flight_2026-08-05_02-11-39.bag"},
+
+    {"id": "n0_20260805_021950", "condition": "nominal", "split": "development", "source": "nominal_flight_2026-08-05_02-19-50_0(near_crash)/flight_2026-08-05_02-19-50.bag"},
+    {"id": "n1_20260805_022212", "condition": "nominal", "split": "validation", "source": "nominal_flight_2026-08-05_02-22-12_1(near_crash)/flight_2026-08-05_02-22-12.bag"},
+    {"id": "n2_20260805_022406", "condition": "nominal", "split": "development", "source": "nominal_flight_2026-08-05_02-24-06_2/flight_2026-08-05_02-24-06.bag"},
+    {"id": "n3_20260805_022551", "condition": "nominal", "split": "validation", "source": "nominal_flight_2026-08-05_02-25-51_3/flight_2026-08-05_02-25-51.bag"}
+  ],
+  "excluded": {
+    "flight_2026-08-05_02-25-51": "generic directory copy is a duplicate of nominal run n3; only the condition-labelled source is used"
+  }
+}
