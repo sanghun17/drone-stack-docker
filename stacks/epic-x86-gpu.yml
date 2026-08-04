@@ -32,5 +32,13 @@ arch: [amd64]
 # sm_75) — EPIC ships no CUDA code, so only the runtime/driver ceiling matters.
 # Drop this line again on a host with a driver new enough for 12.8.
 gpu_arch: sm89
+# 이 호스트는 마스터를 둘 굴린다: risk-aware 스택이 11311(0.0.0.0, LAN 노출),
+# EPIC 이 11312(127.0.0.1). config/epic.env 가 스크립트 경로에서 11312 를 잡아주지만
+# `docker exec` 는 아무 환경도 물려주지 않아서, 맨 셸은 ROS_MASTER_URI 가 비어
+# roscpp 기본값 localhost:11311 = 옆 스택 마스터로 떨어졌다. 실제로 EPIC 컨테이너
+# 안에서 `rosnode list` 가 mavros / flight_safety_* / jax_mppi_controller 를 뱉었다.
+# 이 키가 컨테이너 환경에 localhost:11312 를 박아 그 구멍을 막는다.
+# (스크립트 경로는 ros_env.sh 가 URI 를 무조건 다시 만들므로 영향 없음.)
+ros_master_port: 11312
 modules:
   - planner/epic

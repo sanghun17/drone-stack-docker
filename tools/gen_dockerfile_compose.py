@@ -202,7 +202,8 @@ def gen_dockerfile(mods, arch, gpu_arch, env):
     return "\n".join(L) + "\n"
 
 
-def gen_compose(mods, arch, stack, env, gpu_uuids_key="GPU_UUIDS", gpu=True):
+def gen_compose(mods, arch, stack, env, gpu_uuids_key="GPU_UUIDS", gpu=True,
+                ros_master_port=None, ros_master_host=None):
     image = "drone-stack:%s" % stack
     mounts, runs = [], []
     for m in mods:
@@ -233,11 +234,43 @@ def gen_compose(mods, arch, stack, env, gpu_uuids_key="GPU_UUIDS", gpu=True):
                 "runtime": "nvidia" if (gpu and arch == "arm64") else None,
                 "working_dir": "/work",
                 "volumes": ["../..:/work"] + mounts,
-                # ROS_MASTER_URI / ROS_IP are NOT set here on purpose — they live in
-                # config/ros_env.sh (mounted), so the IP is edit-and-go with no recreate.
+                # ROS_MASTER_URI / ROS_IP are NOT set here by default, on purpose —
+                # they live in config/ros_env.sh (mounted), so the IP is edit-and-go
+                # with no recreate.
+                #
+                # EXCEPT when the stack declares `ros_master_port:` (added 2026-07-31).
+                # Then they ARE emitted, pinned to localhost:<port>. Why: this host runs
+                # TWO masters at once — the risk-aware stack on 11311 (0.0.0.0, LAN-wide)
+                # and EPIC on 11312 (127.0.0.1). `docker exec` inherits NOTHING from the
+                # caller, so a bare shell in the EPIC container had an EMPTY
+                # ROS_MASTER_URI and fell through to roscpp's default localhost:11311 —
+                # i.e. `rosnode list` inside the EPIC container listed the OTHER
+                # project's live nodes (mavros, flight_safety_*, jax_mppi_controller).
+                # A stray `rosnode kill` there would have hit the real robot's stack.
+                #
+                # This does NOT break the edit-and-go property: every run script sources
+                # config/epic.env then config/ros_env.sh, and ros_env.sh rebuilds
+                # ROS_MASTER_URI unconditionally from HOST/PORT, so the sourced path
+                # still wins. Only the UNSOURCED shell's default changes — which is
+                # exactly the hole being closed. Omit the key and output is byte-identical.
                 "environment": [
                     "DISPLAY=${DISPLAY:-:0}",
                 ]
+                #
+                # `ros_master_host:` (optional, default localhost) picks the advertise
+                # address. Keep it localhost for a stack that is purely local (EPIC);
+                # set it to this host's LAN IP for a stack whose topics must be
+                # reachable from another machine, or whose shells also talk to a REMOTE
+                # master — ROS_IP/ROS_HOSTNAME are what the peer calls BACK on, so
+                # 127.0.0.1 there silently yields "connected, no data".
+                + ([
+                    "ROS_MASTER_HOST=%s" % (ros_master_host or "localhost"),
+                    "ROS_MASTER_PORT=%s" % ros_master_port,
+                    "ROS_MASTER_URI=http://%s:%s" % (ros_master_host or "localhost",
+                                                     ros_master_port),
+                    "ROS_IP=%s" % (ros_master_host or "127.0.0.1"),
+                    "ROS_HOSTNAME=%s" % (ros_master_host or "localhost"),
+                  ] if ros_master_port else [])
                 # NVIDIA_DRIVER_CAPABILITIES: the nvidia/cuda base images ship
                 # "compute,utility", which does NOT make the runtime inject the
                 # driver's GL stack (libGLX_nvidia / libEGL_nvidia). Without
@@ -370,8 +403,14 @@ def main():
     # `gpu:` (optional, stacks/*.yml) — set false for a stack that must run on a host
     # with no NVIDIA GPU. Defaults true, so every pre-existing stack is unaffected.
     gpu = stack.get("gpu", True)
+    # `ros_master_port:` (optional, stacks/*.yml) — pin this stack's container to its
+    # OWN master at localhost:<port> so a bare `docker exec` cannot land on a
+    # co-tenant stack's master. Omit it and nothing is emitted (see gen_compose).
+    ros_master_port = stack.get("ros_master_port")
+    ros_master_host = expand(str(stack.get("ros_master_host") or ""), env) or None
     open(os.path.join(outdir, "compose.yml"), "w").write(
-        gen_compose(mods, arch, a.stack, env, gpu_uuids_key, gpu))
+        gen_compose(mods, arch, a.stack, env, gpu_uuids_key, gpu,
+                    ros_master_port, ros_master_host))
     open(os.path.join(outdir, "modules.txt"), "w").write("\n".join(m["_path"] for m in mods) + "\n")
 
     print("stack '%s' arch=%s%s  modules: %s" % (

@@ -16,6 +16,18 @@
 arch: [amd64]
 gpu_arch: sm75
 gpu_uuids_env: SIM_GPU_UUIDS
+# 이 호스트는 마스터를 둘 굴린다: sim 이 11311, EPIC 이 11312(127.0.0.1).
+# `docker exec` 는 아무 환경도 안 물려줘서 맨 셸의 ROS_MASTER_URI 가 비고,
+# roscpp 기본값 localhost:11311 로 떨어진다 — 즉 EPIC 컨테이너의 맨 셸이 이 스택의
+# 마스터를 잡아 mavros/flight_safety_* 를 그대로 보고 있었다. 두 스택 모두 자기
+# 포트를 명시해 그 구멍을 막는다.
+#
+# host 는 localhost 가 아니라 이 PC 의 LAN IP 다 (config/sim.env 와 동일):
+# 이 PC 에서 젯슨(192.168.50.36) 마스터를 붙어 보는 일이 있고, ROS_IP/ROS_HOSTNAME
+# 은 상대가 '콜백해 오는' 주소라 127.0.0.1 로 두면 등록은 되는데 데이터가 안 온다.
+# LAN 광고가 필요 없어지면 localhost 로 바꿔도 된다.
+ros_master_port: 11311
+ros_master_host: 192.168.50.12
 modules:
   - compute/torch          # amd64/sm75 branch (source-built torch 2.2.2, ABI=1 --
                             # unconditional as of 2026-07-26, same wheel ete-train-*
