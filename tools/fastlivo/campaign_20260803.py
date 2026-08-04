@@ -39,7 +39,14 @@ from sensor_msgs.msg import Image
 
 # Reuse the established time association/evaluation implementation.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from eval_fastlivo import associate, estimate_offset, read_traj  # noqa: E402
+from eval_fastlivo import (  # noqa: E402
+    associate,
+    estimate_offset,
+    geodesic_deg,
+    q_to_R,
+    read_traj,
+    slerp,
+)
 
 
 REPO = Path(__file__).resolve().parents[2]
@@ -293,6 +300,100 @@ def prepare(root: Path, spec: Mapping[str, object], ids: Sequence[str],
     print(f"[prepare] wrote {path}")
 
 
+def inspect_inputs(spec: Mapping[str, object], out_dir: Path, stride: int) -> None:
+    """Summarize raw RGB/cloud quality without using estimator outcomes."""
+    if stride < 1:
+        raise ValueError("stride must be at least one")
+    rows = []
+    for index, session in enumerate(spec["sessions"], 1):
+        flight_id = str(session["id"])
+        print(f"[inputs {index}/{len(spec['sessions'])}] {flight_id}", flush=True)
+        image_luma = []
+        image_contrast = []
+        image_blur = []
+        image_dark = []
+        cloud_points = []
+        cloud_median_range = []
+        cloud_p90_range = []
+        counts = {TOPIC_IMAGE_COMPRESSED: 0, TOPIC_CLOUD: 0}
+        with rosbag.Bag(str(Path(session["source"])), "r") as bag:
+            for topic, msg, _ in bag.read_messages(
+                    topics=[TOPIC_IMAGE_COMPRESSED, TOPIC_CLOUD]):
+                counts[topic] += 1
+                if (counts[topic] - 1) % stride:
+                    continue
+                if topic == TOPIC_IMAGE_COMPRESSED:
+                    bgr = cv2.imdecode(np.frombuffer(msg.data, dtype=np.uint8),
+                                       cv2.IMREAD_GRAYSCALE)
+                    if bgr is None:
+                        continue
+                    image_luma.append(float(np.mean(bgr)))
+                    image_contrast.append(float(np.std(bgr)))
+                    image_blur.append(float(cv2.Laplacian(
+                        bgr, cv2.CV_64F).var()))
+                    image_dark.append(float(np.mean(bgr < 30)))
+                else:
+                    endian = ">" if msg.is_bigendian else "<"
+                    point_dtype = np.dtype({
+                        "names": ("x", "y", "z"),
+                        "formats": (f"{endian}f4",) * 3,
+                        "offsets": (0, 4, 8),
+                        "itemsize": msg.point_step,
+                    })
+                    points = np.frombuffer(msg.data, dtype=point_dtype)
+                    xyz = np.column_stack((points["x"], points["y"], points["z"]))
+                    xyz = xyz[np.all(np.isfinite(xyz), axis=1)]
+                    ranges = np.linalg.norm(xyz, axis=1)
+                    cloud_points.append(float(len(xyz)))
+                    if len(ranges):
+                        cloud_median_range.append(float(np.median(ranges)))
+                        cloud_p90_range.append(float(np.quantile(ranges, 0.9)))
+        metrics = {
+            "image_luma_median": image_luma,
+            "image_contrast_median": image_contrast,
+            "image_blur_median": image_blur,
+            "image_dark_fraction_median": image_dark,
+            "cloud_points_median": cloud_points,
+            "cloud_range_median_m": cloud_median_range,
+            "cloud_range_p90_m": cloud_p90_range,
+        }
+        row: Dict[str, object] = {
+            "flight_id": flight_id,
+            "condition": session["condition"],
+            "split": session["split"],
+            "sample_stride": stride,
+            "image_samples": len(image_luma),
+            "cloud_samples": len(cloud_points),
+        }
+        for name, values in metrics.items():
+            if not values:
+                raise RuntimeError(f"{flight_id}: no values for {name}")
+            row[name] = float(np.median(values))
+        rows.append(row)
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    keys = list(rows[0])
+    with (out_dir / "input_sessions.csv").open("w", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=keys)
+        writer.writeheader()
+        writer.writerows(rows)
+    condition_rows = []
+    metric_names = [key for key in keys if key.endswith("_median") or
+                    key.endswith("_median_m") or key.endswith("_p90_m")]
+    for condition in ("pure_wodz", "pure", "pure_mean", "nominal"):
+        group = [row for row in rows if row["condition"] == condition]
+        item: Dict[str, object] = {"condition": condition, "n": len(group)}
+        for name in metric_names:
+            item[f"{name}_mean"] = float(np.mean([
+                float(row[name]) for row in group]))
+        condition_rows.append(item)
+    with (out_dir / "input_conditions.csv").open("w", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=list(condition_rows[0]))
+        writer.writeheader()
+        writer.writerows(condition_rows)
+    print(f"[inputs] wrote {out_dir}")
+
+
 def uniform_path_length(t: np.ndarray, xyz: np.ndarray, hz: float = 10.0) -> float:
     if len(t) < 2:
         return 0.0
@@ -301,15 +402,36 @@ def uniform_path_length(t: np.ndarray, xyz: np.ndarray, hz: float = 10.0) -> flo
     return float(np.linalg.norm(np.diff(p, axis=0), axis=1).sum())
 
 
+def translation_rpe(tm: np.ndarray, pe: np.ndarray, pg: np.ndarray,
+                    delta_s: float = 1.0) -> np.ndarray:
+    """World-frame relative translation error over approximately ``delta_s``."""
+    values = []
+    j = 1
+    for i in range(len(tm)):
+        j = max(j, i + 1)
+        while j < len(tm) and tm[j] - tm[i] < delta_s:
+            j += 1
+        if j >= len(tm):
+            break
+        values.append(np.linalg.norm(
+            (pe[j] - pe[i]) - (pg[j] - pg[i])))
+    return np.asarray(values, dtype=float)
+
+
 def score_bag(path: Path, source_path: Path | None = None) -> Dict[str, object]:
-    tg, xg, _ = read_traj(str(path), TOPIC_GT)
+    tg, xg, qg = read_traj(str(path), TOPIC_GT)
     gt_path = uniform_path_length(tg, xg)
+    gt_up = np.asarray([q_to_R(q)[:, 2] for q in qg])
+    gt_reference_up = np.mean(gt_up[tg <= tg[0] + 2.0], axis=0)
+    gt_reference_up /= np.linalg.norm(gt_reference_up)
+    gt_tilt_deg = np.degrees(np.arccos(np.clip(
+        gt_up @ gt_reference_up, -1.0, 1.0)))
     row: Dict[str, object] = {
         "result_bag": str(path), "gt_path_m": gt_path,
         "valid": False, "catastrophic": True,
     }
     try:
-        te, xe, _ = read_traj(str(path), TOPIC_EST)
+        te, xe, qe = read_traj(str(path), TOPIC_EST)
     except SystemExit as exc:
         row.update(failure=f"missing_estimate: {exc}", output_count=0,
                    coverage=0.0, output_ratio=0.0)
@@ -329,8 +451,20 @@ def score_bag(path: Path, source_path: Path | None = None) -> Dict[str, object]:
     pe = np.asarray([xe[i] for i, _, _, _ in pairs])
     pg = np.asarray([xg[k0] + u * (xg[k1] - xg[k0])
                      for i, k0, k1, u in pairs])
+    qgi = np.asarray([slerp(qg[k0], qg[k1], u)
+                      for _, k0, k1, u in pairs])
+    orientation_error_deg = np.asarray([
+        geodesic_deg(q_to_R(qe[i]), q_to_R(q_ref))
+        for (i, _, _, _), q_ref in zip(pairs, qgi)
+    ])
+    tilt_axis_error_deg = np.asarray([
+        math.degrees(math.acos(float(np.clip(
+            np.dot(q_to_R(qe[i])[:, 2], q_to_R(q_ref)[:, 2]), -1.0, 1.0))))
+        for (i, _, _, _), q_ref in zip(pairs, qgi)
+    ])
     tm = np.asarray([te[i] + offset for i, _, _, _ in pairs])
     ape = np.linalg.norm(pe - pg, axis=1)
+    rpe_1s = translation_rpe(tm, pe, pg)
     est_path = float(np.linalg.norm(np.diff(pe, axis=0), axis=1).sum())
     gt_assoc_path = float(np.linalg.norm(np.diff(pg, axis=0), axis=1).sum())
     eligible_span = max(1e-9, tg[-1] - tm[0])
@@ -363,9 +497,27 @@ def score_bag(path: Path, source_path: Path | None = None) -> Dict[str, object]:
         time_offset_s=float(offset), coverage=coverage,
         output_ratio=output_ratio, max_output_gap_s=max_gap,
         est_path_m=est_path, gt_associated_path_m=gt_assoc_path,
+        gt_duration_s=float(tg[-1] - tg[0]),
+        gt_tilt_p90_deg=float(np.quantile(gt_tilt_deg, 0.9)),
+        gt_tilt_over_20_fraction=float(np.mean(gt_tilt_deg > 20.0)),
         motion_ratio=motion_ratio,
         rmse_m=float(np.sqrt(np.mean(ape * ape))),
         mean_ape_m=float(np.mean(ape)), max_ape_m=float(np.max(ape)),
+        final_ape_m=float(ape[-1]),
+        rmse_per_gt_path=float(np.sqrt(np.mean(ape * ape)) / gt_path)
+        if gt_path > 1e-9 else math.inf,
+        rpe_1s_rmse_m=float(np.sqrt(np.mean(rpe_1s * rpe_1s)))
+        if len(rpe_1s) else math.nan,
+        orientation_rmse_deg=float(np.sqrt(np.mean(
+            orientation_error_deg * orientation_error_deg))),
+        orientation_mean_deg=float(np.mean(orientation_error_deg)),
+        orientation_p90_deg=float(np.quantile(orientation_error_deg, 0.9)),
+        orientation_max_deg=float(np.max(orientation_error_deg)),
+        tilt_axis_rmse_deg=float(np.sqrt(np.mean(
+            tilt_axis_error_deg * tilt_axis_error_deg))),
+        tilt_axis_mean_deg=float(np.mean(tilt_axis_error_deg)),
+        tilt_axis_p90_deg=float(np.quantile(tilt_axis_error_deg, 0.9)),
+        tilt_axis_max_deg=float(np.max(tilt_axis_error_deg)),
         catastrophic_threshold_m=threshold, catastrophic=catastrophic,
         catastrophic_onset_s=(float(tm[idx[0]] - tg[0]) if len(idx) else None),
         integrity=integrity, valid=(not catastrophic and integrity),
@@ -490,6 +642,335 @@ def evaluate_paths(root: Path, spec: Mapping[str, object], paths: Sequence[Path]
         _write_rows(out.parent, rows)
 
 
+def _bootstrap_interval(values: np.ndarray, statistic, rng: np.random.Generator,
+                        samples: int) -> Tuple[float, float]:
+    draws = rng.choice(values, size=(samples, len(values)), replace=True)
+    estimates = statistic(draws, axis=1)
+    lo, hi = np.quantile(estimates, [0.025, 0.975])
+    return float(lo), float(hi)
+
+
+FUSION_MASKS = {
+    "nonfinite": 1,
+    "low_support": 2,
+    "low_quality": 4,
+    "bad_update": 8,
+    "bad_motion": 16,
+    "bad_tilt": 32,
+}
+
+
+def _fusion_stage_stats(rows: Sequence[Mapping[str, str]],
+                        prefix: str) -> Dict[str, object]:
+    if not rows:
+        return {f"{prefix}_rows": 0}
+    nfeat = np.asarray([float(x["nfeat"]) for x in rows])
+    rejected = np.asarray([int(x["rejected"]) for x in rows], dtype=bool)
+    masks = np.asarray([int(x["reject_mask"]) for x in rows], dtype=np.uint32)
+    tilt = np.asarray([float(x["tilt_deg"]) for x in rows])
+    result: Dict[str, object] = {
+        f"{prefix}_rows": len(rows),
+        f"{prefix}_nfeat_median": float(np.median(nfeat)),
+        f"{prefix}_nfeat_p10": float(np.quantile(nfeat, 0.1)),
+        f"{prefix}_nfeat_le_50_fraction": float(np.mean(nfeat <= 50)),
+        f"{prefix}_reject_fraction": float(np.mean(rejected)),
+        f"{prefix}_tilt_p90_deg": float(np.quantile(tilt, 0.9)),
+    }
+    for name, bit in FUSION_MASKS.items():
+        result[f"{prefix}_{name}_fraction"] = float(np.mean((masks & bit) != 0))
+    for field in (
+            "lio_trans_info_ratio", "lio_rot_info_ratio",
+            "lio_info_min_per_feature", "vio_trans_info_ratio",
+            "vio_rot_info_ratio", "vio_info_min_per_measurement",
+            "vio_inlier_ratio", "vio_error_ratio"):
+        values = np.asarray([float(x[field]) for x in rows])
+        result[f"{prefix}_{field}_median"] = float(np.median(values))
+    return result
+
+
+def load_fusion_diagnostics(fusion_dir: Path,
+                            ids: Sequence[str]) -> Dict[str, Dict[str, object]]:
+    diagnostics: Dict[str, Dict[str, object]] = {}
+    for path in sorted(fusion_dir.glob("*_fusion.csv")):
+        flight_id = next((x for x in ids if path.name.startswith(f"{x}_")), None)
+        if flight_id is None:
+            continue
+        with path.open(newline="") as stream:
+            rows = list(csv.DictReader(stream))
+        item: Dict[str, object] = {"fusion_csv": str(path)}
+        for stage, prefix in (("LIO", "lio"), ("VIO", "vio")):
+            item.update(_fusion_stage_stats(
+                [row for row in rows if row["stage"] == stage], prefix))
+        diagnostics[flight_id] = item
+    return diagnostics
+
+
+def write_fusion_summary(rows: Sequence[Mapping[str, object]], fusion_dir: Path,
+                         out_dir: Path) -> None:
+    ids = [str(row["flight_id"]) for row in rows]
+    diagnostics = load_fusion_diagnostics(fusion_dir, ids)
+    missing = sorted(set(ids) - set(diagnostics))
+    if missing:
+        raise ValueError(f"fusion diagnostics missing sessions: {missing}")
+    merged = []
+    for row in rows:
+        item = dict(row)
+        item.update(diagnostics[str(row["flight_id"])])
+        merged.append(item)
+
+    keys = sorted({key for row in merged for key in row})
+    with (out_dir / "fusion_sessions.csv").open("w", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=keys)
+        writer.writeheader()
+        writer.writerows(merged)
+
+    condition_metrics = (
+        "lio_nfeat_median", "lio_nfeat_le_50_fraction", "lio_reject_fraction",
+        "lio_bad_motion_fraction", "lio_bad_tilt_fraction",
+        "lio_lio_trans_info_ratio_median", "lio_lio_rot_info_ratio_median",
+        "lio_lio_info_min_per_feature_median",
+        "vio_nfeat_median", "vio_reject_fraction",
+        "vio_low_support_fraction", "vio_bad_motion_fraction",
+        "vio_bad_tilt_fraction", "vio_vio_trans_info_ratio_median",
+        "vio_vio_rot_info_ratio_median", "vio_vio_info_min_per_measurement_median",
+    )
+    condition_rows = []
+    for condition in ("pure_wodz", "pure", "pure_mean", "nominal"):
+        group = [x for x in merged if x["condition"] == condition]
+        item: Dict[str, object] = {"condition": condition, "n": len(group)}
+        for metric in condition_metrics:
+            item[f"{metric}_mean"] = float(np.mean([
+                float(x[metric]) for x in group]))
+            item[f"{metric}_median"] = float(np.median([
+                float(x[metric]) for x in group]))
+        condition_rows.append(item)
+    condition_keys = list(condition_rows[0])
+    with (out_dir / "fusion_conditions.csv").open("w", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=condition_keys)
+        writer.writeheader()
+        writer.writerows(condition_rows)
+
+    diagnostic_metrics = (
+        "lio_nfeat_median", "lio_nfeat_le_50_fraction", "lio_reject_fraction",
+        "lio_bad_motion_fraction", "lio_bad_tilt_fraction", "lio_tilt_p90_deg",
+        "lio_lio_trans_info_ratio_median", "lio_lio_rot_info_ratio_median",
+        "lio_lio_info_min_per_feature_median", "vio_nfeat_median",
+        "vio_reject_fraction", "vio_low_support_fraction",
+        "vio_bad_motion_fraction", "vio_bad_tilt_fraction",
+        "vio_tilt_p90_deg", "vio_vio_inlier_ratio_median",
+        "vio_vio_trans_info_ratio_median", "vio_vio_rot_info_ratio_median",
+        "vio_vio_info_min_per_measurement_median",
+    )
+    targets = ("rmse_m", "orientation_rmse_deg", "tilt_axis_rmse_deg",
+               "motion_ratio")
+    correlations: Dict[str, object] = {}
+    for target in targets:
+        target_values = np.asarray([float(x[target]) for x in merged])
+        correlations[target] = {}
+        for metric in diagnostic_metrics:
+            values = np.asarray([float(x[metric]) for x in merged])
+            if np.std(values) <= 1e-15 or np.std(target_values) <= 1e-15:
+                correlations[target][metric] = None
+            else:
+                correlations[target][metric] = float(np.corrcoef(
+                    target_values, values)[0, 1])
+    (out_dir / "fusion_correlations.json").write_text(
+        json.dumps(correlations, indent=2, sort_keys=True) + "\n")
+
+
+def summarize_results(spec: Mapping[str, object], result_paths: Sequence[Path],
+                      out_dir: Path, bootstrap_samples: int, seed: int,
+                      fusion_dir: Path | None = None) -> None:
+    by_id = session_index(spec)
+    rows = []
+    for path in result_paths:
+        rows.extend(json.loads(path.read_text()))
+    ids = [str(row["flight_id"]) for row in rows]
+    duplicates = sorted({x for x in ids if ids.count(x) > 1})
+    if duplicates:
+        raise ValueError(f"duplicate sessions across result files: {duplicates}")
+    if set(ids) != set(by_id):
+        missing = sorted(set(by_id) - set(ids))
+        extra = sorted(set(ids) - set(by_id))
+        raise ValueError(f"result/spec mismatch; missing={missing}, extra={extra}")
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    rng = np.random.default_rng(seed)
+    conditions = ["pure_wodz", "pure", "pure_mean", "nominal"]
+    metrics = ("rmse_m", "rmse_per_gt_path", "rpe_1s_rmse_m", "motion_ratio",
+               "orientation_rmse_deg", "tilt_axis_rmse_deg", "gt_tilt_p90_deg")
+    grouped: Dict[str, List[Dict[str, object]]] = {name: [] for name in conditions}
+    for row in rows:
+        row["condition"] = by_id[str(row["flight_id"])]["condition"]
+        row["split"] = by_id[str(row["flight_id"])]["split"]
+        grouped[str(row["condition"])].append(row)
+
+    summaries = {}
+    for condition in conditions:
+        group = grouped[condition]
+        item: Dict[str, object] = {
+            "n": len(group),
+            "catastrophic_count": sum(bool(x["catastrophic"]) for x in group),
+            "integrity_failure_count": sum(not bool(x["integrity"]) for x in group),
+        }
+        for metric in metrics:
+            values = np.asarray([float(x[metric]) for x in group], dtype=float)
+            mean_ci = _bootstrap_interval(values, np.mean, rng, bootstrap_samples)
+            median_ci = _bootstrap_interval(values, np.median, rng, bootstrap_samples)
+            item[metric] = {
+                "mean": float(np.mean(values)),
+                "median": float(np.median(values)),
+                "std": float(np.std(values, ddof=1)) if len(values) > 1 else 0.0,
+                "min": float(np.min(values)),
+                "max": float(np.max(values)),
+                "p90": float(np.quantile(values, 0.9)),
+                "mean_ci95": list(mean_ci),
+                "median_ci95": list(median_ci),
+            }
+        summaries[condition] = item
+
+    # Stratified bootstrap preserves the deliberately unequal group sizes.
+    order_hits_mean = 0
+    order_hits_median = 0
+    adjusted_draws = {name: [] for name in conditions}
+
+    def adjusted_predictions(sample_rows: Sequence[Mapping[str, object]]) -> Dict[str, float]:
+        paths = np.asarray([float(x["gt_path_m"]) for x in sample_rows])
+        durations = np.asarray([float(x["gt_duration_s"]) for x in sample_rows])
+        path_center = float(np.mean([float(x["gt_path_m"]) for x in rows]))
+        duration_center = float(np.mean([float(x["gt_duration_s"]) for x in rows]))
+        design = []
+        target = []
+        for row, path_m, duration_s in zip(sample_rows, paths, durations):
+            condition = str(row["condition"])
+            design.append([
+                1.0,
+                path_m - path_center,
+                duration_s - duration_center,
+                float(condition == "pure_wodz"),
+                float(condition == "pure"),
+                float(condition == "pure_mean"),
+            ])
+            target.append(float(row["rmse_m"]))
+        beta, *_ = np.linalg.lstsq(np.asarray(design), np.asarray(target), rcond=None)
+        return {
+            "nominal": float(beta[0]),
+            "pure_wodz": float(beta[0] + beta[3]),
+            "pure": float(beta[0] + beta[4]),
+            "pure_mean": float(beta[0] + beta[5]),
+        }
+
+    adjusted_point = adjusted_predictions(rows)
+    for _ in range(bootstrap_samples):
+        sample = []
+        boot_stats = {}
+        for condition in conditions:
+            group = grouped[condition]
+            indices = rng.integers(0, len(group), size=len(group))
+            chosen = [group[i] for i in indices]
+            sample.extend(chosen)
+            values = np.asarray([float(x["rmse_m"]) for x in chosen])
+            boot_stats[condition] = (float(np.mean(values)), float(np.median(values)))
+        order_hits_mean += int(
+            boot_stats["pure"][0] < boot_stats["pure_mean"][0] <
+            boot_stats["nominal"][0])
+        order_hits_median += int(
+            boot_stats["pure"][1] < boot_stats["pure_mean"][1] <
+            boot_stats["nominal"][1])
+        predicted = adjusted_predictions(sample)
+        for condition in conditions:
+            adjusted_draws[condition].append(predicted[condition])
+
+    adjusted = {
+        condition: {
+            "rmse_at_overall_mean_path_and_duration": adjusted_point[condition],
+            "ci95": [float(x) for x in np.quantile(
+                np.asarray(adjusted_draws[condition]), [0.025, 0.975])],
+        }
+        for condition in conditions
+    }
+    pure = grouped["pure"]
+    pure_mean = grouped["pure_mean"]
+    nominal = grouped["nominal"]
+    matching_triplets = sum(
+        float(a["rmse_m"]) < float(b["rmse_m"]) < float(c["rmse_m"])
+        for a in pure for b in pure_mean for c in nominal)
+    triplet_total = len(pure) * len(pure_mean) * len(nominal)
+    result = {
+        "campaign": spec["campaign"],
+        "seed": seed,
+        "bootstrap_samples": bootstrap_samples,
+        "session_count": len(rows),
+        "catastrophic_count": sum(bool(x["catastrophic"]) for x in rows),
+        "integrity_failure_count": sum(not bool(x["integrity"]) for x in rows),
+        "conditions": summaries,
+        "adjusted_for_gt_path_and_duration": adjusted,
+        "expected_order_pure_lt_pure_mean_lt_nominal": {
+            "observed_mean": bool(
+                summaries["pure"]["rmse_m"]["mean"] <
+                summaries["pure_mean"]["rmse_m"]["mean"] <
+                summaries["nominal"]["rmse_m"]["mean"]),
+            "observed_median": bool(
+                summaries["pure"]["rmse_m"]["median"] <
+                summaries["pure_mean"]["rmse_m"]["median"] <
+                summaries["nominal"]["rmse_m"]["median"]),
+            "bootstrap_probability_mean": order_hits_mean / bootstrap_samples,
+            "bootstrap_probability_median": order_hits_median / bootstrap_samples,
+            "matching_individual_triplets": int(matching_triplets),
+            "individual_triplets_total": int(triplet_total),
+        },
+    }
+    (out_dir / "summary.json").write_text(
+        json.dumps(result, indent=2, sort_keys=True, allow_nan=True) + "\n")
+
+    session_keys = sorted({key for row in rows for key in row})
+    with (out_dir / "sessions.csv").open("w", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=session_keys)
+        writer.writeheader()
+        writer.writerows(rows)
+    with (out_dir / "conditions.csv").open("w", newline="") as stream:
+        writer = csv.writer(stream)
+        writer.writerow(["condition", "n", "catastrophic", "integrity_failures",
+                         "rmse_mean_m", "rmse_median_m", "rmse_mean_ci95_lo",
+                         "rmse_mean_ci95_hi", "rpe_1s_mean_m", "motion_ratio_median",
+                         "orientation_rmse_mean_deg", "tilt_axis_rmse_mean_deg",
+                         "gt_tilt_p90_mean_deg"])
+        for condition in conditions:
+            item = summaries[condition]
+            writer.writerow([
+                condition, item["n"], item["catastrophic_count"],
+                item["integrity_failure_count"], item["rmse_m"]["mean"],
+                item["rmse_m"]["median"], *item["rmse_m"]["mean_ci95"],
+                item["rpe_1s_rmse_m"]["mean"], item["motion_ratio"]["median"],
+                item["orientation_rmse_deg"]["mean"],
+                item["tilt_axis_rmse_deg"]["mean"],
+                item["gt_tilt_p90_deg"]["mean"],
+            ])
+
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.5))
+    for axis, metric, ylabel in (
+            (axes[0], "rmse_m", "No-alignment RMSE [m]"),
+            (axes[1], "rmse_per_gt_path", "RMSE / GT path length")):
+        data = [[float(x[metric]) for x in grouped[c]] for c in conditions]
+        axis.boxplot(data, labels=conditions, showmeans=True)
+        for i, values in enumerate(data, 1):
+            jitter = np.linspace(-0.08, 0.08, len(values)) if len(values) > 1 else [0.0]
+            axis.scatter(i + np.asarray(jitter), values, s=22, alpha=0.75)
+        axis.set_ylabel(ylabel)
+        axis.grid(axis="y", alpha=0.3)
+        axis.tick_params(axis="x", rotation=20)
+    fig.suptitle("FAST-LIVO frozen production config — 21 real flights")
+    fig.tight_layout()
+    fig.savefig(out_dir / "condition_summary.png", dpi=180)
+    plt.close(fig)
+    if fusion_dir is not None:
+        write_fusion_summary(rows, fusion_dir, out_dir)
+    print(f"[summarize] wrote {out_dir}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=DEFAULT_ROOT)
@@ -501,6 +982,11 @@ def main() -> None:
     prep = sub.add_parser("prepare")
     prep.add_argument("--group", choices=("dev", "validation", "all"), default="all")
     prep.add_argument("--overwrite", action="store_true")
+
+    inputs = sub.add_parser("inspect-inputs")
+    inputs.add_argument("--out-dir", type=Path, required=True)
+    inputs.add_argument("--stride", type=int, default=10,
+                        help="sample every Nth RGB/cloud frame (default: 10)")
 
     run = sub.add_parser("run")
     run.add_argument("--group", choices=("dev", "validation", "all"), default="dev")
@@ -518,11 +1004,20 @@ def main() -> None:
     ev.add_argument("bags", type=Path, nargs="+")
     ev.add_argument("--out", type=Path)
 
+    summary = sub.add_parser("summarize")
+    summary.add_argument("results", type=Path, nargs="+")
+    summary.add_argument("--out-dir", type=Path, required=True)
+    summary.add_argument("--bootstrap", type=int, default=20000)
+    summary.add_argument("--seed", type=int, default=20260805)
+    summary.add_argument("--fusion-dir", type=Path)
+
     args = parser.parse_args()
     root = args.root.resolve()
     spec = load_spec(args.spec.resolve() if args.spec else None)
     if args.command == "prepare":
         prepare(root, spec, _ids_for_group(args.group, spec), args.overwrite)
+    elif args.command == "inspect-inputs":
+        inspect_inputs(spec, args.out_dir, args.stride)
     elif args.command == "run":
         run_campaign(root, spec, args.group, args.tag,
                      args.config.resolve() if args.config else None,
@@ -530,6 +1025,10 @@ def main() -> None:
                      args.rate, args.repeat, args.force, args.ids)
     elif args.command == "evaluate":
         evaluate_paths(root, spec, args.bags, args.out)
+    elif args.command == "summarize":
+        summarize_results(spec, args.results, args.out_dir,
+                          args.bootstrap, args.seed,
+                          args.fusion_dir.resolve() if args.fusion_dir else None)
 
 
 if __name__ == "__main__":
