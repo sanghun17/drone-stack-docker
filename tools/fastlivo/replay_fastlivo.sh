@@ -28,7 +28,16 @@ if [ ! -f /.dockerenv ] && [ "$(uname -m)" = "x86_64" ] && \
   export ROS_MASTER_PORT="${FASTLIVO_REPLAY_PORT:-11391}"
   export ROS_IP=127.0.0.1 ROS_HOSTNAME=localhost
 elif [ ! -f /.dockerenv ]; then
-  __C=drone-stack-d435i-voxblox
+  # A workspace built from inside a bind-mounted container has catkin setup
+  # symlinks rooted at /work.  They are intentionally invalid on the host but
+  # valid in the x86 sim container.  Reuse that container for offline replay
+  # instead of trying to pull the arm64-only deploy image on an x86 host.
+  if [ "$(uname -m)" = "x86_64" ] && \
+     docker inspect drone-stack-sim-x86 >/dev/null 2>&1; then
+    __C=drone-stack-sim-x86
+  else
+    __C=drone-stack-d435i-voxblox
+  fi
   __S="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
   __R="$(cd "$(dirname "$__S")/../.." && pwd)"
   # Offline replay must never attach to the Jetson's live ROS master.  Keep it
