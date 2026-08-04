@@ -10,7 +10,7 @@ modules** you assemble per run.
 | role | remote | branch |
 |------|--------|--------|
 | Docker environment | `https://github.com/sanghun17/drone-stack-docker.git` | `main` |
-| EPIC source | `https://github.com/kimhyoon/EPIC-stack.git` | `feat/early-finish-and-viewpoint-diagnostics` |
+| EPIC source | `https://github.com/kimhyoon/EPIC-stack.git` | `dev` |
 
 ## Idea: declare modules → one image, one container
 
@@ -74,7 +74,7 @@ declared in `modules/planner/epic/module.yml`, so a fresh machine only ever runs
 `docker build` — nothing is installed into a running container.
 
 ```bash
-./setup.sh clone    epic-x86-gpu  # kimhyoon/EPIC-stack @ feat/early-finish-and-viewpoint-diagnostics -> ws/epic
+./setup.sh clone    epic-x86-gpu  # kimhyoon/EPIC-stack @ dev -> ws/epic
 ./setup.sh up       epic-x86-gpu  # gen + docker build + container (idle)
 ./setup.sh build-ws epic-x86-gpu  # catkin build in the container
 ```

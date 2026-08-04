@@ -2,7 +2,7 @@ name: epic
 group: planner
 description: >
   EPIC LiDAR exploration stack (kimhyoon/EPIC-stack @
-  feat/early-finish-and-viewpoint-diagnostics) — MID360/ML-X
+  dev) — MID360/ML-X
   livox driver + FAST_LIO odometry + EPIC global/local planner (MINCO/GCOPTER) +
   px4_ctrl_bridge to MAVROS, plus the MARSIM simulator. One catkin workspace
   (ws/epic), cloned by this module's clone.sh and built in-container by
@@ -111,5 +111,5 @@ mounts:
   # Flight bags for bag_replay.launch, read-only — replay never writes here.
   - "${EPIC_BAGS_DIR}:/bags:ro"
 
-run: [run_livox.sh, run_fastlio.sh, run_mavros.sh, run_tf_relay.sh, run_epic.sh, run_replay.sh, run_view.sh]
+run: [run_livox.sh, run_fastlio.sh, run_mavros.sh, run_tf_relay.sh, run_epic.sh, run_replay.sh, run_view.sh, run_sim.sh]
 provides: [lidar, odometry, exploration, epic-planner]
