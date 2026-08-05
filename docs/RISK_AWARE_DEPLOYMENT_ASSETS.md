@@ -38,7 +38,6 @@ The source itself is versioned separately:
 
 - canonical path:
   `/home/ml/risk_aware_assets/simulation/airsim/AirSim_vanila`
-- compatibility symlink: `/home/ml/AirSim_vanila`
 - remote: `https://github.com/sanghun17/AirSim_custom.git`
 - verified commit: `64cd82eef084936ab2e8c3cd7805e4ea6615df94`
 - verified state: clean
@@ -86,11 +85,11 @@ The canonical ML layout is now:
 ```
 
 The former locations under `~/Downloads`, `~/Documents`, and
-`~/AirSim_vanila` are compatibility symlinks. The real data is no longer
-scattered across those paths. Removing one of those symlinks does not remove
-the canonical asset, but recursively deleting the canonical
-`risk_aware_assets` root would remove everything and must never be used as a
-cleanup operation.
+`~/AirSim_vanila` were removed after the canonical paths passed runtime
+verification. There are no compatibility symlinks: active scripts use the
+canonical paths directly. Recursively deleting the canonical
+`risk_aware_assets` root would therefore remove everything and must never be
+used as a cleanup operation.
 
 ## 3. Current checkpoint deployment contract
 
@@ -356,6 +355,8 @@ assets.
 - AirSim ROS was rebuilt at the canonical path: all 3 catkin packages passed
 - the default TEST9 package started with `-RenderOffScreen`
 - AirSim RPC 41451, PythonClient, and `/airsim_node` ROS registration all passed
+- the old scattered paths and their temporary compatibility symlinks were
+  removed; canonical-only startup passed again afterward
 - the smoke-test processes were stopped after verification
 
 ### 2026-08-05 generated-asset cleanup
