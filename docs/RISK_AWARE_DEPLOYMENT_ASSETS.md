@@ -82,8 +82,7 @@ The canonical ML layout is now:
 │       ├── packaged/            # runnable LinuxNoEditor builds
 │       └── editor/              # editable UE projects
 ├── wheels_x86/                  # x86 build cache, not Jetson payload
-├── backups/                     # historical archives
-└── ete4090_staging/             # transfer staging, not runtime
+└── backups/                     # historical and legacy-checkpoint archives
 ```
 
 The former locations under `~/Downloads`, `~/Documents`, and
@@ -236,7 +235,7 @@ These are the editable sources and are much larger than the cooked packages.
 
 - project root:
   `/home/ml/risk_aware_assets/simulation/unreal/editor/MyFirstUE4`
-  (approximately 29 GB)
+  (approximately 2.5 GB after generated-cache cleanup)
 - project file: `MyFirstUE4.uproject`, SHA-256
   `ce9249ecd75cc14f4558e1cb4d5bf74b35f06aa1cd10e8b46f0d8cc15759c77b`
 - main map: `Content/ModernLivingRoom/Maps/Main.umap`, SHA-256
@@ -256,7 +255,7 @@ version, AirSim plugin commit, packaging settings, and resulting PAK hash.
 
 - project root:
   `/home/ml/risk_aware_assets/simulation/unreal/editor/warehouse`
-  (approximately 80 GB)
+  (approximately 4.0 GB after generated-cache cleanup)
 - project file: `Blocks.uproject`, SHA-256
   `f3512a79458c21a51e34f21c918caa4b937b1853303127c08c662940246a77a9`
 - main map: `Content/FlyingCPP/Maps/warehousemap.umap`, SHA-256
@@ -270,10 +269,10 @@ Two smaller editor projects are also centralized and retained even though they
 are not active simulation defaults:
 
 - `/home/ml/risk_aware_assets/simulation/unreal/editor/Break` (approximately
-  428 MB), `Break.uproject` SHA-256
+  378 MB after generated-cache cleanup), `Break.uproject` SHA-256
   `d6c623f5a27a59af64771e2d0e2308a6ec9747abc9e4a94433407684e0ad14d0`
 - `/home/ml/risk_aware_assets/simulation/unreal/editor/Break2` (approximately
-  1.8 GB), `Break2.uproject` SHA-256
+  1.6 GB after generated-cache cleanup), `Break2.uproject` SHA-256
   `7fd4d2674980f8c1f75af30d68d5123a52b317e10453f463c10a14b2c9d217e7`
 
 ## 6. AirSim settings
@@ -304,12 +303,11 @@ Other top-level directories currently under `/home/ml/risk_aware_assets` are
 not flight-deployment payloads:
 
 - `wheels_x86` (approximately 524 MB): reproducible x86 Torch wheel cache
-- `backups` (approximately 949 MB): historical archives, not active runtime
-- `ete4090_staging` (approximately 3.4 GB): IM transfer/staging material, not a
-  canonical deploy tree
+- `backups` (approximately 953 MB): historical archives and legacy checkpoints,
+  not active runtime
 
-Do not copy these three directories to Jetson merely because they share the
-asset root. Review and archive them independently before deletion.
+Do not copy these directories to Jetson merely because they share the asset
+root. Review and archive them independently before deletion.
 
 ## 8. What stays in Git
 
@@ -359,3 +357,21 @@ assets.
 - the default TEST9 package started with `-RenderOffScreen`
 - AirSim RPC 41451, PythonClient, and `/airsim_node` ROS registration all passed
 - the smoke-test processes were stopped after verification
+
+### 2026-08-05 generated-asset cleanup
+
+- retained: current DEPLOY1/VFE runtime files, GT, packaged UE builds, UE
+  `Content/Config/Source/Plugins`, AirSim source/build, settings, x86 wheels,
+  and historical research archives
+- moved old non-runtime checkpoints into `backups/checkpoints_legacy`
+- removed 3 broken checkpoint symlinks
+- removed IM transfer staging, one 13 GB AirSim recording, and UE-generated
+  `Saved`, `Intermediate`, `Binaries`, `DerivedDataCache`, `.vscode`, and the
+  duplicate `AirSim.backup`
+- permanently reclaimed 125,270,904,404 bytes; pre-existing Trash contents
+  were isolated and restored without modification
+- canonical asset root reduced from approximately 137 GB to 19 GB
+
+The removed UE directories are generated products; opening or rebuilding an
+Editor project will recreate the necessary subset. Packaged simulation builds
+were not removed.
