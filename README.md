@@ -123,6 +123,11 @@ Bootstrapping. See `docs/MODULE_SCHEMA.md` for the manifest spec. The two legacy
 stacks (`~/pure-jetson-stack`, `~/drone-exploration-stack`) are kept intact for
 reference until `d435i-voxblox` and `lidar-epic` are reproduced here and verified.
 
+Large risk-aware model files, AirSim/Unreal packaged environments, and Unreal
+Editor sources intentionally remain outside Git and Docker images. Their
+canonical paths, hashes, runtime ownership, and transfer procedure are recorded
+in [`docs/RISK_AWARE_DEPLOYMENT_ASSETS.md`](docs/RISK_AWARE_DEPLOYMENT_ASSETS.md).
+
 `epic-x86-gpu` (2026-07-30) is the `lidar-epic` replacement, and it now runs — the
 earlier "image build has NOT been run yet" caveat is resolved. Built and verified
 end-to-end on a 4x RTX 2080 Ti / driver 535.261.03 desktop:
