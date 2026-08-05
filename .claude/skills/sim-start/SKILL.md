@@ -196,7 +196,7 @@ timeout 5 rostopic echo /airsim_node/clock -n 1 > /dev/null 2>&1 && echo "RUNNIN
 ```bash
 tmux split-window -t risk_aware_planning:infra 2>/dev/null || true
 tmux send-keys -t risk_aware_planning:infra.2 \
-  "source ~/.bashrc && source /home/ml/miniforge3/etc/profile.d/conda.sh && conda activate airsim && cd ~/AirSim_vanila/ros && source devel/setup.bash && roslaunch airsim_ros_pkgs airsim_node.launch" C-m
+  "source ~/.bashrc && source /home/ml/miniforge3/etc/profile.d/conda.sh && conda activate airsim && cd ~/risk_aware_assets/simulation/airsim/AirSim_vanila/ros && source devel/setup.bash && roslaunch airsim_ros_pkgs airsim_node.launch" C-m
 ```
 
 ### Re-verify (max 15s, check every 3s)

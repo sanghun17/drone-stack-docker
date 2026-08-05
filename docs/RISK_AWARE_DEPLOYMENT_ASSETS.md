@@ -15,14 +15,15 @@ an AirSim requirement:
 | Host (`ml`) | `drone-stack-sim-x86` container |
 |---|---|
 | Packaged Unreal executable | ROS simulation/planning stack |
-| `~/AirSim_vanila/ros` and `airsim_node` | risk-aware sensor publisher |
+| `~/risk_aware_assets/simulation/airsim/AirSim_vanila/ros` and `airsim_node` | risk-aware sensor publisher |
 | AirSim PythonClient used by collection scripts | FAST-LIVO simulation nodes |
 | GPU/display or `-RenderOffScreen` ownership | training-data collection consumers |
 
 The container uses host networking and connects to the AirSim RPC server on
 port 41451 (the second collection rig uses 41452). The active bring-up scripts
-also source the already-built host workspace at
-`~/AirSim_vanila/ros/devel/setup.bash`. Keeping Unreal and this bridge on the
+also source the host workspace at
+`~/risk_aware_assets/simulation/airsim/AirSim_vanila/ros/devel/setup.bash`.
+Keeping Unreal and this bridge on the
 host avoided rebuilding that environment in the container and keeps the
 NVIDIA/Unreal display boundary simple.
 
@@ -30,12 +31,14 @@ It is technically possible to containerize them later, but merely moving the
 directory is insufficient. A replacement must reproduce the Unreal GPU/X11 or
 off-screen runtime, the AirSim ROS catkin build, PythonClient imports, host
 networking, settings files, and both RPC ports. That migration has not been
-implemented or verified, so **do not delete `/home/ml/AirSim_vanila`** on the
+implemented or verified, so **do not delete the canonical AirSim asset** on the
 assumption that `drone-stack-docker` already replaces it.
 
 The source itself is versioned separately:
 
-- path: `/home/ml/AirSim_vanila`
+- canonical path:
+  `/home/ml/risk_aware_assets/simulation/airsim/AirSim_vanila`
+- compatibility symlink: `/home/ml/AirSim_vanila`
 - remote: `https://github.com/sanghun17/AirSim_custom.git`
 - verified commit: `64cd82eef084936ab2e8c3cd7805e4ea6615df94`
 - verified state: clean
@@ -64,6 +67,31 @@ The mount roots are configured in:
 - `config/sim.env`: `RISK_AWARE_CHECKPOINTS=/home/ml/risk_aware_assets/checkpoints`
 - `modules/planner/risk-aware-deploy/module.yml`
 - `modules/planner/risk-aware-sim/module.yml`
+
+The canonical ML layout is now:
+
+```text
+/home/ml/risk_aware_assets/
+├── checkpoints/                 # ML and Jetson runtime models
+├── gt/                          # simulation ground truth
+├── simulation/
+│   ├── airsim/
+│   │   ├── AirSim_vanila/       # source + ROS workspace
+│   │   └── user_data/           # active settings and AirSim recordings
+│   └── unreal/
+│       ├── packaged/            # runnable LinuxNoEditor builds
+│       └── editor/              # editable UE projects
+├── wheels_x86/                  # x86 build cache, not Jetson payload
+├── backups/                     # historical archives
+└── ete4090_staging/             # transfer staging, not runtime
+```
+
+The former locations under `~/Downloads`, `~/Documents`, and
+`~/AirSim_vanila` are compatibility symlinks. The real data is no longer
+scattered across those paths. Removing one of those symlinks does not remove
+the canonical asset, but recursively deleting the canonical
+`risk_aware_assets` root would remove everything and must never be used as a
+cleanup operation.
 
 ## 3. Current checkpoint deployment contract
 
@@ -176,23 +204,23 @@ executable are also required.
 
 | Use | Packaged root | Approx. size | Primary PAK SHA-256 |
 |---|---|---:|---|
-| Default stack-1 / normal risk-aware simulation | `/home/ml/Downloads/TEST9_vio_velocity/LinuxNoEditor` | 3.9 GB | `fed0970f9fce2b1ba5802169bf972f30a08f5b573058c4e73e3a905a24ad96fb` |
-| Parallel collection rig 2 | `/home/ml/Downloads/Modern_Livingroom_v6/LinuxNoEditor` | 3.3 GB | `b176c866a7a6455e9dfb4462cf20016119d17376d13ffcd68f40b6fd103daa56` |
-| Blocks/warehouse, retained secondary environment | `/home/ml/Downloads/LinuxNoEditor` | 481 MB | `90cb6f2129b670eb2bea4a90fa744f551cc418ecc4258c278ee09099355659af` |
+| Default stack-1 / normal risk-aware simulation | `/home/ml/risk_aware_assets/simulation/unreal/packaged/test9_vio_velocity/LinuxNoEditor` | 3.9 GB | `fed0970f9fce2b1ba5802169bf972f30a08f5b573058c4e73e3a905a24ad96fb` |
+| Parallel collection rig 2 | `/home/ml/risk_aware_assets/simulation/unreal/packaged/modern_livingroom_v6/LinuxNoEditor` | 3.3 GB | `b176c866a7a6455e9dfb4462cf20016119d17376d13ffcd68f40b6fd103daa56` |
+| Blocks/warehouse, retained secondary environment | `/home/ml/risk_aware_assets/simulation/unreal/packaged/blocks` | 481 MB | `90cb6f2129b670eb2bea4a90fa744f551cc418ecc4258c278ee09099355659af` |
 
 Primary entry points and hashed files:
 
 ```text
-/home/ml/Downloads/TEST9_vio_velocity/LinuxNoEditor/MyFirstUE4.sh
-/home/ml/Downloads/TEST9_vio_velocity/LinuxNoEditor/MyFirstUE4/Binaries/Linux/MyFirstUE4
-/home/ml/Downloads/TEST9_vio_velocity/LinuxNoEditor/MyFirstUE4/Content/Paks/MyFirstUE4-LinuxNoEditor.pak
+/home/ml/risk_aware_assets/simulation/unreal/packaged/test9_vio_velocity/LinuxNoEditor/MyFirstUE4.sh
+/home/ml/risk_aware_assets/simulation/unreal/packaged/test9_vio_velocity/LinuxNoEditor/MyFirstUE4/Binaries/Linux/MyFirstUE4
+/home/ml/risk_aware_assets/simulation/unreal/packaged/test9_vio_velocity/LinuxNoEditor/MyFirstUE4/Content/Paks/MyFirstUE4-LinuxNoEditor.pak
 
-/home/ml/Downloads/Modern_Livingroom_v6/LinuxNoEditor/MyFirstUE4.sh
-/home/ml/Downloads/Modern_Livingroom_v6/LinuxNoEditor/MyFirstUE4/Binaries/Linux/MyFirstUE4
-/home/ml/Downloads/Modern_Livingroom_v6/LinuxNoEditor/MyFirstUE4/Content/Paks/MyFirstUE4-LinuxNoEditor.pak
+/home/ml/risk_aware_assets/simulation/unreal/packaged/modern_livingroom_v6/LinuxNoEditor/MyFirstUE4.sh
+/home/ml/risk_aware_assets/simulation/unreal/packaged/modern_livingroom_v6/LinuxNoEditor/MyFirstUE4/Binaries/Linux/MyFirstUE4
+/home/ml/risk_aware_assets/simulation/unreal/packaged/modern_livingroom_v6/LinuxNoEditor/MyFirstUE4/Content/Paks/MyFirstUE4-LinuxNoEditor.pak
 
-/home/ml/Downloads/LinuxNoEditor/Blocks.sh
-/home/ml/Downloads/LinuxNoEditor/Blocks/Content/Paks/Blocks-LinuxNoEditor.pak
+/home/ml/risk_aware_assets/simulation/unreal/packaged/blocks/Blocks.sh
+/home/ml/risk_aware_assets/simulation/unreal/packaged/blocks/Blocks/Content/Paks/Blocks-LinuxNoEditor.pak
 ```
 
 The normal tmux bring-up defaults to the TEST9 executable. Rig-2 scripts
@@ -206,7 +234,9 @@ These are the editable sources and are much larger than the cooked packages.
 
 ### MyFirstUE4 / Modern Living Room
 
-- project root: `/home/ml/Documents/Unreal Projects/MyFirstUE4` (approximately 29 GB)
+- project root:
+  `/home/ml/risk_aware_assets/simulation/unreal/editor/MyFirstUE4`
+  (approximately 29 GB)
 - project file: `MyFirstUE4.uproject`, SHA-256
   `ce9249ecd75cc14f4558e1cb4d5bf74b35f06aa1cd10e8b46f0d8cc15759c77b`
 - main map: `Content/ModernLivingRoom/Maps/Main.umap`, SHA-256
@@ -224,22 +254,34 @@ version, AirSim plugin commit, packaging settings, and resulting PAK hash.
 
 ### Blocks / warehouse
 
-- project root: `/home/ml/Downloads/warehouse` (approximately 80 GB)
+- project root:
+  `/home/ml/risk_aware_assets/simulation/unreal/editor/warehouse`
+  (approximately 80 GB)
 - project file: `Blocks.uproject`, SHA-256
   `f3512a79458c21a51e34f21c918caa4b937b1853303127c08c662940246a77a9`
 - main map: `Content/FlyingCPP/Maps/warehousemap.umap`, SHA-256
   `633b31cdb70c151fbcb9006abc5fdc5716f785c9b3d5c1ff4dd2fb10e2d32c0e`
 
 This directory contains editor/cooked/staged material and the AirSim plugin.
-Archive it as an editor project; do not infer that the smaller
-`/home/ml/Downloads/LinuxNoEditor` package can reconstruct it.
+Archive it as an editor project; do not infer that the packaged Blocks
+environment can reconstruct it.
+
+Two smaller editor projects are also centralized and retained even though they
+are not active simulation defaults:
+
+- `/home/ml/risk_aware_assets/simulation/unreal/editor/Break` (approximately
+  428 MB), `Break.uproject` SHA-256
+  `d6c623f5a27a59af64771e2d0e2308a6ec9747abc9e4a94433407684e0ad14d0`
+- `/home/ml/risk_aware_assets/simulation/unreal/editor/Break2` (approximately
+  1.8 GB), `Break2.uproject` SHA-256
+  `7fd4d2674980f8c1f75af30d68d5123a52b317e10453f463c10a14b2c9d217e7`
 
 ## 6. AirSim settings
 
 | Use | File | SHA-256 |
 |---|---|---|
-| Default stack | `/home/ml/Documents/AirSim/settings.json` | `d7e57dd26c40a4281880326f3806b893f949f046b4ba6dbe8e6e47bdb9a801a9` |
-| Rig 2 / port 41452 | `/home/ml/Documents/AirSim/airsim_settings_b.json` | `c83030b414b88bcfd910bf49c6801b2874ebcf660d11d76782a950511ca09a6b` |
+| Default stack | `/home/ml/risk_aware_assets/simulation/airsim/user_data/settings.json` | `d7e57dd26c40a4281880326f3806b893f949f046b4ba6dbe8e6e47bdb9a801a9` |
+| Rig 2 / port 41452 | `/home/ml/risk_aware_assets/simulation/airsim/user_data/airsim_settings_b.json` | `c83030b414b88bcfd910bf49c6801b2874ebcf660d11d76782a950511ca09a6b` |
 
 Files such as `settings.json.backup`, `settings.json.bak`, and
 `settings_260203.json` are backups, not active defaults. A reproducible dataset
@@ -301,6 +343,19 @@ Before removing a legacy directory or moving to a new machine, retain all of:
 6. Dataset/session metadata that records checkpoint hash, code commits, planner
    configuration, AirSim settings hash, and packaged PAK hash.
 
-Do not delete `AirSim_vanila`, a UE editor project, or a packaged UE directory
-merely because simulation ROS nodes now run in Docker. Docker currently replaces
-the ROS consumer stack, not those host-side simulation assets.
+Do not delete `risk_aware_assets/simulation`, a UE editor project, or a packaged
+UE directory merely because simulation ROS nodes now run in Docker. Docker
+currently replaces the ROS consumer stack, not those host-side simulation
+assets.
+
+### 2026-08-05 relocation verification
+
+- all source and destination paths were on the same ext4 filesystem, so the
+  physical relocation used atomic directory renames rather than a copy/delete
+  cycle
+- PAK, `.uproject`, and active AirSim-settings hashes matched the pre-move
+  manifest
+- AirSim ROS was rebuilt at the canonical path: all 3 catkin packages passed
+- the default TEST9 package started with `-RenderOffScreen`
+- AirSim RPC 41451, PythonClient, and `/airsim_node` ROS registration all passed
+- the smoke-test processes were stopped after verification
