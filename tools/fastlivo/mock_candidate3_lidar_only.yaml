@@ -1,0 +1,12 @@
+# POST-HOC candidate-3 diagnostic overlay, 2026-08-06.
+# Apply identically to p1 and pm4. This is not a production FAST-LIVO config
+# and is not locked evidence for the paper comparison.
+common:
+  img_en: 0
+  lidar_en: 1
+
+imu:
+  imu_en: false
+
+uav:
+  imu_rate_odom: false

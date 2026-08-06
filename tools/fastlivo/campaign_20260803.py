@@ -418,6 +418,103 @@ def translation_rpe(tm: np.ndarray, pe: np.ndarray, pg: np.ndarray,
     return np.asarray(values, dtype=float)
 
 
+def trajectory_trend_metrics(tm: np.ndarray, pe: np.ndarray,
+                             pg: np.ndarray) -> Dict[str, object]:
+    """Measure whether an estimate follows GT rather than freezing/reversing.
+
+    This deliberately performs no spatial alignment.  The associated estimate
+    and GT positions are first interpolated to a common 10 Hz timeline.  Each
+    overlapping one-second window is active when GT moves at least 8 cm.
+
+    ``weighted_cosine`` is the GT-distance-weighted cosine between estimated
+    and GT one-second displacements.  ``reverse_distance_fraction`` is the
+    fraction of active GT distance whose displacement cosine is negative.
+    ``stall_fraction`` is the fraction of active windows in which the estimate
+    moves less than 3 cm.  ``progress_correlation`` correlates cumulative GT and
+    estimated displacement projected onto GT's full-episode displacement.
+
+    The trend gate is intentionally lenient relative to the well-tracked
+    campaign flights: cosine >= 0.5, reverse distance <= 0.2, stall <= 0.1,
+    and progress correlation >= 0.5.  Existing ``valid``/``integrity`` fields
+    remain unchanged; this is an additional diagnostic gate.
+    """
+    names = (
+        "trend_1s_weighted_cosine",
+        "trend_reverse_distance_fraction",
+        "trend_stall_fraction",
+        "trend_progress_correlation",
+        "net_displacement_cosine",
+        "net_displacement_ratio",
+    )
+    invalid: Dict[str, object] = {name: math.nan for name in names}
+    invalid["trend_consistent"] = False
+    if len(tm) < 2 or len(pe) != len(tm) or len(pg) != len(tm):
+        return invalid
+
+    timeline = np.arange(float(tm[0]), float(tm[-1]) + 1e-9, 0.1)
+    if len(timeline) <= 10:
+        return invalid
+    est = np.column_stack([
+        np.interp(timeline, tm, pe[:, axis]) for axis in range(3)
+    ])
+    gt = np.column_stack([
+        np.interp(timeline, tm, pg[:, axis]) for axis in range(3)
+    ])
+
+    gt_delta = gt[10:] - gt[:-10]
+    est_delta = est[10:] - est[:-10]
+    gt_distance = np.linalg.norm(gt_delta, axis=1)
+    est_distance = np.linalg.norm(est_delta, axis=1)
+    active = gt_distance >= 0.08
+    active_weight = gt_distance[active]
+    if not np.any(active) or float(np.sum(active_weight)) <= 1e-12:
+        return invalid
+
+    cosine = np.sum(gt_delta * est_delta, axis=1) / (
+        gt_distance * est_distance + 1e-12)
+    weighted_cosine = float(np.sum(
+        active_weight * cosine[active]) / np.sum(active_weight))
+    reverse_fraction = float(np.sum(
+        active_weight[cosine[active] < 0.0]) / np.sum(active_weight))
+    stall_fraction = float(np.mean(est_distance[active] < 0.03))
+
+    gt_net = gt[-1] - gt[0]
+    est_net = est[-1] - est[0]
+    gt_net_norm = float(np.linalg.norm(gt_net))
+    est_net_norm = float(np.linalg.norm(est_net))
+    net_cosine = math.nan
+    net_ratio = math.nan
+    progress_correlation = math.nan
+    if gt_net_norm > 1e-12:
+        net_ratio = est_net_norm / gt_net_norm
+        if est_net_norm > 1e-12:
+            net_cosine = float(np.dot(gt_net, est_net) /
+                               (gt_net_norm * est_net_norm))
+        progress_axis = gt_net / gt_net_norm
+        gt_progress = (gt - gt[0]) @ progress_axis
+        est_progress = (est - est[0]) @ progress_axis
+        if (float(np.std(gt_progress)) > 1e-12 and
+                float(np.std(est_progress)) > 1e-12):
+            progress_correlation = float(np.corrcoef(
+                gt_progress, est_progress)[0, 1])
+
+    finite_gate = all(math.isfinite(value) for value in (
+        weighted_cosine, reverse_fraction, stall_fraction,
+        progress_correlation))
+    return {
+        "trend_1s_weighted_cosine": weighted_cosine,
+        "trend_reverse_distance_fraction": reverse_fraction,
+        "trend_stall_fraction": stall_fraction,
+        "trend_progress_correlation": progress_correlation,
+        "net_displacement_cosine": net_cosine,
+        "net_displacement_ratio": net_ratio,
+        "trend_consistent": bool(
+            finite_gate and weighted_cosine >= 0.5 and
+            reverse_fraction <= 0.2 and stall_fraction <= 0.1 and
+            progress_correlation >= 0.5),
+    }
+
+
 def score_bag(path: Path, source_path: Path | None = None) -> Dict[str, object]:
     tg, xg, qg = read_traj(str(path), TOPIC_GT)
     gt_path = uniform_path_length(tg, xg)
@@ -465,6 +562,7 @@ def score_bag(path: Path, source_path: Path | None = None) -> Dict[str, object]:
     tm = np.asarray([te[i] + offset for i, _, _, _ in pairs])
     ape = np.linalg.norm(pe - pg, axis=1)
     rpe_1s = translation_rpe(tm, pe, pg)
+    trend = trajectory_trend_metrics(tm, pe, pg)
     est_path = float(np.linalg.norm(np.diff(pe, axis=0), axis=1).sum())
     gt_assoc_path = float(np.linalg.norm(np.diff(pg, axis=0), axis=1).sum())
     eligible_span = max(1e-9, tg[-1] - tm[0])
@@ -508,6 +606,7 @@ def score_bag(path: Path, source_path: Path | None = None) -> Dict[str, object]:
         if gt_path > 1e-9 else math.inf,
         rpe_1s_rmse_m=float(np.sqrt(np.mean(rpe_1s * rpe_1s)))
         if len(rpe_1s) else math.nan,
+        **trend,
         orientation_rmse_deg=float(np.sqrt(np.mean(
             orientation_error_deg * orientation_error_deg))),
         orientation_mean_deg=float(np.mean(orientation_error_deg)),
@@ -665,19 +764,34 @@ def _fusion_stage_stats(rows: Sequence[Mapping[str, str]],
     if not rows:
         return {f"{prefix}_rows": 0}
     nfeat = np.asarray([float(x["nfeat"]) for x in rows])
-    rejected = np.asarray([int(x["rejected"]) for x in rows], dtype=bool)
-    masks = np.asarray([int(x["reject_mask"]) for x in rows], dtype=np.uint32)
-    tilt = np.asarray([float(x["tilt_deg"]) for x in rows])
+    has_guard_columns = all(
+        field in rows[0] for field in ("rejected", "reject_mask", "tilt_deg"))
     result: Dict[str, object] = {
         f"{prefix}_rows": len(rows),
         f"{prefix}_nfeat_median": float(np.median(nfeat)),
         f"{prefix}_nfeat_p10": float(np.quantile(nfeat, 0.1)),
         f"{prefix}_nfeat_le_50_fraction": float(np.mean(nfeat <= 50)),
-        f"{prefix}_reject_fraction": float(np.mean(rejected)),
-        f"{prefix}_tilt_p90_deg": float(np.quantile(tilt, 0.9)),
+        f"{prefix}_health_guard_available": has_guard_columns,
     }
-    for name, bit in FUSION_MASKS.items():
-        result[f"{prefix}_{name}_fraction"] = float(np.mean((masks & bit) != 0))
+    if has_guard_columns:
+        rejected = np.asarray(
+            [int(x["rejected"]) for x in rows], dtype=bool)
+        masks = np.asarray(
+            [int(x["reject_mask"]) for x in rows], dtype=np.uint32)
+        tilt = np.asarray([float(x["tilt_deg"]) for x in rows])
+        result[f"{prefix}_reject_fraction"] = float(np.mean(rejected))
+        result[f"{prefix}_tilt_p90_deg"] = float(np.quantile(tilt, 0.9))
+        for name, bit in FUSION_MASKS.items():
+            result[f"{prefix}_{name}_fraction"] = float(
+                np.mean((masks & bit) != 0))
+    else:
+        # New FAST-LIVO logs omit the retired project-specific health guard.
+        # Keep the historical summary schema explicit without fabricating a
+        # zero rejection rate for runs in which no guard existed.
+        result[f"{prefix}_reject_fraction"] = math.nan
+        result[f"{prefix}_tilt_p90_deg"] = math.nan
+        for name in FUSION_MASKS:
+            result[f"{prefix}_{name}_fraction"] = math.nan
     for field in (
             "lio_trans_info_ratio", "lio_rot_info_ratio",
             "lio_info_min_per_feature", "vio_trans_info_ratio",

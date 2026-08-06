@@ -1,5 +1,11 @@
 # FAST-LIVO 21-flight safety-mode campaign (2026-08-05)
 
+> Historical note (2026-08-06): these frozen results were produced with the
+> project-specific `health_guard`. The guard has since been removed from source
+> and production YAML because it is not an upstream FAST-LIVO component. The
+> measurements below remain valid descriptions of those historical runs, not
+> of the current runtime configuration.
+
 ## 결론
 
 현재 production FAST-LIVO 설정은 선정된 실제 비행 21회 모두에서

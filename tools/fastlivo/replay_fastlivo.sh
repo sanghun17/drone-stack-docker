@@ -32,7 +32,10 @@ elif [ ! -f /.dockerenv ]; then
   # symlinks rooted at /work.  They are intentionally invalid on the host but
   # valid in the x86 sim container.  Reuse that container for offline replay
   # instead of trying to pull the arm64-only deploy image on an x86 host.
-  if [ "$(uname -m)" = "x86_64" ] && \
+  if [ -n "${FASTLIVO_REPLAY_CONTAINER:-}" ] && \
+     docker inspect "$FASTLIVO_REPLAY_CONTAINER" >/dev/null 2>&1; then
+    __C="$FASTLIVO_REPLAY_CONTAINER"
+  elif [ "$(uname -m)" = "x86_64" ] && \
      docker inspect drone-stack-sim-x86 >/dev/null 2>&1; then
     __C=drone-stack-sim-x86
   else
@@ -135,7 +138,7 @@ echo "[replay] isolated master=$ROS_MASTER_URI"
 # yaml + sparse overlay; otherwise an omitted A/B key silently inherits the
 # previous experiment's value.
 for ns in common extrin_calib body_calib time_offset preprocess vio imu lio \
-          local_map uav publish evo pcd_save health_guard debug mocap; do
+          local_map uav publish evo pcd_save debug mocap; do
   rosparam delete "/$ns" >/dev/null 2>&1 || true
 done
 rosparam delete /laserMapping >/dev/null 2>&1 || true
