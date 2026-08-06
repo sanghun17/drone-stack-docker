@@ -19,8 +19,12 @@ regenerable.  The source bags are opened read-only and are never modified.
 from __future__ import annotations
 
 import argparse
+from collections import defaultdict
 import csv
+import datetime as dt
 import hashlib
+import heapq
+import io
 import json
 import math
 import os
@@ -36,6 +40,7 @@ import numpy as np
 import rosbag
 import rospy
 from sensor_msgs.msg import Image
+from std_msgs.msg import String
 
 # Reuse the established time association/evaluation implementation.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -75,6 +80,10 @@ TOPIC_INFO = "/camera/color/camera_info"
 TOPIC_GT = "/vrpn_client_node/pure/pose"
 TOPIC_EST = "/aft_mapped_to_optitrack"
 KEEP_TOPICS = {TOPIC_CLOUD, TOPIC_IMU, TOPIC_INFO, TOPIC_GT}
+
+FASTLIVO_SPLICE_PROVENANCE_TOPIC = "/fastlivo_splice/provenance"
+FASTLIVO_SPLICE_SCHEMA = "fastlivo_result_splice/v1"
+FASTLIVO_DEFAULT_OWNER = "/laserMapping"
 
 
 def _legacy_spec() -> Dict[str, object]:
@@ -152,6 +161,564 @@ def sha256(path: Path, block: int = 8 << 20) -> str:
             if not data:
                 return h.hexdigest()
             h.update(data)
+
+
+def _canonical_name(value: object) -> str:
+    name = value.decode() if isinstance(value, bytes) else str(value or "")
+    return "/" + name.lstrip("/") if name else ""
+
+
+def _header_key(header: Mapping[str, object]) -> Tuple[Tuple[str, bytes], ...]:
+    """Return a lossless, order-independent ROS connection identity."""
+    rows = []
+    for key, value in header.items():
+        key_text = key.decode() if isinstance(key, bytes) else str(key)
+        if isinstance(value, bytes):
+            value_bytes = b"b\0" + value
+        else:
+            value_bytes = b"s\0" + str(value).encode("utf-8", "surrogateescape")
+        rows.append((key_text, value_bytes))
+    return tuple(sorted(rows))
+
+
+def _raw_payload(raw_msg) -> bytes:
+    return raw_msg[1]
+
+
+def _raw_message_name(raw_msg) -> str:
+    """Deserialize only the Log.name needed for selective /rosout_agg."""
+    pytype = raw_msg[-1]
+    if pytype is None:
+        raise RuntimeError("cannot deserialize /rosout_agg without its ROS message class")
+    message = pytype()
+    message.deserialize(_raw_payload(raw_msg))
+    if not hasattr(message, "name"):
+        raise RuntimeError("/rosout_agg message does not have a name field")
+    return _canonical_name(message.name)
+
+
+def _fastlivo_owned_record(topic: str, raw_msg,
+                           connection_header: Mapping[str, object],
+                           owner: str) -> bool:
+    """Identify output owned by one FAST-LIVO node without topic-wide drops.
+
+    /tf and /rosout can contain connections from many nodes, so ordinary
+    records are classified strictly by connection callerid.  /rosout_agg is
+    published by /rosout and therefore must instead be classified by the
+    embedded rosgraph_msgs/Log.name field.
+    """
+    canonical_topic = _canonical_name(topic)
+    canonical_owner = _canonical_name(owner)
+    if canonical_topic == "/rosout_agg":
+        return _raw_message_name(raw_msg) == canonical_owner
+    return _canonical_name(connection_header.get("callerid", "")) == canonical_owner
+
+
+def _owned_by_any(topic: str, raw_msg,
+                  connection_header: Mapping[str, object],
+                  owners: Sequence[str]) -> bool:
+    return any(_fastlivo_owned_record(
+        topic, raw_msg, connection_header, owner) for owner in owners)
+
+
+def _serialized_string(value: str):
+    message = String(data=value)
+    stream = io.BytesIO()
+    message.serialize(stream)
+    return (String._type, stream.getvalue(), String._md5sum, String)
+
+
+def _provenance_connection_header(topic: str) -> Dict[str, str]:
+    return {
+        "topic": topic,
+        "type": String._type,
+        "md5sum": String._md5sum,
+        "message_definition": String._full_text,
+        "callerid": "/fastlivo_result_splice",
+        "latching": "1",
+    }
+
+
+class _ConnectionPreservingWriter:
+    """Use rosbag's raw writer while retaining distinct connection headers.
+
+    ROS1's public ``Bag.write`` caches only one connection per topic.  A bag
+    can legitimately have, for example, /tf from several publishers.  The
+    small cache switch below selects the corresponding connection record
+    before each public raw write, preserving those identities without
+    deserializing/re-serializing payloads.
+    """
+
+    def __init__(self, bag: rosbag.Bag):
+        self.bag = bag
+        self.connections = {}
+
+    def write(self, topic: str, raw_msg, bag_time,
+              connection_header: Mapping[str, object]) -> None:
+        header = dict(connection_header)
+        key = (_canonical_name(topic), _header_key(header))
+        connection = self.connections.get(key)
+        if connection is None:
+            self.bag._topic_connections.pop(topic, None)
+            self.bag.write(topic, raw_msg, bag_time, raw=True,
+                           connection_header=header)
+            connection = self.bag._topic_connections[topic]
+            self.connections[key] = connection
+        else:
+            self.bag._topic_connections[topic] = connection
+            self.bag.write(topic, raw_msg, bag_time, raw=True,
+                           connection_header=header)
+
+
+def _file_identity(path: Path, with_hash: bool = True) -> Dict[str, object]:
+    stat = path.stat()
+    result: Dict[str, object] = {
+        "path": str(path),
+        "size_bytes": int(stat.st_size),
+        "mtime_ns": int(stat.st_mtime_ns),
+        "inode": int(stat.st_ino),
+    }
+    if with_hash:
+        result["sha256"] = sha256(path)
+    return result
+
+
+def _git_revision(repository: Path = REPO) -> str | None:
+    try:
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=str(repository), text=True,
+            stderr=subprocess.DEVNULL).strip()
+    except (OSError, subprocess.CalledProcessError):
+        return None
+
+
+def _git_path_status(path: Path) -> str | None:
+    try:
+        relative = path.resolve().relative_to(REPO)
+        return subprocess.check_output(
+            ["git", "status", "--porcelain", "--", str(relative)],
+            cwd=str(REPO), text=True, stderr=subprocess.DEVNULL).strip()
+    except (OSError, ValueError, subprocess.CalledProcessError):
+        return None
+
+
+def _git_worktree_status(repository: Path) -> str | None:
+    try:
+        return subprocess.check_output(
+            ["git", "status", "--porcelain"], cwd=str(repository), text=True,
+            stderr=subprocess.DEVNULL).strip()
+    except (OSError, subprocess.CalledProcessError):
+        return None
+
+
+def _publish_no_replace(temp_path: Path, final_path: Path) -> None:
+    """Atomically publish an adjacent file without overwriting a race winner."""
+    try:
+        os.link(temp_path, final_path)
+    except FileExistsError as exc:
+        raise FileExistsError(
+            f"refusing to overwrite concurrently-created output: {final_path}") from exc
+    temp_path.unlink()
+
+
+def _fingerprints(path: Path, selector) -> Dict[object, Dict[str, object]]:
+    """Fingerprint serialized records per exact connection identity."""
+    states = {}
+    with rosbag.Bag(str(path), "r") as bag:
+        for topic, raw_msg, bag_time, header in bag.read_messages(
+                raw=True, return_connection_header=True):
+            header = dict(header or {})
+            if not selector(topic, raw_msg, header):
+                continue
+            key = (_canonical_name(topic), _header_key(header))
+            if key not in states:
+                states[key] = {"count": 0, "digest": hashlib.sha256()}
+            state = states[key]
+            payload = _raw_payload(raw_msg)
+            state["count"] += 1
+            state["digest"].update(int(bag_time.secs).to_bytes(8, "little", signed=True))
+            state["digest"].update(int(bag_time.nsecs).to_bytes(4, "little"))
+            state["digest"].update(len(payload).to_bytes(8, "little"))
+            state["digest"].update(payload)
+    return {
+        key: {"count": int(value["count"]),
+              "sha256": value["digest"].hexdigest()}
+        for key, value in states.items()
+    }
+
+
+def _topic_payload_hashes(path: Path, topic: str) -> List[bytes]:
+    """Hash serialized messages on one topic, ignoring publisher headers."""
+    values = []
+    with rosbag.Bag(str(path), "r") as bag:
+        for _, raw_msg, _ in bag.read_messages(topics=[topic], raw=True):
+            values.append(hashlib.sha256(_raw_payload(raw_msg)).digest())
+    return values
+
+
+def validate_fastlivo_splice(source: Path, result: Path, output: Path,
+                             owner: str = FASTLIVO_DEFAULT_OWNER,
+                             result_topics: Sequence[str] | None = None,
+                             provenance_topic: str = FASTLIVO_SPLICE_PROVENANCE_TOPIC,
+                             expected_provenance: Mapping[str, object] | None = None,
+                             additional_owners: Sequence[str] | None = None,
+                             ) -> Dict[str, object]:
+    """Prove retained and replacement records are byte-for-byte identical."""
+    selected = (None if result_topics is None else
+                {_canonical_name(topic) for topic in result_topics})
+    owners = tuple(dict.fromkeys([
+        _canonical_name(owner),
+        *[_canonical_name(x) for x in (additional_owners or ())],
+    ]))
+
+    def belongs(topic, raw_msg, header):
+        return _owned_by_any(topic, raw_msg, header, owners)
+
+    def selected_result(topic, raw_msg, header):
+        return ((selected is None or _canonical_name(topic) in selected) and
+                belongs(topic, raw_msg, header))
+
+    def retained_source(topic, raw_msg, header):
+        return (_canonical_name(topic) != _canonical_name(provenance_topic) and
+                not ((selected is None or _canonical_name(topic) in selected) and
+                     belongs(topic, raw_msg, header)))
+
+    expected_retained = _fingerprints(source, retained_source)
+    actual_retained = _fingerprints(output, retained_source)
+    if expected_retained != actual_retained:
+        raise RuntimeError("retained source records or connection identities changed")
+
+    expected_replacement = _fingerprints(result, selected_result)
+    actual_replacement = _fingerprints(output, selected_result)
+    if expected_replacement != actual_replacement:
+        raise RuntimeError("replacement FAST-LIVO records or connection identities changed")
+
+    with rosbag.Bag(str(output), "r") as bag:
+        compression = bag.get_compression_info().compression
+        if str(compression).lower() != "lz4":
+            raise RuntimeError(f"output compression is {compression}, expected lz4")
+        last_ns = None
+        message_count = 0
+        for _, _, bag_time in bag.read_messages():
+            now_ns = int(bag_time.secs) * 1_000_000_000 + int(bag_time.nsecs)
+            if last_ns is not None and now_ns < last_ns:
+                raise RuntimeError("output messages are not timestamp-sorted")
+            last_ns = now_ns
+            message_count += 1
+        provenance_messages = list(bag.read_messages(topics=[provenance_topic]))
+    if len(provenance_messages) != 1:
+        raise RuntimeError(
+            f"expected one in-bag provenance message, found {len(provenance_messages)}")
+    in_bag_document = json.loads(provenance_messages[0][1].data)
+    if in_bag_document.get("schema") != FASTLIVO_SPLICE_SCHEMA:
+        raise RuntimeError("unexpected in-bag provenance schema")
+    if expected_provenance is not None and in_bag_document != expected_provenance:
+        raise RuntimeError("in-bag provenance differs from the requested operation")
+
+    return {
+        "valid": True,
+        "message_count": message_count,
+        "compression": "lz4",
+        "retained_connections": len(expected_retained),
+        "replacement_connections": len(expected_replacement),
+        "retained_messages": sum(x["count"] for x in expected_retained.values()),
+        "replacement_messages": sum(x["count"] for x in expected_replacement.values()),
+        "in_bag_provenance_messages": 1,
+    }
+
+
+def splice_fastlivo_result(source: Path, result: Path, output: Path,
+                           owner: str = FASTLIVO_DEFAULT_OWNER,
+                           result_topics: Sequence[str] | None = None,
+                           provenance_topic: str = FASTLIVO_SPLICE_PROVENANCE_TOPIC,
+                           provenance_notes: Sequence[str] | None = None,
+                           additional_owners: Sequence[str] | None = None,
+                           ) -> Dict[str, object]:
+    """Create a non-destructive source bag with selected FAST-LIVO output replaced."""
+    source = source.expanduser().resolve()
+    result = result.expanduser().resolve()
+    output = output.expanduser().resolve()
+    manifest = Path(str(output) + ".provenance.json")
+    if not source.is_file():
+        raise FileNotFoundError(source)
+    if not result.is_file():
+        raise FileNotFoundError(result)
+    if output in {source, result}:
+        raise ValueError("output must differ from both read-only input bags")
+    if output.exists():
+        raise FileExistsError(f"refusing to overwrite existing output: {output}")
+    if manifest.exists():
+        raise FileExistsError(f"refusing to overwrite existing manifest: {manifest}")
+    if not _canonical_name(owner):
+        raise ValueError("owner must be a non-empty ROS node name")
+    owners = tuple(dict.fromkeys([
+        _canonical_name(owner),
+        *[_canonical_name(x) for x in (additional_owners or ())],
+    ]))
+    if any(not x for x in owners):
+        raise ValueError("additional_owners must contain non-empty ROS node names")
+
+    selected = (None if result_topics is None else
+                tuple(dict.fromkeys(_canonical_name(x) for x in result_topics)))
+    if selected is not None and (not selected or any(not x for x in selected)):
+        raise ValueError("result_topics must contain non-empty ROS topic names")
+
+    with rosbag.Bag(str(source), "r") as source_bag:
+        if provenance_topic in source_bag.get_type_and_topic_info().topics:
+            raise RuntimeError(
+                f"source already contains {provenance_topic}; refusing ambiguous re-splice")
+        if source_bag.get_message_count() == 0:
+            raise RuntimeError("source bag is empty")
+        provenance_time = rospy.Time.from_sec(source_bag.get_start_time())
+        source_start_ns = int(round(source_bag.get_start_time() * 1e9))
+        source_end_ns = int(round(source_bag.get_end_time() * 1e9))
+
+    # The replay result carries the original GT stream.  Requiring its raw
+    # payloads to be a subset of the source bag prevents a valid-looking but
+    # wrong-session result from being spliced into an unrelated flight.
+    source_gt_hashes = set(_topic_payload_hashes(source, TOPIC_GT))
+    result_gt_hashes = _topic_payload_hashes(result, TOPIC_GT)
+    if len(result_gt_hashes) < 10:
+        raise RuntimeError(
+            f"result has only {len(result_gt_hashes)} GT messages on {TOPIC_GT}")
+    unmatched_gt = sum(value not in source_gt_hashes for value in result_gt_hashes)
+    if unmatched_gt:
+        raise RuntimeError(
+            f"result/source session mismatch: {unmatched_gt} GT payloads are absent "
+            "from the source bag")
+
+    # Pre-audit every selected result record so each requested publisher is
+    # present and its replay interval lies inside the source flight.
+    result_owner_counts = defaultdict(int)
+    selected_result_count = 0
+    result_first_ns = None
+    result_last_ns = None
+    with rosbag.Bag(str(result), "r") as result_bag:
+        for topic, raw_msg, bag_time, header in result_bag.read_messages(
+                raw=True, return_connection_header=True):
+            header = dict(header or {})
+            canonical_topic = _canonical_name(topic)
+            if selected is not None and canonical_topic not in selected:
+                continue
+            matched = [candidate for candidate in owners
+                       if _fastlivo_owned_record(
+                           topic, raw_msg, header, candidate)]
+            if not matched:
+                continue
+            selected_result_count += 1
+            for candidate in matched:
+                result_owner_counts[candidate] += 1
+            now_ns = int(bag_time.secs) * 1_000_000_000 + int(bag_time.nsecs)
+            result_first_ns = now_ns if result_first_ns is None else min(
+                result_first_ns, now_ns)
+            result_last_ns = now_ns if result_last_ns is None else max(
+                result_last_ns, now_ns)
+    missing_owners = [candidate for candidate in owners
+                      if result_owner_counts[candidate] == 0]
+    if missing_owners:
+        raise RuntimeError(
+            f"result has no selected records for requested owners: {missing_owners}")
+    if not selected_result_count:
+        raise RuntimeError(f"result has no selected records owned by {owners}")
+    timestamp_tolerance_ns = 1_000_000
+    if (result_first_ns < source_start_ns - timestamp_tolerance_ns or
+            result_last_ns > source_end_ns + timestamp_tolerance_ns):
+        raise RuntimeError(
+            "selected result timestamps fall outside the source bag interval: "
+            f"result=[{result_first_ns}, {result_last_ns}] "
+            f"source=[{source_start_ns}, {source_end_ns}]")
+
+    source_before = _file_identity(source)
+    result_before = _file_identity(result)
+    tool_path = Path(__file__).resolve()
+    params_path = result.with_name(result.stem + "_params.yaml")
+    # ws/fast-livo is only a catkin workspace; the estimator's independent
+    # git repository starts at src/.  Pointing git at the workspace would walk
+    # upward and silently record the outer DSD revision instead.
+    fastlivo_repository = REPO / "ws/fast-livo/src"
+    in_bag_provenance: Dict[str, object] = {
+        "schema": FASTLIVO_SPLICE_SCHEMA,
+        "created_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "tool": str(tool_path),
+        "tool_identity": _file_identity(tool_path),
+        "git_revision": _git_revision(),
+        "git_path_status": _git_path_status(tool_path),
+        "fastlivo_git_revision": (
+            _git_revision(fastlivo_repository)
+            if fastlivo_repository.is_dir() else None),
+        "fastlivo_git_status": (
+            _git_worktree_status(fastlivo_repository)
+            if fastlivo_repository.is_dir() else None),
+        "effective_params": (
+            _file_identity(params_path) if params_path.is_file() else None),
+        "source": source_before,
+        "result": result_before,
+        "output": {
+            "path": str(output),
+            "final_sha256": "recorded only in the adjacent manifest (no self-hash)",
+            "adjacent_manifest": str(manifest),
+        },
+        "selection": {
+            "owners": list(owners),
+            "result_topics": list(selected) if selected is not None else "all owner records",
+            "result_owner_message_counts": dict(sorted(result_owner_counts.items())),
+            "result_interval_ns": [result_first_ns, result_last_ns],
+        },
+        "session_identity": {
+            "topic": TOPIC_GT,
+            "result_payloads": len(result_gt_hashes),
+            "unmatched_result_payloads": unmatched_gt,
+            "method": "serialized result GT payloads are a subset of source GT payloads",
+        },
+        "rules": {
+            "ordinary_tf_rosout_and_other_topics":
+                "remove/insert only connections whose callerid is in owners",
+            "rosout_agg": "remove/insert only messages whose Log.name is in owners",
+            "other_source_records":
+                "raw serialized payload, timestamp, and connection header preserved",
+            "ordering": "global nondecreasing bag timestamp",
+            "compression": "lz4",
+            "source_bag_modified": False,
+            "result_bag_modified": False,
+        },
+        "caveats": [
+            (("All" if selected is None else "Only selected")
+             + " old owner records are removed over the complete source bag. "
+             "Replacement records exist only over the time interval present in "
+             "the result bag; no old estimate is retained outside that interval."),
+            *[str(note) for note in (provenance_notes or ())],
+        ],
+    }
+
+    output.parent.mkdir(parents=True, exist_ok=True)
+    temp_output = output.with_name(output.name + f".active.{os.getpid()}")
+    temp_manifest = manifest.with_name(manifest.name + f".active.{os.getpid()}")
+    if temp_output.exists() or temp_manifest.exists():
+        raise RuntimeError("unexpected active splice artifact already exists")
+
+    source_counts = defaultdict(int)
+    removed_counts = defaultdict(int)
+    inserted_counts = defaultdict(int)
+    ignored_result_counts = defaultdict(int)
+    published_manifest = False
+    published_output = False
+
+    def source_records():
+        with rosbag.Bag(str(source), "r") as bag:
+            serial = 0
+            for topic, raw_msg, bag_time, header in bag.read_messages(
+                    raw=True, return_connection_header=True):
+                header = dict(header or {})
+                canonical_topic = _canonical_name(topic)
+                wanted_topic = selected is None or canonical_topic in selected
+                if wanted_topic and _owned_by_any(
+                        topic, raw_msg, header, owners):
+                    removed_counts[canonical_topic] += 1
+                    continue
+                source_counts[canonical_topic] += 1
+                serial += 1
+                ns = int(bag_time.secs) * 1_000_000_000 + int(bag_time.nsecs)
+                yield (ns, 1, serial, topic, raw_msg, bag_time, header, "source")
+
+    def result_records():
+        with rosbag.Bag(str(result), "r") as bag:
+            serial = 0
+            for topic, raw_msg, bag_time, header in bag.read_messages(
+                    raw=True, return_connection_header=True):
+                header = dict(header or {})
+                canonical_topic = _canonical_name(topic)
+                wanted_topic = selected is None or canonical_topic in selected
+                if not wanted_topic or not _owned_by_any(
+                        topic, raw_msg, header, owners):
+                    ignored_result_counts[canonical_topic] += 1
+                    continue
+                inserted_counts[canonical_topic] += 1
+                serial += 1
+                ns = int(bag_time.secs) * 1_000_000_000 + int(bag_time.nsecs)
+                yield (ns, 2, serial, topic, raw_msg, bag_time, header, "result")
+
+    provenance_raw = _serialized_string(json.dumps(
+        in_bag_provenance, sort_keys=True, separators=(",", ":")))
+    provenance_ns = (int(provenance_time.secs) * 1_000_000_000 +
+                     int(provenance_time.nsecs))
+    provenance_record = iter([(
+        provenance_ns, 0, 0, provenance_topic, provenance_raw, provenance_time,
+        _provenance_connection_header(provenance_topic), "provenance")])
+
+    try:
+        with rosbag.Bag(str(temp_output), "w",
+                        compression=rosbag.Compression.LZ4) as out:
+            writer = _ConnectionPreservingWriter(out)
+            previous_ns = None
+            for record in heapq.merge(
+                    provenance_record, source_records(), result_records(),
+                    key=lambda row: row[:3]):
+                ns, _, _, topic, raw_msg, bag_time, header, _ = record
+                if previous_ns is not None and ns < previous_ns:
+                    raise RuntimeError("internal merge produced decreasing timestamps")
+                previous_ns = ns
+                writer.write(topic, raw_msg, bag_time, header)
+
+        if selected is not None:
+            missing = sorted(set(selected) - {
+                topic for topic, count in inserted_counts.items() if count > 0})
+            if missing:
+                raise RuntimeError(
+                    f"selected result topics have no records owned by {owners}: {missing}")
+        if not inserted_counts:
+            raise RuntimeError(f"result has no records owned by {owners} for insertion")
+
+        source_after = _file_identity(source, with_hash=False)
+        result_after = _file_identity(result, with_hash=False)
+        for label, before, after in (("source", source_before, source_after),
+                                     ("result", result_before, result_after)):
+            for key in ("path", "size_bytes", "mtime_ns", "inode"):
+                if before[key] != after[key]:
+                    raise RuntimeError(f"read-only {label} bag changed during splice")
+
+        validation = validate_fastlivo_splice(
+            source, result, temp_output, owner, selected, provenance_topic,
+            expected_provenance=in_bag_provenance,
+            additional_owners=owners[1:])
+        output_identity = _file_identity(temp_output)
+        output_identity["path"] = str(output)
+        adjacent = dict(in_bag_provenance)
+        adjacent["output"] = {
+            **output_identity,
+            "adjacent_manifest": str(manifest),
+        }
+        adjacent["counts"] = {
+            "retained_source_by_topic": dict(sorted(source_counts.items())),
+            "removed_source_owner_by_topic": dict(sorted(removed_counts.items())),
+            "inserted_result_owner_by_topic": dict(sorted(inserted_counts.items())),
+            "ignored_result_by_topic": dict(sorted(ignored_result_counts.items())),
+        }
+        adjacent["validation"] = validation
+        temp_manifest.write_text(
+            json.dumps(adjacent, indent=2, sort_keys=True) + "\n")
+
+        # Publish the manifest first and the bag last.  The bag is the commit
+        # point: a crash can leave an orphan manifest, but never a provenance-
+        # free final bag.  Hard-link publication is atomic and refuses a path
+        # another process created after our initial exists() check.
+        try:
+            _publish_no_replace(temp_manifest, manifest)
+            published_manifest = True
+            _publish_no_replace(temp_output, output)
+            published_output = True
+        except BaseException:
+            if published_manifest and not published_output and manifest.exists():
+                manifest.unlink()
+            raise
+        return adjacent
+    except BaseException:
+        if temp_output.exists():
+            temp_output.unlink()
+        if temp_manifest.exists():
+            temp_manifest.unlink()
+        if published_manifest and not published_output and manifest.exists():
+            manifest.unlink()
+        raise
 
 
 def stamp_ns(msg) -> int:
@@ -1125,6 +1692,30 @@ def main() -> None:
     summary.add_argument("--seed", type=int, default=20260805)
     summary.add_argument("--fusion-dir", type=Path)
 
+    splice = sub.add_parser(
+        "splice-fastlivo",
+        help=("non-destructively replace /laserMapping-owned records in a "
+              "flight bag with records from an offline result bag"))
+    splice.add_argument("--source", type=Path, required=True,
+                        help="read-only original flight bag")
+    splice.add_argument("--result", type=Path, required=True,
+                        help="read-only offline FAST-LIVO result bag")
+    splice.add_argument("--output", type=Path, required=True,
+                        help="new derived bag; existing paths are refused")
+    splice.add_argument("--owner", default=FASTLIVO_DEFAULT_OWNER,
+                        help="FAST-LIVO ROS node name (default: /laserMapping)")
+    splice.add_argument(
+        "--additional-owner", action="append", default=[],
+        help=("additional result/source callerid to replace (repeatable); "
+              "use /odom_to_camera_init to retain the replay TF chain"))
+    splice.add_argument(
+        "--result-topic", action="append",
+        help=("optional result topic allowlist (repeatable); omitted inserts "
+              "every result record owned by the configured owners"))
+    splice.add_argument(
+        "--provenance-note", action="append", default=[],
+        help="additional caveat stored both in-bag and beside the output")
+
     args = parser.parse_args()
     root = args.root.resolve()
     spec = load_spec(args.spec.resolve() if args.spec else None)
@@ -1143,6 +1734,12 @@ def main() -> None:
         summarize_results(spec, args.results, args.out_dir,
                           args.bootstrap, args.seed,
                           args.fusion_dir.resolve() if args.fusion_dir else None)
+    elif args.command == "splice-fastlivo":
+        document = splice_fastlivo_result(
+            args.source, args.result, args.output, args.owner,
+            args.result_topic, provenance_notes=args.provenance_note,
+            additional_owners=args.additional_owner)
+        print(json.dumps(document, indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":

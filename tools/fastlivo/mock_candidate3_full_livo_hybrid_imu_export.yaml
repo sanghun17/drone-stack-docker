@@ -1,0 +1,30 @@
+# Export overlay for the accepted candidate-3 hybrid-IMU estimator.
+#
+# State estimation is identical to mock_candidate3_full_livo_hybrid_imu.yaml.
+# The only difference is enabling the high-rate propagated odometry so a
+# derived visualization bag can replace every old deploy-facing FAST-LIVO
+# pose stream instead of mixing old and new estimates.
+common:
+  img_en: 1
+  lidar_en: 1
+  imu_topic: /camera/imu_hybrid
+
+imu:
+  imu_en: true
+  acc_cov: 10.0
+
+vio:
+  max_lio_features_for_fusion: -1
+  img_point_cov: 1000
+
+extrin_calib:
+  Rcl: [0.999978, 0.00659742, 0.00021399,
+        -0.00659736, 0.999978, -0.000301692,
+        -0.000215976, 0.000300274, 1.0]
+  Pcl: [0.01438551, 0.0000943, 0.00042120]
+
+uav:
+  imu_rate_odom: true
+
+debug:
+  fusion_log: true

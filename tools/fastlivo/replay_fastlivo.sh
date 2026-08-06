@@ -12,6 +12,8 @@
 #     --paired-drop   bag holds RAW image+points -> regenerate the 10Hz pair
 #     --odom-guard    enable the divergence guard (default off: we want to SEE drift)
 #     --with-cloud    also record /cloud_registered (big; for map inspection)
+#     --with-propagated  also record the 250 Hz propagated body odometry
+#     --with-rgb      also record FAST-LIVO's /rgb_img diagnostic image
 #
 # Output bag holds /aft_mapped_to_init (+_to_odom), /path, the GT pose, and /tf,
 # all on the bag (sim) clock -> feed straight to tools/fastlivo/eval_fastlivo.py.
@@ -81,7 +83,7 @@ export ROS_PACKAGE_PATH="$REPLAY_ROOT/modules/sensor/realsense-d435i${ROS_PACKAG
 
 LAUNCH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/mapping_d435i_replay.launch"
 BAG=""; RATE=1.0; OUT=""; CONFIG=""; OVERLAY=""; CAMCALIB=""; TRACKER="pure"
-PAIRED=false; GUARD=false; WITHCLOUD=0; INTERNAL=0; START=""; DUR=""
+PAIRED=false; GUARD=false; WITHCLOUD=0; WITHPROP=0; WITHRGB=0; INTERNAL=0; START=""; DUR=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --rate)        RATE="$2"; shift 2;;
@@ -95,6 +97,8 @@ while [ $# -gt 0 ]; do
     --paired-drop) PAIRED=true; shift;;
     --odom-guard)  GUARD=true; shift;;
     --with-cloud)  WITHCLOUD=1; shift;;
+    --with-propagated) WITHPROP=1; shift;;
+    --with-rgb)    WITHRGB=1; shift;;
     --internal)    INTERNAL=1; shift;;   # also record FAST-LIVO2 internal-health topics (effective LiDAR pts + visual submap pts)
     -*)            echo "unknown opt: $1" >&2; exit 2;;
     *)             BAG="$1"; shift;;
@@ -113,6 +117,8 @@ LARGS="paired_drop:=$PAIRED odom_guard:=$GUARD"
 GT="/vrpn_client_node/${TRACKER}/pose"
 REC_TOPICS="/aft_mapped_to_init /aft_mapped_to_body /aft_mapped_to_optitrack /path $GT /tf /tf_static"
 [ "$WITHCLOUD" = 1 ] && REC_TOPICS="$REC_TOPICS /cloud_registered"
+[ "$WITHPROP" = 1 ]  && REC_TOPICS="$REC_TOPICS /aft_mapped_to_body_imu_propagated"
+[ "$WITHRGB" = 1 ]   && REC_TOPICS="$REC_TOPICS /rgb_img"
 [ "$INTERNAL" = 1 ]  && REC_TOPICS="$REC_TOPICS /cloud_effected /cloud_visual_sub_map_before"
 
 LP=""; RP=""
@@ -121,11 +127,41 @@ LIVO_LOG="/tmp/replay_livo_${TMP_TAG}.log"
 REC_LOG="/tmp/replay_rec_${TMP_TAG}.log"
 FUSION_LOG="/tmp/fusion_debug.csv"
 rm -f "$FUSION_LOG"
-shutdown(){ for p in "$RP" "$LP"; do [ -n "$p" ] && kill -INT "$p" 2>/dev/null; done
-  # Do not use a global pkill here: campaign workers run on isolated ROS ports
-  # and must not terminate each other's roslaunch.  Roslaunch owns and cleans
-  # its child mapping process when its recorded PID receives SIGINT.
-  sleep 1; }
+stop_and_wait(){
+  local pid="$1" label="$2" limit="$3" i=0
+  [ -z "$pid" ] && return 0
+  kill -INT "$pid" 2>/dev/null || true
+  while kill -0 "$pid" 2>/dev/null && [ "$i" -lt "$limit" ]; do
+    sleep 0.1
+    i=$((i + 1))
+  done
+  if kill -0 "$pid" 2>/dev/null; then
+    echo "[replay] $label did not stop after INT; sending TERM" >&2
+    kill -TERM "$pid" 2>/dev/null || true
+    i=0
+    while kill -0 "$pid" 2>/dev/null && [ "$i" -lt 100 ]; do
+      sleep 0.1
+      i=$((i + 1))
+    done
+  fi
+  if kill -0 "$pid" 2>/dev/null; then
+    echo "[replay] $label did not stop after TERM; sending KILL" >&2
+    kill -KILL "$pid" 2>/dev/null || true
+  fi
+  wait "$pid" 2>/dev/null || true
+}
+shutdown(){
+  # Stop and fully reap the recorder first.  Large cloud/RGB bags can need
+  # several seconds to flush LZ4 chunks, write the index, and rename .active;
+  # killing roslaunch (or returning to the host wrapper's cleanup) before that
+  # completes can leave a partial result that still looks superficially valid.
+  local recorder="$RP" launcher="$LP"
+  RP=""; LP=""
+  stop_and_wait "$recorder" "rosbag recorder" 600
+  # Do not use a global pkill here: campaign workers run on isolated ROS ports.
+  # Roslaunch owns and cleans its child mapping process when reaped here.
+  stop_and_wait "$launcher" "roslaunch" 200
+}
 trap 'echo; echo "[replay] interrupted"; shutdown; exit 130' INT TERM
 trap 'shutdown' ERR
 
@@ -177,6 +213,26 @@ sleep 2   # let the last frames flush through the node + recorder
 
 echo "[replay] done — stopping nodes."
 shutdown
+
+# Refuse success until rosbag close/index/rename completed and every requested
+# estimator output is actually present.  This protects downstream splicing
+# from accepting a truncated export bag.
+[ -s "$OUT" ] || { echo "[replay] missing/empty finalized output: $OUT" >&2; exit 1; }
+BAG_INFO=$(rosbag info "$OUT") || {
+  echo "[replay] output is not an indexed/readable rosbag: $OUT" >&2
+  exit 1
+}
+REQUIRED_TOPICS="/aft_mapped_to_init /aft_mapped_to_body /aft_mapped_to_optitrack /path /tf"
+[ "$WITHCLOUD" = 1 ] && REQUIRED_TOPICS="$REQUIRED_TOPICS /cloud_registered"
+[ "$WITHPROP" = 1 ]  && REQUIRED_TOPICS="$REQUIRED_TOPICS /aft_mapped_to_body_imu_propagated"
+[ "$WITHRGB" = 1 ]   && REQUIRED_TOPICS="$REQUIRED_TOPICS /rgb_img"
+[ "$INTERNAL" = 1 ]  && REQUIRED_TOPICS="$REQUIRED_TOPICS /cloud_effected /cloud_visual_sub_map_before"
+for topic in $REQUIRED_TOPICS; do
+  echo "$BAG_INFO" | grep -Eq "[[:space:]]${topic}[[:space:]]+[0-9]+ msgs" || {
+    echo "[replay] finalized output is missing required topic: $topic" >&2
+    exit 1
+  }
+done
 
 # Preserve node diagnostics beside each result so a campaign run remains
 # auditable after subsequent replays overwrite /tmp/fusion_debug.csv.
