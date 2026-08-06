@@ -137,6 +137,13 @@ condition-specific correlation `r`. The valid-window count is plotted on a secon
 axis because large windows have fewer samples. Configure it with
 `--drift-sweep-min-s`, `--drift-sweep-max-s`, and `--drift-sweep-step-s`.
 
+Calibration and classifier views include all outcomes rather than only high-S/high-drift
+examples. They report scale-bin drift distributions, ROC/precision-recall curves,
+TP/FP/TN/FN at `S > 1.001`, threshold sweeps, session-cluster bootstrap AUROC/AP
+intervals, and a within-session circular-shift null test. Three high-drift definitions
+(`>0.1 m/s`, above median, and top quartile) are shown in parallel to avoid selecting
+one outcome threshold after seeing the result.
+
 ## Files
 
 - `record_fastlivo_bag.sh` — record a replayable bag during a flight

@@ -1016,6 +1016,360 @@ def _plot_deadzone_drift_window_sweep(
     return document
 
 
+def _binary_auc_ap(labels: np.ndarray, scores: np.ndarray) -> Tuple[float | None, float | None]:
+    labels = np.asarray(labels, dtype=bool)
+    scores = np.asarray(scores, dtype=float)
+    positives = int(np.sum(labels))
+    negatives = len(labels) - positives
+    if positives == 0 or negatives == 0:
+        return None, None
+    ranks = _rankdata(scores)
+    auc = (float(np.sum(ranks[labels])) - positives * (positives + 1) / 2.0) / \
+        (positives * negatives)
+    order = np.argsort(-scores, kind="mergesort")
+    sorted_scores = scores[order]
+    sorted_labels = labels[order]
+    ends = np.r_[np.flatnonzero(np.diff(sorted_scores) != 0), len(scores) - 1]
+    true_positive = np.cumsum(sorted_labels)[ends].astype(float)
+    predicted_positive = (ends + 1).astype(float)
+    recall = true_positive / positives
+    precision = true_positive / predicted_positive
+    average_precision = float(np.sum(np.diff(np.r_[0.0, recall]) * precision))
+    return float(auc), average_precision
+
+
+def _roc_pr_points(labels: np.ndarray, scores: np.ndarray) -> Dict[str, np.ndarray]:
+    labels = np.asarray(labels, dtype=bool)
+    scores = np.asarray(scores, dtype=float)
+    positives = int(np.sum(labels))
+    negatives = len(labels) - positives
+    order = np.argsort(-scores, kind="mergesort")
+    sorted_scores = scores[order]
+    sorted_labels = labels[order]
+    ends = np.r_[np.flatnonzero(np.diff(sorted_scores) != 0), len(scores) - 1]
+    true_positive = np.cumsum(sorted_labels)[ends].astype(float)
+    false_positive = (ends + 1).astype(float) - true_positive
+    recall = true_positive / positives
+    false_positive_rate = false_positive / negatives
+    precision = true_positive / (true_positive + false_positive)
+    return {
+        "fpr": np.r_[0.0, false_positive_rate],
+        "tpr": np.r_[0.0, recall],
+        "recall": np.r_[0.0, recall],
+        "precision": np.r_[1.0, precision],
+        "threshold": np.r_[math.inf, sorted_scores[ends]],
+    }
+
+
+def _confusion_metrics(labels: np.ndarray, scores: np.ndarray,
+                       threshold: float) -> Dict[str, object]:
+    labels = np.asarray(labels, dtype=bool)
+    predicted = np.asarray(scores, dtype=float) > threshold
+    tp = int(np.sum(predicted & labels))
+    fp = int(np.sum(predicted & ~labels))
+    tn = int(np.sum(~predicted & ~labels))
+    fn = int(np.sum(~predicted & labels))
+
+    def ratio(numerator: float, denominator: float) -> float | None:
+        return float(numerator / denominator) if denominator else None
+
+    recall = ratio(tp, tp + fn)
+    specificity = ratio(tn, tn + fp)
+    denominator = math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
+    return {
+        "threshold_s": threshold,
+        "tp": tp, "fp": fp, "tn": tn, "fn": fn,
+        "precision": ratio(tp, tp + fp),
+        "recall_sensitivity": recall,
+        "specificity": specificity,
+        "false_positive_rate": ratio(fp, fp + tn),
+        "negative_predictive_value": ratio(tn, tn + fn),
+        "accuracy": ratio(tp + tn, len(labels)),
+        "balanced_accuracy": (0.5 * (recall + specificity)
+                              if recall is not None and specificity is not None else None),
+        "mcc": float((tp * tn - fp * fn) / denominator) if denominator else None,
+    }
+
+
+def _best_youden_threshold(labels: np.ndarray, scores: np.ndarray) -> Dict[str, object]:
+    candidates = np.r_[np.max(scores) + 1e-9, np.unique(scores)]
+    rows = []
+    for threshold in candidates:
+        metrics = _confusion_metrics(labels, scores, float(threshold))
+        recall = metrics["recall_sensitivity"]
+        specificity = metrics["specificity"]
+        youden = ((recall + specificity - 1.0)
+                  if recall is not None and specificity is not None else -math.inf)
+        rows.append((youden, metrics))
+    return max(rows, key=lambda row: row[0])[1]
+
+
+def _cluster_bootstrap_classifier(
+        labels: np.ndarray, scores: np.ndarray, session_ids: np.ndarray,
+        samples: int = 10000, seed: int = 20260806) -> Dict[str, object]:
+    ids = np.unique(session_ids)
+    indices = {flight_id: np.flatnonzero(session_ids == flight_id) for flight_id in ids}
+    rng = np.random.default_rng(seed)
+    auc_values, ap_values = [], []
+    for _ in range(samples):
+        chosen = rng.choice(ids, size=len(ids), replace=True)
+        selected = np.concatenate([indices[flight_id] for flight_id in chosen])
+        auc, average_precision = _binary_auc_ap(labels[selected], scores[selected])
+        if auc is not None:
+            auc_values.append(auc)
+            ap_values.append(average_precision)
+    return {
+        "samples": samples,
+        "auroc_ci95": [float(value) for value in np.quantile(auc_values, [0.025, 0.975])],
+        "average_precision_ci95": [float(value) for value in np.quantile(
+            ap_values, [0.025, 0.975])],
+    }
+
+
+def _circular_shift_auc_pvalue(
+        labels: np.ndarray, scores: np.ndarray, session_ids: np.ndarray,
+        starts: np.ndarray, observed_auc: float, samples: int = 10000,
+        seed: int = 20260806) -> Dict[str, object]:
+    ids = np.unique(session_ids)
+    groups = {}
+    for flight_id in ids:
+        indices = np.flatnonzero(session_ids == flight_id)
+        groups[flight_id] = indices[np.argsort(starts[indices])]
+    rng = np.random.default_rng(seed)
+    null = []
+    for _ in range(samples):
+        shifted = scores.copy()
+        for indices in groups.values():
+            shifted[indices] = np.roll(scores[indices], int(rng.integers(0, len(indices))))
+        auc, _ = _binary_auc_ap(labels, shifted)
+        if auc is not None:
+            null.append(auc)
+    null_array = np.asarray(null)
+    return {
+        "samples": samples,
+        "null_mean": float(np.mean(null_array)),
+        "null_ci95": [float(value) for value in np.quantile(null_array, [0.025, 0.975])],
+        "one_sided_p": float((1 + np.sum(null_array >= observed_auc)) /
+                             (1 + len(null_array))),
+    }
+
+
+def _cluster_bin_interval(rows: Sequence[Mapping[str, object]], field: str,
+                          statistic, samples: int = 10000,
+                          seed: int = 20260806) -> List[float] | None:
+    if not rows:
+        return None
+    ids = sorted({str(row["flight_id"]) for row in rows})
+    by_id = {flight_id: [row for row in rows if row["flight_id"] == flight_id]
+             for flight_id in ids}
+    rng = np.random.default_rng(seed)
+    values = []
+    for _ in range(samples):
+        chosen = rng.choice(ids, size=len(ids), replace=True)
+        sample = [row for flight_id in chosen for row in by_id[str(flight_id)]]
+        array = np.asarray([float(row[field]) for row in sample])
+        values.append(float(statistic(array)))
+    return [float(value) for value in np.quantile(values, [0.025, 0.975])]
+
+
+def _plot_deadzone_calibration_classification(
+        series: Sequence[Mapping[str, object]], out_dir: Path, window: str,
+        drift_window_s: float) -> Dict[str, object]:
+    rows = _deadzone_drift_rows(series, drift_window_s)
+    scores = np.asarray([float(row["dead_zone_scale_mean"]) for row in rows])
+    drift = np.asarray([float(row["rmse_drift_mps"]) for row in rows])
+    session_ids = np.asarray([str(row["flight_id"]) for row in rows])
+    starts = np.asarray([float(row["start_s"]) for row in rows])
+
+    bin_specs = (
+        ("S=1", 1.0, 1.001, True),
+        ("1<S≤1.5", 1.001, 1.5, False),
+        ("1.5<S≤2", 1.5, 2.0, False),
+        ("2<S≤3", 2.0, 3.0, False),
+        ("S>3", 3.0, math.inf, False),
+    )
+    calibration_rows = []
+    bin_groups = []
+    for label, low, high, include_low in bin_specs:
+        group = [row for row in rows
+                 if ((float(row["dead_zone_scale_mean"]) >= low if include_low
+                      else float(row["dead_zone_scale_mean"]) > low) and
+                     float(row["dead_zone_scale_mean"]) <= high)]
+        bin_groups.append(group)
+        values = np.asarray([float(row["rmse_drift_mps"]) for row in group])
+        active = np.asarray([float(row["rmse_drift_mps"]) > 0.1 for row in group])
+        calibration_rows.append({
+            "scale_bin": label,
+            "scale_low_exclusive": low if not include_low else None,
+            "scale_high_inclusive": high if math.isfinite(high) else None,
+            "n_windows": len(group),
+            "n_sessions": len({str(row["flight_id"]) for row in group}),
+            "scale_mean": float(np.mean([
+                float(row["dead_zone_scale_mean"]) for row in group])),
+            "drift_mean_mps": float(np.mean(values)),
+            "drift_median_mps": float(np.median(values)),
+            "drift_mean_cluster_ci95": _cluster_bin_interval(
+                group, "rmse_drift_mps", np.mean),
+            "high_drift_gt_0p1_fraction": float(np.mean(active)),
+            "high_drift_fraction_cluster_ci95": _cluster_bin_interval(
+                [{**row, "high": float(float(row["rmse_drift_mps"]) > 0.1)}
+                 for row in group], "high", np.mean),
+        })
+    calibration_csv = out_dir / f"dead_zone_scale_calibration_{window}.csv"
+    with calibration_csv.open("w", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=list(calibration_rows[0]))
+        writer.writeheader()
+        writer.writerows(calibration_rows)
+
+    positions = np.arange(len(calibration_rows))
+    figure, axes = plt.subplots(2, 1, figsize=(10, 8.5), sharex=True,
+                                constrained_layout=True)
+    for position, (item, group) in enumerate(zip(calibration_rows, bin_groups)):
+        values = np.asarray([float(row["rmse_drift_mps"]) for row in group])
+        jitter = np.random.default_rng(20260806 + position).uniform(-0.10, 0.10, len(values))
+        axes[0].scatter(np.full(len(values), position) + jitter, values, s=18,
+                        alpha=0.28, color="#4C78A8")
+    means = np.asarray([float(row["drift_mean_mps"]) for row in calibration_rows])
+    lower = np.asarray([float(row["drift_mean_cluster_ci95"][0])
+                        for row in calibration_rows])
+    upper = np.asarray([float(row["drift_mean_cluster_ci95"][1])
+                        for row in calibration_rows])
+    medians = np.asarray([float(row["drift_median_mps"]) for row in calibration_rows])
+    axes[0].errorbar(positions, means, yerr=[means - lower, upper - means], fmt="o-",
+                     color="#E15759", capsize=4, linewidth=2, label="mean + session-cluster CI")
+    axes[0].plot(positions, medians, "s--", color="#222222", label="median")
+    axes[0].axhline(0.0, color="black", linewidth=0.8, alpha=0.5)
+    axes[0].set_ylabel("Cumulative RMSE drift (m/s)")
+    axes[0].grid(True, alpha=0.25)
+    axes[0].legend(loc="best", fontsize=8)
+    fractions = np.asarray([float(row["high_drift_gt_0p1_fraction"])
+                            for row in calibration_rows])
+    fraction_lower = np.asarray([float(row["high_drift_fraction_cluster_ci95"][0])
+                                 for row in calibration_rows])
+    fraction_upper = np.asarray([float(row["high_drift_fraction_cluster_ci95"][1])
+                                 for row in calibration_rows])
+    axes[1].errorbar(positions, fractions,
+                     yerr=[fractions - fraction_lower, fraction_upper - fractions],
+                     fmt="o-", color="#59A14F", capsize=4, linewidth=2)
+    axes[1].set_ylabel("P(RMSE drift > 0.1 m/s)")
+    axes[1].set_ylim(0.0, 1.0)
+    axes[1].set_xticks(positions, [
+        f"{row['scale_bin']}\n(n={row['n_windows']})" for row in calibration_rows])
+    axes[1].set_xlabel("Mean dead-zone scale in non-overlapping window")
+    axes[1].grid(True, alpha=0.25)
+    figure.suptitle(
+        f"Dead-zone scale calibration — {window} window\n"
+        f"non-overlapping {drift_window_s:g}s bins; CIs resample complete sessions")
+    calibration_plot = out_dir / f"dead_zone_scale_calibration_{window}.png"
+    figure.savefig(calibration_plot, dpi=180)
+    plt.close(figure)
+
+    outcome_specs = (
+        ("fixed_0p1_mps", 0.1, "drift > 0.1 m/s"),
+        ("above_median", float(np.median(drift)), "drift > pooled median"),
+        ("top_quartile", float(np.quantile(drift, 0.75)), "drift > pooled 75th percentile"),
+    )
+    classifications = {}
+    threshold_rows = []
+    figure, axes = plt.subplots(1, 2, figsize=(12, 5.3), constrained_layout=True)
+    confusion_data = []
+    for index, (name, threshold, label) in enumerate(outcome_specs):
+        outcomes = drift > threshold
+        auc, average_precision = _binary_auc_ap(outcomes, scores)
+        curves = _roc_pr_points(outcomes, scores)
+        bootstrap = _cluster_bootstrap_classifier(
+            outcomes, scores, session_ids, seed=20260806 + index)
+        null = _circular_shift_auc_pvalue(
+            outcomes, scores, session_ids, starts, float(auc), seed=20260906 + index)
+        active_metrics = _confusion_metrics(outcomes, scores, 1.001)
+        best_metrics = _best_youden_threshold(outcomes, scores)
+        classifications[name] = {
+            "outcome_definition": label,
+            "drift_threshold_mps": threshold,
+            "positive_prevalence": float(np.mean(outcomes)),
+            "auroc": auc,
+            "average_precision": average_precision,
+            "random_average_precision": float(np.mean(outcomes)),
+            "cluster_bootstrap": bootstrap,
+            "within_session_circular_shift_auc_null": null,
+            "dead_zone_active_threshold": active_metrics,
+            "exploratory_best_youden_threshold": best_metrics,
+        }
+        axes[0].plot(curves["fpr"], curves["tpr"], linewidth=2,
+                     label=f"{label}: AUC={auc:.3f}")
+        axes[1].plot(curves["recall"], curves["precision"], linewidth=2,
+                     label=f"{label}: AP={average_precision:.3f}")
+        confusion_data.append((name, label, active_metrics))
+        for candidate in np.r_[np.max(scores) + 1e-9, np.unique(scores)]:
+            threshold_rows.append({
+                "outcome": name,
+                "drift_threshold_mps": threshold,
+                **_confusion_metrics(outcomes, scores, float(candidate)),
+            })
+    axes[0].plot([0, 1], [0, 1], "k--", linewidth=0.9, label="chance")
+    axes[0].set_xlabel("False-positive rate")
+    axes[0].set_ylabel("True-positive rate")
+    axes[0].set_title("ROC")
+    axes[1].set_xlabel("Recall")
+    axes[1].set_ylabel("Precision")
+    axes[1].set_title("Precision–Recall")
+    for ax in axes:
+        ax.set_xlim(0, 1)
+        ax.set_ylim(0, 1)
+        ax.grid(True, alpha=0.25)
+        ax.legend(loc="best", fontsize=8)
+    figure.suptitle(
+        f"Dead-zone S as a high-RMSE-drift detector — {window} window\n"
+        f"all TP/FP/TN/FN included; non-overlapping {drift_window_s:g}s samples")
+    roc_pr_plot = out_dir / f"dead_zone_scale_high_drift_roc_pr_{window}.png"
+    figure.savefig(roc_pr_plot, dpi=180)
+    plt.close(figure)
+
+    figure, axes = plt.subplots(1, 3, figsize=(12, 4.2), constrained_layout=True)
+    for ax, (_, label, metrics) in zip(axes, confusion_data):
+        matrix = np.asarray([[metrics["tn"], metrics["fp"]],
+                             [metrics["fn"], metrics["tp"]]])
+        ax.imshow(matrix, cmap="Blues")
+        for row_index in range(2):
+            for column_index in range(2):
+                ax.text(column_index, row_index, str(matrix[row_index, column_index]),
+                        ha="center", va="center", fontsize=14)
+        ax.set_xticks([0, 1], ["Pred low", "Pred high"])
+        ax.set_yticks([0, 1], ["Actual low", "Actual high"])
+        ax.set_title(
+            f"{label}\nprecision={metrics['precision']:.3f}, "
+            f"recall={metrics['recall_sensitivity']:.3f}")
+    figure.suptitle("Confusion matrices at dead-zone-active threshold S > 1.001")
+    confusion_plot = out_dir / f"dead_zone_scale_high_drift_confusion_{window}.png"
+    figure.savefig(confusion_plot, dpi=180)
+    plt.close(figure)
+
+    thresholds_csv = out_dir / f"dead_zone_scale_high_drift_threshold_sweep_{window}.csv"
+    with thresholds_csv.open("w", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=list(threshold_rows[0]))
+        writer.writeheader()
+        writer.writerows(threshold_rows)
+
+    document = {
+        "window": window,
+        "drift_window_s": drift_window_s,
+        "calibration_bins": calibration_rows,
+        "classification": classifications,
+        "caveat": "Observational construct-validity check, not evidence that S causes estimator drift.",
+        "outputs": {
+            "calibration_csv": str(calibration_csv),
+            "calibration_plot": str(calibration_plot),
+            "roc_pr_plot": str(roc_pr_plot),
+            "confusion_plot": str(confusion_plot),
+            "threshold_sweep_csv": str(thresholds_csv),
+        },
+    }
+    json_path = out_dir / f"dead_zone_scale_calibration_classification_{window}.json"
+    document["outputs"]["json"] = str(json_path)
+    _atomic_json(json_path, document)
+    return document
+
+
 def plot_cache(cache_dir: Path, out_dir: Path, window: str, rmse_mode: str,
                rolling_window_s: float, drift_window_s: float,
                drift_sweep_min_s: float, drift_sweep_max_s: float,
@@ -1034,6 +1388,8 @@ def plot_cache(cache_dir: Path, out_dir: Path, window: str, rmse_mode: str,
     drift_sweep = _plot_deadzone_drift_window_sweep(
         series, out_dir, window, drift_sweep_min_s, drift_sweep_max_s,
         drift_sweep_step_s)
+    calibration_classification = _plot_deadzone_calibration_classification(
+        series, out_dir, window, drift_window_s)
     stem = f"{window}_{rmse_mode}"
     subtitle = (f"{index['est_source']}; time-corrected, no spatial alignment; "
                 "thin=session, thick=median, band=IQR")
@@ -1245,6 +1601,7 @@ def plot_cache(cache_dir: Path, out_dir: Path, window: str, rmse_mode: str,
             "best_worst_plots": extreme_outputs,
             "dead_zone_scale_vs_rmse_drift": drift_analysis["outputs"],
             "dead_zone_rmse_drift_window_sweep": drift_sweep["outputs"],
+            "dead_zone_calibration_classification": calibration_classification["outputs"],
         },
     }
     _atomic_json(out_dir / f"summary_{stem}.json", summary)
