@@ -3,7 +3,7 @@
   "recordings_root": "/home/ml/webcam_recorder/recordings",
   "split_rule": "Before replay outcomes: acquisition ordinals 0 and 2 per mode (1 and 3 for one-based pure_wodz) are development; every other session is locked validation.",
   "sessions": [
-    {"id": "pw1_20260804_052639", "condition": "pure_wodz", "split": "development", "source": "pure_wodz_2026-08-04_05-26-39_1/flight_2026-08-04_05-26-39.bag"},
+    {"id": "pw1_20260804_052639", "condition": "pure_wodz", "split": "development", "source": "pure_wodz_flight_2026-08-04_05-26-39_1/flight_2026-08-04_05-26-39.bag"},
     {"id": "pw2_20260804_052845", "condition": "pure_wodz", "split": "validation", "source": "pure_wodz_flight_2026-08-04_05-28-45_2/flight_2026-08-04_05-28-45.bag"},
     {"id": "pw3_20260804_053018", "condition": "pure_wodz", "split": "development", "source": "pure_wodz_flight_2026-08-04_05-30-18_3/flight_2026-08-04_05-30-18.bag"},
     {"id": "pw4_20260804_053223", "condition": "pure_wodz", "split": "validation", "source": "pure_wodz_flight_2026-08-04_05-32-23_4/flight_2026-08-04_05-32-23.bag"},

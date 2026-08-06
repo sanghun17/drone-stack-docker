@@ -86,9 +86,37 @@ So: **most likely no separate calibration run is required** — at most fill the
 extrinsic and a small time offset, both read straight from the data. Confirm empirically by
 A/B replaying (`--config`) the edited config against the identity baseline.
 
+## Cached 21-flight time-series plots
+
+The frozen 2026-08-05 production replay can be turned into a small reusable cache and
+the default hover-to-landing plots with one command:
+
+```bash
+python3 tools/fastlivo/plot_flight_timeseries.py all
+```
+
+This scans each source/result bag once. Later views read only the compressed NPZ cache:
+
+```bash
+python3 tools/fastlivo/plot_flight_timeseries.py plot --window mission
+python3 tools/fastlivo/plot_flight_timeseries.py plot --rmse-mode rolling
+python3 tools/fastlivo/plot_flight_timeseries.py plot --window armed
+```
+
+The default movement curve is the cumulative 3D distance of GT resampled at 10 Hz.
+The default error curve is cumulative position RMSE since the selected window start.
+VIO timestamps use the frozen constant-offset correction and positions receive **no
+spatial alignment**. The cache also retains instantaneous error so rolling or
+instantaneous views require no bag replay or rescan. Generated data live below
+`_campaign_20260805/timeseries/` and are excluded from git.
+
 ## Files
 
 - `record_fastlivo_bag.sh` — record a replayable bag during a flight
 - `replay_fastlivo.sh` + `mapping_d435i_replay.launch` — offline replay (sim time)
 - `eval_fastlivo.py` — APE/RPE + calibration diagnostics (numpy only, no evo)
+- `plot_flight_timeseries.py` — cache the frozen 21-flight campaign once, then plot
+  cumulative GT distance and time-corrected/no-spatial-alignment VIO-GT RMSE over
+  the detected hover-to-landing window. `plot --window mission|armed|full` and
+  `plot --rmse-mode rolling|instantaneous` reuse the same NPZ cache.
 - `dump_d435i_extrinsics.sh` — print factory extrinsics for `d435i.yaml`
