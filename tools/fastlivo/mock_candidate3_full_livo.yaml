@@ -1,7 +1,7 @@
-# POST-HOC candidate-3 full-LIVO diagnostic overlay, 2026-08-06.
-# Apply identically to p1 and pm4.  This keeps depth/LiDAR, RGB correction,
-# and camera IMU integration active.  It is not a production configuration
-# and is not locked evidence for the paper comparison.
+# POST-HOC all-D435-IMU fallback/isolation overlay, 2026-08-06.
+# This passed the pair gates, but was superseded by
+# mock_candidate3_full_livo_hybrid_imu.yaml after the pm4 D435 accelerometer
+# corruption was localized.  It remains useful for exact replay provenance.
 common:
   img_en: 1
   lidar_en: 1

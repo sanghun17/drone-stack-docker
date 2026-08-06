@@ -1,0 +1,33 @@
+# POST-HOC candidate-3 full-LIVO hybrid-IMU overlay, 2026-08-06.
+# The derived /camera/imu_hybrid stream retains D435 timestamps and gyro while
+# replacing only its corrupted acceleration with interpolated FCU acceleration
+# transformed into camera_depth_optical_frame.  RGB, depth/LiDAR, and IMU all
+# remain active.  This is a pair-only diagnostic, not a production config.
+common:
+  img_en: 1
+  lidar_en: 1
+  imu_topic: /camera/imu_hybrid
+
+imu:
+  imu_en: true
+  # FCU acceleration still contains rare motor-vibration spikes.  Native 0.1
+  # diverged; 10.0 was the common p1/pm4 value validated at both 1x and 4x.
+  acc_cov: 10.0
+
+vio:
+  max_lio_features_for_fusion: -1
+  img_point_cov: 1000
+
+extrin_calib:
+  # camera_depth_optical_frame -> camera_color_optical_frame.
+  Rcl: [0.999978, 0.00659742, 0.00021399,
+        -0.00659736, 0.999978, -0.000301692,
+        -0.000215976, 0.000300274, 1.0]
+  Pcl: [0.01438551, 0.0000943, 0.00042120]
+
+uav:
+  # Output-only diagnostic setting; IMU integration remains active.
+  imu_rate_odom: false
+
+debug:
+  fusion_log: true
