@@ -45,7 +45,8 @@ DEFAULT_SPEC = REPO / "tools/fastlivo/campaign_20260805_sessions.json"
 DEFAULT_RESULTS = DEFAULT_ROOT / "runs/production_primary/results.json"
 GT_TOPIC = "/vrpn_client_node/pure/pose"
 EST_TOPIC = "/aft_mapped_to_optitrack"
-CACHE_VERSION = 3
+DEAD_ZONE_TOPIC = "/jax/dead_zone_scale"
+CACHE_VERSION = 4
 CONDITION_ORDER = ("pure_wodz", "pure", "pure_mean", "nominal")
 COLORS = {
     "pure_wodz": "#4C78A8",
@@ -138,8 +139,10 @@ def _read_source(path: Path) -> Dict[str, object]:
     armed: List[Tuple[float, bool, str]] = []
     landed: List[Tuple[float, int]] = []
     planner: List[Tuple[float, str]] = []
+    dead_zone_t: List[float] = []
+    dead_zone_scale: List[float] = []
     topics = [GT_TOPIC, "/mavros/state", "/mavros/extended_state",
-              "/planner/planner_node/state"]
+              "/planner/planner_node/state", DEAD_ZONE_TOPIC]
     with rosbag.Bag(str(path), "r") as bag:
         bag_start = float(bag.get_start_time())
         bag_end = float(bag.get_end_time())
@@ -167,6 +170,9 @@ def _read_source(path: Path) -> Dict[str, object]:
             elif topic == "/planner/planner_node/state":
                 stamp = float(bag_time.to_sec())
                 planner.append((stamp, str(msg.data)))
+            elif topic == DEAD_ZONE_TOPIC:
+                dead_zone_t.append(float(bag_time.to_sec()))
+                dead_zone_scale.append(float(msg.data))
     times, points = _deduplicate_sorted(gt_t, gt_xyz)
     if len(times) < 10:
         raise RuntimeError(f"{path}: only {len(times)} GT poses")
@@ -178,6 +184,8 @@ def _read_source(path: Path) -> Dict[str, object]:
         "armed": armed,
         "landed": landed,
         "planner": planner,
+        "dead_zone_t": np.asarray(dead_zone_t, dtype=float),
+        "dead_zone_scale": np.asarray(dead_zone_scale, dtype=float),
     }
 
 
@@ -405,6 +413,8 @@ def build_cache(sessions: Sequence[Mapping[str, object]], cache_dir: Path,
             "frozen_rmse_reference_m": frozen_ref,
             "frozen_rmse_delta_m": frozen_delta,
             "windows": windows,
+            "dead_zone_topic": DEAD_ZONE_TOPIC,
+            "dead_zone_samples": len(source["dead_zone_t"]),
             "cache_npz": str(npz_path.resolve()),
         })
         _atomic_npz(
@@ -415,6 +425,8 @@ def build_cache(sessions: Sequence[Mapping[str, object]], cache_dir: Path,
             position_error_m=ape,
             gt_time_s=gt_uniform_t,
             gt_xyz=gt_uniform_xyz,
+            dead_zone_time_s=source["dead_zone_t"],
+            dead_zone_scale=source["dead_zone_scale"],
         )
         _atomic_json(meta_path, meta)
         built.append(meta)
@@ -457,6 +469,8 @@ def _derive_series(meta: Mapping[str, object], window: str, rmse_mode: str,
         error = data["position_error_m"].copy()
         gt_t = data["gt_time_s"].copy()
         gt_xyz = data["gt_xyz"].copy()
+        dead_zone_t = data["dead_zone_time_s"].copy()
+        dead_zone_scale = data["dead_zone_scale"].copy()
     bounds = meta["windows"][window]
     start, end = float(bounds["start"]), float(bounds["end"])
     gt_window_t, gt_window_xyz = _with_boundaries(gt_t, gt_xyz, start, end)
@@ -469,6 +483,11 @@ def _derive_series(meta: Mapping[str, object], window: str, rmse_mode: str,
     error_window = error[selected]
     if len(error_t) < 2:
         raise RuntimeError(f"{meta['flight_id']}: empty estimate {window} window")
+    dead_zone_selected = (dead_zone_t >= start) & (dead_zone_t < end)
+    dead_zone_window_t = dead_zone_t[dead_zone_selected]
+    dead_zone_window_scale = dead_zone_scale[dead_zone_selected]
+    if len(dead_zone_window_t) < 2:
+        raise RuntimeError(f"{meta['flight_id']}: empty dead-zone {window} window")
     cumulative = np.sqrt(np.cumsum(error_window * error_window) /
                          np.arange(1, len(error_window) + 1))
     rolling = _rolling_rmse(error_t, error_window, rolling_window_s)
@@ -491,6 +510,8 @@ def _derive_series(meta: Mapping[str, object], window: str, rmse_mode: str,
         "cumulative_rmse_m": cumulative,
         "rolling_rmse_m": rolling,
         "shown_rmse_m": shown,
+        "dead_zone_t": dead_zone_window_t - start,
+        "dead_zone_scale": dead_zone_window_scale,
     }
 
 
@@ -499,8 +520,9 @@ def _aggregate(curves: Sequence[Mapping[str, object]], t_key: str,
     # Keep a fixed cohort.  Allowing short sessions to drop out can make the
     # median cumulative distance jump downward even though every individual
     # distance curve is monotonic.
+    min_common = max(float(curve[t_key][0]) for curve in curves)
     max_common = min(float(curve[t_key][-1]) for curve in curves)
-    grid = np.arange(0.0, max_common + 1e-9, step_s)
+    grid = np.arange(min_common, max_common + 1e-9, step_s)
     values = np.full((len(curves), len(grid)), np.nan)
     for row, curve in enumerate(curves):
         t = np.asarray(curve[t_key])
@@ -516,7 +538,8 @@ def _aggregate(curves: Sequence[Mapping[str, object]], t_key: str,
 
 
 def _draw_metric(ax, grouped: Mapping[str, Sequence[Mapping[str, object]]],
-                 t_key: str, y_key: str, ylabel: str) -> None:
+                 t_key: str, y_key: str, ylabel: str,
+                 y_bottom: float = 0.0) -> None:
     for condition in CONDITION_ORDER:
         curves = grouped.get(condition, [])
         if not curves:
@@ -533,7 +556,7 @@ def _draw_metric(ax, grouped: Mapping[str, Sequence[Mapping[str, object]]],
     ax.set_ylabel(ylabel)
     ax.grid(True, alpha=0.25)
     ax.set_xlim(left=0)
-    ax.set_ylim(bottom=0)
+    ax.set_ylim(bottom=y_bottom)
     ax.legend(loc="best", fontsize=8)
 
 
@@ -543,6 +566,47 @@ def _rmse_ylabel(mode: str, rolling_window_s: float) -> str:
     if mode == "rolling":
         return f"{rolling_window_s:g} s rolling VIO–GT position RMSE (m)"
     return "Instantaneous VIO–GT position error (m)"
+
+
+def _extreme_score(curve: Mapping[str, object], metric: str) -> float:
+    if metric == "distance":
+        return float(curve["distance_m"][-1])
+    if metric == "rmse":
+        return float(curve["cumulative_rmse_m"][-1])
+    if metric == "dead_zone":
+        return float(np.mean(curve["dead_zone_scale"]))
+    raise ValueError(metric)
+
+
+def _select_extremes(grouped: Mapping[str, Sequence[Mapping[str, object]]],
+                     metric: str, kind: str) -> Dict[str, Mapping[str, object]]:
+    # More distance is labelled best; less RMSE / mean scale is labelled best.
+    higher_is_better = metric == "distance"
+    want_max = higher_is_better if kind == "best" else not higher_is_better
+    selector = max if want_max else min
+    return {
+        condition: selector(curves, key=lambda row: _extreme_score(row, metric))
+        for condition, curves in grouped.items() if curves
+    }
+
+
+def _draw_extremes(ax, selected: Mapping[str, Mapping[str, object]], metric: str,
+                   t_key: str, y_key: str, ylabel: str,
+                   y_bottom: float = 0.0) -> None:
+    for condition in CONDITION_ORDER:
+        if condition not in selected:
+            continue
+        curve = selected[condition]
+        score = _extreme_score(curve, metric)
+        flight_id = curve["meta"]["flight_id"]
+        ax.plot(curve[t_key], curve[y_key], color=COLORS[condition], linewidth=2.2,
+                label=f"{condition}: {flight_id} (score={score:.3f})")
+    ax.set_xlabel("Time from window start (s)")
+    ax.set_ylabel(ylabel)
+    ax.grid(True, alpha=0.25)
+    ax.set_xlim(left=0)
+    ax.set_ylim(bottom=y_bottom)
+    ax.legend(loc="best", fontsize=8)
 
 
 def _stats(values: Sequence[float]) -> Dict[str, float]:
@@ -573,12 +637,15 @@ def plot_cache(cache_dir: Path, out_dir: Path, window: str, rmse_mode: str,
     subtitle = (f"{index['est_source']}; time-corrected, no spatial alignment; "
                 "thin=session, thick=median, band=IQR")
 
-    figure, axes = plt.subplots(2, 1, figsize=(11, 9), sharex=True,
+    figure, axes = plt.subplots(3, 1, figsize=(11, 12), sharex=True,
                                 constrained_layout=True)
     _draw_metric(axes[0], grouped, "distance_t", "distance_m",
                  "Cumulative GT distance traveled (m)")
     _draw_metric(axes[1], grouped, "error_t", "shown_rmse_m",
                  _rmse_ylabel(rmse_mode, rolling_window_s))
+    _draw_metric(axes[2], grouped, "dead_zone_t", "dead_zone_scale",
+                 "Current-pose dead-zone scale S", y_bottom=0.95)
+    axes[2].axhline(1.0, color="black", linestyle="--", linewidth=0.8, alpha=0.5)
     figure.suptitle(f"21-flight time series — {window} window\n{subtitle}", fontsize=12)
     overview = out_dir / f"overview_{stem}.png"
     figure.savefig(overview, dpi=180)
@@ -588,29 +655,95 @@ def plot_cache(cache_dir: Path, out_dir: Path, window: str, rmse_mode: str,
             (f"distance_over_time_{window}.png", "distance_t", "distance_m",
              "Cumulative GT distance traveled (m)"),
             (f"vio_gt_{rmse_mode}_rmse_over_time_{window}.png", "error_t",
-             "shown_rmse_m", _rmse_ylabel(rmse_mode, rolling_window_s))):
+             "shown_rmse_m", _rmse_ylabel(rmse_mode, rolling_window_s)),
+            (f"dead_zone_scale_over_time_{window}.png", "dead_zone_t",
+             "dead_zone_scale", "Current-pose dead-zone scale S")):
         figure, ax = plt.subplots(figsize=(11, 5.4), constrained_layout=True)
-        _draw_metric(ax, grouped, t_key, y_key, ylabel)
+        _draw_metric(ax, grouped, t_key, y_key, ylabel,
+                     y_bottom=0.95 if y_key == "dead_zone_scale" else 0.0)
+        if y_key == "dead_zone_scale":
+            ax.axhline(1.0, color="black", linestyle="--", linewidth=0.8, alpha=0.5)
         ax.set_title(f"21-flight campaign — {window} window\n{subtitle}")
         figure.savefig(out_dir / filename, dpi=180)
         plt.close(figure)
+
+    metric_specs = {
+        "distance": ("distance_t", "distance_m", "Cumulative GT distance traveled (m)", 0.0,
+                     "selection score: final cumulative distance (higher is best)"),
+        "rmse": ("error_t", "shown_rmse_m", _rmse_ylabel(rmse_mode, rolling_window_s), 0.0,
+                 "selection score: final cumulative RMSE (lower is best)"),
+        "dead_zone": ("dead_zone_t", "dead_zone_scale", "Current-pose dead-zone scale S", 0.95,
+                      "selection score: time-mean S (lower means less dead-zone inflation; not flight quality)"),
+    }
+    extreme_outputs: Dict[str, str] = {}
+    extreme_rows: List[Dict[str, object]] = []
+    for kind in ("best", "worst"):
+        selected_by_metric = {
+            metric: _select_extremes(grouped, metric, kind)
+            for metric in metric_specs
+        }
+        figure, axes = plt.subplots(3, 1, figsize=(11, 12), sharex=True,
+                                    constrained_layout=True)
+        for ax, metric in zip(axes, ("distance", "rmse", "dead_zone")):
+            t_key, y_key, ylabel, y_bottom, criterion = metric_specs[metric]
+            _draw_extremes(ax, selected_by_metric[metric], metric, t_key, y_key,
+                           ylabel, y_bottom)
+            if metric == "dead_zone":
+                ax.axhline(1.0, color="black", linestyle="--", linewidth=0.8, alpha=0.5)
+            ax.set_title(criterion, fontsize=9)
+        figure.suptitle(
+            f"{kind.upper()} session per condition — {window} window\n"
+            f"Each panel selects independently; {index['est_source']}; "
+            "time-corrected, no spatial alignment", fontsize=12)
+        path = out_dir / f"overview_{stem}_{kind}.png"
+        figure.savefig(path, dpi=180)
+        plt.close(figure)
+        extreme_outputs[f"overview_{kind}"] = str(path)
+
+        for metric, (t_key, y_key, ylabel, y_bottom, criterion) in metric_specs.items():
+            selected = selected_by_metric[metric]
+            figure, ax = plt.subplots(figsize=(11, 5.4), constrained_layout=True)
+            _draw_extremes(ax, selected, metric, t_key, y_key, ylabel, y_bottom)
+            if metric == "dead_zone":
+                ax.axhline(1.0, color="black", linestyle="--", linewidth=0.8, alpha=0.5)
+            ax.set_title(
+                f"{kind.upper()} session per condition — {window} window\n{criterion}")
+            path = out_dir / f"{metric}_over_time_{window}_{kind}.png"
+            figure.savefig(path, dpi=180)
+            plt.close(figure)
+            extreme_outputs[f"{metric}_{kind}"] = str(path)
+            for condition, curve in selected.items():
+                extreme_rows.append({
+                    "metric": metric,
+                    "extreme": kind,
+                    "condition": condition,
+                    "flight_id": curve["meta"]["flight_id"],
+                    "score": _extreme_score(curve, metric),
+                    "selection_definition": criterion,
+                })
 
     pdf_path = out_dir / f"individual_sessions_{stem}.pdf"
     with PdfPages(pdf_path) as pdf:
         for row in series:
             meta = row["meta"]
             color = COLORS[str(meta["condition"])]
-            figure, axes = plt.subplots(2, 1, figsize=(11, 8.5), sharex=True,
+            figure, axes = plt.subplots(3, 1, figsize=(11, 10.5), sharex=True,
                                         constrained_layout=True)
             axes[0].plot(row["distance_t"], row["distance_m"], color=color, linewidth=2)
             axes[0].set_ylabel("Cumulative GT distance (m)")
             axes[1].plot(row["error_t"], row["shown_rmse_m"], color=color, linewidth=2)
             axes[1].set_ylabel(_rmse_ylabel(rmse_mode, rolling_window_s))
-            axes[1].set_xlabel("Time from window start (s)")
+            axes[2].plot(row["dead_zone_t"], row["dead_zone_scale"],
+                         color=color, linewidth=2)
+            axes[2].axhline(1.0, color="black", linestyle="--", linewidth=0.8, alpha=0.5)
+            axes[2].set_ylabel("Dead-zone scale S")
+            axes[2].set_ylim(bottom=0.95)
+            axes[2].set_xlabel("Time from window start (s)")
             for ax in axes:
                 ax.grid(True, alpha=0.25)
                 ax.set_xlim(left=0)
                 ax.set_ylim(bottom=0)
+            axes[2].set_ylim(bottom=0.95)
             figure.suptitle(
                 f"{meta['flight_id']} | {meta['condition']} | {meta['split']}\n"
                 f"window={window} ({row['window_method']}), duration={row['duration_s']:.1f}s, "
@@ -621,6 +754,7 @@ def plot_cache(cache_dir: Path, out_dir: Path, window: str, rmse_mode: str,
     session_rows: List[Dict[str, object]] = []
     for row in series:
         meta = row["meta"]
+        scale = np.asarray(row["dead_zone_scale"])
         session_rows.append({
             "flight_id": meta["flight_id"],
             "condition": meta["condition"],
@@ -636,6 +770,14 @@ def plot_cache(cache_dir: Path, out_dir: Path, window: str, rmse_mode: str,
             "vio_gt_p90_error_m": float(np.quantile(row["error_m"], 0.9)),
             "vio_gt_max_error_m": float(np.max(row["error_m"])),
             "vio_gt_final_error_m": float(row["error_m"][-1]),
+            "dead_zone_scale_mean": float(np.mean(scale)),
+            "dead_zone_scale_median": float(np.median(scale)),
+            "dead_zone_scale_std": float(np.std(scale)),
+            "dead_zone_scale_min": float(np.min(scale)),
+            "dead_zone_scale_max": float(np.max(scale)),
+            "dead_zone_scale_p90": float(np.quantile(scale, 0.9)),
+            "dead_zone_active_fraction": float(np.mean(scale > 1.001)),
+            "dead_zone_sample_count": len(scale),
             "time_offset_s": meta["time_offset_s"],
             "association_count": len(row["error_m"]),
             "source_bag": meta["source_bag"],
@@ -659,7 +801,13 @@ def plot_cache(cache_dir: Path, out_dir: Path, window: str, rmse_mode: str,
         }
         condition_json[condition] = stats
         flat: Dict[str, object] = {"condition": condition, "n": len(rows)}
-        for metric in ("duration_s", "gt_distance_m", "vio_gt_rmse_m"):
+        for metric in ("duration_s", "gt_distance_m", "vio_gt_rmse_m",
+                       "dead_zone_scale_mean", "dead_zone_scale_p90",
+                       "dead_zone_scale_max", "dead_zone_active_fraction"):
+            stats[metric] = _stats([float(row[metric]) for row in rows])
+        for metric in ("duration_s", "gt_distance_m", "vio_gt_rmse_m",
+                       "dead_zone_scale_mean", "dead_zone_scale_p90",
+                       "dead_zone_scale_max", "dead_zone_active_fraction"):
             for stat, value in stats[metric].items():
                 flat[f"{metric}_{stat}"] = value
         condition_rows.append(flat)
@@ -668,6 +816,11 @@ def plot_cache(cache_dir: Path, out_dir: Path, window: str, rmse_mode: str,
         writer = csv.DictWriter(stream, fieldnames=list(condition_rows[0]))
         writer.writeheader()
         writer.writerows(condition_rows)
+    extremes_csv = out_dir / f"best_worst_sessions_{window}.csv"
+    with extremes_csv.open("w", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=list(extreme_rows[0]))
+        writer.writeheader()
+        writer.writerows(extreme_rows)
     summary = {
         "est_source": index["est_source"],
         "window": window,
@@ -677,14 +830,18 @@ def plot_cache(cache_dir: Path, out_dir: Path, window: str, rmse_mode: str,
             "distance": "10 Hz GT cumulative 3D path length within selected window",
             "vio_gt_error": "time-corrected position error with no spatial alignment",
             "rmse": "sqrt(mean(position_error_m^2)) from selected-window start",
+            "dead_zone_scale": "recorded /jax/dead_zone_scale at the current vehicle pose; not the per-candidate trajectory tensor",
             "aggregate": "session curves plus fixed-cohort condition median and IQR; aggregate stops at the shortest session",
         },
         "conditions": condition_json,
         "outputs": {
             "overview": str(overview),
             "individual_pdf": str(pdf_path),
+            "dead_zone_scale_plot": str(out_dir / f"dead_zone_scale_over_time_{window}.png"),
             "sessions_csv": str(session_csv),
             "conditions_csv": str(condition_csv),
+            "best_worst_csv": str(extremes_csv),
+            "best_worst_plots": extreme_outputs,
         },
     }
     _atomic_json(out_dir / f"summary_{stem}.json", summary)

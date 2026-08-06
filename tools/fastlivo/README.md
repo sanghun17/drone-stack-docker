@@ -110,6 +110,19 @@ spatial alignment**. The cache also retains instantaneous error so rolling or
 instantaneous views require no bag replay or rescan. Generated data live below
 `_campaign_20260805/timeseries/` and are excluded from git.
 
+The overview and per-session PDF also plot the recorded `/jax/dead_zone_scale`.
+This is the scale at the **current vehicle pose**, not the internal `(candidate, time)`
+scale tensor used while evaluating all local-planner candidates. Session/condition CSVs
+include its mean, median, standard deviation, p90, maximum, and active (`S > 1.001`)
+fraction.
+
+Every metric also gets separate best/worst figures. Selection is performed within
+each condition: final distance is maximized/minimized, final cumulative RMSE is
+minimized/maximized, and time-mean `S` is minimized/maximized. For `S`, best/worst
+describes dead-zone inflation exposure only and is not a claim about overall flight
+quality. The selected session IDs and scores are saved in
+`best_worst_sessions_<window>.csv`.
+
 ## Files
 
 - `record_fastlivo_bag.sh` — record a replayable bag during a flight
