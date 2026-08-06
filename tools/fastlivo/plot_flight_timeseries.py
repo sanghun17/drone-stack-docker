@@ -621,8 +621,283 @@ def _stats(values: Sequence[float]) -> Dict[str, float]:
     }
 
 
+def _rankdata(values: np.ndarray) -> np.ndarray:
+    order = np.argsort(values, kind="mergesort")
+    ranks = np.empty(len(values), dtype=float)
+    start = 0
+    while start < len(values):
+        end = start + 1
+        while end < len(values) and values[order[end]] == values[order[start]]:
+            end += 1
+        ranks[order[start:end]] = 0.5 * (start + end - 1) + 1.0
+        start = end
+    return ranks
+
+
+def _correlation(x: np.ndarray, y: np.ndarray) -> float | None:
+    if len(x) < 3 or np.std(x) <= 1e-12 or np.std(y) <= 1e-12:
+        return None
+    return float(np.corrcoef(x, y)[0, 1])
+
+
+def _linear_slope(x: np.ndarray, y: np.ndarray) -> float | None:
+    centered = x - np.mean(x)
+    denominator = float(np.dot(centered, centered))
+    if len(x) < 2 or denominator <= 1e-12:
+        return None
+    return float(np.dot(centered, y - np.mean(y)) / denominator)
+
+
+def _within_session_arrays(rows: Sequence[Mapping[str, object]]) -> Tuple[np.ndarray, np.ndarray]:
+    x_parts, y_parts = [], []
+    ids = sorted({str(row["flight_id"]) for row in rows})
+    for flight_id in ids:
+        group = [row for row in rows if row["flight_id"] == flight_id]
+        x = np.asarray([float(row["dead_zone_scale_mean"]) for row in group])
+        y = np.asarray([float(row["rmse_drift_mps"]) for row in group])
+        x_parts.append(x - np.mean(x))
+        y_parts.append(y - np.mean(y))
+    return np.concatenate(x_parts), np.concatenate(y_parts)
+
+
+def _cluster_bootstrap_within_slope(rows: Sequence[Mapping[str, object]],
+                                    samples: int = 10000,
+                                    seed: int = 20260806) -> List[float] | None:
+    ids = sorted({str(row["flight_id"]) for row in rows})
+    by_id = {flight_id: [row for row in rows if row["flight_id"] == flight_id]
+             for flight_id in ids}
+    rng = np.random.default_rng(seed)
+    slopes = []
+    for _ in range(samples):
+        chosen = rng.choice(ids, size=len(ids), replace=True)
+        x_parts, y_parts = [], []
+        for flight_id in chosen:
+            group = by_id[str(flight_id)]
+            x = np.asarray([float(row["dead_zone_scale_mean"]) for row in group])
+            y = np.asarray([float(row["rmse_drift_mps"]) for row in group])
+            x_parts.append(x - np.mean(x))
+            y_parts.append(y - np.mean(y))
+        slope = _linear_slope(np.concatenate(x_parts), np.concatenate(y_parts))
+        if slope is not None and math.isfinite(slope):
+            slopes.append(slope)
+    if not slopes:
+        return None
+    return [float(value) for value in np.quantile(slopes, [0.025, 0.975])]
+
+
+def _relation_stats(rows: Sequence[Mapping[str, object]]) -> Dict[str, object]:
+    x = np.asarray([float(row["dead_zone_scale_mean"]) for row in rows])
+    y = np.asarray([float(row["rmse_drift_mps"]) for row in rows])
+    return {
+        "n_windows": len(rows),
+        "n_sessions": len({str(row["flight_id"]) for row in rows}),
+        "pearson_r": _correlation(x, y),
+        "spearman_r": _correlation(_rankdata(x), _rankdata(y)),
+        "ols_slope_mps_per_scale": _linear_slope(x, y),
+        "scale": _stats(x),
+        "rmse_drift_mps": _stats(y),
+    }
+
+
+def _deadzone_drift_rows(series: Sequence[Mapping[str, object]],
+                         window_s: float) -> List[Dict[str, object]]:
+    rows: List[Dict[str, object]] = []
+    for curve in series:
+        meta = curve["meta"]
+        rmse_t = np.asarray(curve["error_t"])
+        rmse = np.asarray(curve["cumulative_rmse_m"])
+        scale_t = np.asarray(curve["dead_zone_t"])
+        scale = np.asarray(curve["dead_zone_scale"])
+        last_complete = min(float(rmse_t[-1]), float(scale_t[-1]))
+        starts = np.arange(0.0, last_complete - window_s + 1e-9, window_s)
+        for index, start in enumerate(starts):
+            end = start + window_s
+            selected = (scale_t >= start) & (scale_t < end)
+            if np.sum(selected) < 2:
+                continue
+            rmse_start = float(np.interp(start, rmse_t, rmse))
+            rmse_end = float(np.interp(end, rmse_t, rmse))
+            values = scale[selected]
+            rows.append({
+                "flight_id": meta["flight_id"],
+                "condition": meta["condition"],
+                "split": meta["split"],
+                "window_index": index,
+                "start_s": start,
+                "end_s": end,
+                "duration_s": window_s,
+                "dead_zone_scale_mean": float(np.mean(values)),
+                "dead_zone_scale_median": float(np.median(values)),
+                "dead_zone_scale_p90": float(np.quantile(values, 0.9)),
+                "dead_zone_active_fraction": float(np.mean(values > 1.001)),
+                "rmse_start_m": rmse_start,
+                "rmse_end_m": rmse_end,
+                "rmse_change_m": rmse_end - rmse_start,
+                "rmse_drift_mps": (rmse_end - rmse_start) / window_s,
+                "scale_sample_count": int(np.sum(selected)),
+            })
+    return rows
+
+
+def _plot_deadzone_drift(series: Sequence[Mapping[str, object]], out_dir: Path,
+                         window: str, drift_window_s: float) -> Dict[str, object]:
+    rows = _deadzone_drift_rows(series, drift_window_s)
+    if not rows:
+        raise RuntimeError("no complete dead-zone/RMSE drift windows")
+    csv_path = out_dir / f"dead_zone_scale_vs_rmse_drift_{window}.csv"
+    with csv_path.open("w", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
+
+    pooled = _relation_stats(rows)
+    within_x, within_y = _within_session_arrays(rows)
+    pooled["within_session_pearson_r"] = _correlation(within_x, within_y)
+    pooled["within_session_slope_mps_per_scale"] = _linear_slope(within_x, within_y)
+    pooled["within_session_slope_cluster_bootstrap_ci95"] = \
+        _cluster_bootstrap_within_slope(rows)
+
+    session_rows = []
+    for flight_id in sorted({str(row["flight_id"]) for row in rows}):
+        group = [row for row in rows if row["flight_id"] == flight_id]
+        session_rows.append({
+            "flight_id": flight_id,
+            "condition": group[0]["condition"],
+            "mean_scale": float(np.mean([float(row["dead_zone_scale_mean"]) for row in group])),
+            "mean_rmse_drift_mps": float(np.mean([float(row["rmse_drift_mps"]) for row in group])),
+            "n_windows": len(group),
+        })
+    session_x = np.asarray([row["mean_scale"] for row in session_rows])
+    session_y = np.asarray([row["mean_rmse_drift_mps"] for row in session_rows])
+    session_stats = {
+        "n_sessions": len(session_rows),
+        "pearson_r": _correlation(session_x, session_y),
+        "spearman_r": _correlation(_rankdata(session_x), _rankdata(session_y)),
+        "ols_slope_mps_per_scale": _linear_slope(session_x, session_y),
+    }
+    conditions = {
+        condition: _relation_stats([row for row in rows if row["condition"] == condition])
+        for condition in CONDITION_ORDER
+    }
+
+    x = np.asarray([float(row["dead_zone_scale_mean"]) for row in rows])
+    y = np.asarray([float(row["rmse_drift_mps"]) for row in rows])
+    figure, ax = plt.subplots(figsize=(9.5, 6.5), constrained_layout=True)
+    for condition in CONDITION_ORDER:
+        group = [row for row in rows if row["condition"] == condition]
+        gx = [float(row["dead_zone_scale_mean"]) for row in group]
+        gy = [float(row["rmse_drift_mps"]) for row in group]
+        ax.scatter(gx, gy, s=25, alpha=0.55, color=COLORS[condition],
+                   label=f"{condition} (n={len(group)})")
+    slope = pooled["ols_slope_mps_per_scale"]
+    if slope is not None:
+        intercept = float(np.mean(y) - slope * np.mean(x))
+        grid = np.linspace(float(np.min(x)), float(np.max(x)), 100)
+        ax.plot(grid, intercept + slope * grid, color="black", linestyle="--",
+                linewidth=1.4, label="pooled OLS")
+    ax.axhline(0.0, color="black", linewidth=0.8, alpha=0.5)
+    ax.set_xlabel(f"Mean dead-zone scale S in each {drift_window_s:g} s window")
+    ax.set_ylabel("Cumulative RMSE change rate (m/s)")
+    ax.set_title(
+        f"Dead-zone scale vs VIO–GT RMSE drift — {window} window\n"
+        f"non-overlapping {drift_window_s:g}s windows; observational association")
+    ax.grid(True, alpha=0.25)
+    ax.legend(loc="best", fontsize=8)
+    annotation = (
+        f"pooled Pearson r={pooled['pearson_r'] if pooled['pearson_r'] is not None else float('nan'):.3f}\n"
+        f"within-session r={pooled['within_session_pearson_r'] if pooled['within_session_pearson_r'] is not None else float('nan'):.3f}\n"
+        f"within slope={pooled['within_session_slope_mps_per_scale'] if pooled['within_session_slope_mps_per_scale'] is not None else float('nan'):.4f} m/s/S\n"
+        f"session-mean r={session_stats['pearson_r'] if session_stats['pearson_r'] is not None else float('nan'):.3f}")
+    ax.text(0.02, 0.98, annotation, transform=ax.transAxes, va="top", ha="left",
+            fontsize=9, bbox={"boxstyle": "round", "facecolor": "white", "alpha": 0.85})
+    scatter_path = out_dir / f"dead_zone_scale_vs_rmse_drift_{window}.png"
+    figure.savefig(scatter_path, dpi=180)
+    plt.close(figure)
+
+    figure, axes = plt.subplots(2, 2, figsize=(11, 8.5), constrained_layout=True)
+    for ax, condition in zip(axes.ravel(), CONDITION_ORDER):
+        group = [row for row in rows if row["condition"] == condition]
+        gx = np.asarray([float(row["dead_zone_scale_mean"]) for row in group])
+        gy = np.asarray([float(row["rmse_drift_mps"]) for row in group])
+        ax.scatter(gx, gy, s=27, alpha=0.65, color=COLORS[condition])
+        condition_slope = conditions[condition]["ols_slope_mps_per_scale"]
+        if condition_slope is not None:
+            intercept = float(np.mean(gy) - condition_slope * np.mean(gx))
+            grid = np.linspace(float(np.min(gx)), float(np.max(gx)), 60)
+            ax.plot(grid, intercept + condition_slope * grid, color="black",
+                    linestyle="--", linewidth=1.0)
+        ax.axhline(0.0, color="black", linewidth=0.7, alpha=0.45)
+        r_value = conditions[condition]["pearson_r"]
+        r_label = "N/A (S constant)" if r_value is None else f"{r_value:.3f}"
+        ax.set_title(f"{condition}: r={r_label}")
+        ax.set_xlabel("Mean S")
+        ax.set_ylabel("RMSE drift (m/s)")
+        ax.grid(True, alpha=0.25)
+    by_condition_path = out_dir / f"dead_zone_scale_vs_rmse_drift_by_condition_{window}.png"
+    figure.savefig(by_condition_path, dpi=180)
+    plt.close(figure)
+
+    extreme_outputs = {}
+    extreme_selections = {}
+    for kind, selector in (("best", min), ("worst", max)):
+        chosen = {}
+        figure, ax = plt.subplots(figsize=(9.5, 6.5), constrained_layout=True)
+        for condition in CONDITION_ORDER:
+            candidates = [row for row in session_rows if row["condition"] == condition]
+            selected_session = selector(
+                candidates, key=lambda row: float(row["mean_rmse_drift_mps"]))
+            flight_id = str(selected_session["flight_id"])
+            chosen[condition] = selected_session
+            group = [row for row in rows if row["flight_id"] == flight_id]
+            gx = [float(row["dead_zone_scale_mean"]) for row in group]
+            gy = [float(row["rmse_drift_mps"]) for row in group]
+            ax.scatter(
+                gx, gy, s=34, alpha=0.68, color=COLORS[condition],
+                label=(f"{condition}: {flight_id} "
+                       f"(mean drift={selected_session['mean_rmse_drift_mps']:.4f} m/s)"))
+        ax.axhline(0.0, color="black", linewidth=0.8, alpha=0.5)
+        ax.set_xlabel(f"Mean dead-zone scale S in each {drift_window_s:g} s window")
+        ax.set_ylabel("Cumulative RMSE change rate (m/s)")
+        ax.set_title(
+            f"{kind.upper()} RMSE-drift session per condition — {window} window\n"
+            f"selected by session mean over non-overlapping {drift_window_s:g}s windows")
+        ax.grid(True, alpha=0.25)
+        ax.legend(loc="best", fontsize=8)
+        path = out_dir / f"dead_zone_scale_vs_rmse_drift_{window}_{kind}.png"
+        figure.savefig(path, dpi=180)
+        plt.close(figure)
+        extreme_outputs[kind] = str(path)
+        extreme_selections[kind] = chosen
+
+    document = {
+        "window": window,
+        "drift_window_s": drift_window_s,
+        "definition": {
+            "x": "mean recorded current-pose /jax/dead_zone_scale in each non-overlapping window",
+            "y": "(cumulative VIO-GT RMSE at window end - start) / window duration, m/s",
+            "negative_y": "cumulative RMSE decreased because newer errors were smaller",
+            "causal_caveat": "observational; S is from live planning while VIO-GT error is from frozen offline production replay",
+        },
+        "pooled_window_level": pooled,
+        "session_mean_level": session_stats,
+        "by_condition": conditions,
+        "session_rows": session_rows,
+        "outputs": {
+            "samples_csv": str(csv_path),
+            "scatter": str(scatter_path),
+            "by_condition_scatter": str(by_condition_path),
+            "best_worst_scatter": extreme_outputs,
+        },
+        "best_worst_sessions_by_mean_rmse_drift": extreme_selections,
+    }
+    json_path = out_dir / f"dead_zone_scale_vs_rmse_drift_{window}.json"
+    _atomic_json(json_path, document)
+    document["outputs"]["statistics_json"] = str(json_path)
+    return document
+
+
 def plot_cache(cache_dir: Path, out_dir: Path, window: str, rmse_mode: str,
-               rolling_window_s: float) -> Dict[str, object]:
+               rolling_window_s: float, drift_window_s: float) -> Dict[str, object]:
     index_path = cache_dir / "index.json"
     if not index_path.is_file():
         raise FileNotFoundError(f"cache not built: {index_path}")
@@ -633,6 +908,7 @@ def plot_cache(cache_dir: Path, out_dir: Path, window: str, rmse_mode: str,
                             if row["meta"]["condition"] == condition]
                for condition in CONDITION_ORDER}
     out_dir.mkdir(parents=True, exist_ok=True)
+    drift_analysis = _plot_deadzone_drift(series, out_dir, window, drift_window_s)
     stem = f"{window}_{rmse_mode}"
     subtitle = (f"{index['est_source']}; time-corrected, no spatial alignment; "
                 "thin=session, thick=median, band=IQR")
@@ -842,6 +1118,7 @@ def plot_cache(cache_dir: Path, out_dir: Path, window: str, rmse_mode: str,
             "conditions_csv": str(condition_csv),
             "best_worst_csv": str(extremes_csv),
             "best_worst_plots": extreme_outputs,
+            "dead_zone_scale_vs_rmse_drift": drift_analysis["outputs"],
         },
     }
     _atomic_json(out_dir / f"summary_{stem}.json", summary)
@@ -866,6 +1143,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--rmse-mode", choices=("cumulative", "rolling", "instantaneous"),
                         default="cumulative")
     parser.add_argument("--rolling-window-s", type=float, default=5.0)
+    parser.add_argument("--drift-window-s", type=float, default=5.0,
+                        help="non-overlapping window for S-vs-RMSE-drift analysis")
     parser.add_argument("--hover-height-m", type=float, default=0.75)
     parser.add_argument("--hover-max-vz-mps", type=float, default=0.15)
     parser.add_argument("--hover-hold-s", type=float, default=0.5)
@@ -875,7 +1154,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    if args.rolling_window_s <= 0 or args.hover_hold_s <= 0:
+    if args.rolling_window_s <= 0 or args.drift_window_s <= 0 or args.hover_hold_s <= 0:
         raise SystemExit("rolling/hover hold windows must be positive")
     campaign, sessions = _load_spec(args.spec.resolve())
     production = (_load_production_results(args.results.resolve())
@@ -890,7 +1169,7 @@ def main() -> None:
                     args.hover_height_m, args.hover_max_vz_mps, args.hover_hold_s)
     if args.command in ("plot", "all"):
         plot_cache(cache_dir, out_dir, args.window, args.rmse_mode,
-                   args.rolling_window_s)
+                   args.rolling_window_s, args.drift_window_s)
 
 
 if __name__ == "__main__":

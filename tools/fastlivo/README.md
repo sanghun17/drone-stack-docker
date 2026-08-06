@@ -123,6 +123,14 @@ describes dead-zone inflation exposure only and is not a claim about overall fli
 quality. The selected session IDs and scores are saved in
 `best_worst_sessions_<window>.csv`.
 
+The same cached series also produces a dead-zone-scale vs RMSE-drift analysis.
+By default it uses non-overlapping 5 s windows: x is mean current-pose `S`, and y is
+the change in cumulative VIO-GT RMSE divided by 5 s. Pooled, per-condition,
+session-mean, and within-session statistics are reported; the within-session slope
+gets a session-cluster bootstrap confidence interval. Change the bin size with
+`--drift-window-s`. Companion best/worst figures select the lowest/highest
+session-mean RMSE drift within each condition.
+
 ## Files
 
 - `record_fastlivo_bag.sh` — record a replayable bag during a flight
