@@ -1,5 +1,9 @@
 # Candidate 3 pair-only FAST-LIVO diagnostic (2026-08-06)
 
+> Superseded as the accepted candidate-3 diagnostic by
+> `MOCK_CANDIDATE3_FULL_LIVO_DIAGNOSTIC_20260806.md`.  This file is retained as
+> the LiDAR-only isolation arm that identified the sensor-fusion failure.
+
 ## Scope and interpretation
 
 This is a **post-hoc, pair-only diagnostic**, not locked evidence for the paper

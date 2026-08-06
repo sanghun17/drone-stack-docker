@@ -1,0 +1,40 @@
+# POST-HOC candidate-3 full-LIVO diagnostic overlay, 2026-08-06.
+# Apply identically to p1 and pm4.  This keeps depth/LiDAR, RGB correction,
+# and camera IMU integration active.  It is not a production configuration
+# and is not locked evidence for the paper comparison.
+common:
+  img_en: 1
+  lidar_en: 1
+
+imu:
+  imu_en: true
+  # pm4's D435 accelerometer is corrupted (about 2 g while stationary and
+  # strongly time-varying under motor vibration).  Keep it in propagation but
+  # avoid the catastrophic over-confidence of the production 0.1 value.
+  acc_cov: 10.0
+
+vio:
+  # Negative disables the project feature-count gate, so every valid RGB
+  # update reaches the VIO EKF.  img_point_cov=100 diverged on pm4; 1000 is the
+  # lowest tested common value that retained actual RGB state corrections and
+  # passed both pair gates.
+  max_lio_features_for_fusion: -1
+  img_point_cov: 1000
+
+extrin_calib:
+  # camera_depth_optical_frame -> camera_color_optical_frame.  The historic
+  # d435i yaml contained the inverse (Color -> Depth) transform even though
+  # VIOManager projects depth-frame points into the color camera.
+  Rcl: [0.999978, 0.00659742, 0.00021399,
+        -0.00659736, 0.999978, -0.000301692,
+        -0.000215976, 0.000300274, 1.0]
+  Pcl: [0.01438551, 0.0000943, 0.00042120]
+
+uav:
+  # Diagnostic output setting only.  It suppresses the 250-Hz propagated
+  # odometry publication; it does NOT disable IMU preintegration or fusion.
+  # A live deployment must restore true and validate the control-facing topic.
+  imu_rate_odom: false
+
+debug:
+  fusion_log: true
