@@ -891,13 +891,135 @@ def _plot_deadzone_drift(series: Sequence[Mapping[str, object]], out_dir: Path,
         "best_worst_sessions_by_mean_rmse_drift": extreme_selections,
     }
     json_path = out_dir / f"dead_zone_scale_vs_rmse_drift_{window}.json"
-    _atomic_json(json_path, document)
     document["outputs"]["statistics_json"] = str(json_path)
+    _atomic_json(json_path, document)
+    return document
+
+
+def _plot_deadzone_drift_window_sweep(
+        series: Sequence[Mapping[str, object]], out_dir: Path, window: str,
+        minimum_s: float, maximum_s: float, step_s: float) -> Dict[str, object]:
+    window_sizes = np.arange(minimum_s, maximum_s + 0.5 * step_s, step_s)
+    sweep_rows: List[Dict[str, object]] = []
+    for window_s in window_sizes:
+        samples = _deadzone_drift_rows(series, float(window_s))
+        if len(samples) < 3:
+            continue
+        pooled = _relation_stats(samples)
+        within_x, within_y = _within_session_arrays(samples)
+        session_rows = []
+        for flight_id in sorted({str(row["flight_id"]) for row in samples}):
+            group = [row for row in samples if row["flight_id"] == flight_id]
+            session_rows.append({
+                "mean_scale": float(np.mean([
+                    float(row["dead_zone_scale_mean"]) for row in group])),
+                "mean_rmse_drift_mps": float(np.mean([
+                    float(row["rmse_drift_mps"]) for row in group])),
+            })
+        session_x = np.asarray([row["mean_scale"] for row in session_rows])
+        session_y = np.asarray([row["mean_rmse_drift_mps"] for row in session_rows])
+        item: Dict[str, object] = {
+            "window_s": float(window_s),
+            "n_windows": len(samples),
+            "n_sessions": len(session_rows),
+            "pooled_pearson_r": pooled["pearson_r"],
+            "pooled_spearman_r": pooled["spearman_r"],
+            "within_session_pearson_r": _correlation(within_x, within_y),
+            "session_mean_pearson_r": _correlation(session_x, session_y),
+        }
+        for condition in CONDITION_ORDER:
+            group = [row for row in samples if row["condition"] == condition]
+            relation = _relation_stats(group)
+            item[f"{condition}_pearson_r"] = relation["pearson_r"]
+            item[f"{condition}_n_windows"] = len(group)
+        sweep_rows.append(item)
+    if not sweep_rows:
+        raise RuntimeError("window-size sweep produced no valid rows")
+
+    csv_path = out_dir / f"dead_zone_rmse_drift_r_vs_window_size_{window}.csv"
+    with csv_path.open("w", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=list(sweep_rows[0]))
+        writer.writeheader()
+        writer.writerows(sweep_rows)
+
+    x = np.asarray([float(row["window_s"]) for row in sweep_rows])
+    figure, ax = plt.subplots(figsize=(10, 6.3), constrained_layout=True)
+    line_specs = (
+        ("pooled_pearson_r", "Pooled Pearson r", "#222222", "o"),
+        ("pooled_spearman_r", "Pooled Spearman r", "#777777", "s"),
+        ("within_session_pearson_r", "Within-session Pearson r", "#4C78A8", "o"),
+        ("session_mean_pearson_r", "Session-mean Pearson r", "#E15759", "^"),
+    )
+    for field, label, color, marker in line_specs:
+        y = np.asarray([
+            np.nan if row[field] is None else float(row[field])
+            for row in sweep_rows])
+        ax.plot(x, y, color=color, marker=marker, markersize=4,
+                linewidth=1.8, label=label)
+    ax.axhline(0.0, color="black", linewidth=0.8, alpha=0.45)
+    ax.set_xlabel("Non-overlapping window size W (s)")
+    ax.set_ylabel("Correlation r: mean S vs cumulative-RMSE drift")
+    ax.set_ylim(-1.0, 1.0)
+    ax.grid(True, alpha=0.25)
+    ax.legend(loc="upper left", fontsize=8)
+    count_ax = ax.twinx()
+    counts = np.asarray([int(row["n_windows"]) for row in sweep_rows])
+    count_ax.plot(x, counts, color="#999999", linestyle=":", linewidth=1.4,
+                  label="Valid windows")
+    count_ax.set_ylabel("Number of valid windows", color="#777777")
+    count_ax.tick_params(axis="y", colors="#777777")
+    ax.set_title(
+        f"Sensitivity of S–RMSE-drift correlation to window size — {window} window\n"
+        "Same definition at every W; dotted line shows declining sample count")
+    plot_path = out_dir / f"dead_zone_rmse_drift_r_vs_window_size_{window}.png"
+    figure.savefig(plot_path, dpi=180)
+    plt.close(figure)
+
+    figure, ax = plt.subplots(figsize=(10, 6.0), constrained_layout=True)
+    for condition in CONDITION_ORDER:
+        field = f"{condition}_pearson_r"
+        y = np.asarray([
+            np.nan if row[field] is None else float(row[field])
+            for row in sweep_rows])
+        ax.plot(x, y, color=COLORS[condition], marker="o", markersize=4,
+                linewidth=1.8, label=condition)
+    ax.axhline(0.0, color="black", linewidth=0.8, alpha=0.45)
+    ax.set_xlabel("Non-overlapping window size W (s)")
+    ax.set_ylabel("Within-condition pooled Pearson r")
+    ax.set_ylim(-1.0, 1.0)
+    ax.grid(True, alpha=0.25)
+    ax.legend(loc="best", fontsize=8)
+    ax.set_title(
+        f"S–RMSE-drift correlation vs window size by condition — {window} window\n"
+        "pure_wodz is undefined because S=1 throughout")
+    condition_plot_path = out_dir / \
+        f"dead_zone_rmse_drift_r_vs_window_size_by_condition_{window}.png"
+    figure.savefig(condition_plot_path, dpi=180)
+    plt.close(figure)
+
+    document = {
+        "window": window,
+        "minimum_window_s": minimum_s,
+        "maximum_window_s": maximum_s,
+        "step_s": step_s,
+        "definition": "For each W: non-overlapping bins, x=mean S, y=(cumulative RMSE_end-RMSE_start)/W; r is computed across resulting bins.",
+        "rows": sweep_rows,
+        "outputs": {
+            "csv": str(csv_path),
+            "correlation_plot": str(plot_path),
+            "by_condition_plot": str(condition_plot_path),
+        },
+    }
+    json_path = out_dir / f"dead_zone_rmse_drift_r_vs_window_size_{window}.json"
+    document["outputs"]["json"] = str(json_path)
+    _atomic_json(json_path, document)
     return document
 
 
 def plot_cache(cache_dir: Path, out_dir: Path, window: str, rmse_mode: str,
-               rolling_window_s: float, drift_window_s: float) -> Dict[str, object]:
+               rolling_window_s: float, drift_window_s: float,
+               drift_sweep_min_s: float, drift_sweep_max_s: float,
+               drift_sweep_step_s: float) -> Dict[str, object]:
     index_path = cache_dir / "index.json"
     if not index_path.is_file():
         raise FileNotFoundError(f"cache not built: {index_path}")
@@ -909,6 +1031,9 @@ def plot_cache(cache_dir: Path, out_dir: Path, window: str, rmse_mode: str,
                for condition in CONDITION_ORDER}
     out_dir.mkdir(parents=True, exist_ok=True)
     drift_analysis = _plot_deadzone_drift(series, out_dir, window, drift_window_s)
+    drift_sweep = _plot_deadzone_drift_window_sweep(
+        series, out_dir, window, drift_sweep_min_s, drift_sweep_max_s,
+        drift_sweep_step_s)
     stem = f"{window}_{rmse_mode}"
     subtitle = (f"{index['est_source']}; time-corrected, no spatial alignment; "
                 "thin=session, thick=median, band=IQR")
@@ -1119,6 +1244,7 @@ def plot_cache(cache_dir: Path, out_dir: Path, window: str, rmse_mode: str,
             "best_worst_csv": str(extremes_csv),
             "best_worst_plots": extreme_outputs,
             "dead_zone_scale_vs_rmse_drift": drift_analysis["outputs"],
+            "dead_zone_rmse_drift_window_sweep": drift_sweep["outputs"],
         },
     }
     _atomic_json(out_dir / f"summary_{stem}.json", summary)
@@ -1145,6 +1271,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--rolling-window-s", type=float, default=5.0)
     parser.add_argument("--drift-window-s", type=float, default=5.0,
                         help="non-overlapping window for S-vs-RMSE-drift analysis")
+    parser.add_argument("--drift-sweep-min-s", type=float, default=1.0)
+    parser.add_argument("--drift-sweep-max-s", type=float, default=20.0)
+    parser.add_argument("--drift-sweep-step-s", type=float, default=1.0)
     parser.add_argument("--hover-height-m", type=float, default=0.75)
     parser.add_argument("--hover-max-vz-mps", type=float, default=0.15)
     parser.add_argument("--hover-hold-s", type=float, default=0.5)
@@ -1154,7 +1283,9 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    if args.rolling_window_s <= 0 or args.drift_window_s <= 0 or args.hover_hold_s <= 0:
+    if (args.rolling_window_s <= 0 or args.drift_window_s <= 0 or
+            args.drift_sweep_min_s <= 0 or args.drift_sweep_step_s <= 0 or
+            args.drift_sweep_max_s < args.drift_sweep_min_s or args.hover_hold_s <= 0):
         raise SystemExit("rolling/hover hold windows must be positive")
     campaign, sessions = _load_spec(args.spec.resolve())
     production = (_load_production_results(args.results.resolve())
@@ -1169,7 +1300,9 @@ def main() -> None:
                     args.hover_height_m, args.hover_max_vz_mps, args.hover_hold_s)
     if args.command in ("plot", "all"):
         plot_cache(cache_dir, out_dir, args.window, args.rmse_mode,
-                   args.rolling_window_s, args.drift_window_s)
+                   args.rolling_window_s, args.drift_window_s,
+                   args.drift_sweep_min_s, args.drift_sweep_max_s,
+                   args.drift_sweep_step_s)
 
 
 if __name__ == "__main__":

@@ -131,6 +131,12 @@ gets a session-cluster bootstrap confidence interval. Change the bin size with
 `--drift-window-s`. Companion best/worst figures select the lowest/highest
 session-mean RMSE drift within each condition.
 
+A 1--20 s sensitivity sweep is generated at the same time: x is the
+non-overlapping window size and y is pooled, within-session, session-mean, or
+condition-specific correlation `r`. The valid-window count is plotted on a secondary
+axis because large windows have fewer samples. Configure it with
+`--drift-sweep-min-s`, `--drift-sweep-max-s`, and `--drift-sweep-step-s`.
+
 ## Files
 
 - `record_fastlivo_bag.sh` — record a replayable bag during a flight
