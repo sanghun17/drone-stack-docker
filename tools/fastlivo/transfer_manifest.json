@@ -1,0 +1,102 @@
+{
+  "schema": "p1_pm4_windows_transfer_manifest/v1",
+  "purpose": "Copy source files to the ASCII-only relative targets beside README_WINDOWS.md; large files are referenced, not duplicated in the generated asset pack.",
+  "required": [
+    {
+      "session": "p1",
+      "actual_condition": "PURE",
+      "kind": "synthesized_ros1_bag",
+      "source": "/home/ml/webcam_recorder/recordings/pure_flight_2026-08-04_21-29-26_1/flight_2026-08-04_21-29-26_fastlivo_hybrid_imu_acc10.bag",
+      "target_relative": "bags/p1_synth.bag",
+      "size_bytes": 536186152,
+      "sha256": "db81f4ddea5766a945673107e12f62e2532614a017578f20a746b293b83b81b4"
+    },
+    {
+      "session": "pm4",
+      "actual_condition": "PURE-Mean",
+      "kind": "synthesized_ros1_bag",
+      "source": "/home/ml/webcam_recorder/recordings/pure_mean_flight_2026-08-05_02-09-04_4/flight_2026-08-05_02-09-04_fastlivo_hybrid_imu_acc10.bag",
+      "target_relative": "bags/pm4_synth.bag",
+      "size_bytes": 524083062,
+      "sha256": "5694ac79217b9e9319b97efe494e44483cb8072fcc4be82e17d143b7cff9acf3"
+    }
+  ],
+  "optional_external_webcam": [
+    {
+      "session": "p1",
+      "camera": "cam1",
+      "kind": "mp4",
+      "source": "/home/ml/webcam_recorder/recordings/pure_flight_2026-08-04_21-29-26_1/cam1/flight_2026-08-04_21-29-26_cam1.mp4",
+      "target_relative": "external/p1/cam1.mp4",
+      "size_bytes": 213127746,
+      "sha256": "5dfe7a1529ddf9fef33881039b70dcdd24b262bae01558b2ffae19f57967bbcd"
+    },
+    {
+      "session": "p1",
+      "camera": "cam1",
+      "kind": "clicked_extrinsics_json",
+      "source": "/home/ml/webcam_recorder/recordings/pure_flight_2026-08-04_21-29-26_1/cam1/webcam_extrinsics_clicked.json",
+      "target_relative": "external/p1/cam1_extrinsics.json",
+      "size_bytes": 1622,
+      "sha256": "6cd943b38f755a42c9a9ca59ce00232dd529d90ecda1b3b645751d57f11453f5"
+    },
+    {
+      "session": "p1",
+      "camera": "cam2",
+      "kind": "mp4",
+      "source": "/home/ml/webcam_recorder/recordings/pure_flight_2026-08-04_21-29-26_1/cam2/flight_2026-08-04_21-29-26_cam2.mp4",
+      "target_relative": "external/p1/cam2.mp4",
+      "size_bytes": 175847433,
+      "sha256": "44a7cfccdb5c2c45f04b1d337842304bcf34a54860ff23f0ab55117d8ea720cc"
+    },
+    {
+      "session": "p1",
+      "camera": "cam2",
+      "kind": "clicked_extrinsics_json",
+      "source": "/home/ml/webcam_recorder/recordings/pure_flight_2026-08-04_21-29-26_1/cam2/webcam_extrinsics_clicked.json",
+      "target_relative": "external/p1/cam2_extrinsics.json",
+      "size_bytes": 1626,
+      "sha256": "dc28e1b31a35f0c8b0abc06529cf6a840534fb4ef2b7ff7abaf07cdd6b1138cb"
+    },
+    {
+      "session": "pm4",
+      "camera": "cam1",
+      "kind": "mp4",
+      "source": "/home/ml/webcam_recorder/recordings/pure_mean_flight_2026-08-05_02-09-04_4/cam1/flight_2026-08-05_02-09-04_cam1.mp4",
+      "target_relative": "external/pm4/cam1.mp4",
+      "size_bytes": 235244287,
+      "sha256": "50b1f446e1327cdc135fe19e97f2eb6a1502d35b985b99b52fc77fa1a038d17e"
+    },
+    {
+      "session": "pm4",
+      "camera": "cam1",
+      "kind": "clicked_extrinsics_json",
+      "source": "/home/ml/webcam_recorder/recordings/pure_mean_flight_2026-08-05_02-09-04_4/cam1/webcam_extrinsics_clicked.json",
+      "target_relative": "external/pm4/cam1_extrinsics.json",
+      "size_bytes": 1626,
+      "sha256": "c5e022048cc78eb2b5d246ff8b2d871ecc2349a3407dd8c69a6d5f777a792a31"
+    },
+    {
+      "session": "pm4",
+      "camera": "cam2",
+      "kind": "mp4",
+      "source": "/home/ml/webcam_recorder/recordings/pure_mean_flight_2026-08-05_02-09-04_4/cam2/flight_2026-08-05_02-09-04_cam2.mp4",
+      "target_relative": "external/pm4/cam2.mp4",
+      "size_bytes": 183858408,
+      "sha256": "fa986ba19e6c9119cbac9e44e6febef71869708e47ddab79274b9b59793349dc"
+    },
+    {
+      "session": "pm4",
+      "camera": "cam2",
+      "kind": "clicked_extrinsics_json",
+      "source": "/home/ml/webcam_recorder/recordings/pure_mean_flight_2026-08-05_02-09-04_4/cam2/webcam_extrinsics_clicked.json",
+      "target_relative": "external/pm4/cam2_extrinsics.json",
+      "size_bytes": 1621,
+      "sha256": "da6275cc04933d9e03effffbb874109011bbf2dbdbcf2c994895012c8f2bbe88"
+    }
+  ],
+  "known_time_offsets_s": {
+    "tuned_vio_added_to_header_for_gt_association": {"p1": 0.17, "pm4": 0.04},
+    "webcam_clicked_extrinsics_file_contains_current_video_offset": true
+  }
+}
