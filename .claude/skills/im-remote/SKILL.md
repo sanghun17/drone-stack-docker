@@ -57,8 +57,14 @@ DOCKER_HOST=unix:///tmp/docker-ssd.sock docker ps
 ## 스택 / 컨테이너
 
 - 이미지: `drone-stack:ete-train-4090`, 컨테이너: `drone-stack-ete-train-4090`.
-- 리포(코드) 정본: `/media/im/ETE4090/drone-stack-docker` — 컨테이너 안 `/work`로 바인드
-  마운트. 코드 자체는 `/work/ws/risk-aware/src/risk_aware_planning`
+- **코드 정본과 수정 위치는 ml**:
+  `/home/ml/drone-stack-docker/ws/risk-aware/src/risk_aware_planning`. 코드 수정·테스트·
+  commit/push는 ml에서만 한다. IM은 GitHub에서 그 exact commit을 fetch/pull해 실행하는
+  **pull-only 배포 호스트**이며 직접 편집하거나 ml 작업트리를 rsync로 덮지 않는다.
+  IM 기본 체크아웃이 dirty하면 reset/clean하지 말고, 보존한 채 SSD 안 별도 clean
+  worktree를 exact commit으로 만든다. 실험 결과에는 commit SHA와 config 경로를 함께 남긴다.
+- IM 실행 체크아웃: `/media/im/ETE4090/drone-stack-docker` — 컨테이너 안 `/work`로 바인드
+  마운트. 기본 코드 경로는 `/work/ws/risk-aware/src/risk_aware_planning`
   (`modules/training/ete-net/module.yml`이 별도 코드 마운트 없이 dsd 루트 마운트에
   얹혀 자동 노출되는 방식 — clone.sh가 `ws/risk-aware/src/risk_aware_planning`으로
   git clone).
