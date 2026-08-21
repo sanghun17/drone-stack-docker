@@ -144,6 +144,38 @@ intervals, and a within-session circular-shift null test. Three high-drift defin
 (`>0.1 m/s`, above median, and top quartile) are shown in parallel to avoid selecting
 one outcome threshold after seeing the result.
 
+The paper-layout audit reuses the same cache:
+
+```bash
+python3 tools/fastlivo/plot_flight_timeseries.py storyboard
+```
+
+It writes an actual-label best-PURE/worst-nominal comparison and a separately
+watermarked hypothetical relabel preview below `plots/paper_preview/`. Selection
+IDs, source conditions, metrics, and sidecar provenance are stored in
+`storyboard_selection.json`; see `REAL_EXPERIMENT_STORYBOARD_20260806.md`.
+The storyboard command also recomputes a condition-independent cloth-view
+exposure from every session's GT pose/yaw using the common AABB and deployed
+16×12 centre-ray/FOV geometry. Per-pose arrays are stored under
+`paper_preview/offline_common_cloth_s/`; the CSV/JSON beside that directory are
+the auditable 21-session summary. This offline exposure is intentionally not
+the recorded `/jax/dead_zone_scale`, which depends on whether the online module
+and its Voxblox activation gate were enabled in that flight.
+Mock pair selection additionally uses `scenario_completion_audit.{csv,json}`.
+The common episode is hover start through the recorded
+`EXPLORING→TERMINAL_NAV→DONE` protocol (or physical landing first). All 21
+attempts remain eligible; GT distances to the paper corner `(1.5,-1.5)` and
+configured terminal `(-1.5,-1.5,1.0)` are reported as outcomes rather than
+selection filters.
+
+The candidate-3 pair-only estimator diagnostic is documented in
+`MOCK_CANDIDATE3_FULL_LIVO_DIAGNOSTIC_20260806.md`; its reproducible common
+overlay is `mock_candidate3_full_livo_hybrid_imu.yaml`.  It keeps RGB,
+depth/LiDAR, D435 gyro, and FCU acceleration fusion active.  The derived hybrid
+topic is generated non-destructively by `make_hybrid_imu_bag.py`.  The older
+`mock_candidate3_lidar_only.yaml` is retained only as the isolation arm and
+must not be mistaken for the accepted result.
+
 ## Files
 
 - `record_fastlivo_bag.sh` — record a replayable bag during a flight

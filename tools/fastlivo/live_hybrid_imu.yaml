@@ -1,0 +1,33 @@
+# Sparse production-candidate overlay for the causal online hybrid IMU bridge.
+# Load after fast_livo/config/d435i.yaml.  Do not promote this overlay without
+# passing the all-flight parity/replay gates and a stationary live readiness
+# check; the accepted 2026-08-06 pair diagnostic had imu_rate_odom disabled.
+common:
+  imu_topic: /camera/imu_hybrid
+
+# A deployable estimator must not observe OptiTrack.  GT remains available to
+# an external recorder/safety monitor, but FAST-LIVO itself never subscribes or
+# builds the evaluation-only world anchor in this candidate mode.
+mocap:
+  anchor_enable: false
+
+imu:
+  # FCU acceleration has rare motor-vibration spikes.  Preserve the value used
+  # by the all-21 hybrid replay campaign; the bridge intentionally does not clip.
+  acc_cov: 10.0
+
+vio:
+  max_lio_features_for_fusion: -1
+  img_point_cov: 1000
+
+extrin_calib:
+  # camera_depth_optical_frame -> camera_color_optical_frame.
+  Rcl: [0.999978, 0.00659742, 0.00021399,
+        -0.00659736, 0.999978, -0.000301692,
+        -0.000215976, 0.000300274, 1.0]
+  Pcl: [0.01438551, 0.0000943, 0.00042120]
+
+uav:
+  # Required by the live controller; unlike the pair-only diagnostic overlay.
+  imu_rate_odom: true
+  runtime_reinit_enable: false

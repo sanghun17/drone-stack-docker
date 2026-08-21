@@ -1,0 +1,337 @@
+schema: fastlivo_vio_flight_readiness_thresholds/v1
+
+# All pass/fail trajectory association is at the original sensor header time.
+# No per-session time shift is applied.  The auto-correlated offset in the JSON
+# report is diagnostic only.
+association:
+  max_difference_s: 0.020
+
+# Reject physically impossible OptiTrack intervals before interpolation.  The
+# August campaign contains isolated ~180-degree/10-ms mocap flips; treating
+# those as estimator errors corrupts both orientation scores and the old
+# three-second GT anchor.
+gt_filter:
+  max_speed_mps: 5.0
+  max_angular_speed_deg_s: 720.0
+
+# This is the only spatial fit: yaw and translation over the estimator's first
+# second, with unit scale.  It is frozen for the rest of the flight.
+initial_alignment:
+  duration_s: 1.0
+  minimum_samples: 8
+
+stationary:
+  window_s: 30.0
+
+# OptiTrack's z=0 plane is the testbed floor.  Cropped hover/mission replays
+# begin near z=1 m; without this campaign-specific bound a later climb could be
+# mislabeled as takeoff.  Full bags should additionally retain MAVROS landed
+# state for an independent event cross-check.
+takeoff:
+  maximum_ground_z_m: 0.35
+
+# Frozen conservative gates from VIO_FLIGHT_READINESS_PREREGISTRATION_20260814.
+# A missing required metric yields INCOMPLETE, never PASS.  Additional PX4
+# integration checks (GT isolation, covariance, and angular twist) are included
+# because the estimator output cannot safely enter the current mux without them.
+checks:
+  - id: local_finite
+    metric: local.integrity.finite
+    operator: eq
+    threshold: true
+    required: true
+  - id: local_monotonic_header
+    metric: local.integrity.backward_stamp_count
+    operator: eq
+    threshold: 0
+    required: true
+  - id: local_unique_header
+    metric: local.integrity.duplicate_stamp_count
+    operator: eq
+    threshold: 0
+    required: true
+  - id: local_stable_frame
+    metric: local.integrity.frame_stable
+    operator: eq
+    threshold: true
+    required: true
+  - id: local_expected_frame
+    metric: local.integrity.frame_is_odom
+    operator: eq
+    threshold: true
+    required: true
+  - id: local_quaternion_normalized
+    metric: local.integrity.quaternion_norm_error_max
+    operator: le
+    threshold: 0.001
+    required: true
+  - id: local_nonnegative_sensor_age
+    metric: local.integrity.age_min_s
+    operator: ge
+    threshold: 0.0
+    required: true
+  - id: local_max_gap
+    metric: local.integrity.max_gap_s
+    operator: le
+    threshold: 0.25
+    required: true
+  - id: local_pose_coverage
+    metric: local.post_initialization_coverage
+    operator: ge
+    threshold: 0.99
+    required: true
+  - id: local_fixed_association_fraction
+    metric: local.fixed_timestamp_association_fraction
+    operator: ge
+    threshold: 0.98
+    required: true
+  - id: translation_ape_rmse
+    metric: local.translation_ape_rmse_m
+    operator: le
+    threshold: 0.25
+    required: true
+  - id: translation_ape_max
+    metric: local.translation_ape_max_m
+    operator: le
+    threshold: 0.50
+    required: true
+  - id: translation_rpe_1s
+    metric: local.translation_rpe_1p0s_rmse_m
+    operator: le
+    threshold: 0.10
+    required: true
+  - id: orientation_rmse
+    metric: local.orientation_rmse_deg
+    operator: le
+    threshold: 5.0
+    required: true
+  - id: orientation_p90
+    metric: local.orientation_p90_deg
+    operator: le
+    threshold: 10.0
+    required: true
+  - id: path_ratio_lower
+    metric: local.path_ratio
+    operator: ge
+    threshold: 0.90
+    required: true
+  - id: path_ratio_upper
+    metric: local.path_ratio
+    operator: le
+    threshold: 1.10
+    required: true
+  - id: direction_cosine
+    metric: local.direction_cosine_1s
+    operator: ge
+    threshold: 0.98
+    required: true
+  - id: local_dynamic_freeze
+    metric: local.dynamic_freeze.maximum_duration_s
+    operator: le
+    threshold: 0.50
+    required: true
+  - id: stationary_translation_drift
+    metric: local.stationary.translation_drift_max_m
+    operator: le
+    threshold: 0.10
+    required: true
+  - id: stationary_yaw_drift
+    metric: local.stationary.yaw_drift_max_deg
+    operator: le
+    threshold: 5.0
+    required: true
+  - id: propagated_finite
+    metric: propagated.finite
+    operator: eq
+    threshold: true
+    required: true
+  - id: propagated_monotonic_header
+    metric: propagated.backward_stamp_count
+    operator: eq
+    threshold: 0
+    required: true
+  - id: propagated_unique_header
+    metric: propagated.duplicate_stamp_count
+    operator: eq
+    threshold: 0
+    required: true
+  - id: propagated_stable_frame
+    metric: propagated.frame_stable
+    operator: eq
+    threshold: true
+    required: true
+  - id: propagated_expected_world_frame
+    metric: propagated.frame_is_odom
+    operator: eq
+    threshold: true
+    required: true
+  - id: propagated_expected_child_frame
+    metric: propagated.child_frame_is_base_link
+    operator: eq
+    threshold: true
+    required: true
+  - id: propagated_quaternion_normalized
+    metric: propagated.quaternion_norm_error_max
+    operator: le
+    threshold: 0.001
+    required: true
+  - id: propagated_pose_coverage
+    metric: propagated.post_initialization_coverage
+    operator: ge
+    threshold: 0.99
+    required: true
+  - id: propagated_rate
+    metric: propagated.rate_hz
+    operator: ge
+    threshold: 150.0
+    required: true
+  - id: propagated_gap_p99
+    metric: propagated.p99_gap_s
+    operator: le
+    threshold: 0.050
+    required: true
+  - id: propagated_gap_max
+    metric: propagated.max_gap_s
+    operator: le
+    threshold: 0.100
+    required: true
+  - id: propagated_sensor_age_p99
+    metric: propagated.age_p99_s
+    operator: le
+    threshold: 0.050
+    required: true
+  - id: propagated_nonnegative_sensor_age
+    metric: propagated.age_min_s
+    operator: ge
+    threshold: 0.0
+    required: true
+  - id: propagated_position_jump
+    metric: propagated.position_step_max_m
+    operator: le
+    threshold: 0.20
+    required: true
+  - id: propagated_rotation_jump
+    metric: propagated.rotation_step_max_deg
+    operator: le
+    threshold: 10.0
+    required: true
+  - id: propagated_translation_ape_rmse
+    metric: propagated.fixed_local_alignment_ape_rmse_m
+    operator: le
+    threshold: 0.30
+    required: true
+  - id: propagated_translation_ape_max
+    metric: propagated.fixed_local_alignment_ape_max_m
+    operator: le
+    threshold: 0.60
+    required: true
+  - id: propagated_orientation_rmse
+    metric: propagated.fixed_local_alignment_orientation_rmse_deg
+    operator: le
+    threshold: 5.0
+    required: true
+  - id: propagated_orientation_p90
+    metric: propagated.fixed_local_alignment_orientation_p90_deg
+    operator: le
+    threshold: 10.0
+    required: true
+  - id: propagated_linear_twist_finite
+    metric: propagated.linear_twist_finite_fraction
+    operator: ge
+    threshold: 1.0
+    required: true
+  - id: propagated_angular_twist_finite
+    metric: propagated.angular_twist_finite_fraction
+    operator: ge
+    threshold: 1.0
+    required: true
+  - id: propagated_twist_pose_consistency
+    metric: propagated.linear_twist_pose_p95_mps
+    operator: le
+    threshold: 1.0
+    required: true
+  - id: propagated_angular_twist_pose_consistency
+    metric: propagated.angular_twist_pose_p95_rad_s
+    operator: le
+    threshold: 1.0
+    required: true
+  - id: gt_was_not_visible_to_estimator
+    metric: gt_independence.gt_anchor_free
+    operator: eq
+    threshold: true
+    required: true
+  - id: correction_covariance_evaluable
+    metric: correction_covariance.evaluable
+    operator: eq
+    threshold: true
+    required: true
+  - id: correction_covariance_finite
+    metric: correction_covariance.finite_fraction
+    operator: ge
+    threshold: 1.0
+    required: true
+  - id: correction_pose_finite
+    metric: correction_covariance.pose_finite_fraction
+    operator: ge
+    threshold: 1.0
+    required: true
+  - id: correction_pose_quaternion_normalized
+    metric: correction_covariance.quaternion_norm_error_max
+    operator: le
+    threshold: 0.001
+    required: true
+  - id: correction_covariance_nonzero
+    metric: correction_covariance.nonzero_fraction
+    operator: ge
+    threshold: 0.99
+    required: true
+  - id: correction_covariance_psd
+    metric: correction_covariance.psd_fraction
+    operator: ge
+    threshold: 0.99
+    required: true
+  - id: correction_covariance_symmetric
+    metric: correction_covariance.symmetry_error_max
+    operator: le
+    threshold: 1.0e-8
+    required: true
+  - id: correction_covariance_coverage
+    metric: correction_covariance.local_correction_coverage
+    operator: ge
+    threshold: 0.95
+    required: true
+  - id: correction_covariance_frame
+    metric: correction_covariance.frame_stable
+    operator: eq
+    threshold: true
+    required: true
+  - id: correction_covariance_expected_frame
+    metric: correction_covariance.frame_is_odom
+    operator: eq
+    threshold: true
+    required: true
+  - id: correction_covariance_monotonic_header
+    metric: correction_covariance.backward_stamp_count
+    operator: eq
+    threshold: 0
+    required: true
+  - id: correction_covariance_unique_header
+    metric: correction_covariance.duplicate_stamp_count
+    operator: eq
+    threshold: 0
+    required: true
+  - id: correction_covariance_age
+    metric: correction_covariance.age_p99_s
+    operator: le
+    threshold: 0.25
+    required: true
+  - id: correction_covariance_nonnegative_age
+    metric: correction_covariance.age_min_s
+    operator: ge
+    threshold: 0.0
+    required: true
+  - id: propagated_angular_twist
+    metric: propagated.angular_twist_informative
+    operator: eq
+    threshold: true
+    required: true

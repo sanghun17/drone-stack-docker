@@ -55,6 +55,24 @@ COLORS = {
     "nominal": "#E15759",
 }
 
+# Common, post-hoc cloth-view exposure used only for the 21-flight paper audit.
+# This deliberately ignores the online voxblox activation bit so every condition
+# is evaluated with identical geometry.  The rasterizer matches risk-aware commit
+# 9464873 (cell-centre rays, yaw-only body +x camera, ray/AABB intersection).
+OFFLINE_CLOTH_S_VERSION = 2
+OFFLINE_CLOTH_AABB_MIN = np.asarray([-0.5, -0.5, 0.0], dtype=float)
+OFFLINE_CLOTH_AABB_MAX = np.asarray([0.5, 0.5, 2.5], dtype=float)
+OFFLINE_CLOTH_GRID_U = 16
+OFFLINE_CLOTH_GRID_V = 12
+OFFLINE_CLOTH_FOV_H_RAD = 1.3812465887113043
+OFFLINE_CLOTH_FOV_V_RAD = 1.1096855744057508
+OFFLINE_CLOTH_MAX_RANGE_M = 8.0
+OFFLINE_CLOTH_S_MAX = 4.0
+STORYBOARD_START_XY = np.asarray([-1.5, 1.5], dtype=float)
+STORYBOARD_PAPER_CORNER_XY = np.asarray([1.5, -1.5], dtype=float)
+STORYBOARD_CONFIGURED_TERMINAL_XYZ = np.asarray([-1.5, -1.5, 1.0], dtype=float)
+STORYBOARD_START_TOLERANCE_M = 0.5
+
 
 def _atomic_json(path: Path, document: Mapping[str, object]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -1611,9 +1629,1158 @@ def plot_cache(cache_dir: Path, out_dir: Path, window: str, rmse_mode: str,
     return summary
 
 
+def _storyboard_gt_pose_rows(source_bag: str, start: float | None = None,
+                             end: float | None = None
+                             ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Read timestamped GT xyz+yaw without rebuilding the campaign cache."""
+    rows: List[Tuple[float, float, float, float, float]] = []
+    with rosbag.Bag(source_bag) as bag:
+        for _, msg, stamp in bag.read_messages(topics=[GT_TOPIC]):
+            t = _message_stamp(msg, stamp)
+            if start is not None and t < start:
+                continue
+            if end is not None and t > end:
+                break
+            pose = msg.pose if hasattr(msg, "pose") else msg
+            q = pose.orientation
+            yaw = math.atan2(2.0 * (q.w * q.z + q.x * q.y),
+                             1.0 - 2.0 * (q.y * q.y + q.z * q.z))
+            rows.append((t, pose.position.x, pose.position.y, pose.position.z, yaw))
+    if len(rows) < 2:
+        raise RuntimeError(f"no GT pose series in {source_bag}")
+    array = np.asarray(rows, dtype=float)
+    times, poses = _deduplicate_sorted(array[:, 0], array[:, 1:])
+    return times, poses[:, :3], poses[:, 3]
+
+
+def _storyboard_gt_pose_series(source_bag: str, start: float, end: float
+                               ) -> Tuple[np.ndarray, np.ndarray]:
+    """Read GT xyz+yaw for path/heading overlays without rebuilding the cache."""
+    _, xyz, yaw = _storyboard_gt_pose_rows(source_bag, start, end)
+    return xyz, yaw
+
+
+def _offline_cloth_view_fraction(pose_xyz_yaw: np.ndarray) -> np.ndarray:
+    """Recreate the deployed centre-ray/AABB FOV-fill fraction in NumPy.
+
+    Unlike the online scaler, the known cloth AABB is active at every sample.
+    This makes the result a common geometric exposure measure rather than a
+    replay of each run's mapping state or dead-zone enable/disable setting.
+    For the offline paper/mock audit, a camera origin inside (or on the
+    boundary of) the configured box is explicitly assigned zero exposure.
+    Without this semantic override, every ray intersects the containing AABB
+    at distance zero regardless of camera yaw, producing a false f=1 peak
+    while the real camera can be facing completely away from the cloth.
+    """
+    poses = np.asarray(pose_xyz_yaw, dtype=float)
+    if poses.ndim != 2 or poses.shape[1] != 4:
+        raise ValueError(f"expected (N,4) GT xyz+yaw, got {poses.shape}")
+
+    tan_h = math.tan(OFFLINE_CLOTH_FOV_H_RAD / 2.0)
+    tan_v = math.tan(OFFLINE_CLOTH_FOV_V_RAD / 2.0)
+    u = ((np.arange(OFFLINE_CLOTH_GRID_U, dtype=float) + 0.5) /
+         OFFLINE_CLOTH_GRID_U * 2.0 - 1.0) * tan_h
+    v = ((np.arange(OFFLINE_CLOTH_GRID_V, dtype=float) + 0.5) /
+         OFFLINE_CLOTH_GRID_V * 2.0 - 1.0) * tan_v
+    uu, vv = np.meshgrid(u, v, indexing="xy")
+    rays = np.stack([np.ones_like(uu), uu, vv], axis=-1).reshape(-1, 3)
+    rays /= np.linalg.norm(rays, axis=1, keepdims=True)
+
+    yaw = poses[:, 3]
+    c, s = np.cos(yaw)[:, None], np.sin(yaw)[:, None]
+    directions = np.stack([
+        c * rays[None, :, 0] - s * rays[None, :, 1],
+        s * rays[None, :, 0] + c * rays[None, :, 1],
+        np.broadcast_to(rays[None, :, 2], (len(poses), len(rays))),
+    ], axis=-1)
+    origins = poses[:, None, :3]
+
+    eps = 1e-6
+    parallel = np.abs(directions) <= eps
+    outside_parallel = parallel & (
+        (origins < OFFLINE_CLOTH_AABB_MIN[None, None, :]) |
+        (origins > OFFLINE_CLOTH_AABB_MAX[None, None, :]))
+    safe_directions = np.where(parallel, 1.0, directions)
+    t1 = ((OFFLINE_CLOTH_AABB_MIN[None, None, :] - origins) /
+          safe_directions)
+    t2 = ((OFFLINE_CLOTH_AABB_MAX[None, None, :] - origins) /
+          safe_directions)
+    t_axis_near = np.where(parallel, -np.inf, np.minimum(t1, t2))
+    t_axis_far = np.where(parallel, np.inf, np.maximum(t1, t2))
+    t_near = np.max(t_axis_near, axis=-1)
+    t_far = np.min(t_axis_far, axis=-1)
+    first_forward = np.maximum(t_near, 0.0)
+    hits = (~np.any(outside_parallel, axis=-1) &
+            (t_far >= first_forward) &
+            (first_forward <= OFFLINE_CLOTH_MAX_RANGE_M))
+    origin_inside = np.all(
+        (poses[:, :3] >= OFFLINE_CLOTH_AABB_MIN[None, :]) &
+        (poses[:, :3] <= OFFLINE_CLOTH_AABB_MAX[None, :]),
+        axis=1)
+    hits &= ~origin_inside[:, None]
+    return np.mean(hits, axis=1)
+
+
+def _storyboard_build_offline_cloth_s(
+        curves: Sequence[Mapping[str, object]], preview_dir: Path
+        ) -> Dict[str, Dict[str, object]]:
+    """Recompute and persist common GT-based cloth exposure for all sessions."""
+    series_dir = preview_dir / "offline_common_cloth_s"
+    series_dir.mkdir(parents=True, exist_ok=True)
+    summaries: Dict[str, Dict[str, object]] = {}
+    csv_rows: List[Dict[str, object]] = []
+    plot_rows: List[Tuple[str, str, np.ndarray, np.ndarray]] = []
+    for index, curve in enumerate(curves, start=1):
+        meta = curve["meta"]
+        flight_id = str(meta["flight_id"])
+        source = str(meta["source_bag"])
+        t, xyz, yaw = _storyboard_gt_pose_rows(source)
+        poses = np.column_stack([xyz, yaw])
+        fraction = _offline_cloth_view_fraction(poses)
+        scale = 1.0 + (OFFLINE_CLOTH_S_MAX - 1.0) * fraction
+        peak_index = int(np.argmax(fraction))
+        hover_mask = (t >= float(curve["start"])) & (t < float(curve["end"]))
+        if not np.any(hover_mask):
+            raise RuntimeError(f"{flight_id}: no GT samples in hover window")
+        hover_fraction = fraction[hover_mask]
+        npz_path = series_dir / f"{flight_id}.npz"
+        _atomic_npz(
+            npz_path,
+            time_s=t,
+            time_from_bag_start_s=t - float(meta["windows"]["full"]["start"]),
+            pose_xyz_yaw=poses,
+            cloth_view_fraction=fraction,
+            scale_s4=scale,
+        )
+        row: Dict[str, object] = {
+            "flight_id": flight_id,
+            "condition": str(meta["condition"]),
+            "source_bag": source,
+            "samples": int(len(t)),
+            "offline_series_npz": str(npz_path),
+            "full_peak_fraction": float(fraction[peak_index]),
+            "full_peak_s4": float(scale[peak_index]),
+            "full_peak_time_s": float(t[peak_index]),
+            "full_peak_time_from_bag_start_s": float(
+                t[peak_index] - float(meta["windows"]["full"]["start"])),
+            "full_mean_fraction": float(np.mean(fraction)),
+            "full_p90_fraction": float(np.quantile(fraction, 0.9)),
+            "full_active_fraction": float(np.mean(fraction > 0.0)),
+            "hover_peak_fraction": float(np.max(hover_fraction)),
+            "hover_peak_s4": float(
+                1.0 + (OFFLINE_CLOTH_S_MAX - 1.0) * np.max(hover_fraction)),
+            "hover_mean_fraction": float(np.mean(hover_fraction)),
+            "hover_p90_fraction": float(np.quantile(hover_fraction, 0.9)),
+        }
+        summaries[flight_id] = row
+        csv_rows.append(row)
+        plot_rows.append((flight_id, str(meta["condition"]),
+                          t - float(meta["windows"]["full"]["start"]), scale))
+        print(f"[offline S {index:02d}/{len(curves)}] {flight_id}: "
+              f"peak f={row['full_peak_fraction']:.4f}, "
+              f"S4={row['full_peak_s4']:.4f}", flush=True)
+
+    csv_path = preview_dir / "offline_common_cloth_s_sessions.csv"
+    with csv_path.open("w", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=list(csv_rows[0]))
+        writer.writeheader()
+        writer.writerows(csv_rows)
+    figure, axes = plt.subplots(2, 2, figsize=(13, 8), sharey=True,
+                                constrained_layout=True)
+    for ax, condition in zip(axes.ravel(), CONDITION_ORDER):
+        for flight_id, row_condition, relative_t, scale in plot_rows:
+            if row_condition == condition:
+                ax.plot(relative_t, scale, linewidth=1.0, alpha=0.82,
+                        label=flight_id.split("_2026", 1)[0])
+        ax.axhline(2.2, color="#666666", linestyle="--", linewidth=0.9,
+                   label="requested Proposed max (f=40%)")
+        ax.axhline(3.1, color="#B00020", linestyle=":", linewidth=1.0,
+                   label="requested Nominal min (f=70%)")
+        ax.set_title(condition)
+        ax.set_xlabel("time from bag start (s)")
+        ax.set_ylabel("common offline S (S=1+3f)")
+        ax.set_ylim(0.95, 4.05)
+        ax.grid(True, alpha=0.2)
+        ax.legend(fontsize=7, ncol=2)
+    figure.suptitle(
+        "GT-based geometric cloth-view exposure — common AABB/FOV, 21 flights")
+    plot_path = preview_dir / "offline_common_cloth_s_over_time.png"
+    figure.savefig(plot_path, dpi=180)
+    plt.close(figure)
+    document = {
+        "version": OFFLINE_CLOTH_S_VERSION,
+        "definition": (
+            "GT pose/yaw geometric cloth-view exposure; all zones forced active; "
+            "camera origins inside/on the cloth AABB are assigned f=0; not "
+            "recorded /jax/dead_zone_scale and not an online map-state replay"),
+        "implementation_reference": (
+            "risk-aware commit 9464873 centre-ray/AABB rasterizer plus the "
+            "offline box-interior exclusion requested 2026-08-06"),
+        "config": {
+            "cloth_aabb_min_xyz_m": OFFLINE_CLOTH_AABB_MIN.tolist(),
+            "cloth_aabb_max_xyz_m": OFFLINE_CLOTH_AABB_MAX.tolist(),
+            "grid_u": OFFLINE_CLOTH_GRID_U,
+            "grid_v": OFFLINE_CLOTH_GRID_V,
+            "fov_h_rad": OFFLINE_CLOTH_FOV_H_RAD,
+            "fov_v_rad": OFFLINE_CLOTH_FOV_V_RAD,
+            "max_range_m": OFFLINE_CLOTH_MAX_RANGE_M,
+            "common_s_max": OFFLINE_CLOTH_S_MAX,
+            "scale_formula": "S = 1 + (4 - 1) * cloth_view_fraction",
+            "camera_model": "body +x forward, +y left, +z up; yaw-only",
+            "online_voxblox_activation_gate": "forced active/ignored",
+            "camera_origin_inside_or_on_aabb": "force cloth_view_fraction=0",
+        },
+        "session_count": len(csv_rows),
+        "sessions": csv_rows,
+        "outputs": {"csv": str(csv_path), "series_dir": str(series_dir),
+                    "plot": str(plot_path)},
+    }
+    _atomic_json(preview_dir / "offline_common_cloth_s.json", document)
+    return summaries
+
+
+def _storyboard_scenario_curves(
+        curves: Sequence[Mapping[str, object]],
+        offline_s: Mapping[str, Mapping[str, object]]
+        ) -> Tuple[List[Dict[str, object]], Dict[str, Dict[str, object]],
+                   List[Dict[str, object]]]:
+    """Build the common controller episode: hover start through planner DONE."""
+    completed: List[Dict[str, object]] = []
+    scenario_s: Dict[str, Dict[str, object]] = {}
+    audit: List[Dict[str, object]] = []
+    for curve in curves:
+        meta = curve["meta"]
+        flight_id = str(meta["flight_id"])
+        common = offline_s[flight_id]
+        with np.load(str(common["offline_series_npz"])) as data:
+            t = data["time_s"].copy()
+            poses = data["pose_xyz_yaw"].copy()
+            fraction = data["cloth_view_fraction"].copy()
+        start = float(curve["start"])
+        landing = float(curve["end"])
+        start_index = int(np.argmin(np.abs(t - start)))
+        start_distance = float(np.linalg.norm(
+            poses[start_index, :2] - STORYBOARD_START_XY))
+        planner_states: List[Tuple[float, str]] = []
+        with rosbag.Bag(str(meta["source_bag"])) as bag:
+            for _, msg, stamp in bag.read_messages(
+                    topics=["/planner/planner_node/state"]):
+                planner_states.append((float(stamp.to_sec()), str(msg.data)))
+        terminal_time = next(
+            (stamp for stamp, state in planner_states
+             if stamp >= start and state == "TERMINAL_NAV"), None)
+        done_time = next(
+            (stamp for stamp, state in planner_states
+             if terminal_time is not None and stamp >= terminal_time and state == "DONE"),
+            None)
+        window_method = str(curve["window_method"])
+        landing_observed = ("landing" in window_method or
+                            "on_ground" in window_method)
+        paper_corner_distance = np.linalg.norm(
+            poses[:, :2] - STORYBOARD_PAPER_CORNER_XY[None, :], axis=1)
+        configured_terminal_distance = np.linalg.norm(
+            poses[:, :3] - STORYBOARD_CONFIGURED_TERMINAL_XYZ[None, :], axis=1)
+        whole_flight = (t >= start) & (t <= landing)
+        row: Dict[str, object] = {
+            "flight_id": flight_id,
+            "condition": str(meta["condition"]),
+            "start_distance_m": start_distance,
+            "terminal_nav_observed": terminal_time is not None,
+            "done_observed": done_time is not None,
+            "landing_observed_after_hover": landing_observed,
+            "closest_paper_corner_xy_distance_m": float(
+                np.min(paper_corner_distance[whole_flight])),
+            "closest_configured_terminal_xyz_distance_m": float(
+                np.min(configured_terminal_distance[whole_flight])),
+            "configured_terminal_gt_within_0p2m": bool(
+                np.min(configured_terminal_distance[whole_flight]) <= 0.2),
+            "eligible": False,
+            "reason": None,
+        }
+        if start_distance > STORYBOARD_START_TOLERANCE_M:
+            row["reason"] = "start_outside_tolerance"
+        elif terminal_time is None:
+            row["reason"] = "terminal_nav_missing"
+        elif done_time is None:
+            row["reason"] = "planner_done_missing"
+        elif not landing_observed:
+            row["reason"] = "no_landing_event"
+        else:
+            # n0 landed before the delayed DONE publication.  It is still a
+            # valid attempted session; stop its physical episode at landing.
+            episode_end = min(float(done_time), landing)
+            duration = episode_end - start
+            if duration <= 0:
+                row["reason"] = "nonpositive_scenario_duration"
+            else:
+                scenario = dict(curve)
+                scenario["end"] = episode_end
+                scenario["duration_s"] = duration
+
+                distance_t = np.asarray(curve["distance_t"])
+                distance_m = np.asarray(curve["distance_m"])
+                keep_distance = distance_t < duration
+                scenario["distance_t"] = np.r_[distance_t[keep_distance], duration]
+                scenario["distance_m"] = np.r_[
+                    distance_m[keep_distance],
+                    np.interp(duration, distance_t, distance_m)]
+
+                error_t = np.asarray(curve["error_t"])
+                error_m = np.asarray(curve["error_m"])
+                keep_error = error_t <= duration
+                scenario["error_t"] = error_t[keep_error]
+                scenario["error_m"] = error_m[keep_error]
+                scenario["cumulative_rmse_m"] = np.sqrt(
+                    np.cumsum(scenario["error_m"] ** 2) /
+                    np.arange(1, len(scenario["error_m"]) + 1))
+                scenario["rolling_rmse_m"] = _rolling_rmse(
+                    scenario["error_t"], scenario["error_m"], 5.0)
+                scenario["shown_rmse_m"] = scenario["cumulative_rmse_m"]
+
+                keep_recorded_s = np.asarray(curve["dead_zone_t"]) <= duration
+                scenario["dead_zone_t"] = np.asarray(
+                    curve["dead_zone_t"])[keep_recorded_s]
+                scenario["dead_zone_scale"] = np.asarray(
+                    curve["dead_zone_scale"])[keep_recorded_s]
+                scenario["scenario"] = {
+                    "start_xy_m": STORYBOARD_START_XY.tolist(),
+                    "start_tolerance_m": STORYBOARD_START_TOLERANCE_M,
+                    "paper_corner_xy_m": STORYBOARD_PAPER_CORNER_XY.tolist(),
+                    "configured_terminal_xyz_m":
+                        STORYBOARD_CONFIGURED_TERMINAL_XYZ.tolist(),
+                    "closest_paper_corner_xy_distance_m": float(
+                        np.min(paper_corner_distance[whole_flight])),
+                    "closest_configured_terminal_xyz_distance_m": float(
+                        np.min(configured_terminal_distance[whole_flight])),
+                    "landing_minus_done_s": landing - float(done_time),
+                }
+
+                scenario_mask = (t >= start) & (t <= episode_end)
+                scenario_indices = np.flatnonzero(scenario_mask)
+                peak_index = int(scenario_indices[
+                    np.argmax(fraction[scenario_mask])])
+                scenario_s[flight_id] = {
+                    **common,
+                    "selection_peak_fraction": float(fraction[peak_index]),
+                    "selection_peak_s4": float(
+                        1.0 + (OFFLINE_CLOTH_S_MAX - 1.0) *
+                        fraction[peak_index]),
+                    "selection_peak_time_s": float(t[peak_index]),
+                    "selection_peak_time_from_bag_start_s": float(
+                        t[peak_index] -
+                        float(meta["windows"]["full"]["start"])),
+                }
+                completed.append(scenario)
+                row.update({
+                    "eligible": True,
+                    "reason": "common_protocol_completed",
+                    "scenario_duration_s": duration,
+                    "landing_minus_done_s": landing - float(done_time),
+                })
+        audit.append(row)
+    return completed, scenario_s, audit
+
+
+def _storyboard_camera_frame(source_bag: str, target_time: float) -> np.ndarray:
+    """Decode the compressed RGB frame nearest an absolute bag timestamp."""
+    import cv2
+
+    best = None
+    with rosbag.Bag(source_bag) as bag:
+        for _, msg, stamp in bag.read_messages(
+                topics=["/camera/color/image_raw/compressed"]):
+            dt = abs(stamp.to_sec() - target_time)
+            if best is None or dt < best[0]:
+                best = (dt, msg)
+            if stamp.to_sec() > target_time + 0.25:
+                break
+    if best is None:
+        raise RuntimeError(f"no compressed RGB in {source_bag}")
+    frame = cv2.imdecode(np.frombuffer(best[1].data, dtype=np.uint8),
+                         cv2.IMREAD_COLOR)
+    if frame is None:
+        raise RuntimeError(f"could not decode compressed RGB in {source_bag}")
+    return cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+
+def _storyboard_estimate_path(curve: Mapping[str, object]
+                              ) -> Tuple[np.ndarray, np.ndarray]:
+    meta = curve["meta"]
+    with np.load(str(meta["cache_npz"])) as data:
+        t = data["est_time_s"].copy()
+        est = data["est_xyz"].copy()
+        gt = data["gt_at_est_xyz"].copy()
+    selected = (t >= curve["start"]) & (t < curve["end"])
+    return gt[selected], est[selected]
+
+
+def _storyboard_s1(curve: Mapping[str, object]
+                   ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, Path]:
+    source = Path(str(curve["meta"]["source_bag"]))
+    sidecar = source.with_name(source.stem + ".cvar_s1.npz")
+    if not sidecar.is_file():
+        raise FileNotFoundError(
+            f"missing S=1 reconstruction for storyboard: {sidecar}")
+    with np.load(sidecar) as data:
+        t = data["time"].copy()
+        radius = data["uncertainty_radius"].copy()
+    selected = (t >= curve["start"]) & (t < curve["end"])
+    if not np.any(selected):
+        raise RuntimeError(f"no S=1 rows in {curve['meta']['flight_id']} hover window")
+    return (t[selected] - curve["start"], np.mean(radius[selected], axis=1),
+            np.max(radius[selected], axis=1), sidecar)
+
+
+def _storyboard_heading_indices(xyz: np.ndarray, count: int = 12) -> np.ndarray:
+    distance = np.r_[0.0, np.cumsum(np.linalg.norm(np.diff(xyz[:, :2], axis=0),
+                                                   axis=1))]
+    if distance[-1] <= 1e-6:
+        return np.asarray([0], dtype=int)
+    targets = np.linspace(0.0, distance[-1], min(count, len(xyz)))
+    return np.unique(np.searchsorted(distance, targets).clip(0, len(xyz) - 1))
+
+
+def _storyboard_draw_path(ax, curve: Mapping[str, object], title: str) -> None:
+    source = str(curve["meta"]["source_bag"])
+    gt, yaw = _storyboard_gt_pose_series(source, curve["start"], curve["end"])
+    paired_gt, est = _storyboard_estimate_path(curve)
+    ax.add_patch(plt.Rectangle(
+        (-0.5, -0.5), 1.0, 1.0, facecolor="#9E9E9E", alpha=0.18,
+        edgecolor="#555555", hatch="///", linewidth=1.0, label="cloth region"))
+    ax.plot(gt[:, 0], gt[:, 1], color="#222222", linewidth=2.3, label="GT")
+    ax.plot(est[:, 0], est[:, 1], color="#D55E00", linewidth=1.6,
+            alpha=0.9, label="FAST-LIVO estimate")
+    indices = _storyboard_heading_indices(gt)
+    ax.quiver(gt[indices, 0], gt[indices, 1], np.cos(yaw[indices]),
+              np.sin(yaw[indices]), angles="xy", scale_units="xy", scale=2.8,
+              width=0.006, color="#0072B2", alpha=0.85, label="GT heading")
+    ax.scatter(gt[0, 0], gt[0, 1], s=45, marker="o", color="#009E73", zorder=5)
+    ax.scatter(gt[-1, 0], gt[-1, 1], s=55, marker="X", color="#CC79A7", zorder=5)
+    if "scenario" in curve:
+        paper_corner = np.asarray(
+            curve["scenario"]["paper_corner_xy_m"], dtype=float)
+        configured_terminal = np.asarray(
+            curve["scenario"]["configured_terminal_xyz_m"], dtype=float)
+        ax.scatter(paper_corner[0], paper_corner[1], s=90, marker="*",
+                   color="#B00020",
+                   edgecolor="white", linewidth=0.7, zorder=6,
+                   label="paper corner (+1.5,-1.5)")
+        ax.scatter(configured_terminal[0], configured_terminal[1], s=65,
+                   marker="D", color="#7B2CBF", edgecolor="white",
+                   linewidth=0.7, zorder=6,
+                   label="configured terminal (-1.5,-1.5)")
+    ax.set_title(title, fontsize=10)
+    ax.set_xlabel("x (m)")
+    ax.set_ylabel("y (m)")
+    ax.set_aspect("equal", adjustable="box")
+    ax.grid(True, alpha=0.2)
+    ax.legend(loc="best", fontsize=7)
+
+
+def _storyboard_draw_rmse(ax, first: Mapping[str, object],
+                          second: Mapping[str, object], labels: Sequence[str]) -> None:
+    for curve, label, color in zip((first, second), labels,
+                                   ("#0072B2", "#D55E00")):
+        ax.plot(curve["error_t"], curve["cumulative_rmse_m"], color=color,
+                linewidth=2.2,
+                label=f"{label}: {curve['cumulative_rmse_m'][-1]:.2f} m")
+    ax.set_title("Cumulative localization RMSE")
+    ax.set_xlabel("time from hover start (s)")
+    ax.set_ylabel("RMSE (m)")
+    ax.set_xlim(left=0)
+    ax.set_ylim(bottom=0)
+    ax.grid(True, alpha=0.25)
+    ax.legend(fontsize=8)
+
+
+def _storyboard_draw_s1(ax, first: Mapping[str, object],
+                        second: Mapping[str, object], labels: Sequence[str]
+                        ) -> Dict[str, object]:
+    summary: Dict[str, object] = {}
+    for curve, label, color in zip((first, second), labels,
+                                   ("#0072B2", "#D55E00")):
+        t, mean_radius, max_radius, sidecar = _storyboard_s1(curve)
+        ax.fill_between(t, mean_radius, max_radius, color=color, alpha=0.12)
+        ax.plot(t, mean_radius, color=color, linewidth=2.0,
+                label=f"{label} horizon mean")
+        summary[str(curve["meta"]["flight_id"])] = {
+            "sidecar_npz": str(sidecar),
+            "horizon_mean_radius_m": float(np.mean(mean_radius)),
+            "horizon_p90_radius_m": float(np.quantile(mean_radius, 0.9)),
+            "horizon_max_radius_m": float(np.max(max_radius)),
+        }
+    ax.set_title("Raw model uncertainty reconstructed with S=1")
+    ax.set_xlabel("time from hover start (s)")
+    ax.set_ylabel("weighted uncertainty radius (m)")
+    ax.set_xlim(left=0)
+    ax.set_ylim(bottom=0)
+    ax.grid(True, alpha=0.25)
+    ax.legend(fontsize=8)
+    return summary
+
+
+def _storyboard_frame_at_s1_peak(curve: Mapping[str, object]
+                                 ) -> Tuple[np.ndarray, float, float]:
+    t, mean_radius, _, _ = _storyboard_s1(curve)
+    index = int(np.argmax(mean_radius))
+    absolute = float(curve["start"] + t[index])
+    return (_storyboard_camera_frame(str(curve["meta"]["source_bag"]), absolute),
+            float(t[index]), float(mean_radius[index]))
+
+
+def _storyboard_frame_at_relative_time(curve: Mapping[str, object], relative_s: float
+                                       ) -> Tuple[np.ndarray, float]:
+    relative_s = min(max(float(relative_s), 0.0), float(curve["duration_s"]))
+    absolute = float(curve["start"] + relative_s)
+    return (_storyboard_camera_frame(str(curve["meta"]["source_bag"]), absolute),
+            relative_s)
+
+
+def _storyboard_mock_metrics(
+        curve: Mapping[str, object], offline_s: Mapping[str, Mapping[str, object]]
+        ) -> Dict[str, object]:
+    meta = curve["meta"]
+    flight_id = str(meta["flight_id"])
+    common = offline_s[flight_id]
+    path = float(curve["distance_m"][-1])
+    rmse = float(curve["cumulative_rmse_m"][-1])
+    return {
+        "curve": curve,
+        "flight_id": flight_id,
+        "actual_condition": str(meta["condition"]),
+        "path_m": path,
+        "rmse_m": rmse,
+        "error_rate": rmse / path,
+        "offline_s_peak": float(common["selection_peak_s4"]),
+        "offline_s_common_max": OFFLINE_CLOTH_S_MAX,
+        "s_peak_fraction": float(common["selection_peak_fraction"]),
+        "offline_s_peak_time_s": float(common["selection_peak_time_s"]),
+        "offline_s_peak_time_from_bag_start_s": float(
+            common["selection_peak_time_from_bag_start_s"]),
+        "offline_s_series_npz": str(common["offline_series_npz"]),
+        "scenario": curve.get("scenario"),
+    }
+
+
+def _storyboard_select_mock_pair(
+        curves: Sequence[Mapping[str, object]],
+        offline_s: Mapping[str, Mapping[str, object]],
+        ignore_rmse: bool = False,
+                                 ) -> Dict[str, object]:
+    """Apply the requested gates, then find the smallest auditable relaxation."""
+    metrics = [_storyboard_mock_metrics(curve, offline_s) for curve in curves]
+    requested = {
+        "path_ratio_min": 1.0,
+        "path_ratio_max": 1.2,
+        "error_rate_max": 0.5,
+        "mock_pure_s_peak_fraction_max": 0.4,
+        "mock_nominal_s_peak_fraction_min": 0.7,
+    }
+
+    def exact_ok(proposed, baseline):
+        ratio = proposed["path_m"] / baseline["path_m"]
+        rmse_ok = (ignore_rmse or
+                   (proposed["rmse_m"] < baseline["rmse_m"] and
+                    proposed["error_rate"] <= requested["error_rate_max"] and
+                    baseline["error_rate"] <= requested["error_rate_max"]))
+        return (proposed is not baseline and
+                requested["path_ratio_min"] <= ratio <= requested["path_ratio_max"] and
+                rmse_ok and
+                proposed["s_peak_fraction"] <=
+                requested["mock_pure_s_peak_fraction_max"] and
+                baseline["s_peak_fraction"] >=
+                requested["mock_nominal_s_peak_fraction_min"])
+
+    exact = [(proposed, baseline) for proposed in metrics for baseline in metrics
+             if exact_ok(proposed, baseline)]
+    direction_pair_count = sum(
+        1 for proposed in metrics for baseline in metrics
+        if (proposed is not baseline and
+            (ignore_rmse or proposed["rmse_m"] < baseline["rmse_m"])
+            and proposed["s_peak_fraction"] < baseline["s_peak_fraction"]))
+    if exact:
+        proposed, baseline = min(
+            exact,
+            key=lambda pair: (
+                abs(pair[0]["path_m"] / pair[1]["path_m"] - 1.0),
+                -(pair[1]["rmse_m"] - pair[0]["rmse_m"]),
+                pair[0]["flight_id"], pair[1]["flight_id"]))
+        used = dict(requested)
+        relaxations: List[Dict[str, object]] = []
+        policy = "exact requested gates"
+    else:
+        # Preserve the two qualitative directions (lower RMSE and lower cloth
+        # exposure for mock Proposed), then relax the numeric bounds together
+        # only as far as each ordered pair requires.  All bounds are ratios, so
+        # the sum/max of their absolute changes is a transparent common score.
+        candidates = []
+        for proposed_row in metrics:
+            for baseline_row in metrics:
+                if (proposed_row is baseline_row or
+                        (not ignore_rmse and
+                         proposed_row["rmse_m"] >= baseline_row["rmse_m"]) or
+                        proposed_row["s_peak_fraction"] >=
+                        baseline_row["s_peak_fraction"]):
+                    continue
+                ratio = proposed_row["path_m"] / baseline_row["path_m"]
+                used_row = {
+                    "path_ratio_min": min(requested["path_ratio_min"], ratio),
+                    "path_ratio_max": max(requested["path_ratio_max"], ratio),
+                    "error_rate_max": (
+                        requested["error_rate_max"] if ignore_rmse else max(
+                            requested["error_rate_max"],
+                            proposed_row["error_rate"], baseline_row["error_rate"])),
+                    "mock_pure_s_peak_fraction_max": max(
+                        requested["mock_pure_s_peak_fraction_max"],
+                        proposed_row["s_peak_fraction"]),
+                    "mock_nominal_s_peak_fraction_min": min(
+                        requested["mock_nominal_s_peak_fraction_min"],
+                        baseline_row["s_peak_fraction"]),
+                }
+                changes = [
+                    requested["path_ratio_min"] - used_row["path_ratio_min"],
+                    used_row["path_ratio_max"] - requested["path_ratio_max"],
+                    used_row["error_rate_max"] - requested["error_rate_max"],
+                    used_row["mock_pure_s_peak_fraction_max"] -
+                    requested["mock_pure_s_peak_fraction_max"],
+                    requested["mock_nominal_s_peak_fraction_min"] -
+                    used_row["mock_nominal_s_peak_fraction_min"],
+                ]
+                candidates.append((sum(changes), max(changes), abs(ratio - 1.0),
+                                   proposed_row, baseline_row, used_row,
+                                   requested["path_ratio_min"] <= ratio <=
+                                   requested["path_ratio_max"]))
+        if not candidates:
+            raise RuntimeError(
+                "no ordered pair has both lower RMSE and lower offline cloth exposure")
+        path_preserving = [row for row in candidates if row[6]]
+        eligible_candidates = path_preserving or candidates
+        _, _, _, proposed, baseline, used = min(
+            eligible_candidates,
+            key=lambda row: (
+                             ((row[3]["actual_condition"] != "pure") +
+                              (row[4]["actual_condition"] != "nominal"))
+                             if ignore_rmse else 0,
+                             row[0], row[1], row[2],
+                             -(row[4]["rmse_m"] - row[3]["rmse_m"]),
+                             row[3]["flight_id"], row[4]["flight_id"]))[:6]
+        relaxations = []
+        for key, requested_value in requested.items():
+            used_value = used[key]
+            if abs(float(used_value) - float(requested_value)) > 1e-12:
+                relaxations.append({
+                    "constraint": key,
+                    "requested": requested_value,
+                    "used": used_value,
+                    "absolute_change": float(used_value) - float(requested_value),
+                    "change_percentage_points":
+                        100.0 * (float(used_value) - float(requested_value)),
+                })
+        if ignore_rmse:
+            policy = (
+                "RMSE disabled by user: preserve lower common offline cloth "
+                "exposure and requested path-ratio bounds, prefer actual "
+                "PURE->nominal labels, then minimize remaining bound changes")
+        else:
+            policy = (
+                "no exact pair: preserve mock-Proposed lower RMSE, lower common "
+                "offline cloth exposure, and requested path-ratio bounds whenever "
+                "such a pair exists; then minimize summed remaining bound changes")
+    return {
+        "requested_constraints": requested,
+        "rmse_constraints_enabled": not ignore_rmse,
+        "sessions_evaluated": len(metrics),
+        "ordered_pairs_evaluated": len(metrics) * (len(metrics) - 1),
+        "sessions_meeting_mock_pure_s_gate": sum(
+            row["s_peak_fraction"] <=
+            requested["mock_pure_s_peak_fraction_max"] for row in metrics),
+        "sessions_meeting_mock_nominal_s_gate": sum(
+            row["s_peak_fraction"] >=
+            requested["mock_nominal_s_peak_fraction_min"] for row in metrics),
+        "direction_preserving_pair_count": direction_pair_count,
+        "exact_pair_count": len(exact),
+        "relaxations": relaxations,
+        "used_constraints": used,
+        "selection_policy": policy,
+        "mock_proposed": proposed,
+        "mock_nominal": baseline,
+    }
+
+
+def _storyboard_rank_mock_candidates(
+        curves: Sequence[Mapping[str, object]],
+        offline_s: Mapping[str, Mapping[str, object]],
+        limit: int = 6,
+        ) -> Dict[str, object]:
+    """Select diverse RMSE-disabled mock pairs from the requested S/path gates.
+
+    The strategies intentionally use only path length, common offline cloth
+    exposure, and source condition labels.  RMSE is reported in each plot but
+    is not used for admission or ranking.
+    """
+    metrics = [_storyboard_mock_metrics(curve, offline_s) for curve in curves]
+    valid = []
+    for proposed in metrics:
+        for baseline in metrics:
+            if proposed is baseline:
+                continue
+            ratio = proposed["path_m"] / baseline["path_m"]
+            if not (1.0 <= ratio <= 1.2):
+                continue
+            if proposed["s_peak_fraction"] >= baseline["s_peak_fraction"]:
+                continue
+            if baseline["s_peak_fraction"] < 0.7:
+                continue
+            valid.append({
+                "mock_proposed": proposed,
+                "mock_nominal": baseline,
+                "path_ratio": float(ratio),
+                "exposure_gap_fraction": float(
+                    baseline["s_peak_fraction"] -
+                    proposed["s_peak_fraction"]),
+            })
+    if not valid:
+        raise RuntimeError("no RMSE-disabled mock pair satisfies path/S directions")
+
+    selected: List[Dict[str, object]] = []
+    seen = set()
+
+    def add(strategy: str, explanation: str,
+            pool: Sequence[Mapping[str, object]], key) -> None:
+        for row in sorted(pool, key=key):
+            pair = (row["mock_proposed"]["flight_id"],
+                    row["mock_nominal"]["flight_id"])
+            if pair in seen:
+                continue
+            candidate = dict(row)
+            candidate["strategy"] = strategy
+            candidate["selection_reason"] = explanation
+            candidate["rank"] = len(selected) + 1
+            candidate["rmse_constraints_enabled"] = False
+            candidate["proposed_s_gate_requested"] = 0.4
+            candidate["proposed_s_gate_used"] = float(
+                row["mock_proposed"]["s_peak_fraction"])
+            candidate["proposed_s_gate_relaxation"] = float(
+                max(0.0, row["mock_proposed"]["s_peak_fraction"] - 0.4))
+            selected.append(candidate)
+            seen.add(pair)
+            return
+
+    label_faithful = [
+        row for row in valid
+        if (row["mock_proposed"]["actual_condition"] == "pure" and
+            row["mock_nominal"]["actual_condition"] == "nominal")]
+    if label_faithful:
+        add("label_faithful", "retain actual pure -> nominal labels",
+            label_faithful,
+            lambda row: (max(0.0, row["mock_proposed"]["s_peak_fraction"] - 0.4),
+                         abs(row["path_ratio"] - 1.0),
+                         row["mock_proposed"]["flight_id"],
+                         row["mock_nominal"]["flight_id"]))
+    add("closest_path_length", "minimize |Proposed/Nominal path ratio - 1|",
+        valid,
+        lambda row: (abs(row["path_ratio"] - 1.0),
+                     -row["exposure_gap_fraction"],
+                     row["mock_proposed"]["flight_id"],
+                     row["mock_nominal"]["flight_id"]))
+    add("lowest_proposed_exposure", "minimize Proposed common offline peak S",
+        valid,
+        lambda row: (row["mock_proposed"]["s_peak_fraction"],
+                     abs(row["path_ratio"] - 1.0),
+                     -row["exposure_gap_fraction"],
+                     row["mock_proposed"]["flight_id"],
+                     row["mock_nominal"]["flight_id"]))
+    add("largest_exposure_separation",
+        "maximize Nominal minus Proposed common offline peak S",
+        valid,
+        lambda row: (-row["exposure_gap_fraction"],
+                     abs(row["path_ratio"] - 1.0),
+                     row["mock_proposed"]["flight_id"],
+                     row["mock_nominal"]["flight_id"]))
+    add("shortest_path_pair", "minimize the pair's total GT path length",
+        valid,
+        lambda row: (row["mock_proposed"]["path_m"] +
+                     row["mock_nominal"]["path_m"],
+                     abs(row["path_ratio"] - 1.0),
+                     row["mock_proposed"]["flight_id"],
+                     row["mock_nominal"]["flight_id"]))
+    add("longest_path_pair", "maximize the pair's total GT path length",
+        valid,
+        lambda row: (-(row["mock_proposed"]["path_m"] +
+                       row["mock_nominal"]["path_m"]),
+                     abs(row["path_ratio"] - 1.0),
+                     row["mock_proposed"]["flight_id"],
+                     row["mock_nominal"]["flight_id"]))
+
+    # A degenerate dataset can make strategies collide.  Fill remaining slots
+    # using a transparent path/exposure ordering, still without consulting RMSE.
+    for row in sorted(
+            valid,
+            key=lambda item: (
+                max(0.0, item["mock_proposed"]["s_peak_fraction"] - 0.4),
+                abs(item["path_ratio"] - 1.0),
+                -item["exposure_gap_fraction"],
+                item["mock_proposed"]["flight_id"],
+                item["mock_nominal"]["flight_id"])):
+        if len(selected) >= limit:
+            break
+        add("ranked_fill", "next lowest S-gate relaxation and path mismatch",
+            [row], lambda item: (0,))
+    return {
+        "rmse_constraints_enabled": False,
+        "valid_ordered_pair_count": len(valid),
+        "candidate_count": min(len(selected), limit),
+        "candidates": selected[:limit],
+    }
+
+
+def _storyboard_render_mock_candidate(
+        candidate: Mapping[str, object], output_path: Path) -> None:
+    """Render one candidate with the existing path/RMSE/RGB/distance panels."""
+    proposed_metrics = candidate["mock_proposed"]
+    baseline_metrics = candidate["mock_nominal"]
+    proposed = proposed_metrics["curve"]
+    baseline = baseline_metrics["curve"]
+    figure = plt.figure(figsize=(17, 9.5), constrained_layout=True)
+    grid = figure.add_gridspec(2, 3, width_ratios=(1.0, 1.0, 1.15))
+    _storyboard_draw_path(
+        figure.add_subplot(grid[0, 0]), proposed,
+        f"Mock ‘Proposed’\nsource={proposed_metrics['flight_id']}, "
+        f"actual={proposed_metrics['actual_condition']}")
+    _storyboard_draw_path(
+        figure.add_subplot(grid[0, 1]), baseline,
+        f"Mock ‘Nominal’\nsource={baseline_metrics['flight_id']}, "
+        f"actual={baseline_metrics['actual_condition']}")
+    rmse_ax = figure.add_subplot(grid[0, 2])
+    _storyboard_draw_rmse(rmse_ax, proposed, baseline,
+                          ("mock Proposed", "mock Nominal"))
+    rmse_ax.set_title("RMSE — displayed only, disabled for candidate selection")
+
+    proposed_frame = _storyboard_camera_frame(
+        str(proposed["meta"]["source_bag"]),
+        float(proposed_metrics["offline_s_peak_time_s"]))
+    baseline_frame = _storyboard_camera_frame(
+        str(baseline["meta"]["source_bag"]),
+        float(baseline_metrics["offline_s_peak_time_s"]))
+    for ax, frame, label, frame_t in (
+            (figure.add_subplot(grid[1, 0]), proposed_frame,
+             "mock Proposed: RGB at common offline peak S",
+             proposed_metrics["offline_s_peak_time_from_bag_start_s"]),
+            (figure.add_subplot(grid[1, 1]), baseline_frame,
+             "mock Nominal: RGB at common offline peak S",
+             baseline_metrics["offline_s_peak_time_from_bag_start_s"])):
+        ax.imshow(frame)
+        ax.axis("off")
+        ax.set_title(f"{label}\nt={float(frame_t):.1f}s from bag start", fontsize=10)
+    ax = figure.add_subplot(grid[1, 2])
+    for curve, label, color in ((proposed, "mock Proposed", "#0072B2"),
+                                (baseline, "mock Nominal", "#D55E00")):
+        ax.plot(curve["distance_t"], curve["distance_m"], color=color,
+                linewidth=2.2,
+                label=f"{label}: {curve['distance_m'][-1]:.1f} m")
+    ax.set_title("Cumulative GT path length")
+    ax.set_xlabel("time from hover start (s)")
+    ax.set_ylabel("distance (m)")
+    ax.set_xlim(left=0)
+    ax.set_ylim(bottom=0)
+    ax.grid(True, alpha=0.25)
+    ax.legend(fontsize=8)
+    gate_text = (
+        f"path ratio={candidate['path_ratio']:.3f}; peak f="
+        f"{proposed_metrics['s_peak_fraction']:.4f} vs "
+        f"{baseline_metrics['s_peak_fraction']:.4f}; Proposed S gate "
+        f"0.4000→{candidate['proposed_s_gate_used']:.4f}")
+    figure.suptitle(
+        f"MOCK CANDIDATE {candidate['rank']:02d}: "
+        f"{candidate['strategy']} — NOT AN EXPERIMENT RESULT\n{gate_text}",
+        fontsize=15, color="#B00020", fontweight="bold")
+    figure.text(0.5, 0.5, "NOT FOR PAPER • RELABELLED MOCKUP", ha="center",
+                va="center", fontsize=40, color="#B00020", alpha=0.10,
+                rotation=24, fontweight="bold")
+    figure.savefig(output_path, dpi=200)
+    plt.close(figure)
+
+
+def plot_paper_storyboards(cache_dir: Path, out_dir: Path) -> Dict[str, object]:
+    """Build actual-label and explicitly hypothetical real-experiment previews."""
+    index = json.loads((cache_dir / "index.json").read_text())
+    curves = [_derive_series(meta, "hover", "cumulative", 5.0)
+              for meta in index["sessions"]]
+    pure = [row for row in curves if row["meta"]["condition"] == "pure"]
+    nominal = [row for row in curves if row["meta"]["condition"] == "nominal"]
+    actual_pure = min(pure, key=lambda row: float(row["cumulative_rmse_m"][-1]))
+    actual_nominal = max(nominal, key=lambda row: float(row["cumulative_rmse_m"][-1]))
+
+    preview_dir = out_dir / "paper_preview"
+    preview_dir.mkdir(parents=True, exist_ok=True)
+    offline_s = _storyboard_build_offline_cloth_s(curves, preview_dir)
+    scenario_curves, scenario_s, scenario_audit = _storyboard_scenario_curves(
+        curves, offline_s)
+    scenario_audit_csv = preview_dir / "scenario_completion_audit.csv"
+    with scenario_audit_csv.open("w", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=list(scenario_audit[0]))
+        writer.writeheader()
+        writer.writerows(scenario_audit)
+    _atomic_json(preview_dir / "scenario_completion_audit.json", {
+        "start_xy_m": STORYBOARD_START_XY.tolist(),
+        "start_tolerance_m": STORYBOARD_START_TOLERANCE_M,
+        "paper_corner_xy_m": STORYBOARD_PAPER_CORNER_XY.tolist(),
+        "configured_terminal_xyz_m":
+            STORYBOARD_CONFIGURED_TERMINAL_XYZ.tolist(),
+        "definition": (
+            "common controller protocol: hover start through observed "
+            "EXPLORING->TERMINAL_NAV->DONE, followed by landing; physical "
+            "distance to the paper corner and configured terminal are outcomes, "
+            "not eligibility filters"),
+        "eligible_count": len(scenario_curves),
+        "sessions": scenario_audit,
+        "csv": str(scenario_audit_csv),
+    })
+    figure = plt.figure(figsize=(17, 9.5), constrained_layout=True)
+    grid = figure.add_gridspec(2, 3, width_ratios=(1.0, 1.0, 1.15))
+    _storyboard_draw_path(
+        figure.add_subplot(grid[0, 0]), actual_pure,
+        f"Actual PURE best (hover RMSE)\n{actual_pure['meta']['flight_id']}")
+    _storyboard_draw_path(
+        figure.add_subplot(grid[0, 1]), actual_nominal,
+        f"Actual nominal worst (hover RMSE)\n{actual_nominal['meta']['flight_id']}")
+    _storyboard_draw_rmse(figure.add_subplot(grid[0, 2]), actual_pure,
+                          actual_nominal, ("PURE", "nominal"))
+    pure_frame, pure_frame_t, pure_frame_u = _storyboard_frame_at_s1_peak(actual_pure)
+    nominal_frame, nominal_frame_t, nominal_frame_u = \
+        _storyboard_frame_at_s1_peak(actual_nominal)
+    for ax, frame, label, frame_t, radius in (
+            (figure.add_subplot(grid[1, 0]), pure_frame, "PURE", pure_frame_t,
+             pure_frame_u),
+            (figure.add_subplot(grid[1, 1]), nominal_frame, "nominal",
+             nominal_frame_t, nominal_frame_u)):
+        ax.imshow(frame)
+        ax.axis("off")
+        ax.set_title(
+            f"{label}: RGB at maximum S=1 horizon-mean uncertainty\n"
+            f"t={frame_t:.1f}s, radius={radius:.3f}m", fontsize=10)
+    s1_summary = _storyboard_draw_s1(
+        figure.add_subplot(grid[1, 2]), actual_pure, actual_nominal,
+        ("PURE", "nominal"))
+    figure.suptitle(
+        "Actual labels — post-hoc best PURE vs worst nominal\n"
+        "Selection uses hover-to-landing cumulative RMSE; illustrative, not an aggregate result",
+        fontsize=14)
+    actual_path = preview_dir / "actual_pure_best_vs_nominal_worst.png"
+    figure.savefig(actual_path, dpi=200)
+    plt.close(figure)
+
+    # Keep source identities visible and watermark the complete figure so it
+    # cannot be confused with an experimental result.
+    mock_selection = _storyboard_select_mock_pair(
+        scenario_curves, scenario_s, ignore_rmse=True)
+    mock_proposed_metrics = mock_selection["mock_proposed"]
+    mock_baseline_metrics = mock_selection["mock_nominal"]
+    mock_proposed = mock_proposed_metrics["curve"]
+    mock_baseline = mock_baseline_metrics["curve"]
+    figure = plt.figure(figsize=(17, 9.5), constrained_layout=True)
+    grid = figure.add_gridspec(2, 3, width_ratios=(1.0, 1.0, 1.15))
+    _storyboard_draw_path(
+        figure.add_subplot(grid[0, 0]), mock_proposed,
+        f"Mock ‘Proposed’\nsource={mock_proposed_metrics['flight_id']}, "
+        f"actual={mock_proposed_metrics['actual_condition']}")
+    _storyboard_draw_path(
+        figure.add_subplot(grid[0, 1]), mock_baseline,
+        f"Mock ‘Nominal’\nsource={mock_baseline_metrics['flight_id']}, "
+        f"actual={mock_baseline_metrics['actual_condition']}")
+    rmse_ax = figure.add_subplot(grid[0, 2])
+    _storyboard_draw_rmse(rmse_ax, mock_proposed, mock_baseline,
+                          ("mock Proposed", "mock Nominal"))
+    rmse_ax.set_title("RMSE — displayed only, disabled for mock selection")
+    proposed_frame = _storyboard_camera_frame(
+        str(mock_proposed["meta"]["source_bag"]),
+        float(mock_proposed_metrics["offline_s_peak_time_s"]))
+    proposed_t = float(mock_proposed_metrics["offline_s_peak_time_from_bag_start_s"])
+    baseline_frame = _storyboard_camera_frame(
+        str(mock_baseline["meta"]["source_bag"]),
+        float(mock_baseline_metrics["offline_s_peak_time_s"]))
+    baseline_t = float(mock_baseline_metrics["offline_s_peak_time_from_bag_start_s"])
+    for ax, frame, label, frame_t in (
+            (figure.add_subplot(grid[1, 0]), proposed_frame,
+             "mock Proposed: RGB at common offline peak S", proposed_t),
+            (figure.add_subplot(grid[1, 1]), baseline_frame,
+             "mock Nominal: RGB at common offline peak S", baseline_t)):
+        ax.imshow(frame)
+        ax.axis("off")
+        ax.set_title(f"{label}\nt={frame_t:.1f}s from bag start", fontsize=10)
+    ax = figure.add_subplot(grid[1, 2])
+    for curve, label, color in ((mock_proposed, "mock Proposed", "#0072B2"),
+                                (mock_baseline, "mock Nominal", "#D55E00")):
+        ax.plot(curve["distance_t"], curve["distance_m"], color=color,
+                linewidth=2.2,
+                label=f"{label}: {curve['distance_m'][-1]:.1f} m")
+    ax.set_title("Cumulative GT path length")
+    ax.set_xlabel("time from hover start (s)")
+    ax.set_ylabel("distance (m)")
+    ax.set_xlim(left=0)
+    ax.set_ylim(bottom=0)
+    ax.grid(True, alpha=0.25)
+    ax.legend(fontsize=8)
+    relaxations = mock_selection["relaxations"]
+    if not relaxations:
+        gate_text = "All requested gates hold with common GT-based offline S"
+    else:
+        gate_text = "Minimum joint relaxation: " + ", ".join(
+            f"{row['constraint']} {row['requested']:.3f}→{row['used']:.3f}"
+            for row in relaxations)
+    if not mock_selection["rmse_constraints_enabled"]:
+        headline = "RMSE-DISABLED MOCK CANDIDATE (S GATE RELAXED)"
+    elif mock_selection["exact_pair_count"]:
+        headline = "HYPOTHETICAL RELABEL PREVIEW"
+    else:
+        headline = "CLOSEST INFEASIBLE SCENARIO COMPROMISE"
+    figure.suptitle(
+        headline + " — NOT AN EXPERIMENT RESULT\n" + gate_text,
+        fontsize=16, color="#B00020", fontweight="bold")
+    figure.text(0.5, 0.5, "NOT FOR PAPER • RELABELLED MOCKUP", ha="center",
+                va="center", fontsize=40, color="#B00020", alpha=0.10,
+                rotation=24, fontweight="bold")
+    mock_path = preview_dir / "hypothetical_relabel_storyboard_NOT_FOR_PAPER.png"
+    figure.savefig(mock_path, dpi=200)
+    plt.close(figure)
+
+    ranked = _storyboard_rank_mock_candidates(scenario_curves, scenario_s,
+                                               limit=6)
+    candidate_dir = preview_dir / "mock_candidates_NOT_FOR_PAPER"
+    candidate_dir.mkdir(parents=True, exist_ok=True)
+    candidate_records = []
+    for candidate in ranked["candidates"]:
+        proposed_id = candidate["mock_proposed"]["flight_id"].split("_2026", 1)[0]
+        baseline_id = candidate["mock_nominal"]["flight_id"].split("_2026", 1)[0]
+        candidate_path = candidate_dir / (
+            f"candidate_{candidate['rank']:02d}_{candidate['strategy']}_"
+            f"{proposed_id}_vs_{baseline_id}.png")
+        _storyboard_render_mock_candidate(candidate, candidate_path)
+        candidate_records.append({
+            "rank": candidate["rank"],
+            "strategy": candidate["strategy"],
+            "selection_reason": candidate["selection_reason"],
+            "rmse_constraints_enabled": False,
+            "path_ratio": candidate["path_ratio"],
+            "exposure_gap_fraction": candidate["exposure_gap_fraction"],
+            "proposed_s_gate_requested": candidate["proposed_s_gate_requested"],
+            "proposed_s_gate_used": candidate["proposed_s_gate_used"],
+            "proposed_s_gate_relaxation":
+                candidate["proposed_s_gate_relaxation"],
+            "mock_proposed": {
+                key: value for key, value in candidate["mock_proposed"].items()
+                if key != "curve"
+            },
+            "mock_nominal": {
+                key: value for key, value in candidate["mock_nominal"].items()
+                if key != "curve"
+            },
+            "figure": str(candidate_path),
+        })
+    candidate_manifest = candidate_dir / "mock_candidates.json"
+    _atomic_json(candidate_manifest, {
+        "status": "RMSE_DISABLED; MOCK_CANDIDATES; NOT_FOR_PAPER",
+        "selection_window": (
+            "hover start through planner DONE for the common controller protocol"),
+        "admission_gates": {
+            "path_ratio": "1.0 <= Proposed/Nominal <= 1.2",
+            "exposure_direction": "Proposed peak f < Nominal peak f",
+            "nominal_peak_fraction_min": 0.7,
+            "rmse": "disabled; displayed only",
+        },
+        "valid_ordered_pair_count": ranked["valid_ordered_pair_count"],
+        "candidate_count": len(candidate_records),
+        "candidates": candidate_records,
+    })
+
+    summary = {
+        "actual_selection_window": "hover-to-landing",
+        "mock_selection_window": (
+            "hover start through planner DONE for the common "
+            "EXPLORING->TERMINAL_NAV->DONE protocol, with later landing required"),
+        "s_selection_definition": (
+            "scenario-window peak of common GT-pose/yaw geometric cloth-view "
+            "fraction, S=1+3f; online observation gate ignored; camera origins "
+            "inside/on the cloth AABB forced to f=0"),
+        "offline_common_s": str(preview_dir / "offline_common_cloth_s.json"),
+        "scenario_completion_audit": str(
+            preview_dir / "scenario_completion_audit.json"),
+        "actual_comparison": {
+            "selection": "minimum PURE vs maximum nominal cumulative RMSE within condition",
+            "pure": {
+                "flight_id": actual_pure["meta"]["flight_id"],
+                "condition": actual_pure["meta"]["condition"],
+                "rmse_m": float(actual_pure["cumulative_rmse_m"][-1]),
+                "source_bag": actual_pure["meta"]["source_bag"],
+            },
+            "nominal": {
+                "flight_id": actual_nominal["meta"]["flight_id"],
+                "condition": actual_nominal["meta"]["condition"],
+                "rmse_m": float(actual_nominal["cumulative_rmse_m"][-1]),
+                "source_bag": actual_nominal["meta"]["source_bag"],
+            },
+            "s1": s1_summary,
+            "figure": str(actual_path),
+        },
+        "hypothetical_relabel_preview": {
+            "status": (
+                "RMSE_DISABLED; S_GATE_RELAXED; MOCK_CANDIDATE; NOT_FOR_PAPER"
+                if not mock_selection["rmse_constraints_enabled"] else
+                ("NOT_FOR_PAPER; RELABELLED_MOCKUP" if
+                 mock_selection["exact_pair_count"] else
+                 "NO_VALID_PAIR; CLOSEST_INFEASIBLE_SCENARIO_COMPROMISE; "
+                 "NOT_FOR_PAPER")),
+            "selection": {
+                "requested_constraints": mock_selection["requested_constraints"],
+                "rmse_constraints_enabled":
+                    mock_selection["rmse_constraints_enabled"],
+                "sessions_evaluated": mock_selection["sessions_evaluated"],
+                "ordered_pairs_evaluated": mock_selection["ordered_pairs_evaluated"],
+                "sessions_meeting_mock_pure_s_gate":
+                    mock_selection["sessions_meeting_mock_pure_s_gate"],
+                "sessions_meeting_mock_nominal_s_gate":
+                    mock_selection["sessions_meeting_mock_nominal_s_gate"],
+                "direction_preserving_pair_count":
+                    mock_selection["direction_preserving_pair_count"],
+                "exact_pair_count": mock_selection["exact_pair_count"],
+                "relaxations": mock_selection["relaxations"],
+                "used_constraints": mock_selection["used_constraints"],
+                "policy": mock_selection["selection_policy"],
+            },
+            "mock_proposed": {
+                **{key: value for key, value in mock_proposed_metrics.items()
+                   if key != "curve"},
+                "offline_peak_frame_from_bag_start_s": proposed_t,
+            },
+            "mock_nominal": {
+                **{key: value for key, value in mock_baseline_metrics.items()
+                   if key != "curve"},
+                "offline_peak_frame_from_bag_start_s": baseline_t,
+            },
+            "figure": str(mock_path),
+        },
+        "mock_candidate_set": {
+            "status": "RMSE_DISABLED; MOCK_CANDIDATES; NOT_FOR_PAPER",
+            "valid_ordered_pair_count": ranked["valid_ordered_pair_count"],
+            "candidate_count": len(candidate_records),
+            "manifest": str(candidate_manifest),
+            "figures": [row["figure"] for row in candidate_records],
+        },
+    }
+    _atomic_json(preview_dir / "storyboard_selection.json", summary)
+    print(f"[storyboard] {actual_path}")
+    print(f"[storyboard] {mock_path}")
+    print(f"[storyboard] {candidate_manifest}")
+    for row in candidate_records:
+        print(f"[storyboard candidate {row['rank']:02d}] {row['figure']}")
+    return summary
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", nargs="?", choices=("build", "plot", "all"), default="all")
+    parser.add_argument("command", nargs="?",
+                        choices=("build", "plot", "all", "storyboard"),
+                        default="all")
     parser.add_argument("--root", type=Path, default=DEFAULT_ROOT)
     parser.add_argument("--spec", type=Path, default=DEFAULT_SPEC)
     parser.add_argument("--results", type=Path, default=DEFAULT_RESULTS)
@@ -1660,6 +2827,8 @@ def main() -> None:
                    args.rolling_window_s, args.drift_window_s,
                    args.drift_sweep_min_s, args.drift_sweep_max_s,
                    args.drift_sweep_step_s)
+    if args.command == "storyboard":
+        plot_paper_storyboards(cache_dir, out_dir)
 
 
 if __name__ == "__main__":

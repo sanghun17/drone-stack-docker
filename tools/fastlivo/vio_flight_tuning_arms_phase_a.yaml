@@ -1,0 +1,36 @@
+schema: fastlivo_vio_tuning_arms/v1
+
+# Development-only OFAT screen.  The campaign harness applies the frozen
+# hybrid-input, GT-isolation, deterministic-init, propagated-output and
+# no-debug invariants after these overrides.
+arms:
+  - id: baseline_acc10_img1000_out1000
+    overrides: {}
+
+  - id: acc5
+    overrides:
+      imu.acc_cov: 5.0
+
+  - id: acc20
+    overrides:
+      imu.acc_cov: 20.0
+
+  - id: img300
+    overrides:
+      vio.img_point_cov: 300.0
+
+  - id: img3000
+    overrides:
+      vio.img_point_cov: 3000.0
+
+  - id: outlier100
+    overrides:
+      vio.outlier_threshold: 100.0
+
+  - id: outlier300
+    overrides:
+      vio.outlier_threshold: 300.0
+
+  - id: outlier600
+    overrides:
+      vio.outlier_threshold: 600.0

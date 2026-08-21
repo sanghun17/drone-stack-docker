@@ -1,0 +1,12 @@
+schema: fastlivo_vio_tuning_arms/v1
+
+# This file is deliberately tiny.  It exercises overlay construction and the
+# campaign plumbing; it is not the 42-arm tuning grid.
+arms:
+  - id: baseline_hybrid_acc10_cov1000
+    overrides: {}
+
+  - id: example_acc5_cov1000
+    overrides:
+      imu.acc_cov: 5.0
+      vio.img_point_cov: 1000

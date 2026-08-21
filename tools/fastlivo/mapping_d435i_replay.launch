@@ -23,6 +23,9 @@
   <arg name="paired_drop" default="false"/>
   <!-- off by default: in analysis we WANT to see a divergence, not kill the node. -->
   <arg name="odom_guard"  default="false"/>
+  <arg name="visual_quality_log" default="false"/>
+  <arg name="visual_quality_output_prefix" default="/tmp/fast_livo_visual_quality"/>
+  <arg name="mocap_anchor_enable" default="true"/>
 
   <node pkg="tf" type="static_transform_publisher" name="odom_to_camera_init"
         args="0 0 0 0.5 -0.5 0.5 -0.5 odom camera_init 100"/>
@@ -41,6 +44,10 @@
   <param name="common/online_intrinsics_en" value="false"/>
   <param name="common/cam_calib_file" value="$(arg cam_calib)"/>
   <param name="debug/verbose" value="false"/>
+  <param name="debug/visual_quality_log" value="$(arg visual_quality_log)"/>
+  <param name="debug/visual_quality_output_prefix"
+         value="$(arg visual_quality_output_prefix)"/>
+  <param name="mocap/anchor_enable" value="$(arg mocap_anchor_enable)"/>
 
   <!-- no taskset/nice: offline replay is not competing with a live camera, so the
        CPU-fence rationale from mapping_d435i.launch does not apply. -->

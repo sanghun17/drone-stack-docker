@@ -1,0 +1,88 @@
+schema: fastlivo_ground_init_qualification_config/v1
+
+scope: development_only
+validation_data_accessed: false
+reference_phase_a_campaign_id: phase_a_ofat_clean_v2
+reference_phase_a_campaign_identity_sha256: 3f752c9b4d41501b5242ff771973d64ca0d80b22ce6a646cb851440d7e8f4329
+
+# This experiment is append-only and does not supersede the original v2
+# qualification.  That report remains FAIL/NO-GO because of its high-rate
+# end-of-replay inventory mismatch.
+predecessor_qualification:
+  path: tools/fastlivo/_campaign_vio_flight_20260814/postfix_init_qualification_v2/qualification_report.json
+  sha256: 33a5d398fb661f2d6a98eba92945502b0b40a61435fc0f9f20ab5d12b183a30b
+  required_status: fail
+  remains_authoritative_for_high_rate_interface: true
+  superseded: false
+
+effective_parameter_source:
+  arm_id: baseline_acc10_img1000_out1000
+  artifact: result_params.yaml
+
+selection:
+  rule: earliest_explicit_eligible_full_sync_sensor_epoch_from_full_bag_start
+  event_order_basis: rosbag_record_order
+  uses_ground_truth: false
+  uses_estimator_output: false
+  live_fallback_allowed: false
+  placeholder_anchor_allowed: false
+  init_anchor_max_predecessor_gap_s: 0.02
+  init_sample_count: 30
+  samples_strictly_after_anchor: true
+
+# These are the exact runtime stationarity inequalities.  Per-axis sample
+# standard deviation uses Welford M2/(N-1), matching IMU_Processing.cpp.
+stationarity_gate:
+  gravity_m_s2: 9.81
+  max_abs_mean_acc_norm_error_m_s2: 0.10
+  max_acc_sample_std_vector_norm_m_s2: 0.25
+  max_mean_gyr_vector_norm_rad_s: 0.01
+  max_gyr_sample_std_vector_norm_rad_s: 0.04
+  variance_denominator: N_minus_1
+  accumulator: sequential_welford_binary64_in_stamp_seq_order
+  vector_norm: euclidean_l2
+  comparison: inclusive
+  measurement_vector_hash_encoding: concatenated_big_endian_uint64_stamp_ns_uint32_seq_6x_ieee754_binary64_accxyz_gyrxyz
+
+# Ground truth is permitted only after the sensor-only anchor has been frozen.
+# This is a hard acceptance gate proving initialization finishes before
+# physical takeoff; it cannot choose or move the anchor.
+post_selection_ground_hard_gate:
+  source: frozen_development_window_cache
+  minimum_30th_sample_to_takeoff_lead_s: 0.50
+  minimum_anchor_to_hover_score_start_lead_s: 3.0
+  affects_anchor_selection: false
+
+runtime_constant_binding:
+  gravity_macro: G_m_s2
+  expected_literal: 9.81
+  source_relative_to_estimator_root: include/common_lib.h
+  source_sha256: e89d7b8a80c9f9bb88663a6eaa7e4921c222b21a7ad7f898262158d307679796
+
+windows:
+  replay:
+    start: full_bag_record_start
+    end: frozen_cached_landing
+    rosbag_start_offset_s: 0.0
+  primary_evaluation:
+    interval: complete_recorded_ground_to_landing_result
+    safety_failures_can_be_overridden_by_secondary: false
+  secondary_evaluation:
+    interval: frozen_cached_hover_to_landing
+    purpose: phase_a_ranking_compatibility_only
+    sensor_header_time_boundary: start_inclusive_end_inclusive
+    bound_epoch_origins:
+      start: gt_pose_header_epoch_from_cache
+      end: mavros_landing_record_epoch_from_cache
+    interpretation: absolute_ros_epoch_numeric_mask_with_mixed_frozen_sources
+
+sentinels:
+  - id: ground_baseline_pw1
+    arm_id: baseline_acc10_img1000_out1000
+    session_id: pw1_20260804_052639
+  - id: ground_acc5_n0
+    arm_id: acc5
+    session_id: n0_20260805_021950
+
+rates: [0.5, 1.0]
+fresh_process_repeats_per_rate: 3

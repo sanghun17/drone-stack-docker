@@ -21,6 +21,7 @@ modules/compute/torch/wheels/*.whl
 build/
 devel/
 logs/
+Testing/
 .catkin_tools/
 __pycache__/
 *.pyc

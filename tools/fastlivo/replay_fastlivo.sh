@@ -13,7 +13,11 @@
 #     --odom-guard    enable the divergence guard (default off: we want to SEE drift)
 #     --with-cloud    also record /cloud_registered (big; for map inspection)
 #     --with-propagated  also record the 250 Hz propagated body odometry
+#     --no-gt-anchor  do not subscribe GT inside FAST-LIVO (flight-readiness mode)
 #     --with-rgb      also record FAST-LIVO's /rgb_img diagnostic image
+#     --visual-quality-prefix FILE
+#                     write read-only VIO diagnostics to
+#                     FILE_{frames,points}.csv
 #
 # Output bag holds /aft_mapped_to_init (+_to_odom), /path, the GT pose, and /tf,
 # all on the bag (sim) clock -> feed straight to tools/fastlivo/eval_fastlivo.py.
@@ -57,6 +61,7 @@ elif [ ! -f /.dockerenv ]; then
   docker exec $__TT \
     -e ROS_MASTER_HOST=127.0.0.1 -e ROS_MASTER_PORT="$__PORT" \
     -e ROS_IP=127.0.0.1 -e ROS_HOSTNAME=localhost \
+    -e FASTLIVO_REPLAY_DEVEL="${FASTLIVO_REPLAY_DEVEL:-}" \
     "$__C" bash "/work/${__S#$__R/}" "$@"; __rc=$?
   cleanup
   exit $__rc
@@ -67,7 +72,12 @@ if [ "$NATIVE_REPLAY" = 1 ]; then
   source "$FASTLIVO_WS/devel/setup.bash"
   REPLAY_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 else
-  source /work/ws/fast-livo/devel/setup.bash
+  REPLAY_DEVEL="${FASTLIVO_REPLAY_DEVEL:-/work/ws/fast-livo/devel}"
+  [ -f "$REPLAY_DEVEL/setup.bash" ] || {
+    echo "missing FAST-LIVO devel setup: $REPLAY_DEVEL/setup.bash" >&2
+    exit 2
+  }
+  source "$REPLAY_DEVEL/setup.bash"
   REPLAY_ROOT=/work
 fi
 # The host wrapper injects these.  Defaults also make direct in-container
@@ -84,6 +94,8 @@ export ROS_PACKAGE_PATH="$REPLAY_ROOT/modules/sensor/realsense-d435i${ROS_PACKAG
 LAUNCH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/mapping_d435i_replay.launch"
 BAG=""; RATE=1.0; OUT=""; CONFIG=""; OVERLAY=""; CAMCALIB=""; TRACKER="pure"
 PAIRED=false; GUARD=false; WITHCLOUD=0; WITHPROP=0; WITHRGB=0; INTERNAL=0; START=""; DUR=""
+VISUAL_QUALITY_PREFIX=""
+GTANCHOR=true
 while [ $# -gt 0 ]; do
   case "$1" in
     --rate)        RATE="$2"; shift 2;;
@@ -98,8 +110,10 @@ while [ $# -gt 0 ]; do
     --odom-guard)  GUARD=true; shift;;
     --with-cloud)  WITHCLOUD=1; shift;;
     --with-propagated) WITHPROP=1; shift;;
+    --no-gt-anchor) GTANCHOR=false; shift;;
     --with-rgb)    WITHRGB=1; shift;;
     --internal)    INTERNAL=1; shift;;   # also record FAST-LIVO2 internal-health topics (effective LiDAR pts + visual submap pts)
+    --visual-quality-prefix) VISUAL_QUALITY_PREFIX="$2"; shift 2;;
     -*)            echo "unknown opt: $1" >&2; exit 2;;
     *)             BAG="$1"; shift;;
   esac
@@ -108,16 +122,29 @@ done
 [ -f "$BAG" ] || { echo "no such bag: $BAG" >&2; exit 2; }
 [ -z "$OUT" ] && OUT="${BAG%.bag}_livo.bag"
 mkdir -p "$(dirname "$OUT")"
+if [ -n "$VISUAL_QUALITY_PREFIX" ]; then
+  case "$VISUAL_QUALITY_PREFIX" in
+    *[[:space:]]*) echo "visual-quality prefix cannot contain whitespace: $VISUAL_QUALITY_PREFIX" >&2; exit 2;;
+  esac
+  mkdir -p "$(dirname "$VISUAL_QUALITY_PREFIX")"
+  VISUAL_QUALITY_PREFIX="$(readlink -m "$VISUAL_QUALITY_PREFIX")"
+  rm -f "${VISUAL_QUALITY_PREFIX}_frames.csv" "${VISUAL_QUALITY_PREFIX}_points.csv"
+fi
 
-LARGS="paired_drop:=$PAIRED odom_guard:=$GUARD"
+LARGS="paired_drop:=$PAIRED odom_guard:=$GUARD mocap_anchor_enable:=$GTANCHOR"
 [ -n "$CONFIG" ]   && LARGS="$LARGS config:=$CONFIG"
 [ -n "$OVERLAY" ]  && LARGS="$LARGS overlay:=$OVERLAY"
 [ -n "$CAMCALIB" ] && LARGS="$LARGS cam_calib:=$CAMCALIB"
+[ -n "$VISUAL_QUALITY_PREFIX" ] && \
+  LARGS="$LARGS visual_quality_log:=true visual_quality_output_prefix:=$VISUAL_QUALITY_PREFIX"
 
 GT="/vrpn_client_node/${TRACKER}/pose"
-REC_TOPICS="/aft_mapped_to_init /aft_mapped_to_body /aft_mapped_to_optitrack /path $GT /tf /tf_static"
+# Preserve ROS diagnostics in the result bag itself.  The separate roslaunch
+# screen log can lose child stdout during shutdown buffering; /rosout is a
+# sensor-time-adjacent, recorder-flushed evidence path for structured gates.
+REC_TOPICS="/aft_mapped_to_init /aft_mapped_to_body /aft_mapped_to_optitrack /path $GT /tf /tf_static /rosout"
 [ "$WITHCLOUD" = 1 ] && REC_TOPICS="$REC_TOPICS /cloud_registered"
-[ "$WITHPROP" = 1 ]  && REC_TOPICS="$REC_TOPICS /aft_mapped_to_body_imu_propagated"
+[ "$WITHPROP" = 1 ]  && REC_TOPICS="$REC_TOPICS /aft_mapped_to_body_imu_propagated /aft_mapped_to_body_imu_propagated_world_twist /aft_mapped_to_body_correction_pose_cov"
 [ "$WITHRGB" = 1 ]   && REC_TOPICS="$REC_TOPICS /rgb_img"
 [ "$INTERNAL" = 1 ]  && REC_TOPICS="$REC_TOPICS /cloud_effected /cloud_visual_sub_map_before"
 
@@ -222,7 +249,8 @@ BAG_INFO=$(rosbag info "$OUT") || {
   echo "[replay] output is not an indexed/readable rosbag: $OUT" >&2
   exit 1
 }
-REQUIRED_TOPICS="/aft_mapped_to_init /aft_mapped_to_body /aft_mapped_to_optitrack /path /tf"
+REQUIRED_TOPICS="/aft_mapped_to_init /aft_mapped_to_body /path /tf"
+[ "$GTANCHOR" = true ] && REQUIRED_TOPICS="$REQUIRED_TOPICS /aft_mapped_to_optitrack"
 [ "$WITHCLOUD" = 1 ] && REQUIRED_TOPICS="$REQUIRED_TOPICS /cloud_registered"
 [ "$WITHPROP" = 1 ]  && REQUIRED_TOPICS="$REQUIRED_TOPICS /aft_mapped_to_body_imu_propagated"
 [ "$WITHRGB" = 1 ]   && REQUIRED_TOPICS="$REQUIRED_TOPICS /rgb_img"
@@ -238,6 +266,12 @@ done
 # auditable after subsequent replays overwrite /tmp/fusion_debug.csv.
 cp "$LIVO_LOG" "${OUT%.bag}_node.log" 2>/dev/null || true
 [ -f "$FUSION_LOG" ] && cp "$FUSION_LOG" "${OUT%.bag}_fusion.csv"
+if [ -n "$VISUAL_QUALITY_PREFIX" ]; then
+  for csv in "${VISUAL_QUALITY_PREFIX}_frames.csv" "${VISUAL_QUALITY_PREFIX}_points.csv"; do
+    [ -s "$csv" ] || { echo "[replay] missing/empty visual-quality CSV: $csv" >&2; exit 1; }
+  done
+  echo "[replay] visual quality -> ${VISUAL_QUALITY_PREFIX}_{frames,points}.csv"
+fi
 
 echo
 echo "[replay] ===== frame accounting (drops = node couldn't keep up) ====="

@@ -20,10 +20,9 @@ It also appends distinct namespaces to the existing RViz topic
   recomputed_cvar90_s1_raw_best      raw per-axis CVaR ellipsoid
   recomputed_cvar90_s1_boundary_best hollow required-clearance XY ring
 
-``S=1`` is intentional and auditable.  The online dead-zone scaler computed a
-different S for every candidate waypoint, but that (N,T) tensor was not recorded
-in PURE-Nominal bags.  ``/jax/dead_zone_scale`` contains only the current-pose
-scalar, so applying it to all future waypoints would be an undocumented estimate.
+``S=1`` is intentional and auditable.  This reconstruction reports the raw
+network PMF/CVaR before the manually configured dead-zone multiplier.  It does
+not claim to reproduce the online per-candidate safety decision or ESDF slack.
 
 The PMF/CVaR implementation mirrors the 2026-08-05 deployed SWpool05 code.  In
 particular, UniformBinning uses *edge midpoints* (not linspace endpoints), xyz
@@ -380,7 +379,7 @@ def output_paths(input_path, suffix):
             p.with_name(stem + ".json"))
 
 
-def augment_one(input_path, suffix):
+def augment_one(input_path, suffix, max_pair_gap_s):
     input_path = str(Path(input_path).resolve())
     if not os.path.isfile(input_path):
         raise FileNotFoundError(input_path)
@@ -399,6 +398,7 @@ def augment_one(input_path, suffix):
     skipped_legacy = 0
     skipped_no_trajectory = 0
     pair_dt = []
+    delayed_pairs = 0
     meta = metadata_message(contract)
 
     # Preserve compression: these flight bags are hundreds of MB each.
@@ -425,10 +425,12 @@ def augment_one(input_path, suffix):
                 skipped_no_trajectory += 1
                 continue
             dt = stamp.to_sec() - latest_trajectory_time
-            if dt < -1e-6 or dt > 0.25:
+            if dt < -1e-6 or dt > max_pair_gap_s:
                 raise ValueError(
-                    "debug/trajectory pairing gap %.3fs outside [0,0.25] at %.6f" %
-                    (dt, stamp.to_sec()))
+                    "debug/trajectory pairing gap %.3fs outside [0,%.3f] at %.6f" %
+                    (dt, max_pair_gap_s, stamp.to_sec()))
+            if dt > 0.25:
+                delayed_pairs += 1
             pair_dt.append(dt)
             result = reconstruct(debug, trajectory_array(latest_trajectory), contract)
 
@@ -490,6 +492,8 @@ def augment_one(input_path, suffix):
         "n_replans": len(rows),
         "skipped_legacy_debug": skipped_legacy,
         "skipped_no_trajectory": skipped_no_trajectory,
+        "delayed_trajectory_pairs_over_0_25s": delayed_pairs,
+        "max_allowed_trajectory_pair_gap_s": max_pair_gap_s,
         "trajectory_pair_gap_s": {
             "min": float(np.min(pair_dt)), "median": float(np.median(pair_dt)),
             "max": float(np.max(pair_dt)),
@@ -526,9 +530,16 @@ def main(argv=None):
     parser.add_argument("bags", nargs="+", help="source flight bag(s)")
     parser.add_argument("--suffix", default=".cvar_s1",
                         help="output stem suffix (default: .cvar_s1)")
+    parser.add_argument(
+        "--max-pair-gap-s", type=float, default=0.6,
+        help=("maximum preceding optimal-trajectory/debug pairing gap; the "
+              "Aug-04 PURE logs contain one compilation-era 0.479 s pair "
+              "(default: 0.6)"))
     args = parser.parse_args(argv)
+    if args.max_pair_gap_s <= 0.0:
+        parser.error("--max-pair-gap-s must be positive")
     for path in args.bags:
-        augment_one(path, args.suffix)
+        augment_one(path, args.suffix, args.max_pair_gap_s)
     return 0
 
 

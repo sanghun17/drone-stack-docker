@@ -1,4 +1,7 @@
 <launch>
+  <!-- Candidate VIO input. Keep opt-in until the full offline and shadow-flight
+       readiness gates pass; enabling it does not by itself select FAST-LIVO. -->
+  <arg name="enable_hybrid_imu" default="false"/>
   <!-- D435i for FAST-LIVO + voxblox on Jetson Orin (onboard USB hub).
        initial_reset  : true. The D435i motion module often enumerates (gyro/accel
                         TF frames appear) yet streams ZERO samples after an unclean
@@ -83,6 +86,31 @@
     <remap from="cloud_in"  to="/camera/depth/color/points"/>
     <remap from="cloud_out" to="/camera/depth/color/points_10hz"/>
   </node>
+
+  <!-- Causal live equivalent of tools/fastlivo/make_hybrid_imu_bag.py.
+       D435 supplies 200Hz epochs+gyro; FCU supplies 50Hz acceleration.  The
+       bridge waits for the actual right FCU bracket (normally hidden by the
+       ~82ms pointcloud callback latency), retains the D435 header timestamp,
+       and never extrapolates or clips.  It may run before MAVROS; ready stays
+       false and no hybrid samples are fabricated until both inputs are live. -->
+  <group if="$(arg enable_hybrid_imu)">
+    <node pkg="d435i_tools" type="hybrid_imu.py" name="hybrid_imu" output="screen"
+          launch-prefix="taskset -c $(env CPUS_POOL)">
+      <param name="max_bracket_gap_s" value="0.05"/>
+      <param name="max_wait_s" value="0.06"/>
+      <param name="ready_stable_s" value="1.0"/>
+      <param name="stale_timeout_s" value="0.15"/>
+      <param name="min_d435_rate_hz" value="150.0"/>
+      <param name="min_fcu_rate_hz" value="35.0"/>
+      <param name="min_output_rate_hz" value="150.0"/>
+      <param name="output_frame" value="camera_depth_optical_frame"/>
+      <remap from="d435_imu" to="/camera/imu"/>
+      <remap from="fcu_imu" to="/mavros/imu/data_raw"/>
+      <remap from="output" to="/camera/imu_hybrid"/>
+      <remap from="ready" to="/camera/imu_hybrid/ready"/>
+      <remap from="diagnostics" to="/camera/imu_hybrid/diagnostics"/>
+    </node>
+  </group>
 
   <!-- IR emitter at max power (default 150/360): denser projector pattern ->
        better stereo matching indoors. dynparam blocks until the driver's

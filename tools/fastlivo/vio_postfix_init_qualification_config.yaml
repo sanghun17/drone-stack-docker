@@ -1,0 +1,88 @@
+schema: fastlivo_vio_postfix_init_qualification_config/v1
+
+# This configuration is deliberately tied to the clean pre-fix Phase-A
+# replicate.  It selects development data only and is not a replay command.
+reference_phase_a_campaign_identity_sha256: 3f752c9b4d41501b5242ff771973d64ca0d80b22ce6a646cb851440d7e8f4329
+
+anchor_extraction:
+  effective_parameter_source:
+    arm_id: baseline_acc10_img1000_out1000
+    artifact: result_params.yaml
+    paths:
+      image_topic: common.img_topic
+      lidar_topic: common.lid_topic
+      imu_topic: common.imu_topic
+      image_header_add_s: time_offset.img_time_offset
+      image_exposure_add_s: time_offset.exposure_time_init
+      lidar_header_add_s: time_offset.lidar_time_offset
+      imu_header_subtract_s: time_offset.imu_time_offset
+      ros_driver_bug_fix: common.ros_driver_bug_fix
+      lidar_type: preprocess.lidar_type
+      point_filter_num: preprocess.point_filter_num
+      blind_m: preprocess.blind
+  expected_types:
+    image: sensor_msgs/Image
+    lidar: sensor_msgs/PointCloud2
+    imu: sensor_msgs/Imu
+  image_filters:
+    hilti_decimation_enabled: false
+    duplicate_epsilon_s: 0.001
+    minimum_interframe_s: 0.02
+  lidar_validation:
+    required_lidar_type: 4
+    scan_end_rule: l515_zero_point_offset
+    minimum_retained_points: 2
+  synchronization:
+    mode: LIVO
+    initial_image_before_first_lidar_epsilon_s: 0.00001
+    anchor_definition: earliest_explicit_eligible_full_sync_sensor_epoch
+    event_order_basis: rosbag_record_order_within_frozen_crop
+    require_predecessor_imu_at_or_before_anchor: true
+    init_anchor_max_predecessor_gap_s: 0.02
+    require_successor_imu_strictly_after_anchor: true
+
+sentinels:
+  # Sole arm/session whose four-metric vector changed between clean Phase-A
+  # replicates.  It is the highest-value scheduling/init determinism probe.
+  - id: acc5_n0
+    arm_id: acc5
+    session_id: n0_20260805_021950
+
+  # Neutral parameters on the longest development crop.  pw1 also determines
+  # the previous outlier-family minimax result.
+  - id: baseline_pw1
+    arm_id: baseline_acc10_img1000_out1000
+    session_id: pw1_20260804_052639
+
+rates: [0.5, 1.0]
+fresh_process_repeats_per_rate: 3
+
+required_semantics:
+  init_anchor_rule: earliest_explicit_eligible_full_sync_sensor_epoch
+  init_anchor_mode: explicit
+  init_anchor_max_predecessor_gap_s: 0.02
+  init_sample_count: 30
+  init_samples_strictly_after_anchor: true
+  state_epoch_rule: legacy_later_acceptance_sync_epoch
+  suffix_rule: legacy_skip_through_acceptance_state_epoch
+  runtime_reinitialization_allowed: false
+  gt_anchor_allowed: false
+  canonicalization_schema: fastlivo_sensor_stamped_state_canonical/v1
+  compare_rosbag_record_time: false
+  require_exact_low_rate_payload_hashes_across_rates: true
+  high_rate_payload_hashes_are_diagnostic_only: true
+
+postfix_phase_a_rebaseline:
+  rate: 1.0
+  repeats_per_arm_session: 1
+  expected_arm_count: 8
+  expected_session_ids:
+    - pw1_20260804_052639
+    - pm2_20260805_020515
+    - p0_20260804_211027
+    - n0_20260805_021950
+    - pw3_20260804_053018
+  expected_run_count: 40
+  old_scores_may_be_pooled: false
+  reuse_old_completion_pointers: false
+  validation_access_allowed: false
