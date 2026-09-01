@@ -1,5 +1,34 @@
 # FAST-LIVO2 open-loop accuracy + calibration evaluation
 
+For AirSim exploration bags, use `replay_fastlivo_sim.sh`. It runs the latest
+fixed FAST-LIVO binary with the sim-specific camera/topic YAML on an isolated
+loopback ROS master, replays only raw IMU/image/voxel/GT topics, and validates
+the finalized output bag:
+
+```bash
+tools/fastlivo/replay_fastlivo_sim.sh \
+  ws/fast-livo-sim/replay_data/input.bag \
+  --out ws/fast-livo-sim/replay_data/output_fixed_livo.bag \
+  --rate 0.5
+```
+
+Both paths must be under the `drone-stack-docker` checkout because the CPU
+replay container sees that tree at `/work`.
+
+Some recovered AirSim bags contain repeated IMU header stamps. The latest
+synchronized-initialization gate intentionally rejects a non-increasing input
+sequence. Create a non-destructive raw-topic replay copy before rerunning:
+
+```bash
+python3 tools/fastlivo/filter_sim_replay_bag.py \
+  ws/fast-livo-sim/replay_data/input.bag \
+  ws/fast-livo-sim/replay_data/input_dedup.bag
+```
+
+The filter retains every image, voxel cloud, and GT odometry message and drops
+only duplicate/backward IMU stamps. It prints the source checksum and per-topic
+counts for the replay receipt.
+
 Replay an OptiTrack flight bag through FAST-LIVO2 **offline** (no flying), compare the
 estimated trajectory against the mocap ground truth, and read off **which calibration**
 (if any) is limiting accuracy. Nothing here touches the live flight stack.

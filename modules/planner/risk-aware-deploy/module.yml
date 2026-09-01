@@ -36,8 +36,8 @@ deps:
     - tqdm
     - trimesh
     - evo            # FAST-LIVO2 open-loop trajectory eval vs OptiTrack GT (tools/fastlivo)
-    # pyvista DROPPED 2026-06-10: only the offline eval script
-    # (uncertainty_predictor/.../evaluate/plot_trajectory_on_mesh.py) imports it, and
+    # pyvista DROPPED 2026-06-10: only the offline figure script
+    # (scripts/plot_trajectory_on_mesh.py) imports it, and
     # pip's aarch64 pairing is broken (pyvista 0.44 + vtk 9.5 wheel lacks vtkCapsuleSource).
     # Re-add WITH version pins if that script ever needs to run on the Jetson.
 

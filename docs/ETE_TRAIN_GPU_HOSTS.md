@@ -38,7 +38,7 @@ which current v23 arm configs use).
 dependency of the `ete_net` package.** CORRECTED 2026-07-14 (found on a real
 `ete-train-2080ti` run): `rosbag` itself is genuinely lazy-imported and only reached
 by the Stage-0 raw-bag-to-pkl path (`dataset/bag_to_pkl.py`) or offline eval tools
-(`utils/evaluate/plot_trajectory_on_mesh.py`, `utils/debug/measure_fov_envelope.py`,
+(`scripts/plot_trajectory_on_mesh.py`, `utils/debug/measure_fov_envelope.py`,
 one non-`quick` branch of `utils/debug/integrity_check.py`) -- that part of the
 original audit held up. But `dataset/data_processor/pointcloud_sequence_processor.py`
 has a **top-level, non-lazy** `import sensor_msgs.point_cloud2 as pc2`, and it's
