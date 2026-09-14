@@ -1,9 +1,16 @@
 # Real-hardware perception/control stack. Aircraft actuation is intentionally
 # absent until the landing controller and command ownership gates are qualified.
 arch: [arm64]
-ros_master_port: 11313
+# Use the same master as the established risk-aware hardware stack so MAVROS
+# arming and the ml-host /recorder webcam services are shared, not duplicated.
+ros_master_port: 11311
 ros_master_host: 192.168.50.36
+environment:
+  SESSION_RECORDER_PROFILE: hardware
+  SESSION_RECORDER_CONFIG: /work/stack-assets/aruco-landing-jetson/config/session_recorder.yaml
 modules:
   - sensor/see3cam-24cug
   - perception/aruco-landing
   - control/aruco-landing
+  - control/mavros
+  - utility/session-recorder

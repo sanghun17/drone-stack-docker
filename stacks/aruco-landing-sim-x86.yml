@@ -13,7 +13,10 @@ environment:
   AIRSIM_CAMERA_CONFIG: /work/stack-assets/aruco-landing-sim-x86/config/landing_camera.yaml
   AIRSIM_CAMERA_BRIDGE_BIN: /work/.build/aruco-landing-camera-bridge/airsim_landing_camera_bridge
   AIRSIM_CAMERA_BRIDGE_BUILD_SCRIPT: /work/stack-assets/aruco-landing-sim-x86/tools/build_camera_bridge.sh
+  SESSION_RECORDER_PROFILE: simulation
+  SESSION_RECORDER_CONFIG: /work/stack-assets/aruco-landing-sim-x86/config/session_recorder.yaml
 modules:
   - simulation/airsim
   - perception/aruco-landing
   - control/aruco-landing
+  - utility/session-recorder

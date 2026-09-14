@@ -87,8 +87,9 @@ vehicle collision body cannot terminate a trial early; the controller and
 adapter issue a zero-velocity stop at the threshold. These choices are owned by
 `common_experiment.yaml` and `baseline_environment.yaml`, respectively.
 
-Generate all five proposed two-marker configurations (PNG, SVG, exact-scale
-PDF, metric estimator manifest, and Unreal OBJ/MTL) plus a labelled preview:
+Generate all eight proposed configurations (five two-marker and three
+three-marker pads; PNG, SVG, exact-scale PDF, metric estimator manifest, and
+Unreal OBJ/MTL) plus a labelled preview:
 
 ```bash
 ./stack-assets/aruco-landing-sim-x86/tools/generate_proposed_pad_assets.sh
@@ -140,6 +141,22 @@ authored configuration and passed three of three simulated landings. All three
 touchdowns were inside the 5 cm low-altitude bound; worst lateral L-infinity
 error was 2.078 cm, mean touchdown error was 1.94 cm, minimum camera source rate
 was 59.9299 Hz, and pose availability was 100 percent.
+
+The same-date three-marker campaign can be reproduced with:
+
+```bash
+./stack-assets/aruco-landing-sim-x86/tools/run_three_marker_campaign.sh
+```
+
+It rebuilds the map for pads 6, 7, and 8, reuses seed 2909 staging positions,
+and records through the shared session-recorder service (the simulation profile
+never calls a webcam). In the three-trial screening run, pads 6 and 8 achieved
+3/3 landings and 100% pose availability. Pad 7 achieved 2/3; the third staging
+lost the marker during descent, producing 90.74% mean pose availability. Mean
+successful touchdown error was 1.31, 1.38, and 1.53 cm for pads 6, 7, and 8.
+All nine accepted collection attempts met the 59.5 Hz estimator-result gate.
+The compact result table is tracked in `results/three_marker_20260914.csv`;
+full bags and trial JSON remain under the ignored `experiments/` tree.
 
 Generate the landing RGB video and the publication 3-D trajectory plot from any
 trial bag:

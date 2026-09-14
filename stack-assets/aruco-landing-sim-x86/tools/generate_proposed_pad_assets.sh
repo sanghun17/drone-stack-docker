@@ -1,5 +1,5 @@
 #!/bin/bash
-# Generate all five proposed two-marker pad candidates and a labelled preview.
+# Generate every proposed two- and three-marker pad candidate and a labelled preview.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
@@ -10,7 +10,7 @@ PAD_SIZE_M="${ARUCO_PROPOSED_PAD_SIZE_M:-0.70}"
 
 mkdir -p "$OUTPUT"
 IMAGES=()
-for INDEX in 1 2 3 4 5; do
+for INDEX in 1 2 3 4 5 6 7 8; do
   PREFIX="proposed_pad_$INDEX"
   python3 "$GENERATOR" \
     --size-m "$PAD_SIZE_M" \

@@ -31,6 +31,7 @@ stop_ros_nodes() {
     pkill -TERM -f "[p]aper_pad_estimator" || true
     pkill -TERM -f "[l]anding_controller" || true
     pkill -TERM -f "[a]irsim_control_adapter.py" || true
+    pkill -TERM -f "[s]ession_recorder_node.py" || true
     pkill -INT -f "[r]osbag record" || true
   ' >/dev/null 2>&1 || true
   sleep 1
@@ -41,6 +42,7 @@ stop_ros_nodes() {
     pkill -KILL -f "[p]aper_pad_estimator" || true
     pkill -KILL -f "[l]anding_controller" || true
     pkill -KILL -f "[a]irsim_control_adapter.py" || true
+    pkill -KILL -f "[s]ession_recorder_node.py" || true
     pkill -KILL -f "[r]osbag record" || true
   ' >/dev/null 2>&1 || true
 }
@@ -108,6 +110,10 @@ docker exec -d "$CONTAINER" bash -lc \
   "exec /work/modules/control/aruco-landing/run.sh $controller_args >'$LOG_DIR_CONTAINER/controller.log' 2>&1"
 docker exec -d "$CONTAINER" bash -lc \
   "exec /work/stack-assets/aruco-landing-sim-x86/tools/run_control.sh >'$LOG_DIR_CONTAINER/control.log' 2>&1"
+if [ "$RECORD_BAGS" = 1 ]; then
+  docker exec -d "$CONTAINER" bash -lc \
+    "exec /work/modules/utility/session-recorder/run.sh >'$LOG_DIR_CONTAINER/session_recorder.log' 2>&1"
+fi
 
 # UE reports RPC-ready before the render/mmap stream reaches steady cadence.
 sleep 10
@@ -127,6 +133,8 @@ if [ -f "$RUN_DIR/summary.json" ]; then
 fi
 if [ "$RECORD_BAGS" != 1 ]; then
   runner_args+=(--no-bag)
+else
+  runner_args+=(--session-recorder)
 fi
 "$MODULE/tools/run_trials.sh" "${runner_args[@]}" | tee "$LOG_DIR/trials.log"
 

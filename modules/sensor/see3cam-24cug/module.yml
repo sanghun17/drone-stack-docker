@@ -6,6 +6,7 @@ deps:
   apt:
     - ros-noetic-usb-cam
     - ros-noetic-camera-calibration
+    - ros-noetic-compressed-image-transport
     - v4l-utils
 
 mounts:

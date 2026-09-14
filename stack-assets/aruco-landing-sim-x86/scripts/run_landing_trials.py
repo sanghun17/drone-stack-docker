@@ -3,6 +3,7 @@
 
 import argparse
 import csv
+import glob
 import json
 import math
 import os
@@ -372,6 +373,42 @@ class BagRecorder:
         self.process = None
 
 
+class SessionServiceRecorder:
+    """Adapter from a trial to the shared simulation/hardware recorder API."""
+
+    def __init__(self, output_dir, label):
+        self.output_dir = output_dir
+        self.label = label
+        self.output_path = None
+        self.set_recording = rospy.ServiceProxy(
+            "/session_recorder/set_recording", SetBool
+        )
+
+    def start(self):
+        rospy.set_param("/session_recorder/bag_dir", self.output_dir)
+        rospy.set_param("/session_recorder/session_label", self.label)
+        response = self.set_recording(True)
+        if not response.success:
+            raise RuntimeError("session recorder failed to start: " + response.message)
+        self.output_path = response.message
+
+    def stop(self):
+        response = self.set_recording(False)
+        if not response.success:
+            raise RuntimeError("session recorder failed to stop: " + response.message)
+
+    def archive(self, destination):
+        os.makedirs(destination, exist_ok=True)
+        if not self.output_path:
+            return
+        stem = os.path.splitext(self.output_path)[0]
+        # rosbag finalizes through a temporary .active name. Its process has
+        # exited when the service returns, but allow the mounted filesystem to
+        # expose the rename before collecting every sidecar for a rejected run.
+        time.sleep(0.25)
+        for path in glob.glob(stem + ".*"):
+            os.replace(path, os.path.join(destination, os.path.basename(path)))
+
 class TopicRateMonitor:
     def __init__(self, topic):
         self.lock = threading.Lock()
@@ -583,6 +620,10 @@ def main():
     )
     parser.add_argument("--no-bag", action="store_true")
     parser.add_argument(
+        "--session-recorder", action="store_true",
+        help="record through the common /session_recorder service instead of spawning rosbag",
+    )
+    parser.add_argument(
         "--camera-config",
         default=os.path.join(module_dir, "config", "landing_camera.yaml"),
     )
@@ -656,6 +697,8 @@ def main():
 
     rospy.wait_for_service("/landing_controller/enable", timeout=20.0)
     rospy.wait_for_service("/landing_controller/reset", timeout=20.0)
+    if args.session_recorder and not args.no_bag:
+        rospy.wait_for_service("/session_recorder/set_recording", timeout=20.0)
     enable_controller = rospy.ServiceProxy("/landing_controller/enable", SetBool)
     reset_controller = rospy.ServiceProxy("/landing_controller/reset", Trigger)
     observed_rate = 0.0
@@ -706,6 +749,11 @@ def main():
             "matched_staging_manifest_path": os.path.abspath(args.manifest),
             "matched_staging_manifest": manifest,
             "bag_topics": [] if args.no_bag else DEFAULT_BAG_TOPICS,
+            "recording_adapter": (
+                "disabled" if args.no_bag else
+                "session_recorder_service" if args.session_recorder else
+                "direct_rosbag"
+            ),
             "minimum_camera_rate_hz": args.minimum_camera_rate,
             "preflight_observed_estimator_rate_hz": observed_rate,
             "preflight_attempts_used": preflight_attempt,
@@ -786,7 +834,16 @@ def main():
                 os.replace(
                     active_bag_path, os.path.join(interrupted_dir, interrupted_name)
                 )
-            recorder = None if args.no_bag else BagRecorder(bag_path, DEFAULT_BAG_TOPICS)
+            if args.no_bag:
+                recorder = None
+            elif args.session_recorder:
+                recorder = SessionServiceRecorder(
+                    bag_dir, "%s_trial_%02d_attempt_%02d" % (
+                        args.pad_name, trial_number, collection_attempt
+                    )
+                )
+            else:
+                recorder = BagRecorder(bag_path, DEFAULT_BAG_TOPICS)
             measurements.reset()
             if recorder is not None:
                 recorder.start()
@@ -860,6 +917,7 @@ def main():
             enable_controller(False)
             if recorder is not None:
                 recorder.stop()
+                bag_path = recorder.output_path
             estimator_rate = rate_monitor.rate_since(rate_mark)
             terminal_override = (
                 "ABORTED_APPROACH_NO_MARKER" if approach_failed
@@ -885,7 +943,9 @@ def main():
                     "trial %d remained below %.2f Hz after %d collection attempts"
                     % (trial_number, args.minimum_camera_rate, collection_attempt)
                 )
-            if recorder is not None and os.path.isfile(bag_path):
+            if isinstance(recorder, SessionServiceRecorder):
+                recorder.archive(os.path.join(run_dir, "invalid_rate_attempts"))
+            elif recorder is not None and os.path.isfile(bag_path):
                 invalid_dir = os.path.join(run_dir, "invalid_rate_attempts")
                 os.makedirs(invalid_dir, exist_ok=True)
                 invalid_name = "%s_trial_%02d_attempt_%02d.bag" % (

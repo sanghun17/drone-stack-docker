@@ -28,7 +28,7 @@ stack environment selects the implementation profile.
 | simulation | `airsim` |
 | compute | `torch`, `spconv`, `jax` |
 | training | `ete-net` |
-| utility | `gui-vnc`, `rviz`, `rqt` |
+| utility | `gui-vnc`, `rviz`, `rqt`, `session-recorder` |
 
 The ArUco estimator and landing controller are separately selectable runtime
 functions. They currently share the `aruco_landing` source checkout and catkin
@@ -50,6 +50,11 @@ deployment live under `stack-assets/sim-x86/tools`.
 ROS camera bridge. The ArUco landing UE project, camera/pad configuration,
 project-specific performance patches and trial/evaluation code live under
 `stack-assets/aruco-landing-sim-x86`.
+
+`utility/session-recorder` is the shared rosbag lifecycle. Stack-owned profiles
+select topics and adapters: simulation uses its service trigger without a
+webcam, while hardware maps MAVROS arming to the same lifecycle and optionally
+calls the existing webcam start/stop services.
 
 ## Composition flow
 
