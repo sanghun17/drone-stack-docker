@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
   "run": {
-    "label": "aruco-bench-gain1",
-    "created_at_utc": "2026-09-14T07:29:53.001565+00:00",
-    "duration_s": 20.58805775642395,
-    "drone_stack_commit": "1f01e38",
+    "label": "aruco-bench-webcam",
+    "created_at_utc": "2026-09-14T07:57:27.798970+00:00",
+    "duration_s": 21.048576831817627,
+    "drone_stack_commit": "82da80a",
     "aruco_landing_commit": "3482817"
   },
   "hardware_scope": {
@@ -18,38 +18,62 @@
     "pixel_format": "uyvy",
     "exposure_absolute": 150,
     "gain": 1,
-    "rate_hz": 60.02048655202135,
+    "rate_hz": 60.029116668241144,
     "center_crop": "720x720",
-    "frame_mean_gray": 65.27,
+    "frame_mean_gray": 65.0,
     "frame_saturated_fraction": 0.0,
-    "frame_laplacian_variance": 2.13
+    "frame_laplacian_variance": 2.15
   },
   "pipeline": {
-    "detector_result_rate_hz": 59.98769798354689,
-    "command_rate_hz": 59.999838127055874,
-    "detector_results_per_camera_frame": 1.0,
-    "processing_ms_mean": 5.9517641832423225,
-    "processing_ms_p95": 6.837248611450195,
-    "processing_ms_max": 7.311790943145752,
+    "detector_result_rate_hz": 59.99763861199936,
+    "command_rate_hz": 60.00874256813941,
+    "detector_results_per_camera_frame": 1.00078125,
+    "processing_ms_mean": 5.894934230856597,
+    "processing_ms_p95": 6.67093596458435,
+    "processing_ms_max": 7.265068054199219,
     "processing_budget_ms": 16.6667,
     "over_budget_count": 0
   },
   "detection": {
-    "frames": 1253,
+    "frames": 1281,
     "frames_with_any_marker": 0,
     "marker_detection_availability": 0.0,
     "fusion_availability": 0.0,
     "assessment": "blocked_by_physical_focus_or_camera_to_pad_distance"
   },
   "recording": {
-    "bag_file": "aruco-bench-gain1_2026-09-14-07-29-32_2026-09-14-07-29-32.bag",
-    "bag_size_bytes": 43435779,
-    "bag_sha256": "d9139b64b22129c03e9f7f35799a9bcef0f07571a5ab89adf9867bf7e9b48f62",
+    "bag_file": "aruco-bench-webcam_2026-09-14-07-57-06_2026-09-14-07-57-06.bag",
+    "bag_size_bytes": 44344024,
+    "bag_sha256": "2328da8cddb22fefbf204b189de5a6a57a9a2e46bc8586ab510f4b000d6c085b",
     "rosbag_returncode": 0,
-    "ready_marker": true
+    "ready_marker": true,
+    "webcam_mux_service": "/recorder/start|stop",
+    "webcam_session": "flight_2026-09-14_16-57-06.mp4",
+    "webcams": [
+      {
+        "name": "cam1",
+        "resolution": "2592x1944",
+        "codec": "h264",
+        "fps": 30,
+        "frames": 591,
+        "duration_s": 19.7,
+        "size_bytes": 83705119,
+        "sha256": "ad3026b3a3ad6874cab79805fad97ee3a37e0b3a66ad5f0bcb983fc3fe7b4de9"
+      },
+      {
+        "name": "cam2",
+        "resolution": "2592x1944",
+        "codec": "h264",
+        "fps": 30,
+        "frames": 593,
+        "duration_s": 19.767,
+        "size_bytes": 70941546,
+        "sha256": "0351a87246150f440d6e9d57de121b32a6e6ed7c83e19283feae1efeda99d7c3"
+      }
+    ]
   },
   "assessment": {
-    "timing_and_recording": "pass",
+    "timing_rosbag_and_dual_webcam_recording": "pass",
     "marker_detection_and_fusion": "not_qualified",
     "metric_pose_accuracy": "invalid_until_layout_is_surveyed",
     "required_next_action": "Physically focus the lens or increase camera-to-pad distance, then rerun the bench profile. The camera exposes no UVC focus control."
