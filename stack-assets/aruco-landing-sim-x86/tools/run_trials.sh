@@ -10,7 +10,7 @@ if [ ! -f /.dockerenv ]; then
   source "$__R/modules/ensure_container.sh"
   docker start "$__C" >/dev/null 2>&1 || true
   __TT=$([ -t 1 ] && echo -it || echo -i)
-  exec docker exec "$__TT" "$__C" bash "/work/${__S#$__R/}" "$@"
+  exec docker exec $__TT "$__C" bash "/work/${__S#$__R/}" "$@"
 fi
 
 source /work/config/ros_env.sh

@@ -133,12 +133,13 @@ fi
 python3 - "$RUN_DIR/summary.json" <<'PY'
 import json, sys
 summary = json.load(open(sys.argv[1], encoding="utf-8"))
+worst_linf = summary["maximum_low_altitude_lateral_linf_m"]
 print("validation:", json.dumps({
     "trials": summary["trial_count"],
     "successes": summary["success_count"],
     "within_5cm": summary["lateral_bound_met_count"],
     "all_within_5cm": summary["all_trials_meet_lateral_bound"],
-    "worst_linf_cm": 100.0 * summary["maximum_low_altitude_lateral_linf_m"],
+    "worst_linf_cm": None if worst_linf is None else 100.0 * worst_linf,
     "min_camera_hz": summary["minimum_trial_camera_source_rate_hz"],
     "max_pose_age_p95_ms": summary["maximum_trial_marker_pose_age_p95_ms"],
 }, indent=2))

@@ -135,6 +135,12 @@ trials were 59.99--60.00 Hz, with host-wide render hitches lowering the minimum
 trial to 58.10 Hz. Trial-level JSON/CSV records whether the cadence threshold
 was met, so such runs are not silently accepted as 60 Hz data.
 
+The 2026-09-14 post-modularization validation rebuilt the baseline map from its
+authored configuration and passed three of three simulated landings. All three
+touchdowns were inside the 5 cm low-altitude bound; worst lateral L-infinity
+error was 2.078 cm, mean touchdown error was 1.94 cm, minimum camera source rate
+was 59.9299 Hz, and pose availability was 100 percent.
+
 Generate the landing RGB video and the publication 3-D trajectory plot from any
 trial bag:
 

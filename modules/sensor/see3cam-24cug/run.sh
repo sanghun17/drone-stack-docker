@@ -14,7 +14,7 @@ if [ ! -f /.dockerenv ]; then
   __TT=$([ -t 1 ] && echo -it || echo -i)
   cleanup(){ docker exec "$__C" pkill -INT -f "usb_cam_node" >/dev/null 2>&1 || true; }
   trap 'cleanup; exit 130' INT TERM HUP
-  docker exec "$__TT" "$__C" bash "/work/${__S#$__R/}" "$@"; __rc=$?
+  docker exec $__TT "$__C" bash "/work/${__S#$__R/}" "$@"; __rc=$?
   cleanup
   exit $__rc
 fi

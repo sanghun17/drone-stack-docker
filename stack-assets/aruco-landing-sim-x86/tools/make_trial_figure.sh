@@ -16,7 +16,7 @@ if [ ! -f /.dockerenv ]; then
       __ARGS[$__I]="/work/${__ARGS[$__I]#$__R/}"
     fi
   done
-  exec docker exec "$__TT" "$__C" bash "/work/${__S#$__R/}" "${__ARGS[@]}"
+  exec docker exec $__TT "$__C" bash "/work/${__S#$__R/}" "${__ARGS[@]}"
 fi
 
 source /opt/ros/noetic/setup.bash --extend
