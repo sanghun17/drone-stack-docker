@@ -47,6 +47,7 @@ tools/fastlivo/_campaign_*/
 *.bag
 *.bag.active
 /flight_logs/
+/experiments/aruco-landing/
 tools/fastlivo/rerun_eval/*.rrd
 tools/fastlivo/rerun_eval/*.tum
 
@@ -59,3 +60,11 @@ tools/fastlivo/tune_master.parquet
 
 # per-host override for config/stack.env (see that file's footer)
 config/stack.env.local
+
+# Deterministically generated Unreal landing map/assets and local AirSim link.
+modules/simulation/airsim-landing/unreal/ArucoLandingBaseline/Binaries/
+modules/simulation/airsim-landing/unreal/ArucoLandingBaseline/Content/
+modules/simulation/airsim-landing/unreal/ArucoLandingBaseline/DerivedDataCache/
+modules/simulation/airsim-landing/unreal/ArucoLandingBaseline/Intermediate/
+modules/simulation/airsim-landing/unreal/ArucoLandingBaseline/Plugins/AirSim
+modules/simulation/airsim-landing/unreal/ArucoLandingBaseline/Saved/

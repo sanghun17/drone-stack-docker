@@ -1,0 +1,15 @@
+name: see3cam-24cug
+group: sensor
+description: e-con Systems See3CAM_24CUG AR0234 global-shutter UVC camera.
+
+deps:
+  apt:
+    - ros-noetic-usb-cam
+    - ros-noetic-camera-calibration
+    - v4l-utils
+
+mounts:
+  - "/dev:/dev"
+
+run: [run.sh]
+provides: [camera, color, global-shutter]

@@ -19,8 +19,6 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # RISK_AWARE_BRANCH 등을 실제로 받게 한다. (export 없이는 자식이 못 봐 clone.sh 기본값이
 # 조용히 이겨 왔음 — 기본값==stack.env 값이라 가려져 있던 잠재버그, 2026-07-25 수리)
 [ -f "$ROOT/config/stack.env" ] && { set -a; source "$ROOT/config/stack.env"; set +a; }
-PORT="${ROS_MASTER_PORT:-11311}"
-
 ARCH=$(uname -m); case "$ARCH" in aarch64) ARCH=arm64;; x86_64) ARCH=amd64;; esac
 
 # Extra `docker build` options. Symmetric with build_wheel.sh's DOCKER_RUN_OPTS —
@@ -69,8 +67,11 @@ case "$cmd" in
          for v in ETE_CONFIG ETE_SEED ETE_OUTPUT_DIR ${RUN_ENV:-}; do
            [ -n "${!v+x}" ] && envargs+=(-e "$v")
          done
+         # Keep the container's compose-pinned ROS_MASTER_* values. Exporting the
+         # host-wide stack.env port here made every named multi-master stack fall
+         # back onto 11311, despite its stacks/*.yml ros_master_port setting.
          docker exec -it ${envargs[@]+"${envargs[@]}"} "drone-stack-$stack" bash -lc \
-           "source /opt/ros/noetic/setup.bash; export ROS_MASTER_URI=http://localhost:$PORT; bash /work/modules/$mod" ;;
+           "source /opt/ros/noetic/setup.bash; bash /work/modules/$mod" ;;
   sh)    need_stack; docker exec -it "drone-stack-$stack" bash ;;
   down)  need_stack; docker compose -f "$(CF)" down ;;
   clone) need_stack; gen >/dev/null
