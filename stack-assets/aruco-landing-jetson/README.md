@@ -4,6 +4,10 @@ This stack reuses the same estimator, controller, and session recorder as the
 AirSim stack. Only the See3CAM publisher, nominal camera-to-body TF, and MAVROS
 arming/webcam trigger behavior are hardware adapters.
 
+The standalone intrinsic/extrinsic calibration interface, required artifacts,
+Motive rigid-body frame checks, and final acceptance checklist are documented
+in [`docs/camera_calibration_handoff.md`](docs/camera_calibration_handoff.md).
+
 With the FC and OptiTrack powered off, run the non-actuating bench profile on
 the Jetson after pulling the ml-host commit:
 
