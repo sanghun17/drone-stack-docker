@@ -27,6 +27,45 @@ distance before qualifying marker detection and fusion. The timing/recording
 result and this remaining hardware blocker are captured in
 `results/camera_bench_20260914.json`.
 
+## One-time camera-to-body extrinsic capture
+
+FC and MAVROS are not needed. Keep the marker pad rigidly fixed, and make sure
+the Motive `pure` rigid-body origin and axes represent `base_link`. Start only
+OptiTrack, See3CAM, the estimator, and the calibration recorder in separate
+terminals:
+
+```bash
+./setup.sh run aruco-landing-jetson odometry/optitrack
+./setup.sh run aruco-landing-jetson sensor/see3cam-24cug
+./setup.sh run aruco-landing-jetson perception/aruco-landing
+stack-assets/aruco-landing-jetson/tools/run_camera_body_extrinsic_recorder.sh
+```
+
+Do not run the provisional static `base_link -> see3cam_optical_frame` TF from
+`run_bench_profile.sh`; that transform is the unknown being calibrated. Start
+and stop the bag from another terminal:
+
+```bash
+DSD_CONTAINER=drone-stack-aruco-landing-jetson \
+  modules/utility/session-recorder/sessionctl.sh start extrinsic-01
+# Move slowly in x/y/z and excite roll, pitch, and yaw while markers stay visible.
+DSD_CONTAINER=drone-stack-aruco-landing-jetson \
+  modules/utility/session-recorder/sessionctl.sh stop
+```
+
+Capture roughly 30--60 seconds with several distinct attitudes. Translation at
+one fixed attitude is not enough to identify the full six-degree-of-freedom
+extrinsic. Bags are written under
+`experiments/aruco-landing/camera-body-extrinsic/`. The dedicated profile keeps
+compressed images, CameraInfo, per-marker and fused camera-frame poses,
+estimator quality, and `/vrpn_client_node/pure/pose`; it does not call the
+external webcam recorder.
+
+For the final metric result, use one surveyed board or one continuously visible
+marker whose printed side length is known. The current bench multi-marker
+layout is image-inferred, so its fused pose is useful as a cross-check but is
+not an accurate calibration target.
+
 During a later flight test, MAVROS arming starts both the rosbag recorder and
 the existing `/recorder/start` webcam service. Disarming stops both. The same
 recorder uses a service trigger in simulation and does not call a webcam.
