@@ -20,6 +20,13 @@ and load metrics are usable; fused pose accuracy and derived velocity are
 explicitly provisional. Set `ARUCO_HARDWARE_LAYOUT` to a surveyed layout before
 using pose values quantitatively.
 
+The 2026-09-14 bench uses stack-local `SEE3CAM_GAIN=1`; gain 10 saturated
+31.6% of the recorded frame under the current lighting. The camera exposes no
+UVC focus control. Physically focus the lens or increase the camera-to-pad
+distance before qualifying marker detection and fusion. The timing/recording
+result and this remaining hardware blocker are captured in
+`results/camera_bench_20260914.json`.
+
 During a later flight test, MAVROS arming starts both the rosbag recorder and
 the existing `/recorder/start` webcam service. Disarming stops both. The same
 recorder uses a service trigger in simulation and does not call a webcam.
