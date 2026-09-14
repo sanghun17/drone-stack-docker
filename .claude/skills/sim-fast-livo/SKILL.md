@@ -10,7 +10,7 @@ Start, restart, or check FAST-LIVO2 (Visual-Inertial-LiDAR Odometry).
 Based on `automation_experiment.py` Phase C node launch + `_restart_fast_livo()`.
 
 **Container era**: FAST-LIVO2 now runs INSIDE the `drone-stack-sim-x86` container (module
-`odometry/fast-livo-sim`), not bare-metal `~/fast_livo2`. roscore/UE4/airsim_node stay on the
+`odometry/fast-livo`), not bare-metal `~/fast_livo2`. roscore/UE4/airsim_node stay on the
 HOST (tmux window 0 = infra, see `/sim-start`) — only the odometry/mapping/planner/control chain
 moved into the container. `network_mode:host` means container topics are reachable from the host
 the same as before; what changed is *how you launch/kill/query* the node, not the procedure.
@@ -68,7 +68,7 @@ docker exec drone-stack-sim-x86 bash -lc 'source /opt/ros/noetic/setup.bash && s
 
 ### `start`
 Start FAST-LIVO2 in a tmux window, running INSIDE the container via
-`odometry/fast-livo-sim/run.sh` (auto-enters `drone-stack-sim-x86`, sources
+`setup.sh run sim-x86 odometry/fast-livo` (enters `drone-stack-sim-x86`, and the module sources
 `fast-livo-sim/devel` INSIDE the container, and forwards a Ctrl+C on this pane as SIGINT to the
 container-side roslaunch — do NOT prepend `source devel/setup.bash`, the script handles it).
 
@@ -78,11 +78,11 @@ docker exec drone-stack-sim-x86 bash -lc 'source /opt/ros/noetic/setup.bash && s
 
 # Start in tmux
 tmux new-window -t risk_aware_planning -n fast_livo 2>/dev/null || true
-tmux send-keys -t risk_aware_planning:fast_livo "bash /home/ml/drone-stack-docker/modules/odometry/fast-livo-sim/run.sh" C-m
+tmux send-keys -t risk_aware_planning:fast_livo "cd /home/ml/drone-stack-docker && ./setup.sh run sim-x86 odometry/fast-livo" C-m
 ```
 Doc-equivalent (same launch, spelled out via the orchestrator script):
 ```bash
-cd /home/ml/drone-stack-docker && ./setup.sh run sim-x86 odometry/fast-livo-sim/run.sh
+cd /home/ml/drone-stack-docker && ./setup.sh run sim-x86 odometry/fast-livo/run.sh
 ```
 
 #### Verify (max 20s, check every 4s)
@@ -109,7 +109,7 @@ Kill and restart (adapted from `_restart_fast_livo()` in automation_experiment.p
 **Primary method**: Ctrl+C on the tmux pane running `run.sh` — the script's own trap forwards
 SIGINT to the container-side roslaunch for a clean node teardown, same pattern as `start`.
 **Backup kill path** (pane gone, or orphaned nodes suspected): use the exact `__M=` match string
-from `odometry/fast-livo-sim/run.sh` itself (`roslaunch fast_livo mapping_simulator_openvins.launch`)
+from `odometry/fast-livo/run.sh` itself (`roslaunch fast_livo mapping_simulator_openvins.launch`)
 against the container's process list, not the host's — the process lives inside the container now.
 
 ```bash
@@ -127,8 +127,8 @@ sleep 0.5
 docker exec drone-stack-sim-x86 bash -lc 'source /opt/ros/noetic/setup.bash && source /work/ws/fast-livo-sim/devel/setup.bash && source /work/config/sim.env && source /work/config/ros_env.sh && rosnode kill /laserMapping' 2>/dev/null
 sleep 0.5
 
-# 4. Relaunch — same tmux pane, run.sh re-enters the container and sources devel for us
-tmux send-keys -t risk_aware_planning:fast_livo "bash /home/ml/drone-stack-docker/modules/odometry/fast-livo-sim/run.sh" C-m
+# 4. Relaunch — the orchestrator enters the container and run.sh sources devel for us
+tmux send-keys -t risk_aware_planning:fast_livo "cd /home/ml/drone-stack-docker && ./setup.sh run sim-x86 odometry/fast-livo" C-m
 ```
 
 #### Verify (same as start)
@@ -183,7 +183,7 @@ if $INIT_SIM_ALIVE; then
   echo "[OK] initialize_simulator node alive"
 else
   echo "[WARN] initialize_simulator not running — restarting..."
-  tmux send-keys -t risk_aware_planning:init_sim "bash /home/ml/drone-stack-docker/modules/planner/risk-aware-sim/run_init_sim.sh" C-m
+  tmux send-keys -t risk_aware_planning:init_sim "bash /home/ml/drone-stack-docker/stack-assets/sim-x86/tools/run_init_sim.sh" C-m
   # Wait for node to appear (max 10s)
   for i in $(seq 1 10); do
     sleep 1
@@ -349,7 +349,7 @@ fi
 #### Step 5: Restart FAST-LIVO2
 ```bash
 echo "=== Step 5: Restarting FAST-LIVO2 ==="
-tmux send-keys -t risk_aware_planning:fast_livo "bash /home/ml/drone-stack-docker/modules/odometry/fast-livo-sim/run.sh" C-m
+tmux send-keys -t risk_aware_planning:fast_livo "cd /home/ml/drone-stack-docker && ./setup.sh run sim-x86 odometry/fast-livo" C-m
 
 for i in $(seq 1 5); do
   sleep 4
@@ -404,7 +404,7 @@ print(f'{math.sqrt(dx**2+dy**2+dz**2):.3f}')
   sleep 0.5
   docker exec drone-stack-sim-x86 bash -lc 'source /opt/ros/noetic/setup.bash && source /work/ws/fast-livo-sim/devel/setup.bash && source /work/config/sim.env && source /work/config/ros_env.sh && rosnode kill /laserMapping' 2>/dev/null
   sleep 1
-  tmux send-keys -t risk_aware_planning:fast_livo "bash /home/ml/drone-stack-docker/modules/odometry/fast-livo-sim/run.sh" C-m
+  tmux send-keys -t risk_aware_planning:fast_livo "cd /home/ml/drone-stack-docker && ./setup.sh run sim-x86 odometry/fast-livo" C-m
   for i in $(seq 1 5); do
     sleep 4
     docker exec drone-stack-sim-x86 bash -lc 'source /opt/ros/noetic/setup.bash && source /work/ws/fast-livo-sim/devel/setup.bash && source /work/config/sim.env && source /work/config/ros_env.sh && timeout 5 rostopic echo /aft_mapped_to_init_odom -n 1' > /dev/null 2>&1 && break

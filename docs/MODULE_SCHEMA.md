@@ -1,56 +1,60 @@
-# `module.yml` schema
+# Module and stack schema
 
-Every module is a directory `modules/<group>/<name>/` with a `module.yml` manifest.
-`setup.sh` reads the manifest of each module a stack selects, **unions their deps**
-(arch-aware, de-duped) into one image, and merges their mounts/run into one container.
+Every reusable capability lives at `modules/<group>/<name>/module.yml`.
 
 ```yaml
-name: realsense-d435i           # unique module id
-group: sensor                   # base | sensor | odometry | planner | control
-description: Intel RealSense D435i driver (depth+color+IMU)
+name: local-controller
+group: control               # base, sensor, perception, odometry, planner,
+                             # control, simulation, compute, training, utility
+description: Standard trajectory-to-MAVROS controller
 
-# --- image dependencies (unioned across all selected modules) ---
 deps:
-  apt:    [ros-noetic-realsense2-camera]   # apt-get install -y ...
-  pip:    []                               # pip3 install ...
-  source: []                               # names of source-build steps in install.sh
-  # arch-specific ADD-ONs (merged on top of the base lists for that arch):
-  arm64:  { apt: [], pip: [] }
-  amd64:  { apt: [], pip: [] }
+  apt: [ros-noetic-mavros-msgs]
+  pip: []
+  source: [install.sh]
+  arm64: {apt: [], pip: [], source: []}
+  amd64: {apt: [], pip: [], source: []}
 
-# --- source repos to bind-mount (cloned separately, gitignored) ---
-#   ${VARS} resolve from config/stack.env
-mounts:
-  - "/dev:/dev"
-  - "${PLANNER_SRC}:/ws/src/risk_aware_planning"
-
-# --- runtime: scripts (in this module dir) that launch its ROS node(s) ---
-#   run inside the single stack container; each is independently start/stoppable
-run:
-  - run.sh                      # or several: [run_camera.sh, ...]
-
-# --- optional ---
-workspace: /ws                  # catkin workspace this module's pkgs build in
-needs: [base]                   # modules implicitly required (base is always in)
-provides: [camera]              # capability tag (for docs / future validation)
+workspace: /work/ws/example
+clone: clone.sh
+run: [run.sh]
+needs: []
+mounts: ["/dev:/dev"]
+provides: [trajectory-controller]
 ```
 
-## Rules
+- `base` is always included.
+- `needs` is resolved before the dependent module.
+- Dependencies are unioned in stack order and deduplicated. Architecture and
+  optional CPU/GPU combination sections are additive.
+- `install.sh` handles complex image-time setup; `clone.sh` populates a
+  gitignored workspace; `build_ws.sh` builds it; each `run` script launches one
+  independently startable function in the foreground.
+- A module may depend on standard ROS interfaces or another capability, but
+  must not source a consumer planner's workspace merely to obtain generic
+  messages or runtime packages.
+- Maps, paper/trial config and evaluation programs belong to `stack-assets`,
+  not a reusable module.
 
-- **`base` is always included** (the architecture module: ROS Noetic + common toolchain).
-- **Dep union order:** `base` first, then modules in the order listed in the stack
-  (so e.g. `torch` installs before a module that pip-builds against it). Within a
-  module: apt → pip → source.
-- **Arch merge:** final list = `deps.<kind>` + `deps.<arch>.<kind>`. A module with no
-  arch key is arch-agnostic.
-- **`install.sh`** (optional, in the module dir) holds complex/source builds; listed by
-  name under `deps.source`. It gets `TARGETARCH` in env (and `GPU_ARCH`, when the
-  stack sets `gpu_arch:`). (A `build_env:` stack-scoped extra-env-var mechanism existed
-  here 2026-07-25 to 2026-07-26 -- used by `stacks/sim-x86.yml`'s `TORCH_VARIANT:
-  src-abi1` to scope a torch variant to one stack without a new `(cpu_arch, gpu_arch)`
-  combo key -- removed once that variant became `compute/torch/install.sh`'s
-  unconditional sm89/sm75 default; see docs/ETE_TRAIN_GPU_HOSTS.md's "torch
-  unification" section.)
-- **`run.sh`** must be idempotent-ish and foreground (so Ctrl-C stops the node); it
-  sources the workspace + sets `ROS_MASTER_URI` (helper provided).
-- Keep manifests **declarative**; push imperative steps into `install.sh` / `run.sh`.
+A stack in `stacks/<name>.yml` composes modules and selects deployment details:
+
+```yaml
+arch: [amd64]
+gpu_arch: sm75
+ros_master_port: 11311
+ros_master_host: 192.168.50.12
+environment:
+  FAST_LIVO_PROFILE: airsim
+  RISK_AWARE_PROFILE: airsim
+mounts:
+  - "${SIM_RISK_AWARE_ASSETS}:${SIM_RISK_AWARE_ASSETS}"
+modules:
+  - simulation/airsim
+  - odometry/fast-livo
+  - planner/risk-aware
+```
+
+Stack `environment` is written both to Compose and to
+`.build/<stack>/stack.env`, so host-side `clone.sh` can select the same profile.
+Stack `mounts` owns deployment- or scenario-specific host data. Variables are
+expanded from `config/stack.env` and its optional local override.

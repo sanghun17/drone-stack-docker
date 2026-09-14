@@ -1,13 +1,15 @@
 name: mavros
 group: control
-description: MAVROS bridge to the PX4 FCU (px4.launch, fcu_url from config/stack.env). mavros itself is vendored + built in the risk-aware workspace; the image only needs GeographicLib (libs + datasets).
-
-needs: [planner/risk-aware-deploy]     # mavros lives in ws/risk-aware (built by planner/risk-aware-deploy)
+description: Standalone MAVROS bridge to the PX4 FCU. Connection URLs come from config/stack.env.
 
 deps:
   # GeographicLib: link dep for the ws build + runtime datasets (moved OUT of base
   # on purpose — keeps the base layer frozen so compute layers never rebuild)
   apt:
+    - ros-noetic-mavlink
+    - ros-noetic-mavros
+    - ros-noetic-mavros-extras
+    - ros-noetic-mavros-msgs
     - geographiclib-tools
     - libgeographic-dev
   source:

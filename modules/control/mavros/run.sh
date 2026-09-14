@@ -1,11 +1,12 @@
 #!/bin/bash
 # control/mavros: MAVROS bridge to the PX4 flight controller (px4.launch).
 # Connection values live in config/stack.env and are passed to px4.launch via
-# exported FCU_URL/GCS_URL. mavros is built in the risk-aware workspace.
+# exported FCU_URL/GCS_URL. MAVROS comes from the ROS Noetic installation.
 
 # (host) auto-enter the dsd container; (inside) run the node.
 if [ ! -f /.dockerenv ]; then
-  __C=drone-stack-d435i-voxblox
+  : "${DSD_CONTAINER:?set DSD_CONTAINER or invoke through './setup.sh run <stack> control/mavros'}"
+  __C="$DSD_CONTAINER"
   __S="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
   __R="$(cd "$(dirname "$__S")/../../.." && pwd)"
   source "$__R/modules/ensure_container.sh"   # recreate $__C if missing / stale-mounted (repo moved)
@@ -23,7 +24,6 @@ if [ ! -f /.dockerenv ]; then
 fi
 set -e
 source /opt/ros/noetic/setup.bash
-source /work/ws/risk-aware/devel/setup.bash
 [ -f /work/config/stack.env ] && source /work/config/stack.env
 source /work/config/ros_env.sh   # ROS_MASTER_URI / ROS_IP — single source, edit-and-go
 : "${FCU_URL:?FCU_URL missing from /work/config/stack.env}"

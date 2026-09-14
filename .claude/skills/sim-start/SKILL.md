@@ -11,7 +11,7 @@ Each step: **verify** (actual data received?) → already OK → skip / not OK �
 
 **Container era**: roscore, Unreal Engine, and the AirSim ROS node (Steps 1-3) stay on the HOST
 (tmux window `infra`) — unchanged. The sensor publisher (Step 4) and `initialize_simulator.py`
-(Step 5) now run INSIDE the `drone-stack-sim-x86` container (module `planner/risk-aware-sim`),
+(Step 5) now run INSIDE the `drone-stack-sim-x86` container (module `planner/risk-aware`),
 started via that module's `run_sensor_pub.sh` / `run_init_sim.sh` instead of
 `conda activate airsim && roslaunch ...` by hand — same tmux panes/windows as before, just a
 different launch command. `network_mode:host` means their topics/services are reachable from the
@@ -233,9 +233,9 @@ timeout 5 rostopic echo /camera/depth/image_raw/header -n 1 > /dev/null 2>&1 && 
 ```bash
 tmux split-window -t risk_aware_planning:infra 2>/dev/null || true
 tmux send-keys -t risk_aware_planning:infra.3 \
-  "bash /home/ml/drone-stack-docker/modules/planner/risk-aware-sim/run_sensor_pub.sh" C-m
+  "bash /home/ml/drone-stack-docker/stack-assets/sim-x86/tools/run_sensor_pub.sh" C-m
 ```
-Doc-equivalent: `cd /home/ml/drone-stack-docker && ./setup.sh run sim-x86 planner/risk-aware-sim/run_sensor_pub.sh`.
+Doc-equivalent: `cd /home/ml/drone-stack-docker && bash /home/ml/drone-stack-docker/stack-assets/sim-x86/tools/run_sensor_pub.sh`.
 Defaults to `localization:=gt` (matches the old pane's `localization:=gt`) — override with
 `LOC=vio` exported before the `bash` call for the vio scenario.
 
@@ -281,9 +281,9 @@ rosservice list 2>/dev/null | grep -q "/initialize_simulator/teleport_to_positio
 ```bash
 tmux new-window -t risk_aware_planning -n init_sim 2>/dev/null || true
 tmux send-keys -t risk_aware_planning:init_sim \
-  "bash /home/ml/drone-stack-docker/modules/planner/risk-aware-sim/run_init_sim.sh" C-m
+  "bash /home/ml/drone-stack-docker/stack-assets/sim-x86/tools/run_init_sim.sh" C-m
 ```
-Doc-equivalent: `cd /home/ml/drone-stack-docker && ./setup.sh run sim-x86 planner/risk-aware-sim/run_init_sim.sh`.
+Doc-equivalent: `cd /home/ml/drone-stack-docker && bash /home/ml/drone-stack-docker/stack-assets/sim-x86/tools/run_init_sim.sh`.
 
 ### Re-verify (max 20s, check every 4s)
 ```bash

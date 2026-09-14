@@ -13,7 +13,7 @@ user_invocable: true
 ## CRITICAL: 컨테이너 시대 — 노드는 `drone-stack-sim-x86`에서 산다
 
 voxblox/exploration/JAX/SO3/센서 퍼블리셔/initialize_simulator/evaluator는 전부
-`modules/planner/risk-aware-sim/run_*.sh` (+ FAST-LIVO는 `modules/odometry/fast-livo-sim/run.sh`)를
+`modules/planner/risk-aware/run_*_sim.sh and stack-assets/sim-x86/tools/run_*.sh` (+ FAST-LIVO는 `modules/odometry/fast-livo/run.sh`)를
 통해 `drone-stack-sim-x86` 컨테이너 안에서 뜬다 — tmux pane 하나당 `bash <script>` 블로킹 하나,
 기존 패턴 그대로. roscore/UE4/airsim_node(conda `airsim` env)만 호스트(window 0)에 남는다.
 
@@ -76,7 +76,7 @@ ls -la /home/ml/risk_aware_assets/checkpoints/
   (`sim_vio`, `sim_gt` 아님)
 - 센서 퍼블리셔는 `LOC=vio`로 다시 (기본 gt 대신):
   ```bash
-  LOC=vio bash /home/ml/drone-stack-docker/modules/planner/risk-aware-sim/run_sensor_pub.sh
+  LOC=vio bash /home/ml/drone-stack-docker/stack-assets/sim-x86/tools/run_sensor_pub.sh
   ```
 ```bash
 docker exec drone-stack-sim-x86 bash -lc 'source /opt/ros/noetic/setup.bash && source /work/ws/risk-aware/devel/setup.bash && source /work/config/sim.env && source /work/config/ros_env.sh && rosparam get /system/localization'   # → vio 확인
@@ -161,12 +161,12 @@ automation을 안 쓰거나(§1.5 미확인 상태) 단계별로 디버그해야
 재현하지 말 것). 순서는 유연하지만(토픽이 늦게 바인딩됨) fast-livo(vio 시) → voxblox → exploration →
 jax → so3 → eval 순이 무난:
 ```bash
-bash /home/ml/drone-stack-docker/modules/odometry/fast-livo-sim/run.sh          # vio 실험만 필요
-bash /home/ml/drone-stack-docker/modules/planner/risk-aware-sim/run_voxblox.sh
-bash /home/ml/drone-stack-docker/modules/planner/risk-aware-sim/run_exploration.sh
-bash /home/ml/drone-stack-docker/modules/planner/risk-aware-sim/run_jax.sh      # 첫 기동 ~80s (JAX JIT)
-bash /home/ml/drone-stack-docker/modules/planner/risk-aware-sim/run_so3.sh
-bash /home/ml/drone-stack-docker/modules/planner/risk-aware-sim/run_eval.sh     # algorithm:=ours 스크립트에 이미 하드코딩
+cd /home/ml/drone-stack-docker && ./setup.sh run sim-x86 odometry/fast-livo          # vio 실험만 필요
+cd /home/ml/drone-stack-docker && ./setup.sh run sim-x86 planner/risk-aware/run_voxblox.sh
+cd /home/ml/drone-stack-docker && ./setup.sh run sim-x86 planner/risk-aware/run_planner.sh
+cd /home/ml/drone-stack-docker && ./setup.sh run sim-x86 planner/risk-aware/run_jax.sh      # 첫 기동 ~80s (JAX JIT)
+bash /home/ml/drone-stack-docker/stack-assets/sim-x86/tools/run_so3.sh
+bash /home/ml/drone-stack-docker/stack-assets/sim-x86/tools/run_eval.sh     # algorithm:=ours 스크립트에 이미 하드코딩
 ```
 드론 위치잡기는 `/sim-drone teleport` 사용.
 

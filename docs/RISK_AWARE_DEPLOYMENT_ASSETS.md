@@ -64,8 +64,7 @@ The mount roots are configured in:
 - `config/stack.env`: `RISK_AWARE_ASSETS=/home/hmcl/risk_aware_assets`
 - `config/stack.env`: `SIM_RISK_AWARE_ASSETS=/home/ml/risk_aware_assets`
 - `config/sim.env`: `RISK_AWARE_CHECKPOINTS=/home/ml/risk_aware_assets/checkpoints`
-- `modules/planner/risk-aware-deploy/module.yml`
-- `modules/planner/risk-aware-sim/module.yml`
+- `stacks/d435i-voxblox.yml` and `stacks/sim-x86.yml`
 
 The canonical ML layout is now:
 

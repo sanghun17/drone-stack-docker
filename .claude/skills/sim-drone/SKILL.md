@@ -14,9 +14,9 @@ Based on `automation_experiment.py` Phase B (`phase_b_initialize_drone`).
 `initialize_simulator.py` (the node this skill drives — services + dynamic_reconfigure) now runs
 INSIDE the `drone-stack-sim-x86` container, brought up with:
 ```bash
-bash /home/ml/drone-stack-docker/modules/planner/risk-aware-sim/run_init_sim.sh
+bash /home/ml/drone-stack-docker/stack-assets/sim-x86/tools/run_init_sim.sh
 ```
-(equivalent: `cd /home/ml/drone-stack-docker && ./setup.sh run sim-x86 planner/risk-aware-sim/run_init_sim.sh`)
+(equivalent: `cd /home/ml/drone-stack-docker && bash /home/ml/drone-stack-docker/stack-assets/sim-x86/tools/run_init_sim.sh`)
 — one blocking tmux pane, same pattern as every other sim-x86 node. `run_init_sim.sh` already
 handles container creation/start + Ctrl+C teardown internally; don't reproduce `docker exec`
 by hand for THAT part. roscore/UE4/airsim_node stay on the HOST (tmux window 0) — only the
@@ -163,4 +163,4 @@ docker exec drone-stack-sim-x86 bash -lc "source /opt/ros/noetic/setup.bash && s
 | GT odom timeout | sensor publisher or odom publisher down (`run_sensor_pub.sh`) | Check /sim-start health |
 | "Failed to connect to AirSim" | IP mismatch | Check airsim_ip in scenarios/sim_*.yaml |
 | Position oscillates | PD gains too high or competing controllers | Release other controllers first |
-| `docker exec` itself fails / no such container | `drone-stack-sim-x86` not up | `bash /home/ml/drone-stack-docker/modules/planner/risk-aware-sim/run_init_sim.sh` (or `/sim-start`) first |
+| `docker exec` itself fails / no such container | `drone-stack-sim-x86` not up | `bash /home/ml/drone-stack-docker/stack-assets/sim-x86/tools/run_init_sim.sh` (or `/sim-start`) first |

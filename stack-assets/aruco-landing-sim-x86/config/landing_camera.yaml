@@ -1,0 +1,91 @@
+# Single source of truth for the landing camera in simulation.
+#
+# The image geometry is based on the 2026-09-07 See3CAM calibration at
+# 1280x720. The experiment uses the centered 720x720 ROI and the measured
+# 53.9-degree vertical FOV. AirSim renders that square view natively. The mount
+# pose remains provisional until it is measured on-body.
+status: intrinsics_calibrated_mount_provisional
+
+airsim:
+  ip: 127.0.0.1
+  port: 41451
+  # Keep a tiny game viewport active: AirSim services image RPCs on its render
+  # cadence. NoDisplay batches them at roughly 0.5 s intervals.
+  view_mode: NoDisplay
+  vehicle_name: hmcl
+  camera_name: landing_cam
+
+camera:
+  width: 720
+  height: 720
+  publish_rate_hz: 60.0
+  # Poll the continuous UE render target faster than the delivery rate so the
+  # recording thread cannot miss an OnEndDraw boundary by a few hundred us.
+  # This does not request a second render; the bridge still publishes at 60 Hz.
+  capture_poll_rate_hz: 120.0
+  # Keep an eight-frame jitter cushion. Four frames still under-ran when many
+  # baseline markers became visible near the pad, while the old 12-frame queue
+  # made poses roughly 115 ms old. Timestamp prediction compensates the
+  # remaining bounded delay in the horizontal controller.
+  mmap_publish_buffer_frames: 8
+  # The landing-local UE plugin writes frames directly to this memory-mapped
+  # file. This avoids sharing AirSim's RPC server with flight-control calls.
+  transport: mmap
+  mmap_path_container: /work/.build/aruco-landing-sim-x86/landing_camera.mmap
+  rpc_workers: 6               # parallel AirSim readback clients
+  continuous_rpc: true         # sustain >60 captures/s despite RPC latency
+  publish_buffer_frames: 36    # <=56 MB; bounded AirSim burst smoothing
+  startup_buffer_frames: 32    # cover the measured worst-case RPC burst gap
+  image_type: 0                 # AirSim ImageType.Scene
+  horizontal_fov_deg: 53.899
+  target_gamma: 1.5
+  motion_blur_amount: 0.0       # approximate the real global-shutter camera
+  # Use spatial-only FXAA to suppress staircase shimmer without temporal
+  # ghosting. TAA/DoF/motion blur remain disabled because they can blend ArUco
+  # cells across frames and do not represent the real global-shutter camera.
+  render_console_commands:
+    - r.VSync 0
+    - t.MaxFPS 0
+    - sg.ViewDistanceQuality 0
+    - sg.ShadowQuality 0
+    - sg.PostProcessQuality 0
+    - sg.TextureQuality 0
+    - sg.EffectsQuality 0
+    - r.DefaultFeature.AntiAliasing 1
+    - r.PostProcessAAQuality 4
+    - r.MotionBlurQuality 0
+    - r.DepthOfFieldQuality 0
+    - r.BloomQuality 0
+    - r.AmbientOcclusionLevels 0
+    - r.SSR.Quality 0
+    - r.EyeAdaptationQuality 0
+    - r.ContactShadows 0
+    - r.ShadowQuality 0
+    - r.VolumetricFog 0
+
+  # Ideal square AirSim K corresponding to the real camera's vertical focal
+  # length. The real centered crop retains its calibrated, non-central K/D.
+  intrinsics:
+    fx: 708.077114
+    fy: 708.077114
+    cx: 360.0
+    cy: 360.0
+    distortion: [0.0, 0.0, 0.0, 0.0, 0.0]
+
+  # AirSim vehicle/body coordinates: x forward, y right, z down (FRD), metres.
+  # The provisional camera is centered and points down. Replace these values
+  # with the measured See3CAM body-to-camera mount transform.
+  mount_frd:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    roll_deg: 0.0
+    pitch_deg: -90.0
+    yaw_deg: 0.0
+
+ros:
+  image_topic: /landing/camera/image_raw
+  camera_info_topic: /landing/camera/camera_info
+  base_frame: base_link
+  camera_link_frame: landing_camera_link
+  optical_frame: landing_camera_optical_frame

@@ -1,0 +1,16 @@
+--- a/Source/RenderRequest.cpp
++++ b/Source/RenderRequest.cpp
+@@ -85,8 +85,12 @@ void RenderRequest::getScreenshot(std::shared_ptr<RenderParams> params[], std::v
+             });
+
+-            // while we're still on GameThread, enqueue request for capture the scene!
++            // A landing camera registered as a subwindow already captures on
++            // every render frame. Forcing another scene capture per RPC both
++            // duplicates rendering and batches concurrent image requests.
+             for (unsigned int i = 0; i < req_size_; ++i) {
+-                params_[i]->render_component->CaptureSceneDeferred();
++                if (!params_[i]->render_component->bCaptureEveryFrame) {
++                    params_[i]->render_component->CaptureSceneDeferred();
++                }
+             }
+         });

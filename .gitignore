@@ -61,10 +61,11 @@ tools/fastlivo/tune_master.parquet
 # per-host override for config/stack.env (see that file's footer)
 config/stack.env.local
 
-# Deterministically generated Unreal landing map/assets and local AirSim link.
-modules/simulation/airsim-landing/unreal/ArucoLandingBaseline/Binaries/
-modules/simulation/airsim-landing/unreal/ArucoLandingBaseline/Content/
-modules/simulation/airsim-landing/unreal/ArucoLandingBaseline/DerivedDataCache/
-modules/simulation/airsim-landing/unreal/ArucoLandingBaseline/Intermediate/
-modules/simulation/airsim-landing/unreal/ArucoLandingBaseline/Plugins/AirSim
-modules/simulation/airsim-landing/unreal/ArucoLandingBaseline/Saved/
+# Deterministically generated ArUco-landing Unreal assets and local AirSim link.
+/stack-assets/aruco-landing-sim-x86/unreal/ArucoLandingBaseline/Binaries/
+/stack-assets/aruco-landing-sim-x86/unreal/ArucoLandingBaseline/Build/
+/stack-assets/aruco-landing-sim-x86/unreal/ArucoLandingBaseline/Content/
+/stack-assets/aruco-landing-sim-x86/unreal/ArucoLandingBaseline/DerivedDataCache/
+/stack-assets/aruco-landing-sim-x86/unreal/ArucoLandingBaseline/Intermediate/
+/stack-assets/aruco-landing-sim-x86/unreal/ArucoLandingBaseline/Plugins/AirSim
+/stack-assets/aruco-landing-sim-x86/unreal/ArucoLandingBaseline/Saved/

@@ -45,19 +45,19 @@ and left an orphaned node (or the trap didn't fire): `docker exec ... pkill -INT
 `roslaunch ...` match string from that module's own `run_*.sh` (`__M=` variable there).
 
 ```bash
-# FAST-LIVO (odometry/fast-livo-sim/run.sh)
+# FAST-LIVO (odometry/fast-livo/run.sh)
 tmux send-keys -t risk_aware_planning:fast_livo C-c 2>/dev/null
 docker exec drone-stack-sim-x86 pkill -INT -f "roslaunch fast_livo mapping_simulator_openvins.launch" 2>/dev/null
 
-# Voxblox mapping (planner/risk-aware-sim/run_voxblox.sh)
+# Voxblox mapping (planner/risk-aware/run_voxblox.sh)
 tmux send-keys -t risk_aware_planning:voxblox C-c 2>/dev/null
 docker exec drone-stack-sim-x86 pkill -INT -f "roslaunch active_3d_planning_app_reconstruction uncertainty_voxblox.launch" 2>/dev/null
 
-# Exploration planner (planner/risk-aware-sim/run_exploration.sh)
+# Exploration planner (planner/risk-aware/run_planner.sh)
 tmux send-keys -t risk_aware_planning:exploration C-c 2>/dev/null
 docker exec drone-stack-sim-x86 pkill -INT -f "roslaunch active_3d_planning_app_reconstruction exploration_planner.launch" 2>/dev/null
 
-# Eval data recording (planner/risk-aware-sim/run_eval.sh)
+# Eval data recording (stack-assets/sim-x86/tools/run_eval.sh)
 tmux send-keys -t risk_aware_planning:eval C-c 2>/dev/null
 docker exec drone-stack-sim-x86 pkill -INT -f "roslaunch active_3d_planning_app_reconstruction runtime_evaluator.launch" 2>/dev/null
 

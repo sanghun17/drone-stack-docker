@@ -24,7 +24,7 @@ sim-x86's source-built ABI=1 torch wheel to one stack without touching the share
 compute/torch's unconditional sm89/sm75 default, see docs/ETE_TRAIN_GPU_HOSTS.md's
 "torch unification" section.)
 """
-import os, sys, argparse, yaml
+import os, sys, argparse, re, shlex, yaml
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -203,9 +203,11 @@ def gen_dockerfile(mods, arch, gpu_arch, env):
 
 
 def gen_compose(mods, arch, stack, env, gpu_uuids_key="GPU_UUIDS", gpu=True,
-                ros_master_port=None, ros_master_host=None):
+                ros_master_port=None, ros_master_host=None, stack_environment=None,
+                stack_mounts=None):
     image = "drone-stack:%s" % stack
-    mounts, runs = [], []
+    mounts = [expand(mount, env) for mount in (stack_mounts or [])]
+    runs = []
     for m in mods:
         for mt in (m.get("mounts") or []):
             mt = expand(mt, env)
@@ -224,13 +226,8 @@ def gen_compose(mods, arch, stack, env, gpu_uuids_key="GPU_UUIDS", gpu=True,
                 "container_name": "drone-stack-%s" % stack,
                 "network_mode": "host",
                 "privileged": True,
-                # gpu=False (stacks/*.yml `gpu: false`) drops ALL GPU wiring — the
-                # arm64 `runtime: nvidia` here and the amd64 device-reservation /
-                # NVIDIA_VISIBLE_DEVICES paths further down. Needed for a stack whose
-                # host has no NVIDIA GPU (epic-x86): compose refuses to START a
-                # container whose device reservation cannot be satisfied, so the
-                # amd64 default below would make an otherwise-fine CPU stack undeployable.
-                # Defaults to True -> byte-identical output for every existing stack.
+                # gpu=False drops all NVIDIA runtime/device wiring, allowing CPU-only
+                # stacks to start on hosts without an NVIDIA device.
                 "runtime": "nvidia" if (gpu and arch == "arm64") else None,
                 "working_dir": "/work",
                 "volumes": ["../..:/work"] + mounts,
@@ -238,27 +235,18 @@ def gen_compose(mods, arch, stack, env, gpu_uuids_key="GPU_UUIDS", gpu=True,
                 # they live in config/ros_env.sh (mounted), so the IP is edit-and-go
                 # with no recreate.
                 #
-                # EXCEPT when the stack declares `ros_master_port:` (added 2026-07-31).
-                # Then they ARE emitted, pinned to localhost:<port>. Why: this host runs
-                # TWO masters at once — the risk-aware stack on 11311 (0.0.0.0, LAN-wide)
-                # and EPIC on 11312 (127.0.0.1). `docker exec` inherits NOTHING from the
-                # caller, so a bare shell in the EPIC container had an EMPTY
-                # ROS_MASTER_URI and fell through to roscpp's default localhost:11311 —
-                # i.e. `rosnode list` inside the EPIC container listed the OTHER
-                # project's live nodes (mavros, flight_safety_*, jax_mppi_controller).
-                # A stray `rosnode kill` there would have hit the real robot's stack.
-                #
-                # This does NOT break the edit-and-go property: every run script sources
-                # config/epic.env then config/ros_env.sh, and ros_env.sh rebuilds
-                # ROS_MASTER_URI unconditionally from HOST/PORT, so the sourced path
-                # still wins. Only the UNSOURCED shell's default changes — which is
-                # exactly the hole being closed. Omit the key and output is byte-identical.
+                # When a stack declares `ros_master_port`, pin the container environment
+                # as well. This prevents an unsourced `docker exec` shell from silently
+                # attaching to another stack's ROS master.
                 "environment": [
                     "DISPLAY=${DISPLAY:-:0}",
+                    "DSD_STACK_NAME=%s" % stack,
                 ]
+                + ["%s=%s" % (key, value)
+                   for key, value in (stack_environment or {}).items()]
                 #
                 # `ros_master_host:` (optional, default localhost) picks the advertise
-                # address. Keep it localhost for a stack that is purely local (EPIC);
+                # address. Keep it localhost for a stack that is purely local;
                 # set it to this host's LAN IP for a stack whose topics must be
                 # reachable from another machine, or whose shells also talk to a REMOTE
                 # master — ROS_IP/ROS_HOSTNAME are what the peer calls BACK on, so
@@ -277,9 +265,7 @@ def gen_compose(mods, arch, stack, env, gpu_uuids_key="GPU_UUIDS", gpu=True,
                 # "graphics,display" a GPU container still runs CUDA and
                 # nvidia-smi fine, but glxinfo reports llvmpipe /
                 # "Accelerated: no" and every GL client falls back to mesa
-                # software rendering on the CPU. That is what made MARSIM's
-                # opengl_render_node crawl at 3.6 Hz against a 10 Hz target on
-                # epic-x86-gpu (confirmed 2026-07-30).
+                # software rendering on the CPU.
                 # Set here rather than as a module `env:` on purpose: `env:`
                 # becomes a Dockerfile ENV emitted ahead of that module's apt
                 # layer, so changing it invalidates the whole (very slow) apt
@@ -408,10 +394,27 @@ def main():
     # co-tenant stack's master. Omit it and nothing is emitted (see gen_compose).
     ros_master_port = stack.get("ros_master_port")
     ros_master_host = expand(str(stack.get("ros_master_host") or ""), env) or None
+    stack_environment = {
+        str(key): expand(str(value), env)
+        for key, value in (stack.get("environment") or {}).items()
+    }
+    invalid_environment_keys = [
+        key for key in stack_environment
+        if not re.match(r"^[A-Za-z_][A-Za-z0-9_]*$", key)
+    ]
+    if invalid_environment_keys:
+        sys.exit("ERROR: invalid stack environment key(s): %s" %
+                 ", ".join(invalid_environment_keys))
+    stack_mounts = list(stack.get("mounts") or [])
     open(os.path.join(outdir, "compose.yml"), "w").write(
         gen_compose(mods, arch, a.stack, env, gpu_uuids_key, gpu,
-                    ros_master_port, ros_master_host))
+                    ros_master_port, ros_master_host, stack_environment,
+                    stack_mounts))
     open(os.path.join(outdir, "modules.txt"), "w").write("\n".join(m["_path"] for m in mods) + "\n")
+    with open(os.path.join(outdir, "stack.env"), "w") as stream:
+        stream.write("DSD_STACK_NAME=%s\n" % shlex.quote(a.stack))
+        for key, value in stack_environment.items():
+            stream.write("%s=%s\n" % (key, shlex.quote(value)))
 
     print("stack '%s' arch=%s%s  modules: %s" % (
         a.stack, arch, (" gpu_arch=%s" % gpu_arch) if gpu_arch else "",

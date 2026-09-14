@@ -1,0 +1,46 @@
+# Minimal deterministic environment used before closed-loop landing tests.
+environment:
+  pad_size_m: 0.70
+  floor_size_m: 7.0          # 10 L on each side
+  floor_thickness_m: 0.10
+  floor_gray_srgb: 0.45
+  pad_height_m: 0.002        # avoid coplanar z-fighting
+  # The visual floor/pad do not terminate flight. The estimated camera height
+  # in common_experiment.yaml defines touchdown, after which commands stop.
+  collision_enabled: false
+  terminate_trial_on_collision: false
+  post_touchdown_behavior: stop
+
+# AirSim NED coordinates relative to the UE PlayerStart at the pad center.
+spawn_ned:
+  x_m: 0.0
+  y_m: 0.0
+  z_m: -2.0
+  yaw_deg: 0.0
+
+# Fixed map geometry used only to express logged AirSim ground truth in the
+# estimator's pad frame. It is never supplied to estimation or control.
+ground_truth:
+  # Calibrated from timestamp-aligned camera pose/marker geometry in the
+  # packaged UE map. AirSim's local NED origin is attached to its spawned view
+  # target, so it is not exactly -spawn_ned relative to the visual pad plane.
+  pad_local_ned_m: [0.0, 0.0, 1.858163]
+  pad_from_local_ned_rotation:
+    - [1.0, 0.0, 0.0]   # pad x = north
+    - [0.0, -1.0, 0.0]  # pad y = west
+    - [0.0, 0.0, -1.0]  # pad z = up
+
+# Reproducible oblique overview used for the simulation-setup figure. AirSim
+# uses local NED metres/degrees here; the camera looks toward pad centre and
+# the vehicle's nominal 2 m staging pose.
+external_cameras:
+  paper_overview:
+    x_m: -2.5
+    y_m: -2.5
+    z_m: -3.8
+    pitch_deg: -37.0
+    roll_deg: 0.0
+    yaw_deg: 45.0
+    width: 1920
+    height: 1080
+    horizontal_fov_deg: 75.0

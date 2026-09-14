@@ -1,0 +1,187 @@
+--- a/Source/RenderRequest.cpp
++++ b/Source/RenderRequest.cpp
+@@ -3,10 +3,104 @@
+ #include "Engine/TextureRenderTarget2D.h"
+ #include "Async/TaskGraphInterfaces.h"
+ #include "ImageUtils.h"
++#include "RHIGPUReadback.h"
+
+ #include "AirBlueprintLib.h"
+ #include "Async/Async.h"
+
++#include <array>
++#include <mutex>
++#include <unordered_map>
++
++namespace
++{
++struct LandingReadbackSlot
++{
++    TUniquePtr<FRHIGPUTextureReadback> readback;
++    bool pending = false;
++    uint64 ticket = 0;
++    FIntPoint size = FIntPoint::ZeroValue;
++};
++
++struct LandingReadbackState
++{
++    std::array<LandingReadbackSlot, 3> slots;
++    uint64 next_ticket = 1;
++};
++
++// Accessed only by the render thread. Intentionally process-lifetime storage:
++// destroying GPU readback objects after RHI shutdown is unsafe on UE4.27.
++static std::unordered_map<const void*, LandingReadbackState*> landing_readbacks;
++static std::mutex landing_result_mutex;
++static std::unordered_map<const void*, std::shared_ptr<RenderRequest::RenderResult>>
++    landing_results;
++
++bool readSurfaceDataAsync(FRHICommandListImmediate& RHICmdList,
++                          const FTexture2DRHIRef& texture,
++                          RenderRequest::RenderResult* result,
++                          const FIntPoint& size)
++{
++    auto*& state_ptr = landing_readbacks[texture.GetReference()];
++    if (!state_ptr) state_ptr = new LandingReadbackState();
++    LandingReadbackState& state = *state_ptr;
++
++    LandingReadbackSlot* ready = nullptr;
++    for (auto& slot : state.slots) {
++        if (slot.pending && slot.readback->IsReady() &&
++            (!ready || slot.ticket < ready->ticket)) {
++            ready = &slot;
++        }
++    }
++
++    bool produced = false;
++    if (ready) {
++        void* source = nullptr;
++        int32 row_pitch_pixels = 0;
++        ready->readback->LockTexture(RHICmdList, source, row_pitch_pixels);
++        if (source && row_pitch_pixels >= ready->size.X) {
++            result->width = ready->size.X;
++            result->height = ready->size.Y;
++            result->bmp.SetNumUninitialized(result->width * result->height, false);
++            const uint8* source_bytes = static_cast<const uint8*>(source);
++            uint8* destination = reinterpret_cast<uint8*>(result->bmp.GetData());
++            for (int32 row = 0; row < result->height; ++row) {
++                FMemory::Memcpy(destination + row * result->width * sizeof(FColor),
++                                source_bytes + row * row_pitch_pixels * sizeof(FColor),
++                                result->width * sizeof(FColor));
++            }
++            produced = true;
++        }
++        ready->readback->Unlock();
++        ready->pending = false;
++    }
++
++    LandingReadbackSlot* free_slot = nullptr;
++    for (auto& slot : state.slots) {
++        if (!slot.pending) {
++            free_slot = &slot;
++            break;
++        }
++    }
++    if (free_slot) {
++        if (!free_slot->readback) {
++            free_slot->readback.Reset(new FRHIGPUTextureReadback(TEXT("LandingCameraReadback")));
++        }
++        free_slot->size = size;
++        free_slot->ticket = state.next_ticket++;
++        free_slot->readback->EnqueueCopy(RHICmdList, texture);
++        // FRHIGPUTextureReadback's non-RDG EnqueueCopy leaves the source in
++        // CopySrc. The same render target is sampled by AirSim's visible
++        // subwindow on the following frame, so restore a shader-readable
++        // access state explicitly. Without this transition Vulkan reports an
++        // invalid transfer-source image layout and periodically stalls.
++        RHICmdList.Transition(
++            FRHITransitionInfo(texture, ERHIAccess::CopySrc, ERHIAccess::SRVMask));
++        free_slot->pending = true;
++    }
++    return produced;
++}
++}
++
+ RenderRequest::RenderRequest(UGameViewportClient* game_viewport, std::function<void()>&& query_camera_pose_cb)
+     : params_(nullptr), results_(nullptr), req_size_(0), wait_signal_(new msr::airlib::WorkerThreadSignal), game_viewport_(game_viewport), query_camera_pose_cb_(std::move(query_camera_pose_cb))
+ {
+@@ -20,14 +114,33 @@
+ // argument on the thread that calls this method.
+ void RenderRequest::getScreenshot(std::shared_ptr<RenderParams> params[], std::vector<std::shared_ptr<RenderResult>>& results, unsigned int req_size, bool use_safe_method)
+ {
++    const bool reuse_continuous_result =
++        req_size == 1 && params[0]->render_component->bCaptureEveryFrame &&
++        !params[0]->pixels_as_float && !params[0]->compress;
++    std::unique_lock<std::mutex> landing_result_lock;
++    if (reuse_continuous_result) {
++        landing_result_lock = std::unique_lock<std::mutex>(landing_result_mutex);
++    }
++
+     //TODO: is below really needed?
+     for (unsigned int i = 0; i < req_size; ++i) {
+-        results.push_back(std::make_shared<RenderResult>());
++        if (reuse_continuous_result) {
++            auto& pooled = landing_results[params[i]->render_target];
++            if (!pooled) pooled = std::make_shared<RenderResult>();
++            results.push_back(pooled);
++        }
++        else {
++            results.push_back(std::make_shared<RenderResult>());
++        }
+
+-        if (!params[i]->pixels_as_float)
++        if (!params[i]->pixels_as_float) {
+             results[i]->bmp.Reset();
+-        else
++            results[i]->image_data_uint8.Reset();
++        }
++        else {
+             results[i]->bmp_float.Reset();
++            results[i]->image_data_float.Reset();
++        }
+         results[i]->time_stamp = 0;
+     }
+
+@@ -151,12 +264,24 @@
+                 //should we be using ENQUEUE_UNIQUE_RENDER_COMMAND_ONEPARAMETER which was in original commit by @saihv
+                 //https://github.com/Microsoft/AirSim/pull/162/commits/63e80c43812300a8570b04ed42714a3f6949e63f#diff-56b790f9394f7ca1949ddbb320d8456fR64
+                 if (!params_[i]->pixels_as_float) {
+-                    //below is undocumented method that avoids flushing, but it seems to segfault every 2000 or so calls
+-                    RHICmdList.ReadSurfaceData(
+-                        rhi_texture,
+-                        FIntRect(0, 0, size.X, size.Y),
+-                        results_[i]->bmp,
+-                        flags);
++                    if (params_[i]->render_component->bCaptureEveryFrame &&
++                        !params_[i]->compress) {
++                        // Pipeline the 720x720 landing RGB copy instead of
++                        // stalling the render thread on every GPU readback.
++                        if (readSurfaceDataAsync(RHICmdList, rhi_texture, results_[i].get(), size)) {
++                            results_[i]->time_stamp = msr::airlib::ClockFactory::get()->nowNanos();
++                        }
++                    }
++                    else {
++                        // Preserve the stock synchronous behavior for compressed
++                        // screenshots and non-continuous API cameras.
++                        RHICmdList.ReadSurfaceData(
++                            rhi_texture,
++                            FIntRect(0, 0, size.X, size.Y),
++                            results_[i]->bmp,
++                            flags);
++                        results_[i]->time_stamp = msr::airlib::ClockFactory::get()->nowNanos();
++                    }
+                 }
+                 else {
+                     RHICmdList.ReadSurfaceFloatData(
+@@ -166,10 +291,9 @@
+                         CubeFace_PosX,
+                         0,
+                         0);
++                    results_[i]->time_stamp = msr::airlib::ClockFactory::get()->nowNanos();
+                 }
+             }
+-
+-            results_[i]->time_stamp = msr::airlib::ClockFactory::get()->nowNanos();
+         }
+
+         req_size_ = 0;

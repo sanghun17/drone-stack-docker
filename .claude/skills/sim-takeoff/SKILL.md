@@ -9,7 +9,7 @@ user_invocable: true
 Teleport drone to start position, launch all planning/control nodes, and begin autonomous exploration.
 
 **Container era**: FAST-LIVO, voxblox, exploration, JAX, and SO(3) control all run inside the
-`drone-stack-sim-x86` container now (module `odometry/fast-livo-sim` / `planner/risk-aware-sim`) —
+`drone-stack-sim-x86` container now (module `odometry/fast-livo` / `planner/risk-aware`) —
 Phase C below launches each one via its `run_*.sh` in its own tmux window (auto-enters the
 container, sources everything it needs, forwards Ctrl+C as SIGINT — don't prepend
 `source devel/setup.bash`). Service calls into that stack (teleport, planner/control toggles,
@@ -69,7 +69,7 @@ layout (`infra`, `init_sim` from `/sim-start`, then one window per node below).
 For **vio** localization:
 ```bash
 tmux new-window -t risk_aware_planning -n fast_livo 2>/dev/null || true
-tmux send-keys -t risk_aware_planning:fast_livo "bash /home/ml/drone-stack-docker/modules/odometry/fast-livo-sim/run.sh" C-m
+tmux send-keys -t risk_aware_planning:fast_livo "cd /home/ml/drone-stack-docker && ./setup.sh run sim-x86 odometry/fast-livo" C-m
 sleep 3
 ```
 
@@ -77,27 +77,27 @@ For **both gt and vio**:
 ```bash
 # Uncertainty VoxBlox (mapping only — separate from exploration below)
 tmux new-window -t risk_aware_planning -n voxblox 2>/dev/null || true
-tmux send-keys -t risk_aware_planning:voxblox "bash /home/ml/drone-stack-docker/modules/planner/risk-aware-sim/run_voxblox.sh" C-m
+tmux send-keys -t risk_aware_planning:voxblox "cd /home/ml/drone-stack-docker && ./setup.sh run sim-x86 planner/risk-aware/run_voxblox.sh" C-m
 sleep 3
 
 # Exploration Planner
 tmux new-window -t risk_aware_planning -n exploration 2>/dev/null || true
-tmux send-keys -t risk_aware_planning:exploration "bash /home/ml/drone-stack-docker/modules/planner/risk-aware-sim/run_exploration.sh" C-m
+tmux send-keys -t risk_aware_planning:exploration "cd /home/ml/drone-stack-docker && ./setup.sh run sim-x86 planner/risk-aware/run_planner.sh" C-m
 sleep 3
 
 # JAX MPPI Local Planner (first run ~80s — JAX JIT compile)
 tmux new-window -t risk_aware_planning -n jax 2>/dev/null || true
-tmux send-keys -t risk_aware_planning:jax "bash /home/ml/drone-stack-docker/modules/planner/risk-aware-sim/run_jax.sh" C-m
+tmux send-keys -t risk_aware_planning:jax "cd /home/ml/drone-stack-docker && ./setup.sh run sim-x86 planner/risk-aware/run_jax.sh" C-m
 sleep 5
 
 # Eval Data Recording
 tmux new-window -t risk_aware_planning -n eval 2>/dev/null || true
-tmux send-keys -t risk_aware_planning:eval "bash /home/ml/drone-stack-docker/modules/planner/risk-aware-sim/run_eval.sh" C-m
+tmux send-keys -t risk_aware_planning:eval "bash /home/ml/drone-stack-docker/stack-assets/sim-x86/tools/run_eval.sh" C-m
 sleep 1
 
 # SO(3) Control Bridge (traj_server + so3_control_bridge — provides /control_bridge/toggle_running)
 tmux new-window -t risk_aware_planning -n so3 2>/dev/null || true
-tmux send-keys -t risk_aware_planning:so3 "bash /home/ml/drone-stack-docker/modules/planner/risk-aware-sim/run_so3.sh" C-m
+tmux send-keys -t risk_aware_planning:so3 "bash /home/ml/drone-stack-docker/stack-assets/sim-x86/tools/run_so3.sh" C-m
 sleep 3
 ```
 

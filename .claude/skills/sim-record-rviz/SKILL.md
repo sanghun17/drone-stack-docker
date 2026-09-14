@@ -27,13 +27,13 @@ docker exec drone-stack-sim-x86 bash -lc 'source /opt/ros/noetic/setup.bash && s
 
 ## Note: container era — two separate `/rviz` nodes can exist, this skill deliberately stays host-side
 
-`modules/planner/risk-aware-sim/run_sensor_pub.sh` (containerized `airsim_sensor_punlisher.launch`)
+`stack-assets/sim-x86/tools/run_sensor_pub.sh` (containerized `airsim_sensor_punlisher.launch`)
 now brings up its OWN `rviz` node too, but with a different, more basic config
 (`active_3d_planning_app_reconstruction/cfg/gazebo.rviz`, sensor/TF debugging) — and it registers
 under the exact same ROS node name `/rviz`. This skill deliberately keeps using the richer
 `/home/ml/laplanner.rviz` config (occupancy map, trajectory, frontiers, point cloud) launched
 HOST-side, for two concrete reasons:
-- `/home/ml/laplanner.rviz` is a host-only file — it is **not** in any of `risk-aware-sim`'s
+- `/home/ml/laplanner.rviz` is a host-only file — it is **not** in the `sim-x86`
   container mounts (only `RISK_AWARE_PLANNING_SRC`, `SIM_HOST_PY`, `SIM_RISK_AWARE_ASSETS` are
   mounted), so `docker exec ... rviz -d /home/ml/laplanner.rviz` can't see it.
 - the host already has `ros-noetic-rviz` installed natively, and the container shares the host's

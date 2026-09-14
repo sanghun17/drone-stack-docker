@@ -1,8 +1,9 @@
-# Real-hardware perception/planner stack. Actuation is intentionally absent
-# until the landing planner and command ownership gates are flight-qualified.
+# Real-hardware perception/control stack. Aircraft actuation is intentionally
+# absent until the landing controller and command ownership gates are qualified.
 arch: [arm64]
 ros_master_port: 11313
 ros_master_host: 192.168.50.36
 modules:
   - sensor/see3cam-24cug
-  - planner/aruco-landing
+  - perception/aruco-landing
+  - control/aruco-landing

@@ -11,7 +11,7 @@ Kill all planner/mapping nodes while keeping infrastructure (roscore, Unreal, Ai
 Use this between experiment iterations or when switching planners.
 
 **Container era**: FAST-LIVO, voxblox, exploration, JAX, SO(3) control, and eval all run inside the
-`drone-stack-sim-x86` container now (module `odometry/fast-livo-sim` / `planner/risk-aware-sim`).
+`drone-stack-sim-x86` container now (module `odometry/fast-livo` / `planner/risk-aware`).
 `network_mode:host` (no `pid: host`) means the container has its own PID namespace — a host-side
 `ps aux`/`pkill` sweep can no longer see or kill them at all. Stopping a node pane means Ctrl+C on
 its tmux window (the `run_*.sh` wrapper's trap forwards that into the container as SIGINT); the

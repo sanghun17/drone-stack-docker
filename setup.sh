@@ -75,6 +75,7 @@ case "$cmd" in
   sh)    need_stack; docker exec -it "drone-stack-$stack" bash ;;
   down)  need_stack; docker compose -f "$(CF)" down ;;
   clone) need_stack; gen >/dev/null
+         set -a; source "$ROOT/.build/$stack/stack.env"; set +a
          while read -r m; do
            [ -f "$ROOT/modules/$m/clone.sh" ] && { echo ">> clone: $m"; bash "$ROOT/modules/$m/clone.sh"; }
          done < "$ROOT/.build/$stack/modules.txt" ;;

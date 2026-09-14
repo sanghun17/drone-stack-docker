@@ -11,13 +11,13 @@ LA-Planner uses FAST-LIVO2's visual features for localization-aware planning.
 
 **Container era**: LA-Planner (`la_planner_bridge` + the rest of the `la_planner/` tree under
 `ws/risk-aware/src/risk_aware_planning`) IS part of the same source tree bind-mounted into
-`drone-stack-sim-x86` (module `planner/risk-aware-sim`), and IS built by that module's
+`drone-stack-sim-x86` (module `planner/risk-aware`), and IS built by that module's
 `build_ws.sh` (`catkin build` over the whole workspace — no `CATKIN_IGNORE` excludes it; confirmed
 by `devel/lib/exploration_manager/exploration_node` and `devel/lib/local_plan_manager/traj_server`
 existing after a `build-ws` run). It just has **no dedicated `run_*.sh`** in
-`planner/risk-aware-sim/module.yml`'s `run:` list (only voxblox/exploration/jax/eval/so3/sensor_pub/
+`planner/risk-aware/module.yml`'s `run:` list (only voxblox/exploration/jax/eval/so3/sensor_pub/
 init_sim do) — so it's launched via a one-line `docker exec` below, not `bash .../run_X.sh`. FAST-LIVO2
-stays in `odometry/fast-livo-sim` per the `/sim-fast-livo` skill.
+stays in `odometry/fast-livo` per the `/sim-fast-livo` skill.
 
 ⚠ **Because there's no dedicated `run_*.sh`, there's no host-side trap forwarding Ctrl+C into the
 container** (unlike fast-livo/voxblox/jax/so3, whose `run.sh`/`run_*.sh` each `trap INT` and do an
@@ -250,7 +250,7 @@ docker exec drone-stack-sim-x86 pkill -9 -f "fastlivo_mapping" 2>/dev/null
 sleep 0.5
 docker exec drone-stack-sim-x86 bash -lc 'source /opt/ros/noetic/setup.bash && source /work/ws/fast-livo-sim/devel/setup.bash && source /work/config/sim.env && source /work/config/ros_env.sh && rosnode kill /laserMapping && echo y | rosnode cleanup' 2>/dev/null
 sleep 0.5
-tmux send-keys -t risk_aware_planning:fast_livo "bash /home/ml/drone-stack-docker/modules/odometry/fast-livo-sim/run.sh" C-m
+tmux send-keys -t risk_aware_planning:fast_livo "cd /home/ml/drone-stack-docker && ./setup.sh run sim-x86 odometry/fast-livo" C-m
 
 # Step 4: Wait for FAST-LIVO2 odom convergence (GT vs LIVO < 2m) — DO NOT SKIP even
 # if it "looks" converged already: teleport just invalidated the VIO estimate.
@@ -364,7 +364,7 @@ if [ "${NEED_RESTART:-false}" = "true" ]; then
   docker exec drone-stack-sim-x86 bash -lc 'source /opt/ros/noetic/setup.bash && source /work/ws/fast-livo-sim/devel/setup.bash && source /work/config/sim.env && source /work/config/ros_env.sh && rosnode kill /laserMapping && echo y | rosnode cleanup' 2>/dev/null
   sleep 0.5
 
-  tmux send-keys -t risk_aware_planning:fast_livo "bash /home/ml/drone-stack-docker/modules/odometry/fast-livo-sim/run.sh" C-m
+  tmux send-keys -t risk_aware_planning:fast_livo "cd /home/ml/drone-stack-docker && ./setup.sh run sim-x86 odometry/fast-livo" C-m
 
   # Wait for odom convergence (not just existence — must be stable)
   echo "Waiting for FAST-LIVO2 odom convergence..."

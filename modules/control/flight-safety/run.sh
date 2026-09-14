@@ -2,7 +2,10 @@
 # control/flight-safety: the whole module at once -- observe (L1+L2) + response (L3, KILL AUTHORITY)
 # + estimator mux in one roslaunch, plus the rqt_runtime_monitor /diagnostics view in a browser.
 # Actuation gated by require_armed. Ctrl-C kills all of it.
-__C=drone-stack-d435i-voxblox
+if [ ! -f /.dockerenv ]; then
+  : "${DSD_CONTAINER:?set DSD_CONTAINER or invoke through './setup.sh run <stack> control/flight-safety'}"
+fi
+__C="${DSD_CONTAINER:-drone-stack-${DSD_STACK_NAME:-unknown}}"
 __M="roslaunch flight_safety safety.launch"
 __NODES="flight_safety_(diagnosis|monitor|response)|vision_pose_mux|robot_odom_relay|planning_odom_mux"
 __killall(){ docker exec "$__C" pkill -INT -f "$__M"    >/dev/null 2>&1
@@ -27,9 +30,11 @@ fi
 set -e
 source /opt/ros/noetic/setup.bash
 source /work/ws/flight-safety/devel/setup.bash --extend   # flight_safety pkg + Fault/FlightState msgs
-source /work/ws/risk-aware/devel/setup.bash --extend      # mavros_msgs (vendored in risk-aware), runtime only
 source /work/config/ros_env.sh
 source /work/modules/ensure_roscore.sh
-# status LED (control_lane -> APA102), separate process so a GPIO stall can't touch the safety loop
-taskset -c "${CPUS_POOL}" python3 /work/modules/control/flight-safety/fs_led_node.py >/tmp/fs_led.log 2>&1 &
+# Optional Jetson status LED (control_lane -> APA102). The safety capability is
+# usable on non-Jetson hosts without Jetson.GPIO or /dev/gpiochip0.
+if python3 -c 'import Jetson.GPIO' >/dev/null 2>&1 && [ -e /dev/gpiochip0 ]; then
+  taskset -c "${CPUS_POOL}" python3 /work/modules/control/flight-safety/fs_led_node.py >/tmp/fs_led.log 2>&1 &
+fi
 exec taskset -c "${CPUS_POOL:?config/ros_env.sh not sourced}" roslaunch flight_safety safety.launch

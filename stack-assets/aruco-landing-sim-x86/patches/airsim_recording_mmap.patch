@@ -1,0 +1,243 @@
+--- a/Source/Recording/RecordingThread.h
++++ b/Source/Recording/RecordingThread.h
+@@ -12,6 +12,11 @@
+ #include "common/AirSimSettings.hpp"
+ #include "common/WorkerThread.hpp"
+
++#if PLATFORM_LINUX
++#include <cstddef>
++#include <cstdint>
++#endif
++
+ class FRecordingThread : public FRunnable
+ {
+ public:
+@@ -37,6 +42,12 @@
+     virtual void Exit() override;
+
+ private:
++#if PLATFORM_LINUX
++    bool initializeMmap(const ImageCaptureBase::ImageResponse& response);
++    void appendMmap(const ImageCaptureBase::ImageResponse& response);
++    void closeMmap();
++#endif
++
+     FThreadSafeCounter stop_task_counter_;
+
+     static std::unique_ptr<FRecordingThread> running_instance_;
+@@ -57,4 +68,13 @@
+     msr::airlib::TTimePoint last_screenshot_on_;
+
+     bool is_ready_;
+-};
+\ No newline at end of file
++
++#if PLATFORM_LINUX
++    bool mmap_enabled_ = false;
++    std::string mmap_path_;
++    int mmap_fd_ = -1;
++    void* mmap_address_ = nullptr;
++    std::size_t mmap_size_ = 0;
++    std::uint64_t mmap_sequence_ = 0;
++#endif
++};
+--- a/Source/Recording/RecordingThread.cpp
++++ b/Source/Recording/RecordingThread.cpp
+@@ -4,9 +4,44 @@
+
+ #include <thread>
+ #include <mutex>
++#include <cstring>
+ #include "RenderRequest.h"
+ #include "PIPCamera.h"
+
++#if PLATFORM_LINUX
++#include <fcntl.h>
++#include <sys/mman.h>
++#include <sys/stat.h>
++#include <unistd.h>
++
++namespace
++{
++constexpr std::uint64_t kLandingMmapMagic = 0x4C414E4443414D31ULL; // LANDCAM1
++constexpr std::uint32_t kLandingMmapVersion = 1;
++constexpr std::size_t kLandingMmapHeaderBytes = 256;
++constexpr std::uint32_t kLandingMmapSlots = 2;
++
++struct LandingMmapHeader
++{
++    std::uint64_t magic;
++    std::uint32_t version;
++    std::uint32_t header_bytes;
++    std::uint32_t width;
++    std::uint32_t height;
++    std::uint32_t stride;
++    std::uint32_t data_bytes;
++    std::uint32_t slot_count;
++    std::uint32_t active_slot;
++    std::uint64_t sequence;
++    std::uint64_t timestamp_ns;
++    float camera_position[3];
++    float camera_orientation_xyzw[4];
++    std::uint8_t reserved[kLandingMmapHeaderBytes - 84];
++};
++static_assert(sizeof(LandingMmapHeader) == kLandingMmapHeaderBytes, "landing mmap header size");
++}
++#endif
++
+ std::unique_ptr<FRecordingThread> FRecordingThread::running_instance_;
+ std::unique_ptr<FRecordingThread> FRecordingThread::finishing_instance_;
+ msr::airlib::WorkerThreadSignal FRecordingThread::finishing_signal_;
+@@ -39,9 +74,19 @@
+
+     running_instance_->last_screenshot_on_ = 0;
+
+-    running_instance_->recording_file_.reset(new RecordingFile());
+-    // Just need any 1 instance, to set the header line of the record file
+-    running_instance_->recording_file_->startRecording(*(vehicle_sim_apis.begin()), settings.folder);
++#if PLATFORM_LINUX
++    const std::string mmap_prefix = "mmap:";
++    if (settings.folder.compare(0, mmap_prefix.size(), mmap_prefix) == 0) {
++        running_instance_->mmap_enabled_ = true;
++        running_instance_->mmap_path_ = settings.folder.substr(mmap_prefix.size());
++    }
++    else
++#endif
++    {
++        running_instance_->recording_file_.reset(new RecordingFile());
++        // Just need any 1 instance, to set the header line of the record file
++        running_instance_->recording_file_->startRecording(*(vehicle_sim_apis.begin()), settings.folder);
++    }
+
+     // Set is_ready at the end, setting this before can cause a race when the file isn't open yet
+     running_instance_->is_ready_ = true;
+@@ -102,6 +147,9 @@
+
+ uint32 FRecordingThread::Run()
+ {
++#if PLATFORM_LINUX
++    std::unordered_map<std::string, std::vector<ImageCaptureBase::ImageResponse>> mmap_responses;
++#endif
+     while (stop_task_counter_.GetValue() == 0) {
+         //make sure all vars are set up
+         if (is_ready_) {
+@@ -119,17 +167,32 @@
+                     if (!settings_.record_on_move || is_pose_unequal) {
+                         last_poses_[vehicle_name] = kinematics->pose;
+
+-                        std::vector<ImageCaptureBase::ImageResponse> responses;
+-
+-                        image_captures_[vehicle_name]->getImages(settings_.requests[vehicle_name], responses);
+-                        recording_file_->appendRecord(responses, vehicle_sim_api);
++                        std::vector<ImageCaptureBase::ImageResponse> file_responses;
++                        auto* responses = &file_responses;
++#if PLATFORM_LINUX
++                        if (mmap_enabled_) responses = &mmap_responses[vehicle_name];
++#endif
++                        image_captures_[vehicle_name]->getImages(settings_.requests[vehicle_name], *responses);
++#if PLATFORM_LINUX
++                        if (mmap_enabled_) {
++                            if (!responses->empty()) appendMmap(responses->front());
++                        }
++                        else
++#endif
++                        if (recording_file_) {
++                            recording_file_->appendRecord(*responses, vehicle_sim_api);
++                        }
+                     }
+                 }
+             }
+         }
++        FPlatformProcess::SleepNoStats(0.0005f);
+     }
+
+     recording_file_.reset();
++#if PLATFORM_LINUX
++    closeMmap();
++#endif
+
+     return 0;
+ }
+@@ -146,3 +209,82 @@
+         recording_file_.reset();
+     finishing_signal_.signal();
+ }
++
++#if PLATFORM_LINUX
++bool FRecordingThread::initializeMmap(const ImageCaptureBase::ImageResponse& response)
++{
++    if (mmap_address_) return true;
++    if (response.width <= 0 || response.height <= 0 || response.image_data_uint8.empty()) return false;
++
++    const std::size_t data_bytes = response.image_data_uint8.size();
++    mmap_size_ = kLandingMmapHeaderBytes + kLandingMmapSlots * data_bytes;
++    mmap_fd_ = ::open(mmap_path_.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0666);
++    if (mmap_fd_ < 0 || ::ftruncate(mmap_fd_, static_cast<off_t>(mmap_size_)) != 0) {
++        UE_LOG(LogTemp, Error, TEXT("Unable to create landing camera mmap: %s"), UTF8_TO_TCHAR(mmap_path_.c_str()));
++        closeMmap();
++        return false;
++    }
++    mmap_address_ = ::mmap(nullptr, mmap_size_, PROT_READ | PROT_WRITE, MAP_SHARED, mmap_fd_, 0);
++    if (mmap_address_ == MAP_FAILED) {
++        mmap_address_ = nullptr;
++        UE_LOG(LogTemp, Error, TEXT("Unable to map landing camera file: %s"), UTF8_TO_TCHAR(mmap_path_.c_str()));
++        closeMmap();
++        return false;
++    }
++
++    std::memset(mmap_address_, 0, mmap_size_);
++    auto* header = static_cast<LandingMmapHeader*>(mmap_address_);
++    header->magic = kLandingMmapMagic;
++    header->version = kLandingMmapVersion;
++    header->header_bytes = kLandingMmapHeaderBytes;
++    header->width = static_cast<std::uint32_t>(response.width);
++    header->height = static_cast<std::uint32_t>(response.height);
++    header->stride = static_cast<std::uint32_t>(data_bytes / response.height);
++    header->data_bytes = static_cast<std::uint32_t>(data_bytes);
++    header->slot_count = kLandingMmapSlots;
++    __atomic_store_n(&header->sequence, 0ULL, __ATOMIC_RELEASE);
++    UE_LOG(LogTemp, Display, TEXT("Landing camera mmap ready: %s (%dx%d, %d bytes)"),
++           UTF8_TO_TCHAR(mmap_path_.c_str()), response.width, response.height, static_cast<int>(data_bytes));
++    return true;
++}
++
++void FRecordingThread::appendMmap(const ImageCaptureBase::ImageResponse& response)
++{
++    if (!initializeMmap(response)) return;
++    auto* header = static_cast<LandingMmapHeader*>(mmap_address_);
++    if (response.image_data_uint8.size() != header->data_bytes ||
++        response.width != static_cast<int>(header->width) ||
++        response.height != static_cast<int>(header->height)) return;
++
++    const std::uint64_t odd = mmap_sequence_ + 1;
++    const std::uint64_t even = mmap_sequence_ + 2;
++    const std::uint32_t slot = static_cast<std::uint32_t>((even / 2) % kLandingMmapSlots);
++    __atomic_store_n(&header->sequence, odd, __ATOMIC_RELEASE);
++    auto* destination = static_cast<std::uint8_t*>(mmap_address_) +
++                        kLandingMmapHeaderBytes + slot * header->data_bytes;
++    std::memcpy(destination, response.image_data_uint8.data(), header->data_bytes);
++    header->active_slot = slot;
++    header->timestamp_ns = response.time_stamp;
++    header->camera_position[0] = response.camera_position.x();
++    header->camera_position[1] = response.camera_position.y();
++    header->camera_position[2] = response.camera_position.z();
++    header->camera_orientation_xyzw[0] = response.camera_orientation.x();
++    header->camera_orientation_xyzw[1] = response.camera_orientation.y();
++    header->camera_orientation_xyzw[2] = response.camera_orientation.z();
++    header->camera_orientation_xyzw[3] = response.camera_orientation.w();
++    __atomic_store_n(&header->sequence, even, __ATOMIC_RELEASE);
++    mmap_sequence_ = even;
++}
++
++void FRecordingThread::closeMmap()
++{
++    if (mmap_address_) {
++        ::munmap(mmap_address_, mmap_size_);
++        mmap_address_ = nullptr;
++    }
++    if (mmap_fd_ >= 0) {
++        ::close(mmap_fd_);
++        mmap_fd_ = -1;
++    }
++}
++#endif

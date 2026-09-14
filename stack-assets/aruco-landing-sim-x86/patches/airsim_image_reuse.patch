@@ -1,0 +1,41 @@
+--- a/Source/UnrealImageCapture.cpp
++++ b/Source/UnrealImageCapture.cpp
+@@ -20,9 +20,9 @@
+                                    std::vector<msr::airlib::ImageCaptureBase::ImageResponse>& responses) const
+ {
+     if (cameras_->valsSize() == 0) {
++        responses.resize(requests.size());
+         for (unsigned int i = 0; i < requests.size(); ++i) {
+-            responses.push_back(ImageResponse());
+-            responses[responses.size() - 1].message = "camera is not set";
++            responses[i].message = "camera is not set";
+         }
+     }
+     else
+@@ -32,6 +32,7 @@
+ void UnrealImageCapture::getSceneCaptureImage(const std::vector<msr::airlib::ImageCaptureBase::ImageRequest>& requests,
+                                               std::vector<msr::airlib::ImageCaptureBase::ImageResponse>& responses, bool use_safe_method) const
+ {
++    responses.resize(requests.size());
+     std::vector<std::shared_ptr<RenderRequest::RenderParams>> render_params;
+     std::vector<std::shared_ptr<RenderRequest::RenderResult>> render_results;
+
+@@ -55,7 +56,6 @@
+             gameViewport = camera->GetWorld()->GetGameViewport();
+         }
+
+-        responses.push_back(ImageResponse());
+         ImageResponse& response = responses.at(i);
+
+         UTextureRenderTarget2D* textureTarget = nullptr;
+@@ -97,8 +97,8 @@
+
+         response.camera_name = request.camera_name;
+         response.time_stamp = render_results[i]->time_stamp;
+-        response.image_data_uint8 = std::vector<uint8_t>(render_results[i]->image_data_uint8.GetData(), render_results[i]->image_data_uint8.GetData() + render_results[i]->image_data_uint8.Num());
+-        response.image_data_float = std::vector<float>(render_results[i]->image_data_float.GetData(), render_results[i]->image_data_float.GetData() + render_results[i]->image_data_float.Num());
++        response.image_data_uint8.assign(render_results[i]->image_data_uint8.GetData(), render_results[i]->image_data_uint8.GetData() + render_results[i]->image_data_uint8.Num());
++        response.image_data_float.assign(render_results[i]->image_data_float.GetData(), render_results[i]->image_data_float.GetData() + render_results[i]->image_data_float.Num());
+
+         if (use_safe_method) {
+             // Currently, we don't have a way to synthronize image capturing and camera pose when safe method is used,

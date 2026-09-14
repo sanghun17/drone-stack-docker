@@ -1,0 +1,14 @@
+--- a/Source/PIPCamera.cpp
++++ b/Source/PIPCamera.cpp
+@@ -422,6 +422,11 @@
+                                                bool force_linear_gamma)
+ {
+     if (auto_format) {
++        // Scene/segmentation/infrared responses are ultimately returned as
++        // 8-bit pixels. UE's UTextureRenderTarget2D default is RGBA16f, which
++        // doubles render and GPU-readback bandwidth for no useful precision.
++        // Keep this landing-local AirSim build on an 8-bit sRGB target.
++        render_target->RenderTargetFormat = ETextureRenderTargetFormat::RTF_RGBA8_SRGB;
+         render_target->InitAutoFormat(setting.width, setting.height); //256 X 144, X 480
+     }
+     else {

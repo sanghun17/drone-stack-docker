@@ -11,7 +11,7 @@ Combines unit skills into a full experiment pipeline. Argument selects which pla
 ## CRITICAL: container era
 
 `fast_livo`, voxblox, the exploration planner, `local_controller` (JAX/SO3) and `initialize_simulator`
-now run INSIDE the `drone-stack-sim-x86` container via `modules/{odometry/fast-livo-sim,planner/risk-aware-sim}/run_*.sh`
+now run INSIDE the `drone-stack-sim-x86` container via `modules/{odometry/fast-livo,planner/risk-aware}/run_*.sh`
 — each one launched with a plain `bash <script>` in its own tmux pane (the script itself handles
 container start + `docker exec` entry + Ctrl+C teardown; never reproduce `docker exec` by hand for
 a launch). roscore, UE4, `airsim_node` (conda `airsim` env) stay on the HOST, tmux window 0 —
@@ -42,7 +42,7 @@ docker exec drone-stack-sim-x86 bash -lc 'source /opt/ros/noetic/setup.bash && s
 Full pipeline: stop old nodes → drone position → FAST-LIVO2 → LA-Planner → enable exploration.
 
 > **la_planner_bridge**: unlike FAST-LIVO2/voxblox/exploration/jax/so3/sensor-pub/init-sim/eval
-> above, no dedicated `modules/planner/risk-aware-sim/run_*.sh` wraps it — but it runs fine inside
+> above, no dedicated module or `stack-assets/sim-x86/tools/run_*.sh` entrypoint wraps it — but it runs fine inside
 > `drone-stack-sim-x86` (package resolves, built under `ws/risk-aware/build/la_planner_bridge`; it
 > lives at `ws/risk-aware/src/risk_aware_planning/la_planner/la_planner_bridge`, same bind-mounted
 > tree). It's launched with a one-line `docker exec` instead of a `bash <script>` pane. **`/sim-la-planner`
@@ -50,7 +50,7 @@ Full pipeline: stop old nodes → drone position → FAST-LIVO2 → LA-Planner �
 > Step 4 below only shows the containerized launch line itself. This `docker exec` path has **no
 > host-side SIGINT trap** (unlike the run_*.sh scripts) — Ctrl+C in the tmux pane won't reliably
 > stop it; use the `pkill -INT` line below instead. FAST-LIVO2 (Step 3) IS in the confirmed table
-> and is converted to `run.sh` below.
+> and is converted to `run_sim.sh` below.
 
 ### Step 1: Clean previous nodes (`/sim-stop-nodes`)
 ```bash
@@ -119,10 +119,10 @@ for win in $(tmux list-windows -t risk_aware_planning -F "#{window_index}:#{wind
   tmux kill-window -t risk_aware_planning:$win 2>/dev/null
 done
 tmux new-window -t risk_aware_planning -n fast_livo
-tmux send-keys -t risk_aware_planning:fast_livo "bash /home/ml/drone-stack-docker/modules/odometry/fast-livo-sim/run.sh" C-m
+tmux send-keys -t risk_aware_planning:fast_livo "cd /home/ml/drone-stack-docker && ./setup.sh run sim-x86 odometry/fast-livo" C-m
 ```
-(equivalent: `bash /home/ml/drone-stack-docker/modules/odometry/fast-livo-sim/run.sh` blocking directly
-in the pane, or `cd /home/ml/drone-stack-docker && ./setup.sh run sim-x86 odometry/fast-livo-sim/run.sh`
+(equivalent: `cd /home/ml/drone-stack-docker && ./setup.sh run sim-x86 odometry/fast-livo` blocking directly
+in the pane, or `cd /home/ml/drone-stack-docker && ./setup.sh run sim-x86 odometry/fast-livo/run.sh`
 — no `source devel/setup.bash` prefix needed, the script sources inside the container itself.)
 
 #### Verify

@@ -40,11 +40,14 @@ Design: docs/MODULARIZATION.md, docs/MODULE_SCHEMA.md.
 - `setup.sh <cmd> <stack>` — `clone` (run each module's clone.sh → ws/<m>/src), `up` (gen+build+start
   container, idle), `build-ws` (catkin-build in container), `run <stack> <module>`, `sh`, `down`, `ls`.
   Container = `drone-stack-<stack>`, image = `drone-stack:<stack>`. Stacks live in `stacks/*.yml`.
-- `modules/<group>/<name>/` — one module = one image's contribution: `module.yml` (deps apt/pip/source
+- `modules/<group>/<name>/` — one reusable capability = one image/runtime contribution: `module.yml` (deps apt/pip/source
   + mounts + run, arch-aware), `install.sh` (optional source builds), `run.sh` (launch its ROS nodes),
   `clone.sh` (fetch its src repo), `config/`. Groups: base, compute(jax/torch/spconv),
-  control(flight-safety/local-controller/mavros), odometry(fast-livo/optitrack),
-  planner(risk-aware-deploy/risk-aware-sim), sensor(realsense-d435i), utility(gui-vnc/rqt/rviz).
+  control(flight-safety/local-controller/mavros/aruco-landing), odometry(fast-livo/optitrack),
+  perception(aruco-landing), planner(risk-aware), sensor(realsense-d435i/see3cam-24cug),
+  simulation(airsim), training(ete-net), utility(gui-vnc/rqt/rviz).
+- `stack-assets/<stack>/` — maps, scenario profiles, trial/evaluation tools and other
+  deployment-owned assets that are not reusable module capabilities.
 - `ws/<module>/` — per-module catkin workspace. `src/<pkg>` = a SEPARATE git repo (own remote+branch,
   cloned by that module's clone.sh). `build/ devel/ logs/` = artifacts. `/ws/` is gitignored in MAIN.
 - `tools/` host analysis/eval · `config/` shared ros_env.sh + stack.env · `scripts/` · `flight_logs/` (bags, gitignored).
@@ -54,7 +57,7 @@ Design: docs/MODULARIZATION.md, docs/MODULE_SCHEMA.md.
 | path | branch |
 |---|---|
 | ws/flight-safety/src/flight_safety | main |
-| ws/risk-aware/src/risk_aware_planning | jetson-orin-agx  (sim = `ml`; keep the two structurally parallel) |
+| ws/risk-aware/src/risk_aware_planning | main |
 | ws/fast-livo/src | jetson-orin-agx |
 | ws/optitrack/src/vrpn_client_ros | kinetic-devel |
 | ws/allan/src/allan_variance_ros | master |

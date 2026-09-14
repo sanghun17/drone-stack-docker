@@ -1,0 +1,11 @@
+name: aruco-landing-controller
+group: control
+description: Landing-pad-relative descent controller. Consumes the normalized landing target/vehicle pose interface and publishes pad-frame velocity commands.
+
+# This controller currently ships in the same ROS package/workspace as the ArUco
+# estimator. The dependency owns cloning and building that shared source checkout;
+# runtime remains a separately startable control function.
+needs: [perception/aruco-landing]
+
+run: [run.sh]
+provides: [landing-controller, landing-command]

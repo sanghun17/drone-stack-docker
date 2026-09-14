@@ -1,8 +1,14 @@
 name: local-controller
 group: control
-description: "Velocity control bridge — JAX MPPI /jax/optimal_trajectory -> PD velocity setpoints -> /mavros/setpoint_raw/local (PX4). control_bridge.py lives in the `local_controller` ROS package, vendored + built in the risk-aware workspace; this module just loads the real scenario config (/system/control=mavros) and runs it. Runtime deps (must be up first): control/mavros (setpoint sink + IMU) and control/flight-safety (estimator mux -> /robot/odom). Sibling of control/mavros; later swappable with an attitude controller (e.g. control/px4ctrl) consuming /planning/pos_cmd."
+description: Standalone trajectory-to-MAVROS velocity controller. Consumes standard trajectory_msgs and nav_msgs, and publishes through a configurable safety-mux topic.
 
-needs: [planner/risk-aware-deploy]     # control_bridge.py + mavros_msgs are in ws/risk-aware
+deps:
+  apt:
+    - ros-noetic-mavros-msgs
+    - ros-noetic-nav-msgs
+    - ros-noetic-std-srvs
+    - ros-noetic-tf
+    - ros-noetic-trajectory-msgs
 
 run: [run.sh]
-provides: [local-controller]
+provides: [trajectory-controller, mavros-setpoint-source]

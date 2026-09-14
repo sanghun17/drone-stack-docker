@@ -1,0 +1,34 @@
+{
+  "FileVersion": 3,
+  "EngineAssociation": "4.27",
+  "Category": "Simulation",
+  "Description": "Minimal AirSim environment for the marker landing baseline",
+  "Modules": [
+    {
+      "Name": "ArucoLandingBaseline",
+      "Type": "Runtime",
+      "LoadingPhase": "Default",
+      "AdditionalDependencies": [
+        "AirSim"
+      ]
+    }
+  ],
+  "Plugins": [
+    {
+      "Name": "AirSim",
+      "Enabled": true
+    },
+    {
+      "Name": "PythonScriptPlugin",
+      "Enabled": true
+    },
+    {
+      "Name": "SteamVR",
+      "Enabled": false
+    },
+    {
+      "Name": "OculusVR",
+      "Enabled": false
+    }
+  ]
+}
