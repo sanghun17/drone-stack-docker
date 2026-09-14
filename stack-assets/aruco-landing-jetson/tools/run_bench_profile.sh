@@ -6,6 +6,8 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 CONTAINER="${DSD_CONTAINER:-drone-stack-aruco-landing-jetson}"
 DURATION="${ARUCO_BENCH_DURATION_S:-20}"
 LABEL="${ARUCO_BENCH_LABEL:-aruco-bench}"
+REQUIRE_WEBCAM="${ARUCO_BENCH_REQUIRE_WEBCAM:-1}"
+WEBCAM_WAIT_S="${ARUCO_BENCH_WEBCAM_WAIT_S:-30}"
 LAYOUT_HOST="${ARUCO_HARDWARE_LAYOUT:-$ROOT/ws/aruco-landing/src/aruco_landing/config/paper_pad_layout.yaml}"
 LAYOUT_CONTAINER="/work/${LAYOUT_HOST#$ROOT/}"
 OUTPUT_HOST="${ARUCO_BENCH_OUTPUT_DIR:-$ROOT/experiments/aruco-landing/hardware-profiles}"
@@ -63,6 +65,28 @@ if ! docker exec "$CONTAINER" bash -lc \
     echo "ERROR: ROS master did not become ready" >&2
     exit 1
   fi
+fi
+
+webcam_ready=0
+for _ in $(seq 1 "$WEBCAM_WAIT_S"); do
+  if docker exec "$CONTAINER" bash -lc '
+    source /opt/ros/noetic/setup.bash
+    source /work/config/ros_env.sh
+    rosservice type /recorder/start >/dev/null &&
+      rosservice type /recorder/stop >/dev/null
+  ' >/dev/null 2>&1; then
+    webcam_ready=1
+    break
+  fi
+  sleep 1
+done
+if [ "$webcam_ready" -eq 1 ]; then
+  echo ">> external webcam recorder ready (/recorder/start, /recorder/stop)"
+elif [ "$REQUIRE_WEBCAM" = "1" ]; then
+  echo "ERROR: external webcam recorder did not register within ${WEBCAM_WAIT_S}s" >&2
+  exit 1
+else
+  echo "WARN: external webcam recorder unavailable; continuing without MP4 capture" >&2
 fi
 
 # Nominal down-facing optical transform used only to exercise the controller;
