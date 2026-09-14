@@ -4,7 +4,6 @@
 import argparse
 import datetime
 import json
-import math
 import os
 import threading
 import time
@@ -131,13 +130,42 @@ class PipelineProfile:
     def result(self, duration, budget_ms, layout, dictionary, pad_size_m):
         with self.lock:
             velocities = []
+            filtered_velocities = []
+            filtered_velocity = np.zeros(3, dtype=float)
+            derivative_filter_tau_s = 0.1
             for first, second in zip(self.pose_samples, self.pose_samples[1:]):
                 dt = second[0] - first[0]
                 if dt > 1e-6:
-                    velocities.append(math.sqrt(sum(
-                        ((second[index] - first[index]) / dt) ** 2
-                        for index in (1, 2, 3)
-                    )))
+                    raw_velocity = np.asarray(
+                        [
+                            (second[index] - first[index]) / dt
+                            for index in (1, 2, 3)
+                        ],
+                        dtype=float,
+                    )
+                    velocities.append(float(np.linalg.norm(raw_velocity)))
+                    alpha = dt / (derivative_filter_tau_s + dt)
+                    filtered_velocity = (
+                        (1.0 - alpha) * filtered_velocity + alpha * raw_velocity
+                    )
+                    filtered_velocities.append(
+                        float(np.linalg.norm(filtered_velocity))
+                    )
+            positions = np.asarray(
+                [sample[1:4] for sample in self.pose_samples], dtype=float
+            )
+            if positions.size:
+                standard_deviation = np.std(positions, axis=0) * 1000.0
+                peak_to_peak = np.ptp(positions, axis=0) * 1000.0
+                pose_jitter_mm = {
+                    axis: {
+                        "standard_deviation": float(standard_deviation[index]),
+                        "peak_to_peak": float(peak_to_peak[index]),
+                    }
+                    for index, axis in enumerate(("x", "y", "z"))
+                }
+            else:
+                pose_jitter_mm = None
             detections = len(self.receipts["detection"])
             fusions = len(self.receipts["fusion"])
             commands = len(self.receipts["command"])
@@ -200,6 +228,11 @@ class PipelineProfile:
                     ),
                 ),
                 "provisional_fused_pose_speed_mps": stats(velocities),
+                "provisional_fused_pose_speed_filtered_mps": dict(
+                    stats(filtered_velocities),
+                    derivative_filter_tau_s=derivative_filter_tau_s,
+                ),
+                "provisional_fused_pose_jitter_mm": pose_jitter_mm,
                 "control": {
                     "command_count": commands,
                     "nonzero_command_count": self.nonzero_commands,
