@@ -12,6 +12,7 @@ OUTPUT_HOST="${ARUCO_BENCH_OUTPUT_DIR:-$ROOT/experiments/aruco-landing/hardware-
 OUTPUT_CONTAINER="/work/${OUTPUT_HOST#$ROOT/}"
 LOG_HOST="$OUTPUT_HOST/logs"
 LOG_CONTAINER="/work/${LOG_HOST#$ROOT/}"
+STARTED_ROSCORE=0
 
 if [ ! -f "$LAYOUT_HOST" ]; then
   echo "ERROR: layout file not found: $LAYOUT_HOST" >&2
@@ -29,12 +30,40 @@ cleanup() {
     pkill -TERM -f "[s]ession_recorder_node.py" || true
     pkill -TERM -f "[s]tatic_transform_publisher.*see3cam_optical_frame" || true
   ' >/dev/null 2>&1 || true
+  if [ "$STARTED_ROSCORE" -eq 1 ]; then
+    docker exec "$CONTAINER" bash -lc '
+      pkill -TERM -f "[r]osmaster.*--core" || true
+      pkill -TERM -f "[r]oscore" || true
+    ' >/dev/null 2>&1 || true
+  fi
 }
 trap cleanup EXIT INT TERM HUP
 
 mkdir -p "$LOG_HOST"
 docker start "$CONTAINER" >/dev/null
 cleanup
+
+if ! docker exec "$CONTAINER" bash -lc \
+  'source /opt/ros/noetic/setup.bash; source /work/config/ros_env.sh; rosparam get /run_id' \
+  >/dev/null 2>&1; then
+  docker exec -d "$CONTAINER" bash -lc \
+    "source /opt/ros/noetic/setup.bash; source /work/config/ros_env.sh; exec roscore >'$LOG_CONTAINER/roscore.log' 2>&1"
+  STARTED_ROSCORE=1
+  for _ in $(seq 1 50); do
+    if docker exec "$CONTAINER" bash -lc \
+      'source /opt/ros/noetic/setup.bash; source /work/config/ros_env.sh; rosparam get /run_id' \
+      >/dev/null 2>&1; then
+      break
+    fi
+    sleep 0.2
+  done
+  if ! docker exec "$CONTAINER" bash -lc \
+    'source /opt/ros/noetic/setup.bash; source /work/config/ros_env.sh; rosparam get /run_id' \
+    >/dev/null 2>&1; then
+    echo "ERROR: ROS master did not become ready" >&2
+    exit 1
+  fi
+fi
 
 # Nominal down-facing optical transform used only to exercise the controller;
 # it must be replaced with surveyed extrinsics before flight evaluation.
