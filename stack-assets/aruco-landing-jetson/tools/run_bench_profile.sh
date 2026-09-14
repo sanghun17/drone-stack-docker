@@ -8,7 +8,9 @@ DURATION="${ARUCO_BENCH_DURATION_S:-20}"
 LABEL="${ARUCO_BENCH_LABEL:-aruco-bench}"
 REQUIRE_WEBCAM="${ARUCO_BENCH_REQUIRE_WEBCAM:-1}"
 WEBCAM_WAIT_S="${ARUCO_BENCH_WEBCAM_WAIT_S:-30}"
-LAYOUT_HOST="${ARUCO_HARDWARE_LAYOUT:-$ROOT/ws/aruco-landing/src/aruco_landing/config/paper_pad_layout.yaml}"
+LAYOUT_HOST="${ARUCO_HARDWARE_LAYOUT:-$ROOT/stack-assets/aruco-landing-jetson/config/bench_pad_layout.yaml}"
+DICTIONARY="${ARUCO_HARDWARE_DICTIONARY:-DICT_7X7_50}"
+PAD_SIZE_M="${ARUCO_HARDWARE_PAD_SIZE_M:-0.64}"
 LAYOUT_CONTAINER="/work/${LAYOUT_HOST#$ROOT/}"
 OUTPUT_HOST="${ARUCO_BENCH_OUTPUT_DIR:-$ROOT/experiments/aruco-landing/hardware-profiles}"
 OUTPUT_CONTAINER="/work/${OUTPUT_HOST#$ROOT/}"
@@ -96,7 +98,7 @@ docker exec -d "$CONTAINER" bash -lc \
 docker exec -d "$CONTAINER" bash -lc \
   "exec /work/modules/sensor/see3cam-24cug/run.sh >'$LOG_CONTAINER/camera.log' 2>&1"
 docker exec -d "$CONTAINER" bash -lc \
-  "exec /work/modules/perception/aruco-landing/run_estimator.sh pad_size_m:=0.7 layout_file:='$LAYOUT_CONTAINER' >'$LOG_CONTAINER/estimator.log' 2>&1"
+  "exec /work/modules/perception/aruco-landing/run_estimator.sh pad_size_m:='$PAD_SIZE_M' layout_file:='$LAYOUT_CONTAINER' dictionary:='$DICTIONARY' >'$LOG_CONTAINER/estimator.log' 2>&1"
 docker exec -d "$CONTAINER" bash -lc \
   "exec /work/modules/control/aruco-landing/run.sh >'$LOG_CONTAINER/controller.log' 2>&1"
 docker exec -d "$CONTAINER" bash -lc \
@@ -104,4 +106,4 @@ docker exec -d "$CONTAINER" bash -lc \
 
 sleep 5
 docker exec "$CONTAINER" bash -lc \
-  "source /opt/ros/noetic/setup.bash; source /work/config/ros_env.sh; exec python3 /work/stack-assets/aruco-landing-jetson/scripts/profile_pipeline.py --duration '$DURATION' --label '$LABEL' --layout '$LAYOUT_CONTAINER' --output-dir '$OUTPUT_CONTAINER' --enable-controller"
+  "source /opt/ros/noetic/setup.bash; source /work/config/ros_env.sh; exec python3 /work/stack-assets/aruco-landing-jetson/scripts/profile_pipeline.py --duration '$DURATION' --label '$LABEL' --layout '$LAYOUT_CONTAINER' --dictionary '$DICTIONARY' --pad-size-m '$PAD_SIZE_M' --output-dir '$OUTPUT_CONTAINER' --enable-controller"

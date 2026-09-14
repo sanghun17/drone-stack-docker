@@ -1,0 +1,33 @@
+# Provisional layout inferred from the focused 2026-09-14 bench image.
+# The physical pad uses DICT_7X7_50 IDs 1..20. IDs 2 and 3 were occluded and
+# are omitted. Coordinates are a single-view homography estimate; scale is
+# anchored by the measured 3 cm center markers (about 47/1000 canvas units),
+# giving pad_size_m=0.64 in the hardware bench. This is
+# suitable only for detector/RANSAC/rate/relative-velocity bench profiling.
+# Survey the physical marker geometry before using pose values quantitatively.
+name: jetson_bench_pad_image_inferred_18_marker
+source: aruco-bench-focused_2026-09-14-08-11-38-frame.png
+reconstruction: single_view_homography_scale_anchored_by_3cm_center_marker
+dictionary: DICT_7X7_50
+canvas_units: 1000.0
+marker_border_bits: 1
+
+markers:
+  - {id: 1,  x: 795.2, y: 786.6, size: 177.8}
+  - {id: 4,  x: 18.9,  y: 789.8, size: 177.5}
+  - {id: 5,  x: 837.9, y: 606.0, size: 103.2}
+  - {id: 6,  x: 841.1, y: 174.2, size: 103.4}
+  - {id: 7,  x: 58.0,  y: 176.0, size: 102.9}
+  - {id: 8,  x: 56.2,  y: 609.1, size: 103.0}
+  - {id: 9,  x: 668.6, y: 557.3, size: 82.4}
+  - {id: 10, x: 672.0, y: 249.4, size: 81.7}
+  - {id: 11, x: 248.1, y: 251.3, size: 81.8}
+  - {id: 12, x: 246.4, y: 558.4, size: 82.7}
+  - {id: 13, x: 604.3, y: 498.2, size: 46.8}
+  - {id: 14, x: 605.3, y: 346.8, size: 47.4}
+  - {id: 15, x: 346.7, y: 347.7, size: 47.0}
+  - {id: 16, x: 347.0, y: 498.8, size: 46.9}
+  - {id: 17, x: 523.0, y: 475.9, size: 47.3}
+  - {id: 18, x: 523.9, y: 368.8, size: 47.0}
+  - {id: 19, x: 428.4, y: 369.2, size: 47.0}
+  - {id: 20, x: 427.4, y: 477.1, size: 46.9}

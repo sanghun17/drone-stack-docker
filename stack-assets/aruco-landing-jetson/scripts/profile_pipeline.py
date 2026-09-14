@@ -128,7 +128,7 @@ class PipelineProfile:
             if any(abs(value) > 1e-6 for value in values):
                 self.nonzero_commands += 1
 
-    def result(self, duration, budget_ms, layout):
+    def result(self, duration, budget_ms, layout, dictionary, pad_size_m):
         with self.lock:
             velocities = []
             for first, second in zip(self.pose_samples, self.pose_samples[1:]):
@@ -152,6 +152,9 @@ class PipelineProfile:
                 },
                 "layout": {
                     "path": layout,
+                    "dictionary": dictionary,
+                    "pad_size_m": pad_size_m,
+                    "scale_anchor": "center marker side length = 0.03 m",
                     "geometry_status": "unverified_arbitrary_physical_layout",
                     "metric_pose_accuracy_valid": False,
                     "note": "Detection/rate/load results are valid; fused pose and derived velocity are provisional until marker geometry is surveyed.",
@@ -220,6 +223,8 @@ def main():
     parser.add_argument("--output-dir", default="/work/experiments/aruco-landing/hardware-profiles")
     parser.add_argument("--label", default="bench")
     parser.add_argument("--layout", required=True)
+    parser.add_argument("--dictionary", required=True)
+    parser.add_argument("--pad-size-m", required=True, type=float)
     parser.add_argument("--processing-budget-ms", type=float, default=16.6667)
     parser.add_argument("--enable-controller", action="store_true")
     args = parser.parse_args(rospy.myargv()[1:])
@@ -263,7 +268,13 @@ def main():
             rospy.logerr("recording stop failed: %s", error)
 
     os.makedirs(args.output_dir, exist_ok=True)
-    result = profile.result(time.time() - started, args.processing_budget_ms, args.layout)
+    result = profile.result(
+        time.time() - started,
+        args.processing_budget_ms,
+        args.layout,
+        args.dictionary,
+        args.pad_size_m,
+    )
     result["bag_path"] = bag_path
     result["controller_enabled_for_profile"] = bool(args.enable_controller)
     result["created_at"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
