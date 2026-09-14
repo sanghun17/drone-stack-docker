@@ -33,3 +33,63 @@ recorder uses a service trigger in simulation and does not call a webcam.
 Start exactly one MAVROS instance (this stack includes `control/mavros`); do
 not run a second MAVROS node from the risk-aware container on the shared ROS
 master at the same time.
+
+## OptiTrack-first localization transition
+
+MAVROS and PX4 are not modified. `odometry/landing-vision-pose` is an adapter
+whose sole output is `/mavros/vision_pose/pose`:
+
+```text
+OptiTrack T_global_body -------------------------> adapter output -> MAVROS
+             + marker T_pad_body -> T_global_pad -> marker shadow --^
+```
+
+The checked-in first-flight policy locks the output to OptiTrack
+(`LANDING_ALLOW_MARKER_SWITCH=false`). Marker observations are still registered
+against OptiTrack and published on `/landing/vision_pose_marker`; they cannot
+reach EKF2. Run these modules in separate terminals after the Jetson has pulled
+and built the ml-host commit:
+
+```bash
+./setup.sh run aruco-landing-jetson control/mavros
+./setup.sh run aruco-landing-jetson odometry/optitrack
+./setup.sh run aruco-landing-jetson sensor/see3cam-24cug
+./setup.sh run aruco-landing-jetson perception/aruco-landing
+./setup.sh run aruco-landing-jetson odometry/landing-vision-pose
+./setup.sh run aruco-landing-jetson utility/session-recorder
+```
+
+Do not run `control/flight-safety`'s legacy estimation mux in parallel: there
+must be exactly one publisher on `/mavros/vision_pose/pose`. The flight-safety
+package is present only because the instrumented VRPN client builds against its
+generic diagnostic header.
+
+Before arming, verify the locked source and sole publisher:
+
+```bash
+rostopic echo -n1 /landing/vision_pose_source
+rostopic info /mavros/vision_pose/pose
+rostopic echo -n1 /landing/pose_transition/status
+```
+
+For a non-armed hand-carried recording, start and stop the shared recorder
+explicitly (arming continues to trigger the same recorder during flight):
+
+```bash
+rosservice call /session_recorder/set_recording "data: true"
+# carry the aircraft through the approach and marker-acquisition trajectory
+rosservice call /session_recorder/set_recording "data: false"
+```
+
+After a successful OptiTrack-only run, extract `T_optitrack_pad`:
+
+```bash
+stack-assets/aruco-landing-jetson/tools/estimate_pad_alignment.sh \
+  experiments/aruco-landing/hardware-sessions/<flight>.bag
+```
+
+This writes the default alignment under the ignored experiment directory, not
+the source tree. Validate that transform and source-transition continuity in
+PX4 SITL before setting `LANDING_ALLOW_MARKER_SWITCH=true`. The adapter also
+requires fresh sources, qualified registration, and bounded position/attitude
+jumps; no automatic fallback is hidden after a marker-source dropout.

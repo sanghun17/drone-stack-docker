@@ -32,6 +32,19 @@ topics:
   - /landing/controller/abort
   - /landing/controller/touchdown
   - /landing/controller/state
+  # Localization-source transition evidence. The first flight keeps the source
+  # at optitrack while recording the globally aligned marker pose in shadow.
+  - /vrpn_client_node/pure/pose
+  - /landing/vision_pose_marker
+  - /landing/pad_pose_global
+  - /landing/vision_pose_source
+  - /landing/pose_transition/ready
+  - /landing/pose_transition/status
+  - /mavros/vision_pose/pose
+  - /mavros/local_position/pose
+  - /mavros/local_position/odom
+  - /mavros/estimator_status
+  - /diagnostics
   - /mavros/state
   - /tf
   - /tf_static

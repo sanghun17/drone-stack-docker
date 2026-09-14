@@ -21,8 +21,7 @@
     </rosparam>
   </node>
 
-  <!-- vrpn_client_node only. The tracker pose /vrpn_client_node/pure/pose is consumed DIRECTLY by the
-       flight-safety estimator mux (vision_pose_mux.launch, mocap input) -> /mavros/vision_pose/pose. No
-       throttle/relay here: the mux subscribes to pure/pose as-is (100Hz, = update_frequency above). EKF2
-       now sees mocap at 100Hz (was 30Hz via the old throttle). Verify Motive-axis vs ENU before arming. -->
+  <!-- vrpn_client_node only. The consuming stack's pose adapter subscribes to
+       /vrpn_client_node/pure/pose as-is (100Hz, no throttle) and owns the sole
+       /mavros/vision_pose/pose output. Verify Motive-axis vs ENU before arming. -->
 </launch>

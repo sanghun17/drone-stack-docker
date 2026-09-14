@@ -1,0 +1,14 @@
+name: landing-vision-pose
+group: odometry
+description: Landing-localization adapter that keeps MAVROS unchanged while routing OptiTrack or a globally aligned marker pose through one vision-pose output.
+
+needs: [perception/aruco-landing]
+
+deps:
+  apt:
+    - python3-nose
+    - python3-yaml
+    - ros-noetic-rosbag
+
+run: [run.sh]
+provides: [landing-pose-alignment, vision-pose-adapter]
