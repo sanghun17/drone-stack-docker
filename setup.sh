@@ -81,8 +81,10 @@ case "$cmd" in
          done < "$ROOT/.build/$stack/modules.txt" ;;
   build-ws) need_stack; gen >/dev/null     # catkin-build each module's workspace in the container
          while read -r m; do
-           [ -f "$ROOT/modules/$m/build_ws.sh" ] && { echo ">> build-ws: $m"; \
-             docker exec "drone-stack-$stack" bash -lc "bash /work/modules/$m/build_ws.sh"; }
+           if [ -f "$ROOT/modules/$m/build_ws.sh" ]; then
+             echo ">> build-ws: $m"
+             docker exec "drone-stack-$stack" bash -lc "bash /work/modules/$m/build_ws.sh"
+           fi
          done < "$ROOT/.build/$stack/modules.txt" ;;
   ls)    need_stack; gen >/dev/null; sed -n 's/^#   //p' "$(CF)" ;;
   *) sed -n '2,12p' "$0" ;;
