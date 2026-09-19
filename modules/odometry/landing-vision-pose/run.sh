@@ -1,8 +1,10 @@
 #!/bin/bash
 # OptiTrack -> marker source transition adapter. MAVROS remains untouched and
-# must see exactly one publisher on /mavros/vision_pose/pose.
+# receives this output only when flight-safety estimation_source:=external with external_pose_topic:=/landing/vision_pose_selected.
 # shellcheck disable=SC1090,SC1091
 if [ ! -f /.dockerenv ]; then
+  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/select_stack.sh"
+  dsd_select_stack "odometry/landing-vision-pose" || exit $?
   : "${DSD_CONTAINER:?set DSD_CONTAINER or invoke through './setup.sh run <stack> odometry/landing-vision-pose'}"
   __C="$DSD_CONTAINER"
   __S="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
@@ -25,13 +27,11 @@ source /work/modules/ensure_roscore.sh
 
 : "${LANDING_ALLOW_MARKER_SWITCH:=false}"
 : "${LANDING_AUTO_SWITCH:=false}"
-: "${LANDING_ALIGNMENT_FILE:=/work/experiments/aruco-landing/pad-alignments/latest.yaml}"
 
 echo "[landing-vision-pose] OptiTrack is the initial source; marker switch allowed=$LANDING_ALLOW_MARKER_SWITCH auto=$LANDING_AUTO_SWITCH"
-echo "[landing-vision-pose] sole output: /mavros/vision_pose/pose"
-exec taskset -c "${CPUS_POOL:?config/ros_env.sh not sourced}" \
+echo "[landing-vision-pose] candidate output: /landing/vision_pose_selected (flight-safety MUX chooses EKF2 input)"
+exec taskset -c "${CPUS_ESTIMATION:?config/ros_env.sh not sourced}" \
   roslaunch aruco_landing landing_vision_pose_adapter.launch \
     allow_marker_switch:="$LANDING_ALLOW_MARKER_SWITCH" \
     auto_switch:="$LANDING_AUTO_SWITCH" \
-    alignment_file:="$LANDING_ALIGNMENT_FILE" \
     "$@"

@@ -1,0 +1,28 @@
+{
+  "convention": "rotate ROS IMU FLU vectors into the OptiTrack pure body frame",
+  "fit_rpy_deg": [
+    1.345189382478055,
+    -2.366725858895428,
+    -90.79388132267125
+  ],
+  "gyro_rms_rad_s_before": 0.23183573593514428,
+  "gyro_rms_rad_s_after_fixed_minus90_yaw": 0.0483716054859215,
+  "axis_correlation_matrix": [
+    [
+      0.05683947111039824,
+      0.9745479199822209,
+      0.14792723032475052
+    ],
+    [
+      -0.9739862802542172,
+      -0.07756694583151026,
+      -0.11337486444690477
+    ],
+    [
+      0.19837702823682266,
+      0.19976957563921482,
+      0.9828683615679646
+    ]
+  ],
+  "scope": "Diagnostic only. SITL sensor replay uses an explicit -90 degree yaw adjustment. No physical camera mount, Motive body definition, TF or hardware parameters changed."
+}

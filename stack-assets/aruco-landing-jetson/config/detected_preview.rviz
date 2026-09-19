@@ -1,0 +1,23 @@
+Panels:
+- Class: rviz/Displays
+  Name: Displays
+Visualization Manager:
+  Class: ''
+  Global Options:
+    Background Color: 30; 30; 30
+    Fixed Frame: see3cam_optical_frame
+    Frame Rate: 30
+  Displays:
+  - Class: rviz/Image
+    Name: Detected markers
+    Enabled: true
+    Image Topic: /landing/debug/image
+    Transport Hint: compressed
+    Queue Size: 1
+    Normalize Range: true
+  Enabled: true
+  Tools:
+  - Class: rviz/Interact
+Window Geometry:
+  Width: 1450
+  Height: 850

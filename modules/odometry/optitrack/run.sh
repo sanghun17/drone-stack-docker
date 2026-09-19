@@ -8,7 +8,9 @@
 
 # (host) auto-enter the dsd container; (inside) run the node.
 if [ ! -f /.dockerenv ]; then
-  __C=drone-stack-d435i-voxblox
+  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/select_stack.sh"
+  dsd_select_stack "odometry/optitrack" || exit $?
+  __C="$DSD_CONTAINER"
   __S="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
   __R="$(cd "$(dirname "$__S")/../../.." && pwd)"
   source "$__R/modules/ensure_container.sh"   # recreate $__C if missing / stale-mounted (repo moved)

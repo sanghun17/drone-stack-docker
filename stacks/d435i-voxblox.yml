@@ -2,6 +2,11 @@
 # Mirrors the legacy pure-jetson-stack (arm64 / Jetson Orin). planner/risk-aware
 # auto-pulls compute/{torch,spconv,jax} via its `needs:`.
 arch: [arm64]
+gui:
+  display: 99
+  vnc_port: 5900
+  web_port: 6080
+  rviz_config: /work/rviz.rviz
 environment:
   FAST_LIVO_PROFILE: hardware
   RISK_AWARE_PROFILE: hardware

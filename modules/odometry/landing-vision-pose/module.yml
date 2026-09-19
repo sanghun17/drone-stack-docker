@@ -11,4 +11,4 @@ deps:
     - ros-noetic-rosbag
 
 run: [run.sh]
-provides: [landing-pose-alignment, vision-pose-adapter]
+provides: [vision-pose-adapter]

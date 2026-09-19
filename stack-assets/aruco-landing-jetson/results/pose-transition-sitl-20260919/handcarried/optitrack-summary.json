@@ -1,0 +1,147 @@
+{
+  "bag": "/home/ml/drone-stack-docker/experiments/aruco-landing/pose-transition/handcarried-20260919-120243-437248.bag",
+  "duration_s": 70.60608005523682,
+  "marker_hold_s": 1.0,
+  "fallback_timeout_s": null,
+  "recorded_imu": true,
+  "imu_yaw_deg": -90.0,
+  "optitrack_only": true,
+  "warmup_s": 5.029570191996754,
+  "entries_s": [
+    18.619296073913574,
+    35.55884075164795,
+    49.24140238761902
+  ],
+  "events": [],
+  "approaches": [
+    {
+      "index": 1,
+      "entry_s": 18.619296073913574,
+      "switch_s": null,
+      "qualification_delay_s": null,
+      "switch_check": null,
+      "local_near_switch": {
+        "samples": 45,
+        "max_receipt_gap_s": 0.03655195236206055,
+        "max_position_step_m": 0.019802901758319908,
+        "max_motion_compensated_step_m": 0.009181377613868225,
+        "position_error_rms_m": 0.0650774024052108,
+        "position_error_max_m": 0.07879169499745765
+      },
+      "local_after_entry": {
+        "samples": 90,
+        "max_receipt_gap_s": 0.03672146797180176,
+        "max_position_step_m": 0.0245972751803837,
+        "max_motion_compensated_step_m": 0.011992914119305169,
+        "position_error_rms_m": 0.06383459207855233,
+        "position_error_max_m": 0.07879169499745765
+      },
+      "vision_near_switch": {
+        "samples": 145,
+        "max_receipt_gap_s": 0.030092239379882812,
+        "max_position_step_m": 0.0050495937232631315,
+        "max_motion_compensated_step_m": 0.0,
+        "position_error_rms_m": 0.0,
+        "position_error_max_m": 0.0
+      }
+    },
+    {
+      "index": 2,
+      "entry_s": 35.55884075164795,
+      "switch_s": null,
+      "qualification_delay_s": null,
+      "switch_check": null,
+      "local_near_switch": {
+        "samples": 45,
+        "max_receipt_gap_s": 0.03661537170410156,
+        "max_position_step_m": 0.0306714039704165,
+        "max_motion_compensated_step_m": 0.011630693215430452,
+        "position_error_rms_m": 0.07729532847316661,
+        "position_error_max_m": 0.09110074397082883
+      },
+      "local_after_entry": {
+        "samples": 90,
+        "max_receipt_gap_s": 0.03661537170410156,
+        "max_position_step_m": 0.03481024832936274,
+        "max_motion_compensated_step_m": 0.011630693215430452,
+        "position_error_rms_m": 0.07455807054180154,
+        "position_error_max_m": 0.09110074397082883
+      },
+      "vision_near_switch": {
+        "samples": 149,
+        "max_receipt_gap_s": 0.030544042587280273,
+        "max_position_step_m": 0.012898696613268848,
+        "max_motion_compensated_step_m": 0.0,
+        "position_error_rms_m": 0.0,
+        "position_error_max_m": 0.0
+      }
+    },
+    {
+      "index": 3,
+      "entry_s": 49.24140238761902,
+      "switch_s": null,
+      "qualification_delay_s": null,
+      "switch_check": null,
+      "local_near_switch": {
+        "samples": 45,
+        "max_receipt_gap_s": 0.03633737564086914,
+        "max_position_step_m": 0.02901124043303111,
+        "max_motion_compensated_step_m": 0.002751543462968281,
+        "position_error_rms_m": 0.04977224765782166,
+        "position_error_max_m": 0.05667262313915365
+      },
+      "local_after_entry": {
+        "samples": 90,
+        "max_receipt_gap_s": 0.0364382266998291,
+        "max_position_step_m": 0.02901124043303111,
+        "max_motion_compensated_step_m": 0.005963540990743528,
+        "position_error_rms_m": 0.05319221606124253,
+        "position_error_max_m": 0.06731792433467464
+      },
+      "vision_near_switch": {
+        "samples": 150,
+        "max_receipt_gap_s": 0.0236361026763916,
+        "max_position_step_m": 0.007712652594819554,
+        "max_motion_compensated_step_m": 0.0,
+        "position_error_rms_m": 0.0,
+        "position_error_max_m": 0.0
+      }
+    }
+  ],
+  "local_entire_replay": {
+    "samples": 2118,
+    "max_receipt_gap_s": 0.09423708915710449,
+    "max_position_step_m": 0.058433474462949435,
+    "max_motion_compensated_step_m": 0.011992914119305169,
+    "position_error_rms_m": 0.05386672376891837,
+    "position_error_max_m": 0.1079310100976321
+  },
+  "one_vision_publisher": true,
+  "output_stamps_strictly_increasing": true,
+  "fallbacks": [],
+  "px4": {
+    "ev_position_yaw_height_fraction": 1.0,
+    "filter_fault_flags_max": 0,
+    "innovation_rejection_flags_values": [
+      0
+    ],
+    "xy_valid_fraction": 1.0,
+    "z_valid_fraction": 1.0,
+    "resets_during_replay": [],
+    "ever_armed": false
+  },
+  "review_thresholds": {
+    "local_gap_s": 0.1,
+    "motion_compensated_position_step_m": 0.05,
+    "note": "Diagnostic review thresholds for this replay, not flight certification limits."
+  },
+  "checks": {
+    "all_three_reacquisitions_switched": null,
+    "local_gap_under_100ms_near_transitions": true,
+    "extra_position_step_under_5cm_near_transitions": true,
+    "no_px4_position_resets": true,
+    "no_ekf_filter_fault": true,
+    "no_ekf_innovation_rejection": true,
+    "local_position_always_valid": true
+  }
+}

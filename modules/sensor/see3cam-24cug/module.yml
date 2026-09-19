@@ -8,6 +8,14 @@ deps:
     - ros-noetic-camera-calibration
     - ros-noetic-compressed-image-transport
     - v4l-utils
+    - cmake
+    - g++
+    - pkg-config
+    - libopencv-dev
+    - libavcodec-dev
+    - libswscale-dev
+    - libavutil-dev
+    - ros-noetic-camera-info-manager
 
 mounts:
   - "/dev:/dev"

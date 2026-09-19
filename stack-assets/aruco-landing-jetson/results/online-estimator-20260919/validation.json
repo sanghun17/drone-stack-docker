@@ -1,0 +1,45 @@
+{
+  "hardware": "Jetson, existing aruco-landing Docker, OpenCV Python 4.2.0",
+  "isolation": "separate ROS master 11321; no live camera, MAVROS or controller changed",
+  "bag_replay": {
+    "duration_s": 109.38,
+    "processed_images": 6404,
+    "pad_body_messages": 5972,
+    "global_body_messages": 5889,
+    "mocap_forwarding_stopped_after_s": 70,
+    "global_body_messages_after_stop_plus_1s": 2038,
+    "display_hz": 9.959088662420502,
+    "note": "Initial 3-window/4-thread setting; poses withheld when detection quality fails; full bag mean pose rate about 55 Hz."
+  },
+  "final_static_60hz_input": {
+    "duration_s": 20,
+    "input_images": 1200,
+    "processed_images": 1173,
+    "valid_poses": 1173,
+    "rates_after_first_5s_hz": {
+      "pad_body": 59.999151260557596,
+      "global_body": 59.99665219919097,
+      "jpeg": 9.975743034789163
+    },
+    "processing_last_window_mean_ms": 10.613859949978632,
+    "processing_last_window_p95_ms": 11.574038600383572,
+    "opencv_threads": 2,
+    "threshold_windows": [
+      7,
+      27
+    ],
+    "display_rate_limit_hz": 10,
+    "note": "Startup/online-learning frames can be dropped; latest-frame processing prevents a backlog. A steady static-input throughput test is not proof of 60 Hz under all scenes."
+  },
+  "reset": {
+    "service_success": true,
+    "ready_false_observed": true,
+    "pairs_after_reset": 0
+  },
+  "tests": {
+    "unit_tests_ML": 6,
+    "unit_tests_Jetson": 4,
+    "passed": true
+  },
+  "mavros_source_transition_tested": false
+}

@@ -12,17 +12,11 @@ topics:
   - /session_recorder/active
   - /session_recorder/status
 
-  # Raw input retained so detections can be reproduced after the capture.
-  - /landing/camera/image_raw/compressed
+  # Lossless original RGB frames (bag-level LZ4); detections are solved offline.
+  # Only the camera and OptiTrack nodes are needed for this capture.
+  - /landing/camera/image_raw
   - /landing/camera/camera_info
-
-  # Camera-frame marker/pad observations and estimator quality evidence.
-  - /landing/markers/ids
-  - /landing/markers/poses_camera
-  - /landing/target_visible
-  - /landing/target_pose_camera
-  - /landing/estimator/inlier_ids
-  - /landing/estimator/processing_ms
+  - /landing/camera/stream_status
 
   # T_global_body. The Motive rigid-body origin/axes must represent base_link.
   - /vrpn_client_node/pure/pose

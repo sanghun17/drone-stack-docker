@@ -1,0 +1,33 @@
+{
+  "scope": "Boundary classification replay only; uses fresh recorded OptiTrack poses, not full safety replay",
+  "counts": {
+    "aruco-landing-jetson": {
+      "INSIDE": 2864
+    },
+    "d435i-voxblox": {
+      "INSIDE": 1466,
+      "APPROACHING": 1298,
+      "OUTSIDE": 100
+    }
+  },
+  "offboard_entry": {
+    "aruco-landing-jetson": {
+      "status": "INSIDE",
+      "margin_m": 1.1325348615646362,
+      "xyz": [
+        -1.147355079650879,
+        -1.3674651384353638,
+        2.000486135482788
+      ]
+    },
+    "d435i-voxblox": {
+      "status": "OUTSIDE",
+      "margin_m": -0.00048613548278808594,
+      "xyz": [
+        -1.147355079650879,
+        -1.3674651384353638,
+        2.000486135482788
+      ]
+    }
+  }
+}

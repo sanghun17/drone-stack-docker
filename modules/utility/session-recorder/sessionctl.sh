@@ -5,6 +5,8 @@
 set -eo pipefail
 
 if [ ! -f /.dockerenv ]; then
+  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/select_stack.sh"
+  dsd_select_stack "utility/session-recorder" || exit $?
   : "${DSD_CONTAINER:?set DSD_CONTAINER or invoke through './setup.sh run <stack> utility/session-recorder/sessionctl.sh'}"
   __C="$DSD_CONTAINER"
   __S="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"

@@ -1,0 +1,26 @@
+[rospy.client][INFO] 2026-09-20 00:17:28,699: init_node, name[/landing_trial_controller], pid[2259726]
+[xmlrpc][INFO] 2026-09-20 00:17:28,700: XML-RPC server binding to 127.0.0.1:0
+[xmlrpc][INFO] 2026-09-20 00:17:28,700: Started XML-RPC server [http://127.0.0.1:37691/]
+[rospy.impl.masterslave][INFO] 2026-09-20 00:17:28,700: _ready: http://127.0.0.1:37691/
+[rospy.init][INFO] 2026-09-20 00:17:28,700: ROS Slave URI: [http://127.0.0.1:37691/]
+[rospy.registration][INFO] 2026-09-20 00:17:28,701: Registering with master node http://127.0.0.1:11357
+[xmlrpc][INFO] 2026-09-20 00:17:28,701: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2026-09-20 00:17:28,801: registered with master
+[rospy.rosout][INFO] 2026-09-20 00:17:28,801: initializing /rosout core topic
+[rospy.rosout][INFO] 2026-09-20 00:17:28,804: connected to core topic /rosout
+[rospy.simtime][INFO] 2026-09-20 00:17:28,805: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rosout][INFO] 2026-09-20 00:17:28,828: landing controller ready: 60.0 Hz, Kp=0.800 Kd=0.150 vd=0.300, horizontal=camera, touchdown=camera z<=0.000m
+[rospy.internal][INFO] 2026-09-20 00:17:28,953: topic[/landing/trial/landing_cmd_pad] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:17:28,997: topic[/landing/trial/body_pose_pad] adding connection to [http://127.0.0.1:34083/], count 0
+[rospy.internal][INFO] 2026-09-20 00:17:28,999: topic[/landing/trial/control_valid] adding connection to [http://127.0.0.1:34083/], count 0
+[rospy.internal][INFO] 2026-09-20 00:17:29,002: topic[/landing/trial/camera_pose_pad] adding connection to [http://127.0.0.1:34083/], count 0
+[rospy.internal][INFO] 2026-09-20 00:17:29,077: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.core][INFO] 2026-09-20 00:17:43,634: signal_shutdown [signal-2]
+[rospy.internal][INFO] 2026-09-20 00:17:43,642: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2026-09-20 00:17:43,642: topic[/landing/trial/landing_cmd_pad] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:17:43,642: topic[/landing/trial/body_pose_pad] removing connection to http://127.0.0.1:34083/
+[rospy.internal][INFO] 2026-09-20 00:17:43,643: topic[/landing/trial/camera_pose_pad] removing connection to http://127.0.0.1:34083/
+[rospy.internal][INFO] 2026-09-20 00:17:43,643: topic[/landing/trial/control_valid] removing connection to http://127.0.0.1:34083/
+[rospy.internal][INFO] 2026-09-20 00:17:43,643: topic[/landing/trial/control_valid] removing connection to http://127.0.0.1:34083/
+[rospy.impl.masterslave][INFO] 2026-09-20 00:17:43,644: signal-2
+[rospy.core][INFO] 2026-09-20 00:17:44,236: signal_shutdown [atexit]

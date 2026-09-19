@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "checks": {
+    "switched_to_marker": true,
+    "one_output_publisher": true,
+    "strictly_increasing_output_stamps": true,
+    "marker_output_after_mocap_loss": true,
+    "no_output_during_marker_loss": true,
+    "output_recovers_with_marker": true,
+    "px4_fuses_external_position_yaw_height": true,
+    "px4_no_filter_fault": true,
+    "stayed_disarmed": true
+  },
+  "bag": "/home/ml/drone-stack-docker/experiments/aruco-landing/pose-transition/static-pose-pair-20260919-01.bag",
+  "px4_version": "v1.11.3",
+  "switch": {
+    "time": 1789818990.6439345,
+    "source": "marker",
+    "check": {
+      "consistent": true,
+      "translation_jump_m": 0.0008844008266786666,
+      "rotation_jump_deg": 0.1790124285441968,
+      "pair_dt_s": 0.005524635314941406,
+      "allowed": true,
+      "alignment_ready": true,
+      "marker_fresh": true,
+      "mocap_fresh": true,
+      "quality_valid": true,
+      "stable_samples": 65,
+      "stable_duration_s": 1.0666263103485107,
+      "ready": true
+    }
+  },
+  "output_messages": 1644,
+  "phase_counts": {
+    "after_mocap_cutoff": 242,
+    "inside_marker_dropout": 0,
+    "after_marker_recovery": 160
+  },
+  "fusion": {
+    "samples": 177,
+    "position_yaw_height_active_samples": 153,
+    "fault_flags_max": 0,
+    "innovation_rejection_flags_max_during_fusion": 0,
+    "vision_odometry_logged_samples": 890,
+    "ever_armed": false
+  },
+  "scope": "Open-loop pose-source replay with independent jMAVSim IMU. Not a closed-loop flight/landing validation; dynamic recorded motion can conflict with simulated IMU.",
+  "output_step_at_switch_m": 0.0015237796399127112,
+  "output_gap_at_switch_s": 0.011165142059326172
+}

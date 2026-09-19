@@ -1,0 +1,1195 @@
+{
+  "candidate_marker_selected_position_error_m": {
+    "n": 554,
+    "mean": 0.34957134794658207,
+    "p50": 0.309162987116473,
+    "p95": 1.031886945618539,
+    "max": 1.9269531734755014
+  },
+  "bag": "experiments/aruco-landing/manual-flight/manual-flight-20260919-131105-329410.bag",
+  "duration_s": 121.42831683158875,
+  "armed_intervals_s": [
+    [
+      8.616396188735962,
+      12.611376285552979
+    ],
+    [
+      31.615667819976807,
+      91.63308095932007
+    ]
+  ],
+  "main_flight_interval_s": [
+    31.615667819976807,
+    91.63308095932007
+  ],
+  "state_changes": [
+    {
+      "time_s": 0.05824780464172363,
+      "armed": false,
+      "mode": "POSCTL",
+      "connected": true
+    },
+    {
+      "time_s": 8.616396188735962,
+      "armed": true,
+      "mode": "POSCTL",
+      "connected": true
+    },
+    {
+      "time_s": 12.611376285552979,
+      "armed": false,
+      "mode": "POSCTL",
+      "connected": true
+    },
+    {
+      "time_s": 31.615667819976807,
+      "armed": true,
+      "mode": "POSCTL",
+      "connected": true
+    },
+    {
+      "time_s": 91.63308095932007,
+      "armed": false,
+      "mode": "POSCTL",
+      "connected": true
+    }
+  ],
+  "actual_vision_identity": {
+    "exact_matches": 12092,
+    "different": 0,
+    "unmatched_boundary": 1
+  },
+  "local_entire": {
+    "samples": 3642,
+    "rate_hz": 29.999143748794662,
+    "receipt_gap_s": {
+      "n": 3641,
+      "mean": 0.033334284750716564,
+      "p50": 0.03331637382507324,
+      "p95": 0.03744316101074219,
+      "max": 0.05405926704406738
+    },
+    "position_step_m": {
+      "n": 3641,
+      "mean": 0.0031386839200931507,
+      "p50": 0.00047406343911839745,
+      "p95": 0.012901315884826209,
+      "max": 0.030841162499250282
+    },
+    "motion_compensated_step_m": {
+      "n": 3641,
+      "mean": 0.0005759931865377479,
+      "p50": 0.0002981578835820793,
+      "p95": 0.0021295326993422173,
+      "max": 0.009538408598360491
+    },
+    "median_offset_vs_optitrack_m": [
+      -2.6220725348434504e-06,
+      0.0004182429240780234,
+      0.00027908201963534884
+    ],
+    "position_error_m": {
+      "n": 3642,
+      "mean": 0.006718842470890044,
+      "p50": 0.006256979627081041,
+      "p95": 0.017674995740508802,
+      "max": 0.026417986726816826
+    },
+    "centered_position_error_m": {
+      "n": 3642,
+      "mean": 0.0066788429754456825,
+      "p50": 0.006187159577092995,
+      "p95": 0.017480610350457997,
+      "max": 0.02626820645281707
+    },
+    "largest_compensated_steps": [
+      {
+        "time_s": 45.047231674194336,
+        "m": 0.009538408598360491,
+        "receipt_gap_s": 0.03602766990661621
+      },
+      {
+        "time_s": 88.32215881347656,
+        "m": 0.0086076385470153,
+        "receipt_gap_s": 0.03489398956298828
+      },
+      {
+        "time_s": 45.28295278549194,
+        "m": 0.007894804392044054,
+        "receipt_gap_s": 0.04006814956665039
+      },
+      {
+        "time_s": 44.61493492126465,
+        "m": 0.006337828573155207,
+        "receipt_gap_s": 0.03679990768432617
+      },
+      {
+        "time_s": 43.94298338890076,
+        "m": 0.006060300809992423,
+        "receipt_gap_s": 0.029369831085205078
+      }
+    ]
+  },
+  "local_main_flight": {
+    "samples": 1800,
+    "rate_hz": 29.99751329494145,
+    "receipt_gap_s": {
+      "n": 1799,
+      "mean": 0.03333609656799893,
+      "p50": 0.033324241638183594,
+      "p95": 0.03738071918487549,
+      "max": 0.045726776123046875
+    },
+    "position_step_m": {
+      "n": 1799,
+      "mean": 0.0061499431938209495,
+      "p50": 0.005213402191898506,
+      "p95": 0.01545579020071601,
+      "max": 0.030841162499250282
+    },
+    "motion_compensated_step_m": {
+      "n": 1799,
+      "mean": 0.0009828802004962023,
+      "p50": 0.0006318395043004298,
+      "p95": 0.0030305671636535613,
+      "max": 0.009538408598360491
+    },
+    "median_offset_vs_optitrack_m": [
+      -0.00027029251837630726,
+      0.0014652523056147698,
+      0.0011769681567127543
+    ],
+    "position_error_m": {
+      "n": 1800,
+      "mean": 0.010380535463424944,
+      "p50": 0.009097192524576178,
+      "p95": 0.02235337387065198,
+      "max": 0.026417986726816826
+    },
+    "centered_position_error_m": {
+      "n": 1800,
+      "mean": 0.010226931953937035,
+      "p50": 0.00891638271886393,
+      "p95": 0.022141780383887637,
+      "max": 0.02617428773892828
+    },
+    "largest_compensated_steps": [
+      {
+        "time_s": 45.047231674194336,
+        "m": 0.009538408598360491,
+        "receipt_gap_s": 0.03602766990661621
+      },
+      {
+        "time_s": 88.32215881347656,
+        "m": 0.0086076385470153,
+        "receipt_gap_s": 0.03489398956298828
+      },
+      {
+        "time_s": 45.28295278549194,
+        "m": 0.007894804392044054,
+        "receipt_gap_s": 0.04006814956665039
+      },
+      {
+        "time_s": 44.61493492126465,
+        "m": 0.006337828573155207,
+        "receipt_gap_s": 0.03679990768432617
+      },
+      {
+        "time_s": 43.94298338890076,
+        "m": 0.006060300809992423,
+        "receipt_gap_s": 0.029369831085205078
+      }
+    ]
+  },
+  "vision_main_flight": {
+    "samples": 5996,
+    "rate_hz": 99.90202543535985,
+    "receipt_gap_s": {
+      "n": 5995,
+      "mean": 0.010009807064893149,
+      "p50": 0.009980440139770508,
+      "p95": 0.020128154754638673,
+      "max": 0.03440284729003906
+    },
+    "position_step_m": {
+      "n": 5995,
+      "mean": 0.001860838102779636,
+      "p50": 0.0016192305882930349,
+      "p95": 0.0045118600508155735,
+      "max": 0.007766612685702511
+    },
+    "motion_compensated_step_m": {
+      "n": 5995,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+    },
+    "median_offset_vs_optitrack_m": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "position_error_m": {
+      "n": 5996,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+    },
+    "centered_position_error_m": {
+      "n": 5996,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+    },
+    "largest_compensated_steps": [
+      {
+        "time_s": 91.62622666358948,
+        "m": 0.0,
+        "receipt_gap_s": 0.009685993194580078
+      },
+      {
+        "time_s": 51.63640546798706,
+        "m": 0.0,
+        "receipt_gap_s": 0.009889841079711914
+      },
+      {
+        "time_s": 51.54730272293091,
+        "m": 0.0,
+        "receipt_gap_s": 0.010971546173095703
+      },
+      {
+        "time_s": 51.55657458305359,
+        "m": 0.0,
+        "receipt_gap_s": 0.009271860122680664
+      },
+      {
+        "time_s": 51.56658315658569,
+        "m": 0.0,
+        "receipt_gap_s": 0.010008573532104492
+      }
+    ]
+  },
+  "estimator_flags": {
+    "attitude_status_flag": {
+      "True": 121
+    },
+    "velocity_horiz_status_flag": {
+      "True": 121
+    },
+    "velocity_vert_status_flag": {
+      "True": 121
+    },
+    "pos_horiz_rel_status_flag": {
+      "True": 121
+    },
+    "pos_horiz_abs_status_flag": {
+      "False": 121
+    },
+    "pos_vert_abs_status_flag": {
+      "True": 121
+    },
+    "pos_vert_agl_status_flag": {
+      "False": 121
+    },
+    "const_pos_mode_status_flag": {
+      "True": 48,
+      "False": 73
+    },
+    "pred_pos_horiz_rel_status_flag": {
+      "True": 121
+    },
+    "pred_pos_horiz_abs_status_flag": {
+      "False": 121
+    },
+    "gps_glitch_status_flag": {
+      "False": 121
+    },
+    "accel_error_status_flag": {
+      "False": 121
+    }
+  },
+  "source_events": [
+    {
+      "time_s": 39.24050307273865,
+      "source": "marker",
+      "check": {
+        "consistent": true,
+        "translation_jump_m": 0.04588780181457185,
+        "rotation_jump_deg": 1.8900185894310069,
+        "pair_dt_s": 0.0011627674102783203,
+        "allowed": true,
+        "alignment_ready": true,
+        "marker_fresh": true,
+        "mocap_fresh": true,
+        "quality_valid": true,
+        "stable_samples": 30,
+        "stable_duration_s": 1.3023569583892822,
+        "ready": true
+      },
+      "output_step_m": 0.044332276863754044,
+      "output_receipt_gap_s": 0.09122157096862793,
+      "max_step_in_nearby_window_m": 0.044332276863754044
+    },
+    {
+      "time_s": 45.5797221660614,
+      "source": "optitrack",
+      "check": {
+        "reason": "marker_timeout",
+        "marker_absence_s": 0.5152633190155029,
+        "fallback_timeout_s": 0.5
+      },
+      "output_step_m": 1.9858854335446605,
+      "output_receipt_gap_s": 0.5223724842071533,
+      "max_step_in_nearby_window_m": 0.003301949308362655
+    },
+    {
+      "time_s": 71.92062664031982,
+      "source": "marker",
+      "check": {
+        "consistent": true,
+        "translation_jump_m": 0.0763265803415722,
+        "rotation_jump_deg": 6.505823237650128,
+        "pair_dt_s": 0.005140781402587891,
+        "allowed": true,
+        "alignment_ready": true,
+        "marker_fresh": true,
+        "mocap_fresh": true,
+        "quality_valid": true,
+        "stable_samples": 30,
+        "stable_duration_s": 1.1989500522613525,
+        "ready": true
+      },
+      "output_step_m": 0.07534085764282633,
+      "output_receipt_gap_s": 0.06175661087036133,
+      "max_step_in_nearby_window_m": 0.07534085764282633
+    },
+    {
+      "time_s": 92.47978091239929,
+      "source": "optitrack",
+      "check": {
+        "reason": "marker_timeout",
+        "marker_absence_s": 0.5146603584289551,
+        "fallback_timeout_s": 0.5
+      },
+      "output_step_m": 0.01845772239033126,
+      "output_receipt_gap_s": 0.5203404426574707,
+      "max_step_in_nearby_window_m": 0.00011622911581815874
+    }
+  ],
+  "controller": {
+    "optitrack": {
+      "command_continuity": {
+        "rate_hz": 60.00020592837177,
+        "receipt_gap_s": {
+          "n": 7284,
+          "mean": 0.0166666094645375,
+          "p50": 0.01666402816772461,
+          "p95": 0.017440450191497803,
+          "max": 0.023076295852661133
+        }
+      },
+      "armed_command_samples": 3601,
+      "independent_optitrack_direction": {
+        "samples": 3079,
+        "toward_center_fraction": 1.0,
+        "away_samples": 0,
+        "away_radius_m": null,
+        "marker_selected_samples": 1354,
+        "marker_selected_toward_fraction": 1.0,
+        "camera_position_error_m": {
+          "n": 3079,
+          "mean": 0.0025650167646618376,
+          "p50": 0.002078683288221799,
+          "p95": 0.006348628572755707,
+          "max": 0.013810319631057019
+        },
+        "away_time_s": []
+      },
+      "horizontal_speed_mps": {
+        "n": 3601,
+        "mean": 0.28771423426949,
+        "p50": 0.1895771332643359,
+        "p95": 1.0818284248639167,
+        "max": 1.3773247456277562
+      },
+      "vertical_command_values": [
+        -0.5,
+        0.0
+      ],
+      "active_samples": 3079,
+      "direction_test_samples": 3079,
+      "toward_center_fraction": 1.0,
+      "away_from_center_samples": 0,
+      "away_radius_m": null,
+      "pd_reconstruction_error_mps": {
+        "n": 3079,
+        "mean": 6.846882444500306e-06,
+        "p50": 2.4220602999365395e-06,
+        "p95": 9.50109708808858e-06,
+        "max": 0.0022913160498095383
+      },
+      "state_intervals": {
+        "DESCENDING": [
+          [
+            35.84651803970337,
+            35.86558532714844
+          ],
+          [
+            35.87889313697815,
+            36.22904706001282
+          ],
+          [
+            36.49580478668213,
+            45.945958375930786
+          ],
+          [
+            46.196874141693115,
+            47.195544481277466
+          ],
+          [
+            47.64574432373047,
+            88.1459321975708
+          ]
+        ],
+        "TOUCHDOWN": [
+          [
+            0.009050369262695312,
+            1.112696647644043
+          ],
+          [
+            1.1801698207855225,
+            8.845391511917114
+          ],
+          [
+            8.995478391647339,
+            10.429277896881104
+          ],
+          [
+            10.662079811096191,
+            12.695765256881714
+          ],
+          [
+            12.779735088348389,
+            13.779083967208862
+          ],
+          [
+            13.79563570022583,
+            17.628771543502808
+          ],
+          [
+            18.09575319290161,
+            19.313761472702026
+          ],
+          [
+            19.37870693206787,
+            20.379072427749634
+          ],
+          [
+            23.928661584854126,
+            24.92915391921997
+          ],
+          [
+            26.228723526000977,
+            27.229007482528687
+          ],
+          [
+            28.878740072250366,
+            35.84651803970337
+          ],
+          [
+            35.86558532714844,
+            35.87889313697815
+          ],
+          [
+            88.1459321975708,
+            105.81210255622864
+          ]
+        ],
+        "WAITING_FOR_MARKER": [
+          [
+            1.112696647644043,
+            1.1801698207855225
+          ],
+          [
+            8.845391511917114,
+            8.995478391647339
+          ],
+          [
+            10.429277896881104,
+            10.662079811096191
+          ],
+          [
+            12.695765256881714,
+            12.779735088348389
+          ],
+          [
+            13.779083967208862,
+            13.79563570022583
+          ],
+          [
+            17.628771543502808,
+            18.09575319290161
+          ],
+          [
+            19.313761472702026,
+            19.37870693206787
+          ],
+          [
+            20.379072427749634,
+            23.928661584854126
+          ],
+          [
+            24.92915391921997,
+            26.228723526000977
+          ],
+          [
+            27.229007482528687,
+            28.878740072250366
+          ],
+          [
+            36.22904706001282,
+            36.49580478668213
+          ],
+          [
+            45.945958375930786,
+            46.196874141693115
+          ],
+          [
+            47.195544481277466,
+            47.64574432373047
+          ],
+          [
+            105.81210255622864,
+            121.42831683158875
+          ]
+        ]
+      },
+      "invalid_pose_intervals": [
+        [
+          1.1060853004455566,
+          1.1736314296722412
+        ],
+        [
+          8.839020252227783,
+          8.991578102111816
+        ],
+        [
+          10.422311067581177,
+          10.658154964447021
+        ],
+        [
+          12.6892409324646,
+          12.773775339126587
+        ],
+        [
+          13.772384881973267,
+          13.792140483856201
+        ],
+        [
+          17.622459888458252,
+          18.091037034988403
+        ],
+        [
+          19.306053638458252,
+          19.373369693756104
+        ],
+        [
+          20.37221884727478,
+          23.924310207366943
+        ],
+        [
+          24.922574043273926,
+          26.22421431541443
+        ],
+        [
+          27.222373962402344,
+          28.873559713363647
+        ],
+        [
+          36.22249722480774,
+          36.49084973335266
+        ],
+        [
+          45.93909215927124,
+          46.19067668914795
+        ],
+        [
+          47.18919324874878,
+          47.64097881317139
+        ],
+        [
+          105.80559301376343,
+          121.42831683158875
+        ]
+      ],
+      "away_examples": []
+    },
+    "transition": {
+      "command_continuity": {
+        "rate_hz": 60.00015219549484,
+        "receipt_gap_s": {
+          "n": 7284,
+          "mean": 0.01666662439024756,
+          "p50": 0.01666426658630371,
+          "p95": 0.017562246322631835,
+          "max": 0.02519702911376953
+        }
+      },
+      "armed_command_samples": 3601,
+      "independent_optitrack_direction": {
+        "samples": 3055,
+        "toward_center_fraction": 0.8635024549918167,
+        "away_samples": 417,
+        "away_radius_m": {
+          "n": 417,
+          "mean": 0.488843370374268,
+          "p50": 0.28218865477273386,
+          "p95": 1.3692994992049443,
+          "max": 1.562074608691169
+        },
+        "marker_selected_samples": 1333,
+        "marker_selected_toward_fraction": 0.687171792948237,
+        "camera_position_error_m": {
+          "n": 3055,
+          "mean": 0.1726248921129701,
+          "p50": 0.008617859162542438,
+          "p95": 0.5187050986246184,
+          "max": 1.96043400333674
+        },
+        "away_time_s": [
+          42.953792572021484,
+          44.320556640625,
+          73.23768138885498,
+          74.38753938674927,
+          75.53744578361511,
+          76.68755006790161,
+          77.83763027191162
+        ]
+      },
+      "horizontal_speed_mps": {
+        "n": 3601,
+        "mean": 0.2801942267131917,
+        "p50": 0.2218129568877177,
+        "p95": 0.9631567045133271,
+        "max": 1.3199430656119757
+      },
+      "vertical_command_values": [
+        -0.5,
+        0.0
+      ],
+      "active_samples": 3055,
+      "direction_test_samples": 3027,
+      "toward_center_fraction": 1.0,
+      "away_from_center_samples": 0,
+      "away_radius_m": null,
+      "pd_reconstruction_error_mps": {
+        "n": 3055,
+        "mean": 4.4285068590060356e-06,
+        "p50": 2.3040622869384573e-06,
+        "p95": 8.285277792466069e-06,
+        "max": 0.002303834528909313
+      },
+      "state_intervals": {
+        "DESCENDING": [
+          [
+            35.904383182525635,
+            36.23843693733215
+          ],
+          [
+            36.50457715988159,
+            44.9236376285553
+          ],
+          [
+            44.95438194274902,
+            45.221384048461914
+          ],
+          [
+            45.6050009727478,
+            45.954888343811035
+          ],
+          [
+            46.204474210739136,
+            47.204285860061646
+          ],
+          [
+            47.65514874458313,
+            88.20450687408447
+          ]
+        ],
+        "TOUCHDOWN": [
+          [
+            0.01638197898864746,
+            1.1208784580230713
+          ],
+          [
+            1.1874456405639648,
+            8.854056358337402
+          ],
+          [
+            9.004332780838013,
+            10.43770456314087
+          ],
+          [
+            10.671309232711792,
+            12.704595804214478
+          ],
+          [
+            12.787644147872925,
+            13.788131952285767
+          ],
+          [
+            13.805008888244629,
+            17.63758873939514
+          ],
+          [
+            18.104350090026855,
+            19.320887327194214
+          ],
+          [
+            19.387523889541626,
+            20.3873872756958
+          ],
+          [
+            23.93780207633972,
+            24.937700510025024
+          ],
+          [
+            26.237351179122925,
+            27.23770499229431
+          ],
+          [
+            28.88772940635681,
+            35.904383182525635
+          ],
+          [
+            88.20450687408447,
+            88.47104215621948
+          ],
+          [
+            88.687912940979,
+            88.82186460494995
+          ],
+          [
+            88.9546205997467,
+            90.2877254486084
+          ],
+          [
+            90.33751559257507,
+            90.4876275062561
+          ],
+          [
+            90.55472111701965,
+            90.6881275177002
+          ],
+          [
+            90.73806309700012,
+            91.38775300979614
+          ],
+          [
+            91.53774833679199,
+            91.7212643623352
+          ],
+          [
+            91.75473546981812,
+            91.93837094306946
+          ],
+          [
+            91.98837924003601,
+            92.12134003639221
+          ],
+          [
+            92.50465083122253,
+            105.82057285308838
+          ]
+        ],
+        "WAITING_FOR_MARKER": [
+          [
+            1.1208784580230713,
+            1.1874456405639648
+          ],
+          [
+            8.854056358337402,
+            9.004332780838013
+          ],
+          [
+            10.43770456314087,
+            10.671309232711792
+          ],
+          [
+            12.704595804214478,
+            12.787644147872925
+          ],
+          [
+            13.788131952285767,
+            13.805008888244629
+          ],
+          [
+            17.63758873939514,
+            18.104350090026855
+          ],
+          [
+            19.320887327194214,
+            19.387523889541626
+          ],
+          [
+            20.3873872756958,
+            23.93780207633972
+          ],
+          [
+            24.937700510025024,
+            26.237351179122925
+          ],
+          [
+            27.23770499229431,
+            28.88772940635681
+          ],
+          [
+            36.23843693733215,
+            36.50457715988159
+          ],
+          [
+            44.9236376285553,
+            44.95438194274902
+          ],
+          [
+            45.221384048461914,
+            45.6050009727478
+          ],
+          [
+            45.954888343811035,
+            46.204474210739136
+          ],
+          [
+            47.204285860061646,
+            47.65514874458313
+          ],
+          [
+            88.47104215621948,
+            88.687912940979
+          ],
+          [
+            88.82186460494995,
+            88.9546205997467
+          ],
+          [
+            90.2877254486084,
+            90.33751559257507
+          ],
+          [
+            90.4876275062561,
+            90.55472111701965
+          ],
+          [
+            90.6881275177002,
+            90.73806309700012
+          ],
+          [
+            91.38775300979614,
+            91.53774833679199
+          ],
+          [
+            91.7212643623352,
+            91.75473546981812
+          ],
+          [
+            91.93837094306946,
+            91.98837924003601
+          ],
+          [
+            92.12134003639221,
+            92.50465083122253
+          ],
+          [
+            105.82057285308838,
+            121.42831683158875
+          ]
+        ]
+      },
+      "invalid_pose_intervals": [
+        [
+          1.1060411930084229,
+          1.1747052669525146
+        ],
+        [
+          8.839038848876953,
+          8.991569757461548
+        ],
+        [
+          10.423043012619019,
+          10.659292697906494
+        ],
+        [
+          12.68906545639038,
+          12.774943351745605
+        ],
+        [
+          13.772648334503174,
+          13.792112350463867
+        ],
+        [
+          17.62265682220459,
+          18.091363668441772
+        ],
+        [
+          19.30600142478943,
+          19.37384057044983
+        ],
+        [
+          20.372394323349,
+          23.924996376037598
+        ],
+        [
+          24.922535181045532,
+          26.224454164505005
+        ],
+        [
+          27.22253155708313,
+          28.8748037815094
+        ],
+        [
+          36.222479820251465,
+          36.49056053161621
+        ],
+        [
+          44.90873956680298,
+          44.94080996513367
+        ],
+        [
+          45.20684885978699,
+          45.59273552894592
+        ],
+        [
+          45.93919920921326,
+          46.19191288948059
+        ],
+        [
+          47.189223766326904,
+          47.64113187789917
+        ],
+        [
+          88.45751929283142,
+          88.67474794387817
+        ],
+        [
+          88.8077130317688,
+          88.94456338882446
+        ],
+        [
+          90.27400255203247,
+          90.32670426368713
+        ],
+        [
+          90.47380685806274,
+          90.54178357124329
+        ],
+        [
+          90.6738018989563,
+          90.72670984268188
+        ],
+        [
+          91.37363815307617,
+          91.52468228340149
+        ],
+        [
+          91.70743560791016,
+          91.74125266075134
+        ],
+        [
+          91.92352533340454,
+          91.97454404830933
+        ],
+        [
+          92.10730791091919,
+          92.49159026145935
+        ],
+        [
+          105.80545353889465,
+          121.42831683158875
+        ]
+      ],
+      "away_examples": []
+    }
+  },
+  "marker_position_error_m": {
+    "n": 1397,
+    "mean": 0.3783526651470975,
+    "p50": 0.3109619344584873,
+    "p95": 1.236165220310495,
+    "max": 2.249357688473248
+  },
+  "audit_errors": {
+    "unexpected preview command consumer: ['/record_1789823475410504605']": 10,
+    "unexpected preview command consumer: ['/record_1789823498414069244']": 122
+  },
+  "logs": [
+    {
+      "time_s": 8.619567394256592,
+      "node": "/flight_safety_response",
+      "level": 4,
+      "text": "[safety] control session reset (armed): stale Normal/IdleHold cleared"
+    },
+    {
+      "time_s": 9.860898494720459,
+      "node": "/flight_safety_recorder",
+      "level": 4,
+      "text": "[arm_recorder] odom history start failed (/robot_odom_history/start): timeout exceeded while waiting for service /robot_odom_history/start"
+    },
+    {
+      "time_s": 10.318277835845947,
+      "node": "/manual_flight_audit",
+      "level": 4,
+      "text": "Manual audit: unexpected preview command consumer: ['/record_1789823475410504605']; unexpected preview command consumer: ['/record_1789823475410504605']"
+    },
+    {
+      "time_s": 12.614930629730225,
+      "node": "/flight_safety_response",
+      "level": 4,
+      "text": "[safety] control session reset (disarmed): stale Normal/IdleHold cleared"
+    },
+    {
+      "time_s": 13.824981689453125,
+      "node": "/flight_safety_recorder",
+      "level": 4,
+      "text": "[arm_recorder] odom history stop failed (/robot_odom_history/stop): timeout exceeded while waiting for service /robot_odom_history/stop"
+    },
+    {
+      "time_s": 31.618997812271118,
+      "node": "/flight_safety_response",
+      "level": 4,
+      "text": "[safety] control session reset (armed): stale Normal/IdleHold cleared"
+    },
+    {
+      "time_s": 32.862072706222534,
+      "node": "/flight_safety_recorder",
+      "level": 4,
+      "text": "[arm_recorder] odom history start failed (/robot_odom_history/start): timeout exceeded while waiting for service /robot_odom_history/start"
+    },
+    {
+      "time_s": 33.31823754310608,
+      "node": "/manual_flight_audit",
+      "level": 4,
+      "text": "Manual audit: unexpected preview command consumer: ['/record_1789823498414069244']; unexpected preview command consumer: ['/record_1789823498414069244']"
+    },
+    {
+      "time_s": 38.31839299201965,
+      "node": "/manual_flight_audit",
+      "level": 4,
+      "text": "Manual audit: unexpected preview command consumer: ['/record_1789823498414069244']; unexpected preview command consumer: ['/record_1789823498414069244']"
+    },
+    {
+      "time_s": 44.32360124588013,
+      "node": "/manual_flight_audit",
+      "level": 4,
+      "text": "Manual audit: unexpected preview command consumer: ['/record_1789823498414069244']; unexpected preview command consumer: ['/record_1789823498414069244']"
+    },
+    {
+      "time_s": 50.318215131759644,
+      "node": "/manual_flight_audit",
+      "level": 4,
+      "text": "Manual audit: unexpected preview command consumer: ['/record_1789823498414069244']; unexpected preview command consumer: ['/record_1789823498414069244']"
+    },
+    {
+      "time_s": 56.31840705871582,
+      "node": "/manual_flight_audit",
+      "level": 4,
+      "text": "Manual audit: unexpected preview command consumer: ['/record_1789823498414069244']; unexpected preview command consumer: ['/record_1789823498414069244']"
+    },
+    {
+      "time_s": 62.321810245513916,
+      "node": "/manual_flight_audit",
+      "level": 4,
+      "text": "Manual audit: unexpected preview command consumer: ['/record_1789823498414069244']; unexpected preview command consumer: ['/record_1789823498414069244']"
+    },
+    {
+      "time_s": 68.31953239440918,
+      "node": "/manual_flight_audit",
+      "level": 4,
+      "text": "Manual audit: unexpected preview command consumer: ['/record_1789823498414069244']; unexpected preview command consumer: ['/record_1789823498414069244']"
+    },
+    {
+      "time_s": 73.32074189186096,
+      "node": "/manual_flight_audit",
+      "level": 4,
+      "text": "Manual audit: unexpected preview command consumer: ['/record_1789823498414069244']; unexpected preview command consumer: ['/record_1789823498414069244']"
+    },
+    {
+      "time_s": 78.32559990882874,
+      "node": "/manual_flight_audit",
+      "level": 4,
+      "text": "Manual audit: unexpected preview command consumer: ['/record_1789823498414069244']; unexpected preview command consumer: ['/record_1789823498414069244']"
+    },
+    {
+      "time_s": 83.32806491851807,
+      "node": "/manual_flight_audit",
+      "level": 4,
+      "text": "Manual audit: unexpected preview command consumer: ['/record_1789823498414069244']; unexpected preview command consumer: ['/record_1789823498414069244']"
+    },
+    {
+      "time_s": 89.31786799430847,
+      "node": "/manual_flight_audit",
+      "level": 4,
+      "text": "Manual audit: unexpected preview command consumer: ['/record_1789823498414069244']; unexpected preview command consumer: ['/record_1789823498414069244']"
+    },
+    {
+      "time_s": 91.63598704338074,
+      "node": "/flight_safety_response",
+      "level": 4,
+      "text": "[safety] control session reset (disarmed): stale Normal/IdleHold cleared"
+    },
+    {
+      "time_s": 92.84705591201782,
+      "node": "/flight_safety_recorder",
+      "level": 4,
+      "text": "[arm_recorder] odom history stop failed (/robot_odom_history/stop): timeout exceeded while waiting for service /robot_odom_history/stop"
+    },
+    {
+      "time_s": 93.97837972640991,
+      "node": "/flight_safety_recorder",
+      "level": 4,
+      "text": "[arm_recorder] recovered unfinalized bag (.active): /work/flight_logs/safety_2026-09-19-13-11-37.bag"
+    },
+    {
+      "time_s": 114.34913349151611,
+      "node": "/landing/camera",
+      "level": 8,
+      "text": "select timeout"
+    }
+  ],
+  "camera_processing_hz": {
+    "n": 120,
+    "mean": 25.923531032352926,
+    "p50": 23.81236739455059,
+    "p95": 42.208804527197266,
+    "max": 60.01444387960323
+  },
+  "camera_zero_processing_intervals": [
+    [
+      20.395249366760254,
+      20.89582109451294
+    ],
+    [
+      21.89550542831421,
+      22.89553189277649
+    ],
+    [
+      27.394776821136475,
+      28.39456820487976
+    ],
+    [
+      105.89590692520142,
+      109.39471578598022
+    ],
+    [
+      110.39481925964355,
+      121.42831683158875
+    ]
+  ],
+  "limits": [
+    "Real EKF2 used OptiTrack only; candidate transitions did not drive PX4.",
+    "MAVROS flags are sampled at ~1 Hz; ULog required to rule out every internal EKF reset/rejection.",
+    "Command directions are pad-frame previews, not executed OFFBOARD setpoints."
+  ]
+}

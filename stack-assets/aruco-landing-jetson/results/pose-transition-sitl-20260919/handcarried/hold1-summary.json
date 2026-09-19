@@ -1,0 +1,406 @@
+{
+  "bag": "/home/ml/drone-stack-docker/experiments/aruco-landing/pose-transition/handcarried-20260919-120243-437248.bag",
+  "duration_s": 70.60608005523682,
+  "marker_hold_s": 1.0,
+  "fallback_timeout_s": 0.5,
+  "recorded_imu": true,
+  "imu_yaw_deg": -90.0,
+  "optitrack_only": false,
+  "warmup_s": 5.057050700997934,
+  "entries_s": [
+    18.619296073913574,
+    35.55884075164795,
+    49.24140238761902
+  ],
+  "events": [
+    {
+      "time": 1789820431.0931997,
+      "source": "marker",
+      "check": {
+        "consistent": true,
+        "translation_jump_m": 0.0018078867035212583,
+        "rotation_jump_deg": 0.38275754239752774,
+        "pair_dt_s": 0.0026955604553222656,
+        "allowed": true,
+        "alignment_ready": true,
+        "marker_fresh": true,
+        "mocap_fresh": true,
+        "quality_valid": true,
+        "stable_samples": 61,
+        "stable_duration_s": 1.000046968460083,
+        "ready": true
+      },
+      "elapsed_s": 2.031233310699463
+    },
+    {
+      "time": 1789820447.1119447,
+      "source": "optitrack",
+      "check": {
+        "reason": "marker_timeout",
+        "marker_absence_s": 0.5078694820404053,
+        "fallback_timeout_s": 0.5
+      },
+      "elapsed_s": 18.049978256225586
+    },
+    {
+      "time": 1789820449.1528244,
+      "source": "marker",
+      "check": {
+        "consistent": true,
+        "translation_jump_m": 0.01739552343061593,
+        "rotation_jump_deg": 1.3058768971806651,
+        "pair_dt_s": 0.0018763542175292969,
+        "allowed": true,
+        "alignment_ready": true,
+        "marker_fresh": true,
+        "mocap_fresh": true,
+        "quality_valid": true,
+        "stable_samples": 62,
+        "stable_duration_s": 1.0166332721710205,
+        "ready": true
+      },
+      "elapsed_s": 20.090857982635498
+    },
+    {
+      "time": 1789820457.791989,
+      "source": "optitrack",
+      "check": {
+        "reason": "marker_timeout",
+        "marker_absence_s": 0.5049312114715576,
+        "fallback_timeout_s": 0.5
+      },
+      "elapsed_s": 28.7300226688385
+    },
+    {
+      "time": 1789820465.6526845,
+      "source": "marker",
+      "check": {
+        "consistent": true,
+        "translation_jump_m": 0.03453715355884941,
+        "rotation_jump_deg": 1.506717878343799,
+        "pair_dt_s": 0.0012238025665283203,
+        "allowed": true,
+        "alignment_ready": true,
+        "marker_fresh": true,
+        "mocap_fresh": true,
+        "quality_valid": true,
+        "stable_samples": 62,
+        "stable_duration_s": 1.0166716575622559,
+        "ready": true
+      },
+      "elapsed_s": 36.590718030929565
+    },
+    {
+      "time": 1789820472.2919188,
+      "source": "optitrack",
+      "check": {
+        "reason": "marker_timeout",
+        "marker_absence_s": 0.5191495418548584,
+        "fallback_timeout_s": 0.5
+      },
+      "elapsed_s": 43.229952335357666
+    },
+    {
+      "time": 1789820479.5724123,
+      "source": "marker",
+      "check": {
+        "consistent": true,
+        "translation_jump_m": 0.022052098651402147,
+        "rotation_jump_deg": 0.6333226072414438,
+        "pair_dt_s": 0.0025930404663085938,
+        "allowed": true,
+        "alignment_ready": true,
+        "marker_fresh": true,
+        "mocap_fresh": true,
+        "quality_valid": true,
+        "stable_samples": 62,
+        "stable_duration_s": 1.0167109966278076,
+        "ready": true
+      },
+      "elapsed_s": 50.51044583320618
+    },
+    {
+      "time": 1789820486.651985,
+      "source": "optitrack",
+      "check": {
+        "reason": "marker_timeout",
+        "marker_absence_s": 0.5144600868225098,
+        "fallback_timeout_s": 0.5
+      },
+      "elapsed_s": 57.59001851081848
+    }
+  ],
+  "approaches": [
+    {
+      "index": 1,
+      "entry_s": 18.619296073913574,
+      "switch_s": 20.090857982635498,
+      "qualification_delay_s": 1.4715619087219238,
+      "switch_check": {
+        "consistent": true,
+        "translation_jump_m": 0.01739552343061593,
+        "rotation_jump_deg": 1.3058768971806651,
+        "pair_dt_s": 0.0018763542175292969,
+        "allowed": true,
+        "alignment_ready": true,
+        "marker_fresh": true,
+        "mocap_fresh": true,
+        "quality_valid": true,
+        "stable_samples": 62,
+        "stable_duration_s": 1.0166332721710205,
+        "ready": true
+      },
+      "local_near_switch": {
+        "samples": 45,
+        "max_receipt_gap_s": 0.03821516036987305,
+        "max_position_step_m": 0.02628006593341071,
+        "max_motion_compensated_step_m": 0.008485248241325299,
+        "position_error_rms_m": 0.04592887986552675,
+        "position_error_max_m": 0.06375347296041103
+      },
+      "local_after_entry": {
+        "samples": 90,
+        "max_receipt_gap_s": 0.03821516036987305,
+        "max_position_step_m": 0.02628006593341071,
+        "max_motion_compensated_step_m": 0.008485248241325299,
+        "position_error_rms_m": 0.05409488488793701,
+        "position_error_max_m": 0.0695452040831769
+      },
+      "vision_near_switch": {
+        "samples": 106,
+        "max_receipt_gap_s": 0.07346558570861816,
+        "max_position_step_m": 0.019339322900983464,
+        "max_motion_compensated_step_m": 0.014465906882863122,
+        "position_error_rms_m": 0.0078080344670613516,
+        "position_error_max_m": 0.016372001261145835
+      },
+      "vision_handover_step_m": 0.019339322900983464,
+      "vision_handover_measurement_gap_s": 0.015157461166381836
+    },
+    {
+      "index": 2,
+      "entry_s": 35.55884075164795,
+      "switch_s": 36.590718030929565,
+      "qualification_delay_s": 1.0318772792816162,
+      "switch_check": {
+        "consistent": true,
+        "translation_jump_m": 0.03453715355884941,
+        "rotation_jump_deg": 1.506717878343799,
+        "pair_dt_s": 0.0012238025665283203,
+        "allowed": true,
+        "alignment_ready": true,
+        "marker_fresh": true,
+        "mocap_fresh": true,
+        "quality_valid": true,
+        "stable_samples": 62,
+        "stable_duration_s": 1.0166716575622559,
+        "ready": true
+      },
+      "local_near_switch": {
+        "samples": 45,
+        "max_receipt_gap_s": 0.03653144836425781,
+        "max_position_step_m": 0.026665179070115595,
+        "max_motion_compensated_step_m": 0.010487441288946459,
+        "position_error_rms_m": 0.07421983673095318,
+        "position_error_max_m": 0.08344113435159467
+      },
+      "local_after_entry": {
+        "samples": 90,
+        "max_receipt_gap_s": 0.037644386291503906,
+        "max_position_step_m": 0.034846358398608474,
+        "max_motion_compensated_step_m": 0.010487441288946459,
+        "position_error_rms_m": 0.06677304938753312,
+        "position_error_max_m": 0.08344113435159467
+      },
+      "vision_near_switch": {
+        "samples": 106,
+        "max_receipt_gap_s": 0.08141446113586426,
+        "max_position_step_m": 0.03392119782221483,
+        "max_motion_compensated_step_m": 0.027858682635045186,
+        "position_error_rms_m": 0.016481597412661902,
+        "position_error_max_m": 0.028728310551781773
+      },
+      "vision_handover_step_m": 0.03392119782221484,
+      "vision_handover_measurement_gap_s": 0.014562606811523438
+    },
+    {
+      "index": 3,
+      "entry_s": 49.24140238761902,
+      "switch_s": 50.51044583320618,
+      "qualification_delay_s": 1.2690434455871582,
+      "switch_check": {
+        "consistent": true,
+        "translation_jump_m": 0.022052098651402147,
+        "rotation_jump_deg": 0.6333226072414438,
+        "pair_dt_s": 0.0025930404663085938,
+        "allowed": true,
+        "alignment_ready": true,
+        "marker_fresh": true,
+        "mocap_fresh": true,
+        "quality_valid": true,
+        "stable_samples": 62,
+        "stable_duration_s": 1.0167109966278076,
+        "ready": true
+      },
+      "local_near_switch": {
+        "samples": 45,
+        "max_receipt_gap_s": 0.03660154342651367,
+        "max_position_step_m": 0.029356946902712986,
+        "max_motion_compensated_step_m": 0.0021205483410767483,
+        "position_error_rms_m": 0.045551358361162954,
+        "position_error_max_m": 0.05241931053765845
+      },
+      "local_after_entry": {
+        "samples": 90,
+        "max_receipt_gap_s": 0.03660154342651367,
+        "max_position_step_m": 0.029356946902712986,
+        "max_motion_compensated_step_m": 0.0034718283446779873,
+        "position_error_rms_m": 0.047063031628886615,
+        "position_error_max_m": 0.06705578291206957
+      },
+      "vision_near_switch": {
+        "samples": 106,
+        "max_receipt_gap_s": 0.06850457191467285,
+        "max_position_step_m": 0.028078327497500267,
+        "max_motion_compensated_step_m": 0.020750324111546516,
+        "position_error_rms_m": 0.015094664856222855,
+        "position_error_max_m": 0.025830650963891894
+      },
+      "vision_handover_step_m": 0.028078327497500267,
+      "vision_handover_measurement_gap_s": 0.01068425178527832
+    }
+  ],
+  "local_entire_replay": {
+    "samples": 2118,
+    "max_receipt_gap_s": 0.09713077545166016,
+    "max_position_step_m": 0.05526716282581892,
+    "max_motion_compensated_step_m": 0.01357512076242266,
+    "position_error_rms_m": 0.056080307266945274,
+    "position_error_max_m": 0.10807947896770624
+  },
+  "one_vision_publisher": true,
+  "output_stamps_strictly_increasing": true,
+  "fallbacks": [
+    {
+      "elapsed_s": 18.049978256225586,
+      "check": {
+        "reason": "marker_timeout",
+        "marker_absence_s": 0.5078694820404053,
+        "fallback_timeout_s": 0.5
+      },
+      "local_near_fallback": {
+        "samples": 33,
+        "max_receipt_gap_s": 0.03681039810180664,
+        "max_position_step_m": 0.04825404186963869,
+        "max_motion_compensated_step_m": 0.011906861856589705,
+        "position_error_rms_m": 0.08670245377612147,
+        "position_error_max_m": 0.10807947896770624
+      },
+      "vision_near_fallback": {
+        "samples": 54,
+        "max_receipt_gap_s": 0.5136065483093262,
+        "max_position_step_m": 0.4751815111700597,
+        "max_motion_compensated_step_m": 0.0990932944293302,
+        "position_error_rms_m": 0.027362237230161023,
+        "position_error_max_m": 0.10136922354761745
+      }
+    },
+    {
+      "elapsed_s": 28.7300226688385,
+      "check": {
+        "reason": "marker_timeout",
+        "marker_absence_s": 0.5049312114715576,
+        "fallback_timeout_s": 0.5
+      },
+      "local_near_fallback": {
+        "samples": 33,
+        "max_receipt_gap_s": 0.038649559020996094,
+        "max_position_step_m": 0.03219639487160306,
+        "max_motion_compensated_step_m": 0.00868904122751948,
+        "position_error_rms_m": 0.0637267528960737,
+        "position_error_max_m": 0.07049109184713728
+      },
+      "vision_near_fallback": {
+        "samples": 56,
+        "max_receipt_gap_s": 0.511202335357666,
+        "max_position_step_m": 0.46421526708601807,
+        "max_motion_compensated_step_m": 0.15716224344121243,
+        "position_error_rms_m": 0.024662282878285747,
+        "position_error_max_m": 0.13109535855700546
+      }
+    },
+    {
+      "elapsed_s": 43.229952335357666,
+      "check": {
+        "reason": "marker_timeout",
+        "marker_absence_s": 0.5191495418548584,
+        "fallback_timeout_s": 0.5
+      },
+      "local_near_fallback": {
+        "samples": 33,
+        "max_receipt_gap_s": 0.0368499755859375,
+        "max_position_step_m": 0.04644268027225208,
+        "max_motion_compensated_step_m": 0.0044252743682363475,
+        "position_error_rms_m": 0.049614981433167074,
+        "position_error_max_m": 0.05919598702744676
+      },
+      "vision_near_fallback": {
+        "samples": 52,
+        "max_receipt_gap_s": 0.5272665023803711,
+        "max_position_step_m": 0.5504495521700442,
+        "max_motion_compensated_step_m": 0.0395823195688108,
+        "position_error_rms_m": 0.0075460717283600785,
+        "position_error_max_m": 0.0395823195688108
+      }
+    },
+    {
+      "elapsed_s": 57.59001851081848,
+      "check": {
+        "reason": "marker_timeout",
+        "marker_absence_s": 0.5144600868225098,
+        "fallback_timeout_s": 0.5
+      },
+      "local_near_fallback": {
+        "samples": 33,
+        "max_receipt_gap_s": 0.03624415397644043,
+        "max_position_step_m": 0.02378533095142145,
+        "max_motion_compensated_step_m": 0.01357512076242266,
+        "position_error_rms_m": 0.0865906486806718,
+        "position_error_max_m": 0.10370477312163817
+      },
+      "vision_near_fallback": {
+        "samples": 56,
+        "max_receipt_gap_s": 0.5206601619720459,
+        "max_position_step_m": 0.14047050247610196,
+        "max_motion_compensated_step_m": 0.029352966273267923,
+        "position_error_rms_m": 0.01100062850621797,
+        "position_error_max_m": 0.039807891503559005
+      }
+    }
+  ],
+  "px4": {
+    "ev_position_yaw_height_fraction": 1.0,
+    "filter_fault_flags_max": 0,
+    "innovation_rejection_flags_values": [
+      0
+    ],
+    "xy_valid_fraction": 1.0,
+    "z_valid_fraction": 1.0,
+    "resets_during_replay": [],
+    "ever_armed": false
+  },
+  "review_thresholds": {
+    "local_gap_s": 0.1,
+    "motion_compensated_position_step_m": 0.05,
+    "note": "Diagnostic review thresholds for this replay, not flight certification limits."
+  },
+  "checks": {
+    "all_three_reacquisitions_switched": true,
+    "local_gap_under_100ms_near_transitions": true,
+    "extra_position_step_under_5cm_near_transitions": true,
+    "no_px4_position_resets": true,
+    "no_ekf_filter_fault": true,
+    "no_ekf_innovation_rejection": true,
+    "local_position_always_valid": true
+  }
+}

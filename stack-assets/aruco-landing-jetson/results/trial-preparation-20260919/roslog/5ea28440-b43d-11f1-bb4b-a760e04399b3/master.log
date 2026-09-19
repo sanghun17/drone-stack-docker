@@ -1,0 +1,322 @@
+[rosmaster.main][INFO] 2026-09-20 00:18:30,302: initialization complete, waiting for shutdown
+[rosmaster.main][INFO] 2026-09-20 00:18:30,302: Starting ROS Master Node
+[xmlrpc][INFO] 2026-09-20 00:18:30,302: XML-RPC server binding to 127.0.0.1:11357
+[xmlrpc][INFO] 2026-09-20 00:18:30,303: Started XML-RPC server [http://127.0.0.1:11357/]
+[rosmaster.master][INFO] 2026-09-20 00:18:30,303: Master initialized: port[11357], uri[http://127.0.0.1:11357/]
+[xmlrpc][INFO] 2026-09-20 00:18:30,303: xml rpc node: starting XML-RPC server
+[rosmaster.master][INFO] 2026-09-20 00:18:30,406: +PARAM [/run_id] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,407: +PARAM [/roslaunch/uris/host_127_0_0_1__35525] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,436: +PARAM [/rosversion] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,436: +PARAM [/rosdistro] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,447: +SERVICE [/rosout/get_loggers] /rosout http://127.0.0.1:42857/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,447: +SERVICE [/rosout/set_logger_level] /rosout http://127.0.0.1:42857/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,448: +PUB [/rosout_agg] /rosout http://127.0.0.1:42857/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,451: +SUB [/rosout] /rosout http://127.0.0.1:42857/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,482: +PUB [/rosout] /trial_integration_test http://192.168.50.12:41315/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,485: +SERVICE [/trial_integration_test/get_loggers] /trial_integration_test http://192.168.50.12:41315/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,486: +SERVICE [/trial_integration_test/set_logger_level] /trial_integration_test http://192.168.50.12:41315/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,487: +SERVICE [/mavros/set_mode] /trial_integration_test http://192.168.50.12:41315/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,488: +SERVICE [/mavros/param/get] /trial_integration_test http://192.168.50.12:41315/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,495: +PARAM [/flight_safety_response] by /trial_integration_test
+[rosmaster.master][INFO] 2026-09-20 00:18:30,500: +PUB [/vrpn_client_node/pure/pose] /trial_integration_test http://192.168.50.12:41315/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,501: +PUB [/mavros/local_position/pose] /trial_integration_test http://192.168.50.12:41315/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,502: +PUB [/mavros/state] /trial_integration_test http://192.168.50.12:41315/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,502: +PUB [/mavros/extended_state] /trial_integration_test http://192.168.50.12:41315/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,502: publisherUpdate[/rosout] -> http://127.0.0.1:42857/ ['http://192.168.50.12:41315/']
+[rosmaster.master][INFO] 2026-09-20 00:18:30,504: +PUB [/landing/pad_pose_global] /trial_integration_test http://192.168.50.12:41315/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,505: +PUB [/landing/alignment/ready] /trial_integration_test http://192.168.50.12:41315/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,507: +PUB [/landing/target_visible] /trial_integration_test http://192.168.50.12:41315/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,508: publisherUpdate[/rosout] -> http://127.0.0.1:42857/ ['http://192.168.50.12:41315/']: sec=0.01, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-09-20 00:18:30,509: +PUB [/landing/estimator/inlier_ids] /trial_integration_test http://192.168.50.12:41315/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,510: +PUB [/landing/vehicle_pose_pad] /trial_integration_test http://192.168.50.12:41315/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,510: +PUB [/landing/camera_pose_pad] /trial_integration_test http://192.168.50.12:41315/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,512: +SUB [/landing/trial/status] /trial_integration_test http://192.168.50.12:41315/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,513: +SUB [/mavros/setpoint_raw/local] /trial_integration_test http://192.168.50.12:41315/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,684: +PUB [/rosout] /vision_pose_mux http://127.0.0.1:34387/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,685: +SERVICE [/vision_pose_mux/get_loggers] /vision_pose_mux http://127.0.0.1:34387/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,685: +SERVICE [/vision_pose_mux/set_logger_level] /vision_pose_mux http://127.0.0.1:34387/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,686: +PUB [/vision_pose_mux/selected] /vision_pose_mux http://127.0.0.1:34387/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,688: +SUB [/vrpn_client_node/pure/pose] /vision_pose_mux http://127.0.0.1:34387/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,689: +SUB [/estimation/external_pose] /vision_pose_mux http://127.0.0.1:34387/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,690: +SERVICE [/mavros/vision_pose/pose_select] /vision_pose_mux http://127.0.0.1:34387/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,690: +SERVICE [/vision_pose_mux/select] /vision_pose_mux http://127.0.0.1:34387/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,691: +SERVICE [/vision_pose_mux/add] /vision_pose_mux http://127.0.0.1:34387/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,691: +SERVICE [/vision_pose_mux/list] /vision_pose_mux http://127.0.0.1:34387/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,691: +SERVICE [/vision_pose_mux/delete] /vision_pose_mux http://127.0.0.1:34387/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,703: publisherUpdate[/rosout] -> http://127.0.0.1:42857/ ['http://192.168.50.12:41315/', 'http://127.0.0.1:34387/']
+[rosmaster.master][INFO] 2026-09-20 00:18:30,703: publisherUpdate[/rosout] -> http://127.0.0.1:42857/ ['http://192.168.50.12:41315/', 'http://127.0.0.1:34387/']: sec=0.00, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-09-20 00:18:30,867: +PUB [/rosout] /flight_safety_response http://127.0.0.1:43579/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,869: +SERVICE [/flight_safety_response/get_loggers] /flight_safety_response http://127.0.0.1:43579/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,870: +SERVICE [/flight_safety_response/set_logger_level] /flight_safety_response http://127.0.0.1:43579/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,875: +PUB [/mavros/setpoint_raw/local] /flight_safety_response http://127.0.0.1:43579/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,876: +PUB [/flight_safety/state] /flight_safety_response http://127.0.0.1:43579/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,877: +SUB [/flight_safety/fault] /flight_safety_response http://127.0.0.1:43579/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,878: +SUB [/mavros/state] /flight_safety_response http://127.0.0.1:43579/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,879: +SUB [/mavros/rc/in] /flight_safety_response http://127.0.0.1:43579/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,881: +SUB [/local_controller/setpoint_raw/local] /flight_safety_response http://127.0.0.1:43579/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,884: +SUB [/mavros/imu/data] /flight_safety_response http://127.0.0.1:43579/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,885: +CACHEDPARAM [/rosout_disable_topics_generation] by /flight_safety_response
+[rosmaster.master][INFO] 2026-09-20 00:18:30,904: publisherUpdate[/rosout] -> http://127.0.0.1:42857/ ['http://192.168.50.12:41315/', 'http://127.0.0.1:34387/', 'http://127.0.0.1:43579/']
+[rosmaster.master][INFO] 2026-09-20 00:18:30,904: publisherUpdate[/mavros/setpoint_raw/local] -> http://192.168.50.12:41315/ ['http://127.0.0.1:43579/']
+[rosmaster.master][INFO] 2026-09-20 00:18:30,906: publisherUpdate[/rosout] -> http://127.0.0.1:42857/ ['http://192.168.50.12:41315/', 'http://127.0.0.1:34387/', 'http://127.0.0.1:43579/']: sec=0.00, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-09-20 00:18:30,908: publisherUpdate[/mavros/setpoint_raw/local] -> http://192.168.50.12:41315/ ['http://127.0.0.1:43579/']: sec=0.00, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-09-20 00:18:30,916: +CACHEDPARAM [/rosout_disable_topics_generation] by /vision_pose_mux
+[rosmaster.master][INFO] 2026-09-20 00:18:30,917: +PUB [/mavros/vision_pose/pose] /vision_pose_mux http://127.0.0.1:34387/
+[rosmaster.master][INFO] 2026-09-20 00:18:30,917: +CACHEDPARAM [/rosout/omit_topics] by /rosout
+[rosmaster.master][INFO] 2026-09-20 00:18:30,977: +PARAM [/roslaunch/uris/host_127_0_0_1__35329] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,981: +PARAM [/rosversion] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,982: +PARAM [/rosdistro] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,982: +PARAM [/landing_trial_controller/parameter_status] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,982: +PARAM [/landing_trial_controller/update_rate_hz] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,982: +PARAM [/landing_trial_controller/airsim_command_rate_hz] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,982: +PARAM [/landing_trial_controller/landing_altitude_min_m] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,982: +PARAM [/landing_trial_controller/touchdown_height_reference] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,982: +PARAM [/landing_trial_controller/horizontal_reference] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,982: +PARAM [/landing_trial_controller/landing_altitude_max_m] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,982: +PARAM [/landing_trial_controller/lateral_uncertainty_bound_m] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,982: +PARAM [/landing_trial_controller/minimum_lateral_speed_mps] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,982: +PARAM [/landing_trial_controller/descent_speed_mps] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,982: +PARAM [/landing_trial_controller/horizontal_speed_limit_mps] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,982: +PARAM [/landing_trial_controller/kp_xy] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,982: +PARAM [/landing_trial_controller/kd_xy] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,983: +PARAM [/landing_trial_controller/derivative_filter_tau_s] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,983: +PARAM [/landing_trial_controller/derivative_speed_limit_mps] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,983: +PARAM [/landing_trial_controller/latency_compensation_enabled] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,983: +PARAM [/landing_trial_controller/max_pose_prediction_s] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,983: +PARAM [/landing_trial_controller/touchdown_stop_lead_s] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,983: +PARAM [/landing_trial_controller/marker_loss_timeout_s] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,983: +PARAM [/landing_trial_controller/yaw_reference_rad] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,983: +PARAM [/landing_trial_controller/yaw_control_enabled] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,983: +PARAM [/landing_trial_controller/yaw_kp] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,983: +PARAM [/landing_trial_controller/yaw_rate_limit_rad_s] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,983: +PARAM [/landing_trial_controller/yaw_deadband_deg] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,983: +PARAM [/landing_trial_controller/trials_per_pad] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,983: +PARAM [/landing_trial_controller/enabled] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,983: +PARAM [/landing_trial_controller/vehicle_pose_topic] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,983: +PARAM [/landing_trial_controller/camera_pose_topic] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,983: +PARAM [/landing_trial_controller/target_visible_topic] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,984: +PARAM [/landing_trial_controller/command_topic] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,984: +PARAM [/landing_trial/initial_target_global_xy] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,984: +PARAM [/landing_trial/auto_start_on_offboard] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,984: +PARAM [/landing_trial/dry_run] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,984: +PARAM [/landing_trial/extrinsic_file] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,984: +PARAM [/landing_trial/marker_confirm_s] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,984: +PARAM [/landing_trial/marker_loss_s] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:30,984: +PARAM [/landing_trial/approach_speed_mps] by /roslaunch
+[rosmaster.master][INFO] 2026-09-20 00:18:31,354: +PUB [/rosout] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,357: +SERVICE [/landing_trial_controller/get_loggers] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,358: +SERVICE [/landing_trial_controller/set_logger_level] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,370: +PUB [/landing/trial/landing_cmd_pad] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,370: +PUB [/landing/trial/yaw_cmd] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,371: +PUB [/landing/trial/yaw_error] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,372: +PUB [/landing/trial/controller/active] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,373: +PUB [/landing/trial/controller/abort] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,373: +PUB [/landing/trial/controller/touchdown] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,374: +PUB [/landing/trial/controller/state] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,376: +SUB [/landing/trial/body_pose_pad] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,378: +SUB [/landing/trial/camera_pose_pad] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,379: +SUB [/landing/trial/control_valid] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,380: +SERVICE [/landing_trial_controller/reset] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,380: +SERVICE [/landing_trial_controller/enable] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,381: +CACHEDPARAM [/rosout_disable_topics_generation] by /landing_trial_controller
+[rosmaster.master][INFO] 2026-09-20 00:18:31,402: +PUB [/rosout] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,405: +SERVICE [/landing_trial/get_loggers] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,406: +SERVICE [/landing_trial/set_logger_level] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,408: publisherUpdate[/rosout] -> http://127.0.0.1:42857/ ['http://192.168.50.12:41315/', 'http://127.0.0.1:34387/', 'http://127.0.0.1:43579/', 'http://127.0.0.1:32927/']
+[rosmaster.master][INFO] 2026-09-20 00:18:31,410: publisherUpdate[/rosout] -> http://127.0.0.1:42857/ ['http://192.168.50.12:41315/', 'http://127.0.0.1:34387/', 'http://127.0.0.1:43579/', 'http://127.0.0.1:32927/']: sec=0.00, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-09-20 00:18:31,411: publisherUpdate[/rosout] -> http://127.0.0.1:42857/ ['http://192.168.50.12:41315/', 'http://127.0.0.1:34387/', 'http://127.0.0.1:43579/', 'http://127.0.0.1:32927/', 'http://127.0.0.1:35933/']
+[rosmaster.master][INFO] 2026-09-20 00:18:31,412: publisherUpdate[/rosout] -> http://127.0.0.1:42857/ ['http://192.168.50.12:41315/', 'http://127.0.0.1:34387/', 'http://127.0.0.1:43579/', 'http://127.0.0.1:32927/', 'http://127.0.0.1:35933/']: sec=0.00, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-09-20 00:18:31,419: +PUB [/landing/trial/setpoint_preview] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,421: +PUB [/local_controller/setpoint_raw/local] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,422: +PUB [/control/mission_status] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,422: +PUB [/landing/trial/status] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,423: +PUB [/landing/trial/body_pose_pad] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,424: +PUB [/landing/trial/camera_pose_pad] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,424: +PUB [/landing/trial/control_valid] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,425: +SUB [/vrpn_client_node/pure/pose] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,427: +SUB [/mavros/local_position/pose] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,429: +SUB [/mavros/state] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,432: +SUB [/mavros/extended_state] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,433: +SUB [/flight_safety/state] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,435: +SUB [/mavros/vision_pose/pose] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,438: +SUB [/vision_pose_mux/selected] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,441: +SUB [/landing/pad_pose_global] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,443: +SUB [/landing/alignment/ready] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,464: +SUB [/landing/target_visible] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,467: +SUB [/landing/estimator/inlier_ids] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,470: +SUB [/landing/vehicle_pose_pad] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,473: +SUB [/landing/camera_pose_pad] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,477: +SUB [/landing/trial/landing_cmd_pad] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,478: +SERVICE [/landing_trial/start] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,478: +SERVICE [/landing_trial/reset] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,479: +SERVICE [/landing_trial/abort] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:31,509: publisherUpdate[/local_controller/setpoint_raw/local] -> http://127.0.0.1:43579/ ['http://127.0.0.1:35933/']
+[rosmaster.master][INFO] 2026-09-20 00:18:31,512: publisherUpdate[/landing/trial/status] -> http://192.168.50.12:41315/ ['http://127.0.0.1:35933/']
+[rosmaster.master][INFO] 2026-09-20 00:18:31,513: publisherUpdate[/local_controller/setpoint_raw/local] -> http://127.0.0.1:43579/ ['http://127.0.0.1:35933/']: sec=0.00, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-09-20 00:18:31,513: publisherUpdate[/landing/trial/body_pose_pad] -> http://127.0.0.1:32927/ ['http://127.0.0.1:35933/']
+[rosmaster.master][INFO] 2026-09-20 00:18:31,513: publisherUpdate[/landing/trial/status] -> http://192.168.50.12:41315/ ['http://127.0.0.1:35933/']: sec=0.00, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-09-20 00:18:31,519: publisherUpdate[/landing/trial/body_pose_pad] -> http://127.0.0.1:32927/ ['http://127.0.0.1:35933/']: sec=0.01, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-09-20 00:18:31,519: publisherUpdate[/landing/trial/camera_pose_pad] -> http://127.0.0.1:32927/ ['http://127.0.0.1:35933/']
+[rosmaster.master][INFO] 2026-09-20 00:18:31,520: publisherUpdate[/landing/trial/camera_pose_pad] -> http://127.0.0.1:32927/ ['http://127.0.0.1:35933/']: sec=0.00, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-09-20 00:18:31,520: publisherUpdate[/landing/trial/control_valid] -> http://127.0.0.1:32927/ ['http://127.0.0.1:35933/']
+[rosmaster.master][INFO] 2026-09-20 00:18:31,521: publisherUpdate[/landing/trial/control_valid] -> http://127.0.0.1:32927/ ['http://127.0.0.1:35933/']: sec=0.00, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-09-20 00:18:33,750: +CACHEDPARAM [/rosout_disable_topics_generation] by /flight_safety_response
+[rosmaster.master][INFO] 2026-09-20 00:18:35,165: +CACHEDPARAM [/rosout_disable_topics_generation] by /flight_safety_response
+[rosmaster.master][INFO] 2026-09-20 00:18:38,353: +CACHEDPARAM [/rosout_disable_topics_generation] by /flight_safety_response
+[rosmaster.master][INFO] 2026-09-20 00:18:40,525: +CACHEDPARAM [/rosout_disable_topics_generation] by /flight_safety_response
+[rosmaster.master][INFO] 2026-09-20 00:18:41,626: +CACHEDPARAM [/rosout_disable_topics_generation] by /flight_safety_response
+[rosmaster.master][INFO] 2026-09-20 00:18:41,805: +CACHEDPARAM [/rosout_disable_topics_generation] by /flight_safety_response
+[rosmaster.master][INFO] 2026-09-20 00:18:41,839: +CACHEDPARAM [/rosout_disable_topics_generation] by /flight_safety_response
+[rosmaster.master][INFO] 2026-09-20 00:18:44,006: +CACHEDPARAM [/rosout_disable_topics_generation] by /flight_safety_response
+[rosmaster.master][INFO] 2026-09-20 00:18:45,131: +CACHEDPARAM [/rosout_disable_topics_generation] by /flight_safety_response
+[rosmaster.master][INFO] 2026-09-20 00:18:46,148: -SUB [/flight_safety/fault] /flight_safety_response http://127.0.0.1:43579/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,149: -SUB [/mavros/state] /flight_safety_response http://127.0.0.1:43579/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,149: -SUB [/mavros/rc/in] /flight_safety_response http://127.0.0.1:43579/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,149: -SUB [/local_controller/setpoint_raw/local] /flight_safety_response http://127.0.0.1:43579/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,149: -SUB [/mavros/imu/data] /flight_safety_response http://127.0.0.1:43579/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,149: -PUB [/rosout] /flight_safety_response http://127.0.0.1:43579/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,149: -PUB [/mavros/setpoint_raw/local] /flight_safety_response http://127.0.0.1:43579/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,149: -PUB [/flight_safety/state] /flight_safety_response http://127.0.0.1:43579/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,149: -SERVICE [/flight_safety_response/get_loggers] /flight_safety_response rosrpc://127.0.0.1:37077
+[rosmaster.master][INFO] 2026-09-20 00:18:46,149: -SERVICE [/flight_safety_response/set_logger_level] /flight_safety_response rosrpc://127.0.0.1:37077
+[rosmaster.master][INFO] 2026-09-20 00:18:46,191: -SUB [/landing/trial/body_pose_pad] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,192: -SUB [/landing/trial/camera_pose_pad] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,192: -SUB [/landing/trial/control_valid] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,192: -PUB [/rosout] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,192: -PUB [/landing/trial/landing_cmd_pad] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,192: -PUB [/landing/trial/yaw_cmd] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,192: -PUB [/landing/trial/yaw_error] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,192: -PUB [/landing/trial/controller/active] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,192: -PUB [/landing/trial/controller/abort] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,193: -SUB [/vrpn_client_node/pure/pose] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,194: -PUB [/landing/trial/controller/touchdown] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,194: -SUB [/mavros/local_position/pose] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,194: -PUB [/landing/trial/controller/state] /landing_trial_controller http://127.0.0.1:32927/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,194: -SUB [/mavros/state] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,194: -SERVICE [/landing_trial_controller/get_loggers] /landing_trial_controller rosrpc://127.0.0.1:45963
+[rosmaster.master][INFO] 2026-09-20 00:18:46,194: -SUB [/mavros/extended_state] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,194: -SERVICE [/landing_trial_controller/set_logger_level] /landing_trial_controller rosrpc://127.0.0.1:45963
+[rosmaster.master][INFO] 2026-09-20 00:18:46,194: -SUB [/flight_safety/state] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,195: -SERVICE [/landing_trial_controller/reset] /landing_trial_controller rosrpc://127.0.0.1:45963
+[rosmaster.master][INFO] 2026-09-20 00:18:46,195: -SUB [/mavros/vision_pose/pose] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,195: -SERVICE [/landing_trial_controller/enable] /landing_trial_controller rosrpc://127.0.0.1:45963
+[rosmaster.master][INFO] 2026-09-20 00:18:46,195: -SUB [/vision_pose_mux/selected] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,195: -SUB [/landing/pad_pose_global] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,195: -SUB [/landing/alignment/ready] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,195: -SUB [/landing/target_visible] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,195: -SUB [/landing/estimator/inlier_ids] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,195: -SUB [/landing/vehicle_pose_pad] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,196: -SUB [/landing/camera_pose_pad] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,196: -SUB [/landing/trial/landing_cmd_pad] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,196: -PUB [/rosout] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,196: -PUB [/landing/trial/setpoint_preview] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,196: -PUB [/local_controller/setpoint_raw/local] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,196: -PUB [/control/mission_status] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,196: -PUB [/landing/trial/status] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,196: -PUB [/landing/trial/body_pose_pad] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,196: -PUB [/landing/trial/camera_pose_pad] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,197: -PUB [/landing/trial/control_valid] /landing_trial http://127.0.0.1:35933/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,197: -SERVICE [/landing_trial/get_loggers] /landing_trial rosrpc://127.0.0.1:42045
+[rosmaster.master][INFO] 2026-09-20 00:18:46,197: -SERVICE [/landing_trial/set_logger_level] /landing_trial rosrpc://127.0.0.1:42045
+[rosmaster.master][INFO] 2026-09-20 00:18:46,197: -SERVICE [/landing_trial/start] /landing_trial rosrpc://127.0.0.1:42045
+[rosmaster.master][INFO] 2026-09-20 00:18:46,197: -SERVICE [/landing_trial/reset] /landing_trial rosrpc://127.0.0.1:42045
+[rosmaster.master][INFO] 2026-09-20 00:18:46,197: -SERVICE [/landing_trial/abort] /landing_trial rosrpc://127.0.0.1:42045
+[rosmaster.master][INFO] 2026-09-20 00:18:46,233: publisherUpdate[/rosout] -> http://127.0.0.1:42857/ ['http://192.168.50.12:41315/', 'http://127.0.0.1:34387/', 'http://127.0.0.1:32927/', 'http://127.0.0.1:35933/']
+[rosmaster.master][INFO] 2026-09-20 00:18:46,234: publisherUpdate[/rosout] -> http://127.0.0.1:42857/ ['http://192.168.50.12:41315/', 'http://127.0.0.1:34387/', 'http://127.0.0.1:32927/', 'http://127.0.0.1:35933/']: sec=0.00, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-09-20 00:18:46,234: publisherUpdate[/mavros/setpoint_raw/local] -> http://192.168.50.12:41315/ []
+[rosmaster.master][INFO] 2026-09-20 00:18:46,235: publisherUpdate[/mavros/setpoint_raw/local] -> http://192.168.50.12:41315/ []: sec=0.00, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-09-20 00:18:46,235: publisherUpdate[/flight_safety/state] -> http://127.0.0.1:35933/ []
+[rosmaster.master][INFO] 2026-09-20 00:18:46,236: publisherUpdate[/flight_safety/state] -> http://127.0.0.1:35933/ []: sec=0.00, exception=[Errno 111] Connection refused
+[rosmaster.master][INFO] 2026-09-20 00:18:46,237: publisherUpdate[/rosout] -> http://127.0.0.1:42857/ ['http://192.168.50.12:41315/', 'http://127.0.0.1:34387/', 'http://127.0.0.1:35933/']
+[rosmaster.master][INFO] 2026-09-20 00:18:46,237: publisherUpdate[/rosout] -> http://127.0.0.1:42857/ ['http://192.168.50.12:41315/', 'http://127.0.0.1:34387/', 'http://127.0.0.1:35933/']: sec=0.00, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-09-20 00:18:46,238: publisherUpdate[/landing/trial/landing_cmd_pad] -> http://127.0.0.1:35933/ []
+[rosmaster.master][INFO] 2026-09-20 00:18:46,238: publisherUpdate[/rosout] -> http://127.0.0.1:42857/ ['http://192.168.50.12:41315/', 'http://127.0.0.1:34387/']
+[rosmaster.master][INFO] 2026-09-20 00:18:46,239: publisherUpdate[/landing/trial/landing_cmd_pad] -> http://127.0.0.1:35933/ []: sec=0.00, exception=[Errno 111] Connection refused
+[rosmaster.threadpool][ERROR] 2026-09-20 00:18:46,239: Traceback (most recent call last):
+  File "/opt/ros/noetic/lib/python3/dist-packages/rosmaster/threadpool.py", line 218, in run
+    result = cmd(*args)
+  File "/opt/ros/noetic/lib/python3/dist-packages/rosmaster/master_api.py", line 210, in publisher_update_task
+    ret = xmlrpcapi(api).publisherUpdate('/master', topic, pub_uris)
+  File "/usr/lib/python3.8/xmlrpc/client.py", line 1109, in __call__
+    return self.__send(self.__name, args)
+  File "/usr/lib/python3.8/xmlrpc/client.py", line 1450, in __request
+    response = self.__transport.request(
+  File "/usr/lib/python3.8/xmlrpc/client.py", line 1153, in request
+    return self.single_request(host, handler, request_body, verbose)
+  File "/usr/lib/python3.8/xmlrpc/client.py", line 1165, in single_request
+    http_conn = self.send_request(host, handler, request_body, verbose)
+  File "/usr/lib/python3.8/xmlrpc/client.py", line 1278, in send_request
+    self.send_content(connection, request_body)
+  File "/usr/lib/python3.8/xmlrpc/client.py", line 1308, in send_content
+    connection.endheaders(request_body)
+  File "/usr/lib/python3.8/http/client.py", line 1251, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/usr/lib/python3.8/http/client.py", line 1011, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.8/http/client.py", line 951, in send
+    self.connect()
+  File "/usr/lib/python3.8/http/client.py", line 922, in connect
+    self.sock = self._create_connection(
+  File "/usr/lib/python3.8/socket.py", line 808, in create_connection
+    raise err
+  File "/usr/lib/python3.8/socket.py", line 796, in create_connection
+    sock.connect(sa)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+[rosmaster.threadpool][ERROR] 2026-09-20 00:18:46,239: Traceback (most recent call last):
+  File "/opt/ros/noetic/lib/python3/dist-packages/rosmaster/threadpool.py", line 218, in run
+    result = cmd(*args)
+  File "/opt/ros/noetic/lib/python3/dist-packages/rosmaster/master_api.py", line 210, in publisher_update_task
+    ret = xmlrpcapi(api).publisherUpdate('/master', topic, pub_uris)
+  File "/usr/lib/python3.8/xmlrpc/client.py", line 1109, in __call__
+    return self.__send(self.__name, args)
+  File "/usr/lib/python3.8/xmlrpc/client.py", line 1450, in __request
+    response = self.__transport.request(
+  File "/usr/lib/python3.8/xmlrpc/client.py", line 1153, in request
+    return self.single_request(host, handler, request_body, verbose)
+  File "/usr/lib/python3.8/xmlrpc/client.py", line 1165, in single_request
+    http_conn = self.send_request(host, handler, request_body, verbose)
+  File "/usr/lib/python3.8/xmlrpc/client.py", line 1278, in send_request
+    self.send_content(connection, request_body)
+  File "/usr/lib/python3.8/xmlrpc/client.py", line 1308, in send_content
+    connection.endheaders(request_body)
+  File "/usr/lib/python3.8/http/client.py", line 1251, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/usr/lib/python3.8/http/client.py", line 1011, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.8/http/client.py", line 951, in send
+    self.connect()
+  File "/usr/lib/python3.8/http/client.py", line 922, in connect
+    self.sock = self._create_connection(
+  File "/usr/lib/python3.8/socket.py", line 808, in create_connection
+    raise err
+  File "/usr/lib/python3.8/socket.py", line 796, in create_connection
+    sock.connect(sa)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+[rosmaster.master][INFO] 2026-09-20 00:18:46,240: publisherUpdate[/rosout] -> http://127.0.0.1:42857/ ['http://192.168.50.12:41315/', 'http://127.0.0.1:34387/']: sec=0.00, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-09-20 00:18:46,240: publisherUpdate[/landing/trial/status] -> http://192.168.50.12:41315/ []
+[rosmaster.master][INFO] 2026-09-20 00:18:46,241: publisherUpdate[/landing/trial/status] -> http://192.168.50.12:41315/ []: sec=0.00, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-09-20 00:18:46,260: -PUB [/rosout] /vision_pose_mux http://127.0.0.1:34387/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,261: -PUB [/vision_pose_mux/selected] /vision_pose_mux http://127.0.0.1:34387/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,261: -PUB [/mavros/vision_pose/pose] /vision_pose_mux http://127.0.0.1:34387/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,261: -SUB [/vrpn_client_node/pure/pose] /vision_pose_mux http://127.0.0.1:34387/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,262: -SUB [/estimation/external_pose] /vision_pose_mux http://127.0.0.1:34387/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,262: -SERVICE [/vision_pose_mux/get_loggers] /vision_pose_mux rosrpc://127.0.0.1:38733
+[rosmaster.master][INFO] 2026-09-20 00:18:46,262: -SERVICE [/vision_pose_mux/set_logger_level] /vision_pose_mux rosrpc://127.0.0.1:38733
+[rosmaster.master][INFO] 2026-09-20 00:18:46,263: -SERVICE [/mavros/vision_pose/pose_select] /vision_pose_mux rosrpc://127.0.0.1:38733
+[rosmaster.master][INFO] 2026-09-20 00:18:46,263: -SERVICE [/vision_pose_mux/select] /vision_pose_mux rosrpc://127.0.0.1:38733
+[rosmaster.master][INFO] 2026-09-20 00:18:46,263: -SERVICE [/vision_pose_mux/add] /vision_pose_mux rosrpc://127.0.0.1:38733
+[rosmaster.master][INFO] 2026-09-20 00:18:46,264: -SERVICE [/vision_pose_mux/list] /vision_pose_mux rosrpc://127.0.0.1:38733
+[rosmaster.master][INFO] 2026-09-20 00:18:46,264: -SERVICE [/vision_pose_mux/delete] /vision_pose_mux rosrpc://127.0.0.1:38733
+[rosmaster.master][INFO] 2026-09-20 00:18:46,264: -CACHEDPARAM [/rosout_disable_topics_generation] by /vision_pose_mux
+[rosmaster.master][INFO] 2026-09-20 00:18:46,340: publisherUpdate[/rosout] -> http://127.0.0.1:42857/ ['http://192.168.50.12:41315/']
+[rosmaster.master][INFO] 2026-09-20 00:18:46,341: publisherUpdate[/rosout] -> http://127.0.0.1:42857/ ['http://192.168.50.12:41315/']: sec=0.00, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-09-20 00:18:46,442: -PUB [/rosout_agg] /rosout http://127.0.0.1:42857/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,443: -SUB [/rosout] /rosout http://127.0.0.1:42857/
+[rosmaster.master][INFO] 2026-09-20 00:18:46,443: -SERVICE [/rosout/get_loggers] /rosout rosrpc://127.0.0.1:49941
+[rosmaster.master][INFO] 2026-09-20 00:18:46,444: -SERVICE [/rosout/set_logger_level] /rosout rosrpc://127.0.0.1:49941
+[rosmaster.master][INFO] 2026-09-20 00:18:46,445: -CACHEDPARAM [/rosout/omit_topics] by /rosout
+[rosmaster.main][INFO] 2026-09-20 00:18:46,513: keyboard interrupt, will exit
+[rosmaster.main][INFO] 2026-09-20 00:18:46,514: stopping master...
+[rospy.core][INFO] 2026-09-20 00:18:46,514: signal_shutdown [atexit]

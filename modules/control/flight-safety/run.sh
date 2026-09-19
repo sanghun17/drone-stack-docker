@@ -3,6 +3,8 @@
 # + estimator mux in one roslaunch, plus the rqt_runtime_monitor /diagnostics view in a browser.
 # Actuation gated by require_armed. Ctrl-C kills all of it.
 if [ ! -f /.dockerenv ]; then
+  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/select_stack.sh"
+  dsd_select_stack "control/flight-safety" || exit $?
   : "${DSD_CONTAINER:?set DSD_CONTAINER or invoke through './setup.sh run <stack> control/flight-safety'}"
 fi
 __C="${DSD_CONTAINER:-drone-stack-${DSD_STACK_NAME:-unknown}}"
@@ -18,17 +20,19 @@ if [ ! -f /.dockerenv ]; then
   __R="$(cd "$(dirname "$__S")/../../.." && pwd)"
   source "$__R/modules/ensure_container.sh"
   docker start "$__C" >/dev/null 2>&1
+  docker exec "$__C" bash /work/modules/control/mavros/check_runtime.sh messages-only || exit $?
   docker exec "$__C" bash -lc 'source /work/config/ros_env.sh; source /work/modules/ensure_roscore.sh'  # master up before the GUI
   "$__R/scripts/_vnc_gui.sh" 99 5900 6080 monitor \
     rqt --standalone rqt_runtime_monitor.runtime_monitor.RuntimeMonitor || true   # diagnostic GUI (best-effort)
   __TT=$([ -t 1 ] && echo -it || echo -i)
   trap '__killall; exit 130' INT TERM HUP
-  docker exec $__TT "$__C" bash "/work/${__S#$__R/}"; __rc=$?
+  docker exec $__TT "$__C" bash "/work/${__S#$__R/}" "$@"; __rc=$?
   __killall
   exit $__rc
 fi
 set -e
 source /opt/ros/noetic/setup.bash
+bash /work/modules/control/mavros/check_runtime.sh messages-only
 source /work/ws/flight-safety/devel/setup.bash --extend   # flight_safety pkg + Fault/FlightState msgs
 source /work/config/ros_env.sh
 source /work/modules/ensure_roscore.sh
@@ -37,4 +41,7 @@ source /work/modules/ensure_roscore.sh
 if python3 -c 'import Jetson.GPIO' >/dev/null 2>&1 && [ -e /dev/gpiochip0 ]; then
   taskset -c "${CPUS_POOL}" python3 /work/modules/control/flight-safety/fs_led_node.py >/tmp/fs_led.log 2>&1 &
 fi
-exec taskset -c "${CPUS_POOL:?config/ros_env.sh not sourced}" roslaunch flight_safety safety.launch
+recorder_args=("allow_external_termination:=${FLIGHT_SAFETY_ALLOW_EXTERNAL_TERMINATION:-false}")
+[ -z "${FLIGHT_SAFETY_RECORDER_CONFIG:-}" ] || recorder_args+=("recorder_config:=$FLIGHT_SAFETY_RECORDER_CONFIG")
+[ -z "${FLIGHT_SAFETY_GEOFENCE_CONFIG:-}" ] || recorder_args+=("geofence_config:=$FLIGHT_SAFETY_GEOFENCE_CONFIG")
+exec taskset -c "${CPUS_POOL:?config/ros_env.sh not sourced}" roslaunch flight_safety safety.launch "${recorder_args[@]}" "$@"

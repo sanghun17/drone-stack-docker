@@ -1,10 +1,14 @@
-# Real-hardware perception/control stack. Aircraft actuation is intentionally
-# absent until the landing controller and command ownership gates are qualified.
+# Real-hardware stack. The landing planner starts movement only on pilot OFFBOARD entry.
 arch: [arm64]
 # Use the same master as the established risk-aware hardware stack so MAVROS
 # arming and the ml-host /recorder webcam services are shared, not duplicated.
 ros_master_port: 11311
 ros_master_host: 192.168.50.36
+gui:
+  display: 100
+  vnc_port: 5901
+  web_port: 6081
+  rviz_config: /work/stack-assets/aruco-landing-jetson/config/detected_preview.rviz
 environment:
   SESSION_RECORDER_PROFILE: hardware
   SESSION_RECORDER_CONFIG: /work/stack-assets/aruco-landing-jetson/config/session_recorder.yaml
@@ -15,12 +19,14 @@ environment:
   # but only OptiTrack is allowed to feed MAVROS/EKF2.
   LANDING_ALLOW_MARKER_SWITCH: "false"
   LANDING_AUTO_SWITCH: "false"
-  LANDING_ALIGNMENT_FILE: /work/experiments/aruco-landing/pad-alignments/latest.yaml
 modules:
   - sensor/see3cam-24cug
   - perception/aruco-landing
   - odometry/landing-vision-pose
-  - control/aruco-landing
+  - planner/aruco-landing
   - control/mavros
+  - control/flight-safety
+  - utility/rviz
+  - utility/rqt
   - utility/session-recorder
   - odometry/optitrack

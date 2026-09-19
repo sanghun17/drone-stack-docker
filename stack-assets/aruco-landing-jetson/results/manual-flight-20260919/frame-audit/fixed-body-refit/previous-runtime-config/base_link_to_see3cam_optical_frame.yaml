@@ -1,0 +1,36 @@
+parent_frame: base_link
+child_frame: see3cam_optical_frame
+convention: T_parent_child maps child coordinates into parent coordinates
+translation_m:
+  x: 0.0013966850043304491
+  y: -0.12254631636942921
+  z: 9.932603318125186e-05
+rotation_xyzw:
+  x: 0.9998187414368302
+  y: -0.011972291505993436
+  z: 0.008307569772606488
+  w: 0.01225286873517262
+matrix_row_major:
+- 0.9995752970411375
+- -0.02414382597513849
+- 0.016318738076327825
+- 0.0013966850043304491
+- -0.023736659727410347
+- -0.9994130628877081
+- -0.02470021688963
+- -0.12254631636942921
+- 0.016905517741456468
+- 0.024302374301533904
+- -0.9995617029844636
+- 9.932603318125186e-05
+- 0.0
+- 0.0
+- 0.0
+- 1.0
+validation_result: PASS
+validation_scope: offline held-out AXZY closure; live estimator and PX4 transition
+  not validated
+source_bag: experiments/aruco-landing/camera-body-extrinsic/extrinsic-pad-anchor30mm-01_2026-09-19-10-14-42.bag
+anchor_id: 21
+anchor_side_m: 0.03
+image_to_body_time_offset_s: -0.041589316816677754

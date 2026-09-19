@@ -1,0 +1,209 @@
+{
+  "frame_contract": "Current Pure is Body (FLU); current Pure origin is vehicle centre, per user. Same mechanical origin across earlier recordings is assumed.",
+  "method": "A single fixed Body<-Camera transform, three independent session Global<-Pad poses and three timing corrections. Historical Pure rotation is from independent gyro alignment, not forced to 90 degrees.",
+  "old_pure_to_current_body": [
+    [
+      0.007060194566683133,
+      -0.999713268581915,
+      0.02288087135457839,
+      0.0
+    ],
+    [
+      0.9997998525559012,
+      0.007485442261690201,
+      0.018553247245316914,
+      0.0
+    ],
+    [
+      -0.018719200887846038,
+      0.02274530227126229,
+      0.9995660272051615,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "old_pure_to_body_rpy_deg": [
+    1.3035506660850078,
+    1.0725938539487379,
+    89.59540639417258
+  ],
+  "body_from_camera": [
+    [
+      0.031504332199472594,
+      0.9995018241279913,
+      -0.0018922519606821642,
+      0.1253561321764021
+    ],
+    [
+      0.9995009432747347,
+      -0.03150856915383058,
+      -0.0022526568299224463,
+      7.830621472088443e-05
+    ],
+    [
+      -0.002311156762401489,
+      -0.0018203391705140023,
+      -0.9999956724504979,
+      -0.006854967546666358
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "translation_m": [
+    0.1253561321764021,
+    7.830621472088443e-05,
+    -0.006854967546666358
+  ],
+  "rpy_deg": [
+    -179.89570191209438,
+    0.13241964616429022,
+    88.19463117712394
+  ],
+  "results": {
+    "initial_calibration": {
+      "additional_time_offset_s": -0.0009889278867037665,
+      "train": {
+        "n": 113,
+        "position_m": {
+          "rms": 0.02768535192123572,
+          "median": 0.005890876575662186,
+          "p95": 0.03402679030818551,
+          "max": 0.22294514669643067
+        },
+        "orientation_deg": {
+          "rms": 1.0070981855410421,
+          "median": 0.5347283362286017,
+          "p95": 1.5378345224774088,
+          "max": 5.59415135070199
+        }
+      },
+      "test": {
+        "n": 92,
+        "position_m": {
+          "rms": 0.025288928571398153,
+          "median": 0.005051941784708887,
+          "p95": 0.04775995609157407,
+          "max": 0.1359583663136015
+        },
+        "orientation_deg": {
+          "rms": 1.1100300539209176,
+          "median": 0.6113320381632961,
+          "p95": 2.061895126604008,
+          "max": 3.9077420313379956
+        }
+      }
+    },
+    "handcarried": {
+      "additional_time_offset_s": 0.03346203152710146,
+      "train": {
+        "n": 666,
+        "position_m": {
+          "rms": 0.015076189411512007,
+          "median": 0.006660743493008521,
+          "p95": 0.03159254703803328,
+          "max": 0.09007933333388779
+        },
+        "orientation_deg": {
+          "rms": 0.6566160060401828,
+          "median": 0.4225451353239418,
+          "p95": 1.1933743459137096,
+          "max": 3.165893366494922
+        }
+      },
+      "test": {
+        "n": 538,
+        "position_m": {
+          "rms": 0.00720045813319154,
+          "median": 0.005328520281014682,
+          "p95": 0.011391317165293206,
+          "max": 0.02634164271974786
+        },
+        "orientation_deg": {
+          "rms": 1.0542148625263363,
+          "median": 1.021905732383158,
+          "p95": 1.576124245601323,
+          "max": 4.347382511832736
+        }
+      }
+    },
+    "manual_flight": {
+      "additional_time_offset_s": -0.08185265952947068,
+      "train": {
+        "n": 303,
+        "position_m": {
+          "rms": 0.023310298609602684,
+          "median": 0.012884166480316919,
+          "p95": 0.05531655074915063,
+          "max": 0.0886307203855564
+        },
+        "orientation_deg": {
+          "rms": 1.1648143460680658,
+          "median": 0.7215823051569141,
+          "p95": 2.217829103955857,
+          "max": 7.332871130330344
+        }
+      },
+      "test": {
+        "n": 245,
+        "position_m": {
+          "rms": 0.013035726524415729,
+          "median": 0.010043149758131142,
+          "p95": 0.023996119244036232,
+          "max": 0.02693491437834184
+        },
+        "orientation_deg": {
+          "rms": 1.062321465261651,
+          "median": 0.6497819160726706,
+          "p95": 2.160092789216924,
+          "max": 3.699031247574887
+        }
+      }
+    }
+  },
+  "diagnostics": {
+    "optimizer_success": true,
+    "cost": 54.9268689545652,
+    "scaled_jacobian_singular_values": [
+      6982.540679488157,
+      994.8735882203025,
+      796.9532572989954,
+      714.8698509521993,
+      430.22308052645343,
+      390.2669061091451,
+      362.62450363348864,
+      359.5586824933853,
+      358.18950458895466,
+      356.729484398865,
+      338.3435496356999,
+      327.504985338443,
+      317.97487024981757,
+      240.70766841492372,
+      236.9018216207778,
+      225.9968398779957,
+      225.6749189172306,
+      207.71302063450355,
+      207.33678934545787,
+      199.29844902337337,
+      198.3691651944658,
+      187.24862807282582,
+      186.80421982425386,
+      163.8958817145935,
+      160.9587261887877,
+      110.40516269649332,
+      62.26672150296025
+    ]
+  },
+  "historical_scope": "First calibration has no IMU; shares old Pure convention inferred from matching camera extrinsics in first and handcarried recordings.",
+  "timing_scope": "Original image time offset is added to fitted additional offsets. Session-dependent corrections are diagnostic, not a universal clock measurement.",
+  "original_image_to_body_offset_s": -0.041589316816677754,
+  "deployment": "Updated local runtime mount/inverse/static TF; unchanged runtime timing. Jetson receives the same stack-owned files without starting nodes."
+}

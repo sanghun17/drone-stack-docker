@@ -1,0 +1,37 @@
+Panels:
+- Class: rviz/Displays
+  Name: Displays
+Visualization Manager:
+  Class: ''
+  Global Options:
+    Background Color: 30; 30; 30
+    Fixed Frame: see3cam_optical_frame
+    Frame Rate: 20
+  Displays:
+  - Class: rviz/Image
+    Name: Original
+    Enabled: true
+    Image Topic: /landing/camera/image_color
+    Transport Hint: raw
+    Queue Size: 1
+    Normalize Range: true
+  - Class: rviz/Image
+    Name: Undistorted
+    Enabled: true
+    Image Topic: /landing/camera/image_rect_color
+    Transport Hint: raw
+    Queue Size: 1
+    Normalize Range: true
+  Enabled: true
+  Tools:
+  - Class: rviz/Interact
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Distance: 2
+Window Geometry:
+  Width: 1580
+  Height: 860
+  X: 0
+  Y: 0
+  QMainWindow State: 000000ff00000000fd0000000200000000000000f0000000ccfc0200000001fb000000100044006900730070006c0061007900730100000000000000cc0000001700ffffff000000030000062c0000028afc0100000002fb00000010004f0072006900670069006e0061006c0100000000000003130000003e00fffffffb000000160055006e0064006900730074006f00720074006500640100000319000003130000003e00ffffff00000536000000cc00000004000000040000000800000008fc00000000

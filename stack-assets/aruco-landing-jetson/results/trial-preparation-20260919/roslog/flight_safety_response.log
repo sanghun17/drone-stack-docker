@@ -1,0 +1,287 @@
+[rospy.client][INFO] 2026-09-19 23:58:33,404: init_node, name[/flight_safety_response], pid[2224101]
+[xmlrpc][INFO] 2026-09-19 23:58:33,404: XML-RPC server binding to 127.0.0.1:0
+[xmlrpc][INFO] 2026-09-19 23:58:33,404: Started XML-RPC server [http://127.0.0.1:38045/]
+[rospy.init][INFO] 2026-09-19 23:58:33,405: ROS Slave URI: [http://127.0.0.1:38045/]
+[rospy.impl.masterslave][INFO] 2026-09-19 23:58:33,405: _ready: http://127.0.0.1:38045/
+[rospy.registration][INFO] 2026-09-19 23:58:33,406: Registering with master node http://127.0.0.1:11357
+[xmlrpc][INFO] 2026-09-19 23:58:33,406: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2026-09-19 23:58:33,505: registered with master
+[rospy.rosout][INFO] 2026-09-19 23:58:33,505: initializing /rosout core topic
+[rospy.rosout][INFO] 2026-09-19 23:58:33,509: connected to core topic /rosout
+[rospy.simtime][INFO] 2026-09-19 23:58:33,510: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2026-09-19 23:58:33,528: topic[/mavros/state] adding connection to [http://192.168.50.12:39139/], count 0
+[rosout][WARNING] 2026-09-19 23:58:33,531: [flight_safety_response] up -- KILL authority (require_armed gates actuation)
+[rosout][WARNING] 2026-09-19 23:58:33,540: [safety] control session reset (initial armed state): stale Normal/IdleHold cleared
+[rospy.internal][INFO] 2026-09-19 23:58:33,618: topic[/mavros/setpoint_raw/local] adding connection to [/trial_integration_test], count 0
+[rospy.internal][INFO] 2026-09-19 23:58:33,716: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2026-09-19 23:58:34,006: topic[/flight_safety/state] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-19 23:58:34,032: topic[/local_controller/setpoint_raw/local] adding connection to [http://127.0.0.1:36699/], count 0
+[rosout][INFO] 2026-09-19 23:58:35,351: [safety] OFFBOARD admitted with fresh Normal setpoint
+[rospy.core][INFO] 2026-09-19 23:58:40,520: signal_shutdown [signal-2]
+[rospy.internal][INFO] 2026-09-19 23:58:40,526: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2026-09-19 23:58:40,526: topic[/mavros/setpoint_raw/local] removing connection to /trial_integration_test
+[rospy.internal][INFO] 2026-09-19 23:58:40,527: topic[/flight_safety/state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-19 23:58:40,527: topic[/mavros/state] removing connection to http://192.168.50.12:39139/
+[rospy.internal][INFO] 2026-09-19 23:58:40,527: topic[/local_controller/setpoint_raw/local] removing connection to http://127.0.0.1:36699/
+[rospy.impl.masterslave][INFO] 2026-09-19 23:58:40,527: signal-2
+[rospy.core][INFO] 2026-09-19 23:58:41,122: signal_shutdown [atexit]
+[rospy.client][INFO] 2026-09-19 23:59:26,995: init_node, name[/flight_safety_response], pid[2226050]
+[xmlrpc][INFO] 2026-09-19 23:59:26,995: XML-RPC server binding to 127.0.0.1:0
+[xmlrpc][INFO] 2026-09-19 23:59:26,996: Started XML-RPC server [http://127.0.0.1:33421/]
+[rospy.init][INFO] 2026-09-19 23:59:26,996: ROS Slave URI: [http://127.0.0.1:33421/]
+[rospy.impl.masterslave][INFO] 2026-09-19 23:59:26,996: _ready: http://127.0.0.1:33421/
+[rospy.registration][INFO] 2026-09-19 23:59:26,997: Registering with master node http://127.0.0.1:11357
+[xmlrpc][INFO] 2026-09-19 23:59:26,997: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2026-09-19 23:59:27,096: registered with master
+[rospy.rosout][INFO] 2026-09-19 23:59:27,096: initializing /rosout core topic
+[rospy.rosout][INFO] 2026-09-19 23:59:27,101: connected to core topic /rosout
+[rospy.simtime][INFO] 2026-09-19 23:59:27,102: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2026-09-19 23:59:27,114: topic[/mavros/state] adding connection to [http://192.168.50.12:40243/], count 0
+[rosout][WARNING] 2026-09-19 23:59:27,117: [flight_safety_response] up -- KILL authority (require_armed gates actuation)
+[rospy.internal][INFO] 2026-09-19 23:59:27,124: topic[/mavros/setpoint_raw/local] adding connection to [/trial_integration_test], count 0
+[rosout][WARNING] 2026-09-19 23:59:27,126: [safety] control session reset (initial armed state): stale Normal/IdleHold cleared
+[rospy.internal][INFO] 2026-09-19 23:59:27,323: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2026-09-19 23:59:27,598: topic[/flight_safety/state] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-19 23:59:27,627: topic[/local_controller/setpoint_raw/local] adding connection to [http://127.0.0.1:46023/], count 0
+[rosout][INFO] 2026-09-19 23:59:28,957: [safety] OFFBOARD admitted with fresh Normal setpoint
+[rospy.core][INFO] 2026-09-19 23:59:30,835: signal_shutdown [signal-2]
+[rospy.internal][INFO] 2026-09-19 23:59:30,839: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2026-09-19 23:59:30,839: topic[/mavros/setpoint_raw/local] removing connection to /trial_integration_test
+[rospy.internal][INFO] 2026-09-19 23:59:30,839: topic[/flight_safety/state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-19 23:59:30,839: topic[/mavros/state] removing connection to http://192.168.50.12:40243/
+[rospy.internal][INFO] 2026-09-19 23:59:30,840: topic[/local_controller/setpoint_raw/local] removing connection to http://127.0.0.1:46023/
+[rospy.impl.masterslave][INFO] 2026-09-19 23:59:30,841: signal-2
+[rospy.core][INFO] 2026-09-19 23:59:31,437: signal_shutdown [atexit]
+[rospy.client][INFO] 2026-09-20 00:00:23,148: init_node, name[/flight_safety_response], pid[2227901]
+[xmlrpc][INFO] 2026-09-20 00:00:23,149: XML-RPC server binding to 127.0.0.1:0
+[xmlrpc][INFO] 2026-09-20 00:00:23,149: Started XML-RPC server [http://127.0.0.1:43761/]
+[rospy.init][INFO] 2026-09-20 00:00:23,149: ROS Slave URI: [http://127.0.0.1:43761/]
+[rospy.impl.masterslave][INFO] 2026-09-20 00:00:23,149: _ready: http://127.0.0.1:43761/
+[rospy.registration][INFO] 2026-09-20 00:00:23,150: Registering with master node http://127.0.0.1:11357
+[xmlrpc][INFO] 2026-09-20 00:00:23,150: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2026-09-20 00:00:23,250: registered with master
+[rospy.rosout][INFO] 2026-09-20 00:00:23,250: initializing /rosout core topic
+[rospy.rosout][INFO] 2026-09-20 00:00:23,255: connected to core topic /rosout
+[rospy.simtime][INFO] 2026-09-20 00:00:23,257: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2026-09-20 00:00:23,268: topic[/mavros/state] adding connection to [http://192.168.50.12:36383/], count 0
+[rospy.internal][INFO] 2026-09-20 00:00:23,276: topic[/mavros/setpoint_raw/local] adding connection to [/trial_integration_test], count 0
+[rosout][WARNING] 2026-09-20 00:00:23,277: [flight_safety_response] up -- KILL authority (require_armed gates actuation)
+[rosout][WARNING] 2026-09-20 00:00:23,281: [safety] control session reset (initial armed state): stale Normal/IdleHold cleared
+[rospy.internal][INFO] 2026-09-20 00:00:23,470: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2026-09-20 00:00:23,800: topic[/flight_safety/state] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:00:23,873: topic[/local_controller/setpoint_raw/local] adding connection to [http://127.0.0.1:33999/], count 0
+[rosout][INFO] 2026-09-20 00:00:25,097: [safety] OFFBOARD admitted with fresh Normal setpoint
+[rosout][WARNING] 2026-09-20 00:00:28,265: [safety] control session reset (left OFFBOARD): stale Normal/IdleHold cleared
+[rosout][INFO] 2026-09-20 00:00:29,417: [safety] OFFBOARD admitted with fresh Normal setpoint
+[rosout][WARNING] 2026-09-20 00:00:30,531: [safety] control session reset (left OFFBOARD): stale Normal/IdleHold cleared
+[rosout][WARNING] 2026-09-20 00:00:30,703: [safety] control session reset (disarmed): stale Normal/IdleHold cleared
+[rospy.core][INFO] 2026-09-20 00:00:30,734: signal_shutdown [signal-2]
+[rospy.internal][INFO] 2026-09-20 00:00:30,736: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2026-09-20 00:00:30,737: topic[/mavros/setpoint_raw/local] removing connection to /trial_integration_test
+[rospy.internal][INFO] 2026-09-20 00:00:30,737: topic[/flight_safety/state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:00:30,737: topic[/mavros/state] removing connection to http://192.168.50.12:36383/
+[rospy.internal][INFO] 2026-09-20 00:00:30,738: topic[/local_controller/setpoint_raw/local] removing connection to http://127.0.0.1:33999/
+[rospy.internal][INFO] 2026-09-20 00:00:30,738: topic[/local_controller/setpoint_raw/local] removing connection to http://127.0.0.1:33999/
+[rospy.impl.masterslave][INFO] 2026-09-20 00:00:30,738: signal-2
+[rospy.core][INFO] 2026-09-20 00:00:31,335: signal_shutdown [atexit]
+[rospy.client][INFO] 2026-09-20 00:05:13,133: init_node, name[/flight_safety_response], pid[2237068]
+[xmlrpc][INFO] 2026-09-20 00:05:13,144: XML-RPC server binding to 127.0.0.1:0
+[xmlrpc][INFO] 2026-09-20 00:05:13,144: Started XML-RPC server [http://127.0.0.1:39175/]
+[rospy.init][INFO] 2026-09-20 00:05:13,144: ROS Slave URI: [http://127.0.0.1:39175/]
+[rospy.impl.masterslave][INFO] 2026-09-20 00:05:13,145: _ready: http://127.0.0.1:39175/
+[rospy.registration][INFO] 2026-09-20 00:05:13,149: Registering with master node http://127.0.0.1:11357
+[xmlrpc][INFO] 2026-09-20 00:05:13,149: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2026-09-20 00:05:13,245: registered with master
+[rospy.rosout][INFO] 2026-09-20 00:05:13,245: initializing /rosout core topic
+[rospy.rosout][INFO] 2026-09-20 00:05:13,249: connected to core topic /rosout
+[rospy.simtime][INFO] 2026-09-20 00:05:13,251: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2026-09-20 00:05:13,264: topic[/mavros/state] adding connection to [http://192.168.50.12:37063/], count 0
+[rosout][WARNING] 2026-09-20 00:05:13,266: [flight_safety_response] up -- KILL authority (require_armed gates actuation)
+[rosout][WARNING] 2026-09-20 00:05:13,277: [safety] control session reset (initial armed state): stale Normal/IdleHold cleared
+[rospy.internal][INFO] 2026-09-20 00:05:13,293: topic[/mavros/setpoint_raw/local] adding connection to [/trial_integration_test], count 0
+[rospy.internal][INFO] 2026-09-20 00:05:13,495: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2026-09-20 00:05:13,857: topic[/flight_safety/state] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:05:13,895: topic[/local_controller/setpoint_raw/local] adding connection to [http://127.0.0.1:40483/], count 0
+[rosout][INFO] 2026-09-20 00:05:15,326: [safety] OFFBOARD admitted with fresh Normal setpoint
+[rosout][WARNING] 2026-09-20 00:05:18,523: [safety] control session reset (left OFFBOARD): stale Normal/IdleHold cleared
+[rosout][INFO] 2026-09-20 00:05:19,686: [safety] OFFBOARD admitted with fresh Normal setpoint
+[rosout][WARNING] 2026-09-20 00:05:20,784: [safety] control session reset (left OFFBOARD): stale Normal/IdleHold cleared
+[rosout][WARNING] 2026-09-20 00:05:20,962: [safety] control session reset (disarmed): stale Normal/IdleHold cleared
+[rosout][WARNING] 2026-09-20 00:05:20,997: [safety] control session reset (armed): stale Normal/IdleHold cleared
+[rosout][INFO] 2026-09-20 00:05:22,326: [safety] OFFBOARD admitted with fresh Normal setpoint
+[rosout][WARNING] 2026-09-20 00:05:23,429: [safety] control session reset (left OFFBOARD): stale Normal/IdleHold cleared
+[rospy.core][INFO] 2026-09-20 00:05:24,442: signal_shutdown [signal-2]
+[rospy.internal][INFO] 2026-09-20 00:05:24,447: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2026-09-20 00:05:24,448: topic[/mavros/setpoint_raw/local] removing connection to /trial_integration_test
+[rospy.internal][INFO] 2026-09-20 00:05:24,448: topic[/flight_safety/state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:05:24,448: topic[/mavros/state] removing connection to http://192.168.50.12:37063/
+[rospy.internal][INFO] 2026-09-20 00:05:24,449: topic[/local_controller/setpoint_raw/local] removing connection to http://127.0.0.1:40483/
+[rospy.impl.masterslave][INFO] 2026-09-20 00:05:24,449: signal-2
+[rospy.core][INFO] 2026-09-20 00:05:25,044: signal_shutdown [atexit]
+[rospy.client][INFO] 2026-09-20 00:10:28,022: init_node, name[/flight_safety_response], pid[2246782]
+[xmlrpc][INFO] 2026-09-20 00:10:28,022: XML-RPC server binding to 127.0.0.1:0
+[xmlrpc][INFO] 2026-09-20 00:10:28,023: Started XML-RPC server [http://127.0.0.1:35177/]
+[rospy.init][INFO] 2026-09-20 00:10:28,023: ROS Slave URI: [http://127.0.0.1:35177/]
+[rospy.impl.masterslave][INFO] 2026-09-20 00:10:28,023: _ready: http://127.0.0.1:35177/
+[rospy.registration][INFO] 2026-09-20 00:10:28,023: Registering with master node http://127.0.0.1:11357
+[xmlrpc][INFO] 2026-09-20 00:10:28,023: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2026-09-20 00:10:28,123: registered with master
+[rospy.rosout][INFO] 2026-09-20 00:10:28,123: initializing /rosout core topic
+[rospy.rosout][INFO] 2026-09-20 00:10:28,128: connected to core topic /rosout
+[rospy.simtime][INFO] 2026-09-20 00:10:28,129: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2026-09-20 00:10:28,139: topic[/mavros/state] adding connection to [http://192.168.50.12:40425/], count 0
+[rosout][WARNING] 2026-09-20 00:10:28,143: [flight_safety_response] up -- KILL authority (require_armed gates actuation)
+[rosout][WARNING] 2026-09-20 00:10:28,151: [safety] control session reset (initial armed state): stale Normal/IdleHold cleared
+[rospy.internal][INFO] 2026-09-20 00:10:28,185: topic[/mavros/setpoint_raw/local] adding connection to [/trial_integration_test], count 0
+[rospy.internal][INFO] 2026-09-20 00:10:28,382: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2026-09-20 00:10:28,686: topic[/local_controller/setpoint_raw/local] adding connection to [http://127.0.0.1:37747/], count 0
+[rospy.internal][INFO] 2026-09-20 00:10:28,722: topic[/flight_safety/state] adding connection to [/landing_trial], count 0
+[rosout][INFO] 2026-09-20 00:10:30,223: [safety] OFFBOARD admitted with fresh Normal setpoint
+[rosout][WARNING] 2026-09-20 00:10:33,398: [safety] control session reset (left OFFBOARD): stale Normal/IdleHold cleared
+[rosout][INFO] 2026-09-20 00:10:34,563: [safety] OFFBOARD admitted with fresh Normal setpoint
+[rosout][WARNING] 2026-09-20 00:10:35,653: [safety] control session reset (left OFFBOARD): stale Normal/IdleHold cleared
+[rosout][WARNING] 2026-09-20 00:10:35,811: [safety] control session reset (disarmed): stale Normal/IdleHold cleared
+[rosout][WARNING] 2026-09-20 00:10:35,845: [safety] control session reset (armed): stale Normal/IdleHold cleared
+[rosout][INFO] 2026-09-20 00:10:37,163: [safety] OFFBOARD admitted with fresh Normal setpoint
+[rosout][WARNING] 2026-09-20 00:10:38,273: [safety] control session reset (left OFFBOARD): stale Normal/IdleHold cleared
+[rospy.core][INFO] 2026-09-20 00:10:39,289: signal_shutdown [signal-2]
+[rospy.internal][INFO] 2026-09-20 00:10:39,293: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2026-09-20 00:10:39,293: topic[/mavros/setpoint_raw/local] removing connection to /trial_integration_test
+[rospy.internal][INFO] 2026-09-20 00:10:39,293: topic[/flight_safety/state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:10:39,294: topic[/mavros/state] removing connection to http://192.168.50.12:40425/
+[rospy.internal][INFO] 2026-09-20 00:10:39,294: topic[/local_controller/setpoint_raw/local] removing connection to http://127.0.0.1:37747/
+[rospy.impl.masterslave][INFO] 2026-09-20 00:10:39,294: signal-2
+[rospy.core][INFO] 2026-09-20 00:10:39,891: signal_shutdown [atexit]
+[rospy.client][INFO] 2026-09-20 00:17:28,230: init_node, name[/flight_safety_response], pid[2259625]
+[xmlrpc][INFO] 2026-09-20 00:17:28,230: XML-RPC server binding to 127.0.0.1:0
+[xmlrpc][INFO] 2026-09-20 00:17:28,231: Started XML-RPC server [http://127.0.0.1:37283/]
+[rospy.init][INFO] 2026-09-20 00:17:28,231: ROS Slave URI: [http://127.0.0.1:37283/]
+[rospy.impl.masterslave][INFO] 2026-09-20 00:17:28,231: _ready: http://127.0.0.1:37283/
+[rospy.registration][INFO] 2026-09-20 00:17:28,232: Registering with master node http://127.0.0.1:11357
+[xmlrpc][INFO] 2026-09-20 00:17:28,233: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2026-09-20 00:17:28,331: registered with master
+[rospy.rosout][INFO] 2026-09-20 00:17:28,332: initializing /rosout core topic
+[rospy.rosout][INFO] 2026-09-20 00:17:28,335: connected to core topic /rosout
+[rospy.simtime][INFO] 2026-09-20 00:17:28,336: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2026-09-20 00:17:28,351: topic[/mavros/state] adding connection to [http://192.168.50.12:34267/], count 0
+[rosout][WARNING] 2026-09-20 00:17:28,354: [flight_safety_response] up -- KILL authority (require_armed gates actuation)
+[rospy.internal][INFO] 2026-09-20 00:17:28,375: topic[/mavros/setpoint_raw/local] adding connection to [/trial_integration_test], count 0
+[rospy.internal][INFO] 2026-09-20 00:17:28,574: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2026-09-20 00:17:28,913: topic[/flight_safety/state] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:17:28,985: topic[/local_controller/setpoint_raw/local] adding connection to [http://127.0.0.1:34083/], count 0
+[rosout][WARNING] 2026-09-20 00:17:31,213: [safety] control session reset (armed): stale Normal/IdleHold cleared
+[rosout][INFO] 2026-09-20 00:17:32,614: [safety] OFFBOARD admitted with fresh Normal setpoint
+[rosout][WARNING] 2026-09-20 00:17:35,780: [safety] control session reset (left OFFBOARD): stale Normal/IdleHold cleared
+[rosout][INFO] 2026-09-20 00:17:37,914: [safety] OFFBOARD admitted with fresh Normal setpoint
+[rosout][WARNING] 2026-09-20 00:17:39,064: [safety] control session reset (left OFFBOARD): stale Normal/IdleHold cleared
+[rosout][WARNING] 2026-09-20 00:17:39,243: [safety] control session reset (disarmed): stale Normal/IdleHold cleared
+[rosout][WARNING] 2026-09-20 00:17:39,266: [safety] control session reset (armed): stale Normal/IdleHold cleared
+[rosout][INFO] 2026-09-20 00:17:41,394: [safety] OFFBOARD admitted with fresh Normal setpoint
+[rosout][WARNING] 2026-09-20 00:17:42,565: [safety] control session reset (left OFFBOARD): stale Normal/IdleHold cleared
+[rospy.core][INFO] 2026-09-20 00:17:43,583: signal_shutdown [signal-2]
+[rospy.internal][INFO] 2026-09-20 00:17:43,586: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2026-09-20 00:17:43,586: topic[/mavros/setpoint_raw/local] removing connection to /trial_integration_test
+[rospy.internal][INFO] 2026-09-20 00:17:43,586: topic[/flight_safety/state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:17:43,586: topic[/mavros/state] removing connection to http://192.168.50.12:34267/
+[rospy.internal][INFO] 2026-09-20 00:17:43,586: topic[/local_controller/setpoint_raw/local] removing connection to http://127.0.0.1:34083/
+[rospy.impl.masterslave][INFO] 2026-09-20 00:17:43,586: signal-2
+[rospy.core][INFO] 2026-09-20 00:17:44,184: signal_shutdown [atexit]
+[rospy.client][INFO] 2026-09-20 00:18:30,763: init_node, name[/flight_safety_response], pid[2261854]
+[xmlrpc][INFO] 2026-09-20 00:18:30,763: XML-RPC server binding to 127.0.0.1:0
+[xmlrpc][INFO] 2026-09-20 00:18:30,763: Started XML-RPC server [http://127.0.0.1:43579/]
+[rospy.init][INFO] 2026-09-20 00:18:30,764: ROS Slave URI: [http://127.0.0.1:43579/]
+[rospy.impl.masterslave][INFO] 2026-09-20 00:18:30,764: _ready: http://127.0.0.1:43579/
+[rospy.registration][INFO] 2026-09-20 00:18:30,764: Registering with master node http://127.0.0.1:11357
+[xmlrpc][INFO] 2026-09-20 00:18:30,764: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2026-09-20 00:18:30,864: registered with master
+[rospy.rosout][INFO] 2026-09-20 00:18:30,864: initializing /rosout core topic
+[rospy.rosout][INFO] 2026-09-20 00:18:30,868: connected to core topic /rosout
+[rospy.simtime][INFO] 2026-09-20 00:18:30,869: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2026-09-20 00:18:30,882: topic[/mavros/state] adding connection to [http://192.168.50.12:41315/], count 0
+[rosout][WARNING] 2026-09-20 00:18:30,884: [flight_safety_response] up -- KILL authority (require_armed gates actuation)
+[rospy.internal][INFO] 2026-09-20 00:18:30,911: topic[/mavros/setpoint_raw/local] adding connection to [/trial_integration_test], count 0
+[rospy.internal][INFO] 2026-09-20 00:18:31,109: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2026-09-20 00:18:31,440: topic[/flight_safety/state] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:18:31,523: topic[/local_controller/setpoint_raw/local] adding connection to [http://127.0.0.1:35933/], count 0
+[rosout][WARNING] 2026-09-20 00:18:33,749: [safety] control session reset (armed): stale Normal/IdleHold cleared
+[rosout][INFO] 2026-09-20 00:18:35,165: [safety] OFFBOARD admitted with fresh Normal setpoint
+[rosout][WARNING] 2026-09-20 00:18:38,352: [safety] control session reset (left OFFBOARD): stale Normal/IdleHold cleared
+[rosout][INFO] 2026-09-20 00:18:40,525: [safety] OFFBOARD admitted with fresh Normal setpoint
+[rosout][WARNING] 2026-09-20 00:18:41,625: [safety] control session reset (left OFFBOARD): stale Normal/IdleHold cleared
+[rosout][WARNING] 2026-09-20 00:18:41,805: [safety] control session reset (disarmed): stale Normal/IdleHold cleared
+[rosout][WARNING] 2026-09-20 00:18:41,839: [safety] control session reset (armed): stale Normal/IdleHold cleared
+[rosout][INFO] 2026-09-20 00:18:44,005: [safety] OFFBOARD admitted with fresh Normal setpoint
+[rosout][WARNING] 2026-09-20 00:18:45,130: [safety] control session reset (left OFFBOARD): stale Normal/IdleHold cleared
+[rospy.core][INFO] 2026-09-20 00:18:46,147: signal_shutdown [signal-2]
+[rospy.internal][INFO] 2026-09-20 00:18:46,151: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2026-09-20 00:18:46,151: topic[/mavros/setpoint_raw/local] removing connection to /trial_integration_test
+[rospy.internal][INFO] 2026-09-20 00:18:46,151: topic[/flight_safety/state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:18:46,151: topic[/mavros/state] removing connection to http://192.168.50.12:41315/
+[rospy.internal][INFO] 2026-09-20 00:18:46,151: topic[/local_controller/setpoint_raw/local] removing connection to http://127.0.0.1:35933/
+[rospy.impl.masterslave][INFO] 2026-09-20 00:18:46,152: signal-2
+[rospy.core][INFO] 2026-09-20 00:18:46,748: signal_shutdown [atexit]
+[rospy.client][INFO] 2026-09-20 00:33:30,243: init_node, name[/flight_safety_response], pid[2290908]
+[xmlrpc][INFO] 2026-09-20 00:33:30,243: XML-RPC server binding to 127.0.0.1:0
+[xmlrpc][INFO] 2026-09-20 00:33:30,244: Started XML-RPC server [http://127.0.0.1:34313/]
+[rospy.init][INFO] 2026-09-20 00:33:30,244: ROS Slave URI: [http://127.0.0.1:34313/]
+[rospy.impl.masterslave][INFO] 2026-09-20 00:33:30,244: _ready: http://127.0.0.1:34313/
+[rospy.registration][INFO] 2026-09-20 00:33:30,245: Registering with master node http://127.0.0.1:11357
+[xmlrpc][INFO] 2026-09-20 00:33:30,245: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2026-09-20 00:33:30,344: registered with master
+[rospy.rosout][INFO] 2026-09-20 00:33:30,345: initializing /rosout core topic
+[rospy.rosout][INFO] 2026-09-20 00:33:30,348: connected to core topic /rosout
+[rospy.simtime][INFO] 2026-09-20 00:33:30,349: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2026-09-20 00:33:30,363: topic[/mavros/state] adding connection to [http://192.168.50.12:41991/], count 0
+[rosout][WARNING] 2026-09-20 00:33:30,366: [flight_safety_response] up -- KILL authority (require_armed gates actuation)
+[rospy.internal][INFO] 2026-09-20 00:33:30,433: topic[/mavros/setpoint_raw/local] adding connection to [/trial_integration_test], count 0
+[rospy.internal][INFO] 2026-09-20 00:33:30,632: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2026-09-20 00:33:30,938: topic[/local_controller/setpoint_raw/local] adding connection to [http://127.0.0.1:38251/], count 0
+[rospy.internal][INFO] 2026-09-20 00:33:30,973: topic[/flight_safety/state] adding connection to [/landing_trial], count 0
+[rosout][WARNING] 2026-09-20 00:33:33,234: [safety] control session reset (armed): stale Normal/IdleHold cleared
+[rosout][INFO] 2026-09-20 00:33:34,646: [safety] OFFBOARD admitted with fresh Normal setpoint
+[rosout][WARNING] 2026-09-20 00:33:37,865: [safety] control session reset (left OFFBOARD): stale Normal/IdleHold cleared
+[rosout][INFO] 2026-09-20 00:33:40,026: [safety] OFFBOARD admitted with fresh Normal setpoint
+[rosout][CRITICAL] 2026-09-20 00:33:41,124: [safety] KILL: force-disarm acknowledgement success=True
+[rosout][WARNING] 2026-09-20 00:33:41,135: [safety] control session reset (disarmed): stale Normal/IdleHold cleared
+[rospy.core][INFO] 2026-09-20 00:33:41,461: signal_shutdown [signal-2]
+[rospy.internal][INFO] 2026-09-20 00:33:41,466: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2026-09-20 00:33:41,466: topic[/mavros/setpoint_raw/local] removing connection to /trial_integration_test
+[rospy.internal][INFO] 2026-09-20 00:33:41,466: topic[/flight_safety/state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:33:41,467: topic[/mavros/state] removing connection to http://192.168.50.12:41991/
+[rospy.internal][INFO] 2026-09-20 00:33:41,467: topic[/local_controller/setpoint_raw/local] removing connection to http://127.0.0.1:38251/
+[rospy.impl.masterslave][INFO] 2026-09-20 00:33:41,467: signal-2
+[rospy.core][INFO] 2026-09-20 00:33:42,064: signal_shutdown [atexit]
+[rospy.client][INFO] 2026-09-20 00:35:51,024: init_node, name[/flight_safety_response], pid[2295636]
+[xmlrpc][INFO] 2026-09-20 00:35:51,024: XML-RPC server binding to 127.0.0.1:0
+[xmlrpc][INFO] 2026-09-20 00:35:51,025: Started XML-RPC server [http://127.0.0.1:41623/]
+[rospy.init][INFO] 2026-09-20 00:35:51,025: ROS Slave URI: [http://127.0.0.1:41623/]
+[rospy.impl.masterslave][INFO] 2026-09-20 00:35:51,025: _ready: http://127.0.0.1:41623/
+[rospy.registration][INFO] 2026-09-20 00:35:51,026: Registering with master node http://127.0.0.1:11357
+[xmlrpc][INFO] 2026-09-20 00:35:51,026: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2026-09-20 00:35:51,125: registered with master
+[rospy.rosout][INFO] 2026-09-20 00:35:51,126: initializing /rosout core topic
+[rospy.rosout][INFO] 2026-09-20 00:35:51,130: connected to core topic /rosout
+[rospy.simtime][INFO] 2026-09-20 00:35:51,132: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2026-09-20 00:35:51,145: topic[/mavros/state] adding connection to [http://192.168.50.12:41637/], count 0
+[rosout][WARNING] 2026-09-20 00:35:51,151: [flight_safety_response] up -- KILL authority (require_armed gates actuation)
+[rospy.internal][INFO] 2026-09-20 00:35:51,191: topic[/mavros/setpoint_raw/local] adding connection to [/trial_integration_test], count 0
+[rospy.internal][INFO] 2026-09-20 00:35:51,408: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2026-09-20 00:35:51,753: topic[/flight_safety/state] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:35:51,793: topic[/local_controller/setpoint_raw/local] adding connection to [http://127.0.0.1:39195/], count 0
+[rosout][WARNING] 2026-09-20 00:35:54,038: [safety] control session reset (armed): stale Normal/IdleHold cleared
+[rosout][INFO] 2026-09-20 00:35:55,451: [safety] OFFBOARD admitted with fresh Normal setpoint
+[rosout][WARNING] 2026-09-20 00:35:58,610: [safety] control session reset (left OFFBOARD): stale Normal/IdleHold cleared
+[rosout][INFO] 2026-09-20 00:36:00,771: [safety] OFFBOARD admitted with fresh Normal setpoint
+[rosout][WARNING] 2026-09-20 00:36:01,882: [safety] control session reset (left OFFBOARD): stale Normal/IdleHold cleared
+[rosout][WARNING] 2026-09-20 00:36:02,061: [safety] control session reset (disarmed): stale Normal/IdleHold cleared
+[rosout][WARNING] 2026-09-20 00:36:02,094: [safety] control session reset (armed): stale Normal/IdleHold cleared
+[rosout][INFO] 2026-09-20 00:36:04,251: [safety] OFFBOARD admitted with fresh Normal setpoint
+[rosout][WARNING] 2026-09-20 00:36:05,359: [safety] control session reset (left OFFBOARD): stale Normal/IdleHold cleared
+[rospy.core][INFO] 2026-09-20 00:36:06,376: signal_shutdown [signal-2]
+[rospy.internal][INFO] 2026-09-20 00:36:06,380: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2026-09-20 00:36:06,380: topic[/mavros/setpoint_raw/local] removing connection to /trial_integration_test
+[rospy.internal][INFO] 2026-09-20 00:36:06,381: topic[/flight_safety/state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:36:06,381: topic[/mavros/state] removing connection to http://192.168.50.12:41637/
+[rospy.internal][INFO] 2026-09-20 00:36:06,382: topic[/local_controller/setpoint_raw/local] removing connection to http://127.0.0.1:39195/
+[rospy.impl.masterslave][INFO] 2026-09-20 00:36:06,382: signal-2
+[rospy.core][INFO] 2026-09-20 00:36:06,977: signal_shutdown [atexit]

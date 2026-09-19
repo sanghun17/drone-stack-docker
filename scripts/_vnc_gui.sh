@@ -16,8 +16,10 @@
 # which never reaps children, so dead Xvfb/x11vnc/app linger as zombies that would fool pgrep.
 # Re-running is safe: it attaches to whatever is already up and only (re)starts what's actually dead.
 set -e
-C=drone-stack-d435i-voxblox
-DN="$1"; P="$2"; WP="$3"; APPNAME="$4"; shift 4   # remaining "$@" = the app command + its args
+source "$(dirname "$(readlink -f "$0")")/../modules/select_stack.sh"
+dsd_select_stack utility/gui-vnc
+C="$DSD_CONTAINER"
+DN="${DSD_GUI_DISPLAY:-$1}"; P="${DSD_GUI_VNC_PORT:-$2}"; WP="${DSD_GUI_WEB_PORT:-$3}"; APPNAME="$4"; shift 4   # remaining "$@" = the app command + its args
 # x11vnc poll/defer (ms) = 1000/VNC_FPS. Default 10 Hz (100ms) — safe for the flaky RTL8822CE wifi so
 # heavy rviz motion can't saturate the link and stall ssh/the browser. Raise for snappier interaction
 # at more bandwidth (best on a solid/wired link): VNC_FPS=20 -> 50ms, VNC_FPS=30 -> 33ms.
@@ -29,7 +31,7 @@ docker start "$C" >/dev/null 2>&1
 # first so the app (in /opt/ros/noetic/bin) is on PATH — a plain login shell doesn't auto-source it.
 if ! docker exec "$C" bash -lc "command -v websockify >/dev/null && [ -f /opt/novnc/vnc.html ] && { source /opt/ros/noetic/setup.bash 2>/dev/null; command -v $1 >/dev/null; }"; then
   echo "ERROR: '$1', websockify, or the noVNC files are missing in the container."
-  echo "  bake them into the image:  ./setup.sh build d435i-voxblox   (utility/gui-vnc + utility/$APPNAME)"
+  echo "  bake them into the image:  ./setup.sh build $DSD_STACK   (utility/gui-vnc + utility/$APPNAME)"
   exit 1
 fi
 
@@ -76,7 +78,9 @@ fi
 if ! app_up; then
   source /opt/ros/noetic/setup.bash
   [ -f /work/ws/flight-safety/devel/setup.bash ] && source /work/ws/flight-safety/devel/setup.bash --extend
-  [ -f /work/ws/risk-aware/devel/setup.bash ] && source /work/ws/risk-aware/devel/setup.bash --extend
+  if [ "${DSD_STACK_NAME:-}" = d435i-voxblox ] && [ -f /work/ws/risk-aware/devel/setup.bash ]; then
+    source /work/ws/risk-aware/devel/setup.bash --extend
+  fi
   [ -f /work/config/ros_env.sh ] && source /work/config/ros_env.sh
   export XDG_RUNTIME_DIR=/tmp/runtime-root; mkdir -p "$XDG_RUNTIME_DIR"; chmod 700 "$XDG_RUNTIME_DIR"
   # rviz is ~2.3 cores of llvmpipe software GL — pool + nice +10 ($T above).

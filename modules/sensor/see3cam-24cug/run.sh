@@ -6,13 +6,15 @@
 set -eo pipefail
 
 if [ ! -f /.dockerenv ]; then
-  __C=drone-stack-aruco-landing-jetson
+  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/select_stack.sh"
+  dsd_select_stack "sensor/see3cam-24cug" || exit $?
+  __C="$DSD_CONTAINER"
   __S="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
   __R="$(cd "$(dirname "$__S")/../../.." && pwd)"
   source "$__R/modules/ensure_container.sh"
   docker start "$__C" >/dev/null 2>&1
   __TT=$([ -t 1 ] && echo -it || echo -i)
-  cleanup(){ docker exec "$__C" pkill -INT -f "usb_cam_node" >/dev/null 2>&1 || true; }
+  cleanup(){ docker exec "$__C" pkill -INT -x see3cam_node >/dev/null 2>&1 || true; }
   trap 'cleanup; exit 130' INT TERM HUP
   docker exec $__TT "$__C" bash "/work/${__S#$__R/}" "$@"; __rc=$?
   cleanup
@@ -35,6 +37,17 @@ source /work/modules/ensure_roscore.sh
 : "${SEE3CAM_EXPOSURE_AUTO:=1}"
 : "${SEE3CAM_EXPOSURE_ABSOLUTE:=150}"
 : "${SEE3CAM_GAIN:=10}"
+: "${SEE3CAM_RECTIFY_FPS:=20}"
+
+# Build the publisher with the same usb_cam capture source and one OpenCV ABI.
+module_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+binary="/work/.build/see3cam-demand/$(uname -m)/see3cam_node"
+if [ ! -x "$binary" ] || [ "$module_dir/see3cam_node.cpp" -nt "$binary" ] || \
+   [ "$module_dir/CMakeLists.txt" -nt "$binary" ] || [ "$module_dir/build.sh" -nt "$binary" ] || \
+   [ "$module_dir/vendor/usb_cam/usb_cam.cpp" -nt "$binary" ] || \
+   [ "$module_dir/vendor/usb_cam/include/usb_cam/usb_cam.h" -nt "$binary" ]; then
+  bash "$module_dir/build.sh"
+fi
 
 if [ ! -e "$SEE3CAM_DEVICE" ]; then
   echo "ERROR: See3CAM device not found: $SEE3CAM_DEVICE" >&2
@@ -58,10 +71,10 @@ else
 fi
 
 echo ">> See3CAM $SEE3CAM_DEVICE ${SEE3CAM_WIDTH}x${SEE3CAM_HEIGHT}@${SEE3CAM_FPS} $SEE3CAM_PIXEL_FORMAT exposure=${SEE3CAM_EXPOSURE_ABSOLUTE} gain=${SEE3CAM_GAIN}"
-# usb_cam advertises through a private node handle, so the node's fully
-# resolved name is also the canonical topic prefix.
+# The private node handle preserves the existing topic prefix. Both raw and
+# compressed subscribers count as demand; no images are captured while idle.
 exec taskset -c "${CPUS_CAMERA:?config/ros_env.sh not sourced}" \
-  rosrun usb_cam usb_cam_node \
+  "$binary" \
     "__ns:=/landing" \
     "__name:=camera" \
     "_video_device:=$SEE3CAM_DEVICE" \
@@ -73,5 +86,6 @@ exec taskset -c "${CPUS_CAMERA:?config/ros_env.sh not sourced}" \
     "_io_method:=mmap" \
     "_camera_name:=$SEE3CAM_CAMERA_NAME" \
     "_camera_frame_id:=$SEE3CAM_FRAME_ID" \
+    "_rectify_fps:=$SEE3CAM_RECTIFY_FPS" \
     "${camera_info_arg[@]}" \
     "$@"

@@ -9,6 +9,10 @@ Place the calibrated ROS `camera_info` yaml here as:
 Calibrate the exact deployed lens/focus and stream mode. The initial operating
 mode is 1280x720 UYVY at 60 Hz. Do not copy the D435i intrinsics.
 
+The installed serial-specific YAML is the 2026-09-15 colleague result
+(61 views, 0.481465 px fitting RMS). See
+[intrinsic preview provenance](../../../../stack-assets/aruco-landing-jetson/docs/intrinsic_preview.md).
+
 Generate the standard target used by this module:
 
 ```bash

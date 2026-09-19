@@ -1,0 +1,16 @@
+>> See3CAM calibration: /work/modules/sensor/see3cam-24cug/calibration/1A3958060A020900.yaml
+>> See3CAM /dev/v4l/by-id/usb-e-con_systems_See3CAM_24CUG_1A3958060A020900-video-index0 1280x720@60 uyvy exposure=150 gain=1
+[31m[ERROR] [1789833361.602997713]: select timeout[0m
+[0m[INFO] [1789833344.157656097]: camera calibration URL: file:///work/modules/sensor/see3cam-24cug/calibration/1A3958060A020900.yaml[0m
+[0m[INFO] [1789833344.159174639]: See3CAM ready: 1280x720@60 uyvy; capture starts when an image subscriber connects[0m
+[0m[INFO] [1789833344.347357338]: Image subscriber connected: camera opened[0m
+[0m[INFO] [1789833344.448500755]: No image subscribers: camera capture paused[0m
+[0m[INFO] [1789833346.399084620]: Image subscriber connected: camera capture resumed[0m
+[0m[INFO] [1789833346.553536410]: No image subscribers: camera capture paused[0m
+[0m[INFO] [1789833348.504117748]: Image subscriber connected: camera capture resumed[0m
+[0m[INFO] [1789833348.651406942]: No image subscribers: camera capture paused[0m
+[0m[INFO] [1789833350.601995639]: Image subscriber connected: camera capture resumed[0m
+[0m[INFO] [1789833350.784460844]: No image subscribers: camera capture paused[0m
+[0m[INFO] [1789833352.735026789]: Image subscriber connected: camera capture resumed[0m
+[0m[INFO] [1789833352.917611579]: No image subscribers: camera capture paused[0m
+[0m[INFO] [1789833354.868192148]: Image subscriber connected: camera capture resumed[0m

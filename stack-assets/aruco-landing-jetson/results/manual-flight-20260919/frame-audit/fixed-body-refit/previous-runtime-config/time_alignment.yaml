@@ -1,0 +1,6 @@
+image_to_body_offset_s: -0.041589316816677754
+convention: body pose is interpolated at image header stamp + offset
+conditional_bootstrap_std_s: 0.0013135572641347452
+scope: This bag and sensor timestamp path; a motion-based fit, not independent clock
+  measurement.
+application: Physical estimator corrects output pose stamps; original image stamps remain unchanged.

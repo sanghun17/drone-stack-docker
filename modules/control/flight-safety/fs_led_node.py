@@ -18,6 +18,8 @@ Color scheme (priority top-down):
   manual KILL + RC offboard                               -> RED <-> GREEN      (killed; would resume offboard)
   manual KILL + RC not-offboard (position/other)          -> RED <-> BLUE       (killed; would resume position)
   RC offboard, FC NOT offboard (offboard-loss failsafe)   -> GREEN <-> BLUE     (dropped to Position on its own)
+  mission hold_failed + healthy commanded OFFBOARD      -> GREEN <-> WHITE    (failed trial, holding)
+  mission landing + FC AUTO.LAND                         -> CYAN blink         (intentional landing handoff)
   NORMAL (offboard) + setpoint fresh                      -> GREEN solid        (autonomous, commanded)
   NORMAL (offboard) + no setpoint                         -> GREEN blink        (offboard starving)
   MANUAL  mode==POSCTL                                    -> BLUE solid         (pilot position hold)
@@ -28,10 +30,12 @@ Color scheme (priority top-down):
 Wiring (40-pin J30): APA102 DI->pin19, CI->pin23, VCC->pin2 (5V), GND->pin6.
 Colors below are plain edits -- no image rebuild needed to change them.
 """
+import json
 import rospy
 import Jetson.GPIO as GPIO
 from flight_safety.msg import FlightState
 from mavros_msgs.msg import RCIn, PositionTarget
+from std_msgs.msg import String
 
 DATA, CLK = 19, 23      # BOARD pins -> APA102 DI / CI
 BRIGHT = 8              # 0..31
@@ -57,6 +61,7 @@ SOLID_BLUE_MODES = {"POSCTL"}   # manual modes shown as SOLID blue (else caution
 
 RED, GREEN, BLUE, AMBER = (255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 80, 0)
 OFF = (0, 0, 0)
+WHITE, CYAN = (255, 255, 255), (0, 255, 255)
 
 
 def _byte(b):
@@ -85,10 +90,23 @@ class LedNode(object):
         self.mode_offb = False
         self.rc_last = None
         self.sp_last = None
+        self.mission = None
+        self.mission_last = None
+        # Optional stack-neutral mission hint; never overrides safety/kill.
+        rospy.Subscriber(rospy.get_param("~mission_status_topic", "/control/mission_status"),
+                         String, self._mission_cb, queue_size=1)
         rospy.Subscriber("/flight_safety/state", FlightState, self._state_cb, queue_size=1)
         rospy.Subscriber("/mavros/rc/in", RCIn, self._rc_cb, queue_size=1)
         rospy.Subscriber(SETPOINT_TOPIC, PositionTarget, self._sp_cb, queue_size=1)
         rospy.Timer(rospy.Duration(1.0 / RENDER_HZ), self._render)
+
+    def _mission_cb(self, m):
+        try:
+            value = json.loads(m.data)
+            self.mission = value if isinstance(value, dict) and value.get("dry_run") is False else None
+            self.mission_last = rospy.Time.now()
+        except (ValueError, TypeError):
+            self.mission = None
 
     def _state_cb(self, m):
         self.state = m
@@ -104,7 +122,7 @@ class LedNode(object):
         self.sp_last = rospy.Time.now()
 
     def _fresh(self, stamp, timeout):
-        return stamp is not None and (rospy.Time.now() - stamp).to_sec() < timeout
+        return stamp is not None and 0 <= (rospy.Time.now() - stamp).to_sec() < timeout
 
     def _decide(self):
         """Return (colorA, colorB, blink_hz): alternate A/B at blink_hz; 0 hz = solid A."""
@@ -121,6 +139,16 @@ class LedNode(object):
         # 2. s/w (auto) kill -- manual already handled above, so lane==KILL here is our force-disarm
         if lane == "KILL":
             return RED, RED, 0.0
+
+        # Explicit mission states are optional. Only trust a fresh live hint
+        # while safety is OK and the actual FC mode/setpoint agrees with it.
+        mission = self.mission if self._fresh(self.mission_last, TIMEOUT) else None
+        if mission and self.state.level == 0 and lane != "LAND":
+            if (mission.get("state") == "hold_failed" and lane == "NORMAL"
+                    and mode == "OFFBOARD" and self._fresh(self.sp_last, SP_TIMEOUT)):
+                return GREEN, WHITE, 2.0
+            if mission.get("state") == "landing" and mode == "AUTO.LAND":
+                return CYAN, OFF, 2.0
 
         # 3. offboard-loss failsafe: RC still asks offboard but FC dropped to another mode
         if rc and self.mode_offb and mode != "OFFBOARD":

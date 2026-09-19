@@ -1,0 +1,396 @@
+[rospy.client][INFO] 2026-09-19 23:58:33,073: init_node, name[/trial_integration_test], pid[2224040]
+[xmlrpc][INFO] 2026-09-19 23:58:33,073: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2026-09-19 23:58:33,074: Started XML-RPC server [http://192.168.50.12:39139/]
+[rospy.init][INFO] 2026-09-19 23:58:33,074: ROS Slave URI: [http://192.168.50.12:39139/]
+[rospy.impl.masterslave][INFO] 2026-09-19 23:58:33,074: _ready: http://192.168.50.12:39139/
+[rospy.registration][INFO] 2026-09-19 23:58:33,075: Registering with master node http://127.0.0.1:11357
+[xmlrpc][INFO] 2026-09-19 23:58:33,075: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2026-09-19 23:58:33,175: registered with master
+[rospy.rosout][INFO] 2026-09-19 23:58:33,175: initializing /rosout core topic
+[rospy.rosout][INFO] 2026-09-19 23:58:33,177: connected to core topic /rosout
+[rospy.simtime][INFO] 2026-09-19 23:58:33,178: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2026-09-19 23:58:33,513: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2026-09-19 23:58:33,529: topic[/mavros/state] adding connection to [/flight_safety_response], count 0
+[rospy.internal][INFO] 2026-09-19 23:58:33,615: topic[/vrpn_client_node/pure/pose] adding connection to [/vision_pose_mux], count 0
+[rospy.internal][INFO] 2026-09-19 23:58:33,617: topic[/mavros/setpoint_raw/local] adding connection to [http://127.0.0.1:38045/], count 0
+[rospy.internal][INFO] 2026-09-19 23:58:34,000: topic[/vrpn_client_node/pure/pose] adding connection to [/landing_trial], count 1
+[rospy.internal][INFO] 2026-09-19 23:58:34,001: topic[/mavros/local_position/pose] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-19 23:58:34,002: topic[/mavros/state] adding connection to [/landing_trial], count 1
+[rospy.internal][INFO] 2026-09-19 23:58:34,004: topic[/mavros/extended_state] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-19 23:58:34,032: topic[/landing/pad_pose_global] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-19 23:58:34,036: topic[/landing/trial/status] adding connection to [http://127.0.0.1:36699/], count 0
+[rospy.internal][INFO] 2026-09-19 23:58:34,040: topic[/landing/alignment/ready] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-19 23:58:34,045: topic[/landing/target_visible] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-19 23:58:34,046: topic[/landing/estimator/inlier_ids] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-19 23:58:34,048: topic[/landing/vehicle_pose_pad] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-19 23:58:34,055: topic[/landing/camera_pose_pad] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-19 23:58:40,527: topic[/mavros/setpoint_raw/local] removing connection to http://127.0.0.1:38045/
+[rospy.internal][INFO] 2026-09-19 23:58:40,614: topic[/landing/trial/status] removing connection to http://127.0.0.1:36699/
+[rospy.internal][INFO] 2026-09-19 23:58:41,020: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2026-09-19 23:58:41,020: topic[/vrpn_client_node/pure/pose] removing connection to /vision_pose_mux
+[rospy.internal][INFO] 2026-09-19 23:58:41,020: topic[/vrpn_client_node/pure/pose] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-19 23:58:41,020: topic[/mavros/local_position/pose] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-19 23:58:41,020: topic[/mavros/state] removing connection to /flight_safety_response
+[rospy.internal][INFO] 2026-09-19 23:58:41,021: topic[/mavros/state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-19 23:58:41,021: topic[/mavros/extended_state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-19 23:58:41,021: topic[/landing/pad_pose_global] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-19 23:58:41,021: topic[/landing/alignment/ready] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-19 23:58:41,021: topic[/landing/target_visible] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-19 23:58:41,021: topic[/landing/estimator/inlier_ids] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-19 23:58:41,021: topic[/landing/vehicle_pose_pad] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-19 23:58:41,021: topic[/landing/camera_pose_pad] removing connection to /landing_trial
+[rospy.core][INFO] 2026-09-19 23:58:41,556: signal_shutdown [atexit]
+[rospy.registration][WARNING] 2026-09-19 23:58:41,556: cannot unregister with master due to network issues
+[rospy.impl.masterslave][INFO] 2026-09-19 23:58:41,556: atexit
+[rospy.client][INFO] 2026-09-19 23:59:26,678: init_node, name[/trial_integration_test], pid[2225989]
+[xmlrpc][INFO] 2026-09-19 23:59:26,678: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2026-09-19 23:59:26,678: Started XML-RPC server [http://192.168.50.12:40243/]
+[rospy.init][INFO] 2026-09-19 23:59:26,678: ROS Slave URI: [http://192.168.50.12:40243/]
+[rospy.impl.masterslave][INFO] 2026-09-19 23:59:26,678: _ready: http://192.168.50.12:40243/
+[rospy.registration][INFO] 2026-09-19 23:59:26,679: Registering with master node http://127.0.0.1:11357
+[xmlrpc][INFO] 2026-09-19 23:59:26,679: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2026-09-19 23:59:26,779: registered with master
+[rospy.rosout][INFO] 2026-09-19 23:59:26,779: initializing /rosout core topic
+[rospy.rosout][INFO] 2026-09-19 23:59:26,781: connected to core topic /rosout
+[rospy.simtime][INFO] 2026-09-19 23:59:26,782: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2026-09-19 23:59:27,117: topic[/mavros/state] adding connection to [/flight_safety_response], count 0
+[rospy.internal][INFO] 2026-09-19 23:59:27,121: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2026-09-19 23:59:27,123: topic[/mavros/setpoint_raw/local] adding connection to [http://127.0.0.1:33421/], count 0
+[rospy.internal][INFO] 2026-09-19 23:59:27,222: topic[/vrpn_client_node/pure/pose] adding connection to [/vision_pose_mux], count 0
+[rospy.internal][INFO] 2026-09-19 23:59:27,589: topic[/vrpn_client_node/pure/pose] adding connection to [/landing_trial], count 1
+[rospy.internal][INFO] 2026-09-19 23:59:27,592: topic[/mavros/local_position/pose] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-19 23:59:27,595: topic[/mavros/state] adding connection to [/landing_trial], count 1
+[rospy.internal][INFO] 2026-09-19 23:59:27,596: topic[/mavros/extended_state] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-19 23:59:27,627: topic[/landing/pad_pose_global] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-19 23:59:27,631: topic[/landing/trial/status] adding connection to [http://127.0.0.1:46023/], count 0
+[rospy.internal][INFO] 2026-09-19 23:59:27,632: topic[/landing/alignment/ready] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-19 23:59:27,636: topic[/landing/target_visible] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-19 23:59:27,641: topic[/landing/estimator/inlier_ids] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-19 23:59:27,643: topic[/landing/vehicle_pose_pad] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-19 23:59:27,646: topic[/landing/camera_pose_pad] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-19 23:59:30,840: topic[/mavros/setpoint_raw/local] removing connection to http://127.0.0.1:33421/
+[rospy.internal][INFO] 2026-09-19 23:59:30,915: topic[/landing/trial/status] removing connection to http://127.0.0.1:46023/
+[rospy.internal][INFO] 2026-09-19 23:59:31,126: topic[/vrpn_client_node/pure/pose] removing connection to /vision_pose_mux
+[rospy.internal][INFO] 2026-09-19 23:59:31,126: topic[/vrpn_client_node/pure/pose] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-19 23:59:31,127: topic[/mavros/local_position/pose] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-19 23:59:31,127: topic[/mavros/state] removing connection to /flight_safety_response
+[rospy.internal][INFO] 2026-09-19 23:59:31,127: topic[/mavros/state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-19 23:59:31,128: topic[/mavros/extended_state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-19 23:59:31,128: topic[/landing/pad_pose_global] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-19 23:59:31,128: topic[/landing/alignment/ready] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-19 23:59:31,128: topic[/landing/target_visible] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-19 23:59:31,129: topic[/landing/estimator/inlier_ids] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-19 23:59:31,129: topic[/landing/vehicle_pose_pad] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-19 23:59:31,129: topic[/landing/camera_pose_pad] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-19 23:59:31,629: topic[/rosout] removing connection to /rosout
+[rospy.core][INFO] 2026-09-19 23:59:31,834: signal_shutdown [atexit]
+[rospy.registration][WARNING] 2026-09-19 23:59:31,835: cannot unregister with master due to network issues
+[rospy.impl.masterslave][INFO] 2026-09-19 23:59:31,835: atexit
+[rospy.client][INFO] 2026-09-20 00:00:22,834: init_node, name[/trial_integration_test], pid[2227841]
+[xmlrpc][INFO] 2026-09-20 00:00:22,834: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2026-09-20 00:00:22,835: Started XML-RPC server [http://192.168.50.12:36383/]
+[rospy.init][INFO] 2026-09-20 00:00:22,835: ROS Slave URI: [http://192.168.50.12:36383/]
+[rospy.impl.masterslave][INFO] 2026-09-20 00:00:22,835: _ready: http://192.168.50.12:36383/
+[rospy.registration][INFO] 2026-09-20 00:00:22,835: Registering with master node http://127.0.0.1:11357
+[xmlrpc][INFO] 2026-09-20 00:00:22,835: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2026-09-20 00:00:22,935: registered with master
+[rospy.rosout][INFO] 2026-09-20 00:00:22,936: initializing /rosout core topic
+[rospy.rosout][INFO] 2026-09-20 00:00:22,937: connected to core topic /rosout
+[rospy.simtime][INFO] 2026-09-20 00:00:22,938: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2026-09-20 00:00:23,267: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2026-09-20 00:00:23,274: topic[/mavros/setpoint_raw/local] adding connection to [http://127.0.0.1:43761/], count 0
+[rospy.internal][INFO] 2026-09-20 00:00:23,275: topic[/mavros/state] adding connection to [/flight_safety_response], count 0
+[rospy.internal][INFO] 2026-09-20 00:00:23,368: topic[/vrpn_client_node/pure/pose] adding connection to [/vision_pose_mux], count 0
+[rospy.internal][INFO] 2026-09-20 00:00:23,787: topic[/vrpn_client_node/pure/pose] adding connection to [/landing_trial], count 1
+[rospy.internal][INFO] 2026-09-20 00:00:23,789: topic[/mavros/local_position/pose] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:00:23,792: topic[/mavros/state] adding connection to [/landing_trial], count 1
+[rospy.internal][INFO] 2026-09-20 00:00:23,795: topic[/mavros/extended_state] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:00:23,826: topic[/landing/pad_pose_global] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:00:23,828: topic[/landing/alignment/ready] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:00:23,830: topic[/landing/target_visible] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:00:23,834: topic[/landing/estimator/inlier_ids] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:00:23,840: topic[/landing/vehicle_pose_pad] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:00:23,842: topic[/landing/camera_pose_pad] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:00:23,875: topic[/landing/trial/status] adding connection to [http://127.0.0.1:33999/], count 0
+[rospy.internal][INFO] 2026-09-20 00:00:30,737: topic[/mavros/setpoint_raw/local] removing connection to http://127.0.0.1:43761/
+[rospy.internal][INFO] 2026-09-20 00:00:30,796: topic[/landing/trial/status] removing connection to http://127.0.0.1:33999/
+[rospy.internal][INFO] 2026-09-20 00:00:30,875: topic[/vrpn_client_node/pure/pose] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:00:30,876: topic[/mavros/local_position/pose] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:00:30,876: topic[/mavros/state] removing connection to /flight_safety_response
+[rospy.internal][INFO] 2026-09-20 00:00:30,876: topic[/mavros/state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:00:30,876: topic[/mavros/extended_state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:00:30,877: topic[/landing/pad_pose_global] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:00:30,877: topic[/landing/alignment/ready] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:00:30,877: topic[/landing/target_visible] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:00:30,877: topic[/landing/estimator/inlier_ids] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:00:30,877: topic[/landing/vehicle_pose_pad] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:00:30,877: topic[/landing/camera_pose_pad] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:00:31,378: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2026-09-20 00:00:31,378: topic[/vrpn_client_node/pure/pose] removing connection to /vision_pose_mux
+[rospy.core][INFO] 2026-09-20 00:00:31,663: signal_shutdown [atexit]
+[rospy.registration][WARNING] 2026-09-20 00:00:31,665: cannot unregister with master due to network issues
+[rospy.impl.masterslave][INFO] 2026-09-20 00:00:31,665: atexit
+[rospy.client][INFO] 2026-09-20 00:05:12,755: init_node, name[/trial_integration_test], pid[2236951]
+[xmlrpc][INFO] 2026-09-20 00:05:12,756: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2026-09-20 00:05:12,756: Started XML-RPC server [http://192.168.50.12:37063/]
+[rospy.init][INFO] 2026-09-20 00:05:12,757: ROS Slave URI: [http://192.168.50.12:37063/]
+[rospy.impl.masterslave][INFO] 2026-09-20 00:05:12,757: _ready: http://192.168.50.12:37063/
+[rospy.registration][INFO] 2026-09-20 00:05:12,757: Registering with master node http://127.0.0.1:11357
+[xmlrpc][INFO] 2026-09-20 00:05:12,757: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2026-09-20 00:05:12,857: registered with master
+[rospy.rosout][INFO] 2026-09-20 00:05:12,857: initializing /rosout core topic
+[rospy.rosout][INFO] 2026-09-20 00:05:12,859: connected to core topic /rosout
+[rospy.simtime][INFO] 2026-09-20 00:05:12,860: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2026-09-20 00:05:13,094: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2026-09-20 00:05:13,266: topic[/mavros/state] adding connection to [/flight_safety_response], count 0
+[rospy.internal][INFO] 2026-09-20 00:05:13,289: topic[/vrpn_client_node/pure/pose] adding connection to [/vision_pose_mux], count 0
+[rospy.internal][INFO] 2026-09-20 00:05:13,291: topic[/mavros/setpoint_raw/local] adding connection to [http://127.0.0.1:39175/], count 0
+[rospy.internal][INFO] 2026-09-20 00:05:13,851: topic[/vrpn_client_node/pure/pose] adding connection to [/landing_trial], count 1
+[rospy.internal][INFO] 2026-09-20 00:05:13,852: topic[/mavros/local_position/pose] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:05:13,853: topic[/mavros/state] adding connection to [/landing_trial], count 1
+[rospy.internal][INFO] 2026-09-20 00:05:13,858: topic[/mavros/extended_state] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:05:13,885: topic[/landing/pad_pose_global] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:05:13,889: topic[/landing/alignment/ready] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:05:13,891: topic[/landing/target_visible] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:05:13,894: topic[/landing/estimator/inlier_ids] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:05:13,895: topic[/landing/trial/status] adding connection to [http://127.0.0.1:40483/], count 0
+[rospy.internal][INFO] 2026-09-20 00:05:13,900: topic[/landing/vehicle_pose_pad] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:05:13,906: topic[/landing/camera_pose_pad] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:05:24,448: topic[/mavros/setpoint_raw/local] removing connection to http://127.0.0.1:39175/
+[rospy.internal][INFO] 2026-09-20 00:05:24,494: topic[/landing/trial/status] removing connection to http://127.0.0.1:40483/
+[rospy.internal][INFO] 2026-09-20 00:05:24,898: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2026-09-20 00:05:24,898: topic[/vrpn_client_node/pure/pose] removing connection to /vision_pose_mux
+[rospy.internal][INFO] 2026-09-20 00:05:24,899: topic[/vrpn_client_node/pure/pose] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:05:24,899: topic[/mavros/local_position/pose] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:05:24,899: topic[/mavros/state] removing connection to /flight_safety_response
+[rospy.internal][INFO] 2026-09-20 00:05:24,899: topic[/mavros/state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:05:24,900: topic[/mavros/extended_state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:05:24,900: topic[/landing/pad_pose_global] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:05:24,900: topic[/landing/alignment/ready] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:05:24,900: topic[/landing/target_visible] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:05:24,901: topic[/landing/estimator/inlier_ids] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:05:24,901: topic[/landing/vehicle_pose_pad] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:05:24,901: topic[/landing/camera_pose_pad] removing connection to /landing_trial
+[rospy.core][INFO] 2026-09-20 00:05:25,352: signal_shutdown [atexit]
+[rospy.registration][WARNING] 2026-09-20 00:05:25,353: cannot unregister with master due to network issues
+[rospy.impl.masterslave][INFO] 2026-09-20 00:05:25,354: atexit
+[rospy.client][INFO] 2026-09-20 00:10:27,636: init_node, name[/trial_integration_test], pid[2246660]
+[xmlrpc][INFO] 2026-09-20 00:10:27,637: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2026-09-20 00:10:27,637: Started XML-RPC server [http://192.168.50.12:40425/]
+[rospy.init][INFO] 2026-09-20 00:10:27,637: ROS Slave URI: [http://192.168.50.12:40425/]
+[rospy.impl.masterslave][INFO] 2026-09-20 00:10:27,637: _ready: http://192.168.50.12:40425/
+[rospy.registration][INFO] 2026-09-20 00:10:27,637: Registering with master node http://127.0.0.1:11357
+[xmlrpc][INFO] 2026-09-20 00:10:27,637: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2026-09-20 00:10:27,737: registered with master
+[rospy.rosout][INFO] 2026-09-20 00:10:27,738: initializing /rosout core topic
+[rospy.rosout][INFO] 2026-09-20 00:10:27,739: connected to core topic /rosout
+[rospy.simtime][INFO] 2026-09-20 00:10:27,741: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2026-09-20 00:10:28,080: topic[/vrpn_client_node/pure/pose] adding connection to [/vision_pose_mux], count 0
+[rospy.internal][INFO] 2026-09-20 00:10:28,081: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2026-09-20 00:10:28,141: topic[/mavros/state] adding connection to [/flight_safety_response], count 0
+[rospy.internal][INFO] 2026-09-20 00:10:28,183: topic[/mavros/setpoint_raw/local] adding connection to [http://127.0.0.1:35177/], count 0
+[rospy.internal][INFO] 2026-09-20 00:10:28,687: topic[/landing/trial/status] adding connection to [http://127.0.0.1:37747/], count 0
+[rospy.internal][INFO] 2026-09-20 00:10:28,711: topic[/mavros/local_position/pose] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:10:28,711: topic[/vrpn_client_node/pure/pose] adding connection to [/landing_trial], count 1
+[rospy.internal][INFO] 2026-09-20 00:10:28,717: topic[/mavros/state] adding connection to [/landing_trial], count 1
+[rospy.internal][INFO] 2026-09-20 00:10:28,720: topic[/mavros/extended_state] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:10:28,730: topic[/landing/pad_pose_global] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:10:28,733: topic[/landing/alignment/ready] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:10:28,735: topic[/landing/target_visible] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:10:28,738: topic[/landing/estimator/inlier_ids] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:10:28,741: topic[/landing/vehicle_pose_pad] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:10:28,744: topic[/landing/camera_pose_pad] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:10:39,294: topic[/mavros/setpoint_raw/local] removing connection to http://127.0.0.1:35177/
+[rospy.internal][INFO] 2026-09-20 00:10:39,345: topic[/landing/trial/status] removing connection to http://127.0.0.1:37747/
+[rospy.internal][INFO] 2026-09-20 00:10:39,691: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2026-09-20 00:10:39,691: topic[/vrpn_client_node/pure/pose] removing connection to /vision_pose_mux
+[rospy.internal][INFO] 2026-09-20 00:10:39,691: topic[/vrpn_client_node/pure/pose] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:10:39,692: topic[/mavros/local_position/pose] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:10:39,692: topic[/mavros/state] removing connection to /flight_safety_response
+[rospy.internal][INFO] 2026-09-20 00:10:39,692: topic[/mavros/state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:10:39,692: topic[/mavros/extended_state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:10:39,692: topic[/landing/pad_pose_global] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:10:39,693: topic[/landing/alignment/ready] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:10:39,693: topic[/landing/target_visible] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:10:39,693: topic[/landing/estimator/inlier_ids] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:10:39,693: topic[/landing/vehicle_pose_pad] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:10:39,694: topic[/landing/camera_pose_pad] removing connection to /landing_trial
+[rospy.core][INFO] 2026-09-20 00:10:40,218: signal_shutdown [atexit]
+[rospy.registration][WARNING] 2026-09-20 00:10:40,219: cannot unregister with master due to network issues
+[rospy.impl.masterslave][INFO] 2026-09-20 00:10:40,220: atexit
+[rospy.client][INFO] 2026-09-20 00:17:27,838: init_node, name[/trial_integration_test], pid[2259497]
+[xmlrpc][INFO] 2026-09-20 00:17:27,838: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2026-09-20 00:17:27,838: Started XML-RPC server [http://192.168.50.12:34267/]
+[rospy.init][INFO] 2026-09-20 00:17:27,838: ROS Slave URI: [http://192.168.50.12:34267/]
+[rospy.impl.masterslave][INFO] 2026-09-20 00:17:27,838: _ready: http://192.168.50.12:34267/
+[rospy.registration][INFO] 2026-09-20 00:17:27,839: Registering with master node http://127.0.0.1:11357
+[xmlrpc][INFO] 2026-09-20 00:17:27,839: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2026-09-20 00:17:27,939: registered with master
+[rospy.rosout][INFO] 2026-09-20 00:17:27,939: initializing /rosout core topic
+[rospy.rosout][INFO] 2026-09-20 00:17:27,942: connected to core topic /rosout
+[rospy.simtime][INFO] 2026-09-20 00:17:27,943: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2026-09-20 00:17:28,173: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2026-09-20 00:17:28,354: topic[/mavros/state] adding connection to [/flight_safety_response], count 0
+[rospy.internal][INFO] 2026-09-20 00:17:28,373: topic[/mavros/setpoint_raw/local] adding connection to [http://127.0.0.1:37283/], count 0
+[rospy.internal][INFO] 2026-09-20 00:17:28,375: topic[/vrpn_client_node/pure/pose] adding connection to [/vision_pose_mux], count 0
+[rospy.internal][INFO] 2026-09-20 00:17:28,904: topic[/vrpn_client_node/pure/pose] adding connection to [/landing_trial], count 1
+[rospy.internal][INFO] 2026-09-20 00:17:28,906: topic[/mavros/local_position/pose] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:17:28,908: topic[/mavros/state] adding connection to [/landing_trial], count 1
+[rospy.internal][INFO] 2026-09-20 00:17:28,912: topic[/mavros/extended_state] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:17:28,940: topic[/landing/pad_pose_global] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:17:28,942: topic[/landing/alignment/ready] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:17:28,948: topic[/landing/target_visible] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:17:28,948: topic[/landing/estimator/inlier_ids] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:17:28,950: topic[/landing/vehicle_pose_pad] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:17:28,953: topic[/landing/camera_pose_pad] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:17:28,994: topic[/landing/trial/status] adding connection to [http://127.0.0.1:34083/], count 0
+[rospy.internal][INFO] 2026-09-20 00:17:43,587: topic[/mavros/setpoint_raw/local] removing connection to http://127.0.0.1:37283/
+[rospy.internal][INFO] 2026-09-20 00:17:43,644: topic[/landing/trial/status] removing connection to http://127.0.0.1:34083/
+[rospy.internal][INFO] 2026-09-20 00:17:43,990: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2026-09-20 00:17:43,990: topic[/vrpn_client_node/pure/pose] removing connection to /vision_pose_mux
+[rospy.internal][INFO] 2026-09-20 00:17:43,991: topic[/vrpn_client_node/pure/pose] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:17:43,991: topic[/mavros/local_position/pose] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:17:43,991: topic[/mavros/state] removing connection to /flight_safety_response
+[rospy.internal][INFO] 2026-09-20 00:17:43,991: topic[/mavros/state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:17:43,992: topic[/mavros/extended_state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:17:43,992: topic[/landing/pad_pose_global] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:17:43,992: topic[/landing/alignment/ready] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:17:43,992: topic[/landing/target_visible] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:17:43,993: topic[/landing/estimator/inlier_ids] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:17:43,993: topic[/landing/vehicle_pose_pad] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:17:43,993: topic[/landing/camera_pose_pad] removing connection to /landing_trial
+[rospy.core][INFO] 2026-09-20 00:17:44,512: signal_shutdown [atexit]
+[rospy.registration][WARNING] 2026-09-20 00:17:44,513: cannot unregister with master due to network issues
+[rospy.impl.masterslave][INFO] 2026-09-20 00:17:44,514: atexit
+[rospy.client][INFO] 2026-09-20 00:18:30,378: init_node, name[/trial_integration_test], pid[2261737]
+[xmlrpc][INFO] 2026-09-20 00:18:30,379: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2026-09-20 00:18:30,380: Started XML-RPC server [http://192.168.50.12:41315/]
+[rospy.init][INFO] 2026-09-20 00:18:30,380: ROS Slave URI: [http://192.168.50.12:41315/]
+[rospy.impl.masterslave][INFO] 2026-09-20 00:18:30,380: _ready: http://192.168.50.12:41315/
+[rospy.registration][INFO] 2026-09-20 00:18:30,380: Registering with master node http://127.0.0.1:11357
+[xmlrpc][INFO] 2026-09-20 00:18:30,381: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2026-09-20 00:18:30,480: registered with master
+[rospy.rosout][INFO] 2026-09-20 00:18:30,481: initializing /rosout core topic
+[rospy.rosout][INFO] 2026-09-20 00:18:30,482: connected to core topic /rosout
+[rospy.simtime][INFO] 2026-09-20 00:18:30,484: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2026-09-20 00:18:30,805: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2026-09-20 00:18:30,884: topic[/mavros/state] adding connection to [/flight_safety_response], count 0
+[rospy.internal][INFO] 2026-09-20 00:18:30,907: topic[/vrpn_client_node/pure/pose] adding connection to [/vision_pose_mux], count 0
+[rospy.internal][INFO] 2026-09-20 00:18:30,910: topic[/mavros/setpoint_raw/local] adding connection to [http://127.0.0.1:43579/], count 0
+[rospy.internal][INFO] 2026-09-20 00:18:31,433: topic[/vrpn_client_node/pure/pose] adding connection to [/landing_trial], count 1
+[rospy.internal][INFO] 2026-09-20 00:18:31,434: topic[/mavros/local_position/pose] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:18:31,435: topic[/mavros/state] adding connection to [/landing_trial], count 1
+[rospy.internal][INFO] 2026-09-20 00:18:31,436: topic[/mavros/extended_state] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:18:31,468: topic[/landing/pad_pose_global] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:18:31,470: topic[/landing/alignment/ready] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:18:31,473: topic[/landing/target_visible] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:18:31,477: topic[/landing/estimator/inlier_ids] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:18:31,479: topic[/landing/vehicle_pose_pad] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:18:31,481: topic[/landing/camera_pose_pad] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:18:31,521: topic[/landing/trial/status] adding connection to [http://127.0.0.1:35933/], count 0
+[rospy.internal][INFO] 2026-09-20 00:18:46,151: topic[/mavros/setpoint_raw/local] removing connection to http://127.0.0.1:43579/
+[rospy.internal][INFO] 2026-09-20 00:18:46,200: topic[/landing/trial/status] removing connection to http://127.0.0.1:35933/
+[rospy.internal][INFO] 2026-09-20 00:18:46,521: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2026-09-20 00:18:46,522: topic[/vrpn_client_node/pure/pose] removing connection to /vision_pose_mux
+[rospy.internal][INFO] 2026-09-20 00:18:46,522: topic[/vrpn_client_node/pure/pose] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:18:46,522: topic[/mavros/local_position/pose] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:18:46,523: topic[/mavros/state] removing connection to /flight_safety_response
+[rospy.internal][INFO] 2026-09-20 00:18:46,523: topic[/mavros/state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:18:46,524: topic[/mavros/extended_state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:18:46,524: topic[/landing/pad_pose_global] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:18:46,524: topic[/landing/alignment/ready] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:18:46,524: topic[/landing/target_visible] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:18:46,525: topic[/landing/estimator/inlier_ids] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:18:46,525: topic[/landing/vehicle_pose_pad] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:18:46,525: topic[/landing/camera_pose_pad] removing connection to /landing_trial
+[rospy.core][INFO] 2026-09-20 00:18:47,076: signal_shutdown [atexit]
+[rospy.registration][WARNING] 2026-09-20 00:18:47,077: cannot unregister with master due to network issues
+[rospy.impl.masterslave][INFO] 2026-09-20 00:18:47,077: atexit
+[rospy.client][INFO] 2026-09-20 00:33:29,856: init_node, name[/trial_integration_test], pid[2290789]
+[xmlrpc][INFO] 2026-09-20 00:33:29,857: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2026-09-20 00:33:29,857: Started XML-RPC server [http://192.168.50.12:41991/]
+[rospy.init][INFO] 2026-09-20 00:33:29,857: ROS Slave URI: [http://192.168.50.12:41991/]
+[rospy.impl.masterslave][INFO] 2026-09-20 00:33:29,857: _ready: http://192.168.50.12:41991/
+[rospy.registration][INFO] 2026-09-20 00:33:29,858: Registering with master node http://127.0.0.1:11357
+[xmlrpc][INFO] 2026-09-20 00:33:29,858: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2026-09-20 00:33:29,958: registered with master
+[rospy.rosout][INFO] 2026-09-20 00:33:29,958: initializing /rosout core topic
+[rospy.rosout][INFO] 2026-09-20 00:33:29,960: connected to core topic /rosout
+[rospy.simtime][INFO] 2026-09-20 00:33:29,960: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2026-09-20 00:33:30,329: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2026-09-20 00:33:30,365: topic[/mavros/state] adding connection to [/flight_safety_response], count 0
+[rospy.internal][INFO] 2026-09-20 00:33:30,430: topic[/vrpn_client_node/pure/pose] adding connection to [/vision_pose_mux], count 0
+[rospy.internal][INFO] 2026-09-20 00:33:30,431: topic[/mavros/setpoint_raw/local] adding connection to [http://127.0.0.1:34313/], count 0
+[rospy.internal][INFO] 2026-09-20 00:33:30,938: topic[/landing/trial/status] adding connection to [http://127.0.0.1:38251/], count 0
+[rospy.internal][INFO] 2026-09-20 00:33:30,964: topic[/vrpn_client_node/pure/pose] adding connection to [/landing_trial], count 1
+[rospy.internal][INFO] 2026-09-20 00:33:30,966: topic[/mavros/local_position/pose] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:33:30,969: topic[/mavros/state] adding connection to [/landing_trial], count 1
+[rospy.internal][INFO] 2026-09-20 00:33:30,970: topic[/mavros/extended_state] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:33:30,980: topic[/landing/pad_pose_global] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:33:30,981: topic[/landing/alignment/ready] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:33:30,985: topic[/landing/target_visible] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:33:30,986: topic[/landing/estimator/inlier_ids] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:33:30,993: topic[/landing/vehicle_pose_pad] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:33:30,995: topic[/landing/camera_pose_pad] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:33:41,467: topic[/mavros/setpoint_raw/local] removing connection to http://127.0.0.1:34313/
+[rospy.internal][INFO] 2026-09-20 00:33:41,480: topic[/landing/trial/status] removing connection to http://127.0.0.1:38251/
+[rospy.internal][INFO] 2026-09-20 00:33:41,940: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2026-09-20 00:33:41,940: topic[/vrpn_client_node/pure/pose] removing connection to /vision_pose_mux
+[rospy.internal][INFO] 2026-09-20 00:33:41,940: topic[/vrpn_client_node/pure/pose] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:33:41,941: topic[/mavros/local_position/pose] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:33:41,941: topic[/mavros/state] removing connection to /flight_safety_response
+[rospy.internal][INFO] 2026-09-20 00:33:41,941: topic[/mavros/state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:33:41,941: topic[/mavros/extended_state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:33:41,941: topic[/landing/pad_pose_global] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:33:41,941: topic[/landing/alignment/ready] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:33:41,941: topic[/landing/target_visible] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:33:41,942: topic[/landing/estimator/inlier_ids] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:33:41,942: topic[/landing/vehicle_pose_pad] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:33:41,942: topic[/landing/camera_pose_pad] removing connection to /landing_trial
+[rospy.core][INFO] 2026-09-20 00:33:42,340: signal_shutdown [atexit]
+[rospy.registration][WARNING] 2026-09-20 00:33:42,341: cannot unregister with master due to network issues
+[rospy.impl.masterslave][INFO] 2026-09-20 00:33:42,341: atexit
+[rospy.client][INFO] 2026-09-20 00:35:50,660: init_node, name[/trial_integration_test], pid[2295502]
+[xmlrpc][INFO] 2026-09-20 00:35:50,660: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2026-09-20 00:35:50,661: Started XML-RPC server [http://192.168.50.12:41637/]
+[rospy.init][INFO] 2026-09-20 00:35:50,661: ROS Slave URI: [http://192.168.50.12:41637/]
+[rospy.impl.masterslave][INFO] 2026-09-20 00:35:50,661: _ready: http://192.168.50.12:41637/
+[rospy.registration][INFO] 2026-09-20 00:35:50,662: Registering with master node http://127.0.0.1:11357
+[xmlrpc][INFO] 2026-09-20 00:35:50,662: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2026-09-20 00:35:50,761: registered with master
+[rospy.rosout][INFO] 2026-09-20 00:35:50,762: initializing /rosout core topic
+[rospy.rosout][INFO] 2026-09-20 00:35:50,764: connected to core topic /rosout
+[rospy.simtime][INFO] 2026-09-20 00:35:50,765: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2026-09-20 00:35:50,993: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2026-09-20 00:35:51,148: topic[/mavros/state] adding connection to [/flight_safety_response], count 0
+[rospy.internal][INFO] 2026-09-20 00:35:51,190: topic[/mavros/setpoint_raw/local] adding connection to [http://127.0.0.1:41623/], count 0
+[rospy.internal][INFO] 2026-09-20 00:35:51,288: topic[/vrpn_client_node/pure/pose] adding connection to [/vision_pose_mux], count 0
+[rospy.internal][INFO] 2026-09-20 00:35:51,745: topic[/vrpn_client_node/pure/pose] adding connection to [/landing_trial], count 1
+[rospy.internal][INFO] 2026-09-20 00:35:51,746: topic[/mavros/local_position/pose] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:35:51,748: topic[/mavros/state] adding connection to [/landing_trial], count 1
+[rospy.internal][INFO] 2026-09-20 00:35:51,749: topic[/mavros/extended_state] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:35:51,780: topic[/landing/pad_pose_global] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:35:51,783: topic[/landing/alignment/ready] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:35:51,784: topic[/landing/target_visible] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:35:51,790: topic[/landing/estimator/inlier_ids] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:35:51,790: topic[/landing/vehicle_pose_pad] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:35:51,797: topic[/landing/trial/status] adding connection to [http://127.0.0.1:39195/], count 0
+[rospy.internal][INFO] 2026-09-20 00:35:51,800: topic[/landing/camera_pose_pad] adding connection to [/landing_trial], count 0
+[rospy.internal][INFO] 2026-09-20 00:36:06,381: topic[/mavros/setpoint_raw/local] removing connection to http://127.0.0.1:41623/
+[rospy.internal][INFO] 2026-09-20 00:36:06,477: topic[/landing/trial/status] removing connection to http://127.0.0.1:39195/
+[rospy.internal][INFO] 2026-09-20 00:36:06,797: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2026-09-20 00:36:06,798: topic[/vrpn_client_node/pure/pose] removing connection to /vision_pose_mux
+[rospy.internal][INFO] 2026-09-20 00:36:06,798: topic[/vrpn_client_node/pure/pose] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:36:06,798: topic[/mavros/local_position/pose] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:36:06,799: topic[/mavros/state] removing connection to /flight_safety_response
+[rospy.internal][INFO] 2026-09-20 00:36:06,799: topic[/mavros/state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:36:06,799: topic[/mavros/extended_state] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:36:06,799: topic[/landing/pad_pose_global] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:36:06,800: topic[/landing/alignment/ready] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:36:06,800: topic[/landing/target_visible] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:36:06,800: topic[/landing/estimator/inlier_ids] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:36:06,800: topic[/landing/vehicle_pose_pad] removing connection to /landing_trial
+[rospy.internal][INFO] 2026-09-20 00:36:06,801: topic[/landing/camera_pose_pad] removing connection to /landing_trial
+[rospy.core][INFO] 2026-09-20 00:36:07,355: signal_shutdown [atexit]
+[rospy.registration][WARNING] 2026-09-20 00:36:07,357: cannot unregister with master due to network issues
+[rospy.impl.masterslave][INFO] 2026-09-20 00:36:07,358: atexit

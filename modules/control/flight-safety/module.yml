@@ -2,6 +2,8 @@ name: flight-safety
 group: control
 description: Layered standalone flight safety — diagnosis, fault monitor, response/setpoint mux, and estimator mux. Builds in ws/flight-safety and consumes the distro MAVROS message API.
 
+needs: [utility/gui-vnc]
+
 deps:
   apt:
     - ros-noetic-diagnostic-updater

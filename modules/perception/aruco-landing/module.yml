@@ -1,6 +1,6 @@
 name: aruco-landing-perception
 group: perception
-description: Sensor-independent ArUco landing-pad detection and pose estimation.
+description: ArUco detection, calibrated pad/body pose estimation, session-only global alignment, and detected-image output.
 
 deps:
   apt:
@@ -25,7 +25,6 @@ deps:
 
 workspace: /work/ws/aruco-landing
 clone: clone.sh
-# The C++ estimator already performs detection; running the legacy Python
-# detector in parallel would duplicate the 60 Hz image workload.
-run: [run_estimator.sh]
-provides: [aruco-detection, landing-target]
+# One runtime entrypoint, shared by scripts/perception_aruco-landing.sh and setup.sh.
+run: [run.sh]
+provides: [aruco-detection, landing-target, pad-relative-body-pose, marker-global-body-pose]

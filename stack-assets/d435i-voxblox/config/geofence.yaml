@@ -1,0 +1,20 @@
+# Stack-owned geofence; disabled axes have no boundary checks.
+source: /vrpn_client_node/pure/pose
+fallback_source: /mavros/local_position/pose
+box:
+  x:
+  - -2.5
+  - 2.5
+  y:
+  - -2.5
+  - 2.5
+  z:
+  - -0.5
+  - 2.0
+margin_m: 0.4
+pose_timeout_s: 0.5
+fallback_timeout_s: 0.5
+enabled_axes:
+- x
+- y
+- z

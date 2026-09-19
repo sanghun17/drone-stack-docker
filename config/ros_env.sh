@@ -1,3 +1,12 @@
+# Optional stack-owned runtime policy. Common modules remain stack-independent.
+# Bind-mounted file: changes apply on the next module launch without rebuilding.
+_dsd_repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+if [[ "${DSD_STACK_NAME:-}" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+  _dsd_runtime_policy="$_dsd_repo_root/stack-assets/$DSD_STACK_NAME/config/runtime.env"
+  [ ! -f "$_dsd_runtime_policy" ] || source "$_dsd_runtime_policy"
+fi
+unset _dsd_repo_root _dsd_runtime_policy
+
 # ─────────────────────────────────────────────────────────────────────────
 # ROS networking — the SINGLE source of truth.
 # Edit a value here and it takes effect IMMEDIATELY: this file is mounted into
@@ -47,3 +56,9 @@ export ROS_HOSTNAME="${ROS_HOSTNAME:-$ROS_IP}"    # 신설 — sim.env sets this
 export CPUS_CAMERA="${CPUS_CAMERA:-0,1}"
 export CPUS_FASTLIVO="${CPUS_FASTLIVO:-2,3}"
 export CPUS_POOL="${CPUS_POOL:-4-11}"
+
+# Optional workload classes default to the existing shared pool in every stack.
+export CPUS_PERCEPTION="${CPUS_PERCEPTION:-$CPUS_POOL}"
+export CPUS_ESTIMATION="${CPUS_ESTIMATION:-$CPUS_POOL}"
+export CPUS_CONTROL="${CPUS_CONTROL:-$CPUS_POOL}"
+export CPUS_RECORDER="${CPUS_RECORDER:-$CPUS_POOL}"

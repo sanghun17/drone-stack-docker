@@ -31,6 +31,12 @@ ARCH=$(uname -m); case "$ARCH" in aarch64) ARCH=arm64;; x86_64) ARCH=amd64;; esa
 : "${DOCKER_BUILD_OPTS:=}"
 
 cmd="${1:-help}"; stack="${2:-}"
+# Explicit setup.sh stack arguments override the saved selection and shell defaults.
+if [ -n "$stack" ]; then
+  context_exports="$(python3 "$ROOT/tools/stack_context.py" resolve --stack "$stack" --shell)"
+  eval "$context_exports"
+  stack="$DSD_STACK"
+fi
 need_stack(){ [ -n "$stack" ] || { echo "need <stack> (see stacks/)"; exit 1; }; }
 # the generated Dockerfile uses BuildKit `RUN --mount` (modules/ is bind-mounted at
 # build time, never COPY-ed in) — so buildx is required for build/up.
@@ -53,6 +59,9 @@ case "$cmd" in
          docker compose -f "$(CF)" up -d
          echo ">> container drone-stack-$stack up. start nodes: ./setup.sh run $stack <module>" ;;
   run)   need_stack; mod="${3:?need <module> e.g. sensor/realsense-d435i}"
+         module_key="$mod"
+         [ ! -f "$ROOT/modules/$mod" ] || module_key="${mod%/*}"
+         python3 "$ROOT/tools/stack_context.py" resolve --stack "$stack" --module "$module_key" >/dev/null
          [ -f "$ROOT/modules/$mod" ] || mod="$mod/run.sh"   # allow dir or explicit script
          # `docker exec` does NOT inherit the caller's environment, so a module run
          # script that reads env vars (training/ete-net/run.sh needs ETE_CONFIG, and

@@ -1,0 +1,67 @@
+[INFO] [1789832151.660874]: landing controller ready: 60.0 Hz, Kp=0.800 Kd=0.150 vd=0.300, horizontal=camera, touchdown=camera z<=0.000m
+... logging to /home/ml/drone-stack-docker/stack-assets/aruco-landing-jetson/results/trial-preparation-20260919/roslog/cab358b0-b43f-11f1-bb4b-a760e04399b3/roslaunch-ml-2295637.log
+Checking log directory for disk usage. This may take a while.
+Press Ctrl-C to interrupt
+Done checking log file disk usage. Usage is <1GB.
+]2;/home/ml/drone-stack-docker/ws/aruco-landing/src/aruco_landing/launch/landing_trial.launch
+[1mstarted roslaunch server http://127.0.0.1:34745/[0m
+
+SUMMARY
+========
+
+PARAMETERS
+ * /landing_trial/approach_speed_mps: 0.5
+ * /landing_trial/auto_start_on_offboard: True
+ * /landing_trial/dry_run: False
+ * /landing_trial/extrinsic_file: /home/ml/drone-st...
+ * /landing_trial/initial_target_global_xy: [0.0, 0.0]
+ * /landing_trial/landing_finish_mode: auto_land
+ * /landing_trial/marker_confirm_s: 1.0
+ * /landing_trial/marker_loss_s: 0.5
+ * /landing_trial_controller/airsim_command_rate_hz: 60.0
+ * /landing_trial_controller/camera_pose_topic: /landing/trial/ca...
+ * /landing_trial_controller/command_topic: /landing/trial/la...
+ * /landing_trial_controller/derivative_filter_tau_s: 0.1
+ * /landing_trial_controller/derivative_speed_limit_mps: 2.0
+ * /landing_trial_controller/descent_speed_mps: 0.3
+ * /landing_trial_controller/enabled: True
+ * /landing_trial_controller/horizontal_reference: camera
+ * /landing_trial_controller/horizontal_speed_limit_mps: 0.5
+ * /landing_trial_controller/kd_xy: 0.15
+ * /landing_trial_controller/kp_xy: 0.8
+ * /landing_trial_controller/landing_altitude_max_m: 2.0
+ * /landing_trial_controller/landing_altitude_min_m: 0.0
+ * /landing_trial_controller/latency_compensation_enabled: True
+ * /landing_trial_controller/lateral_uncertainty_bound_m: 0.05
+ * /landing_trial_controller/marker_loss_timeout_s: 0.5
+ * /landing_trial_controller/max_pose_prediction_s: 0.2
+ * /landing_trial_controller/minimum_lateral_speed_mps: 0.0
+ * /landing_trial_controller/parameter_status: provisional
+ * /landing_trial_controller/target_visible_topic: /landing/trial/co...
+ * /landing_trial_controller/touchdown_height_reference: camera
+ * /landing_trial_controller/touchdown_stop_lead_s: 0.08
+ * /landing_trial_controller/trials_per_pad: 10
+ * /landing_trial_controller/update_rate_hz: 60.0
+ * /landing_trial_controller/vehicle_pose_topic: /landing/trial/bo...
+ * /landing_trial_controller/yaw_control_enabled: True
+ * /landing_trial_controller/yaw_deadband_deg: 1.0
+ * /landing_trial_controller/yaw_kp: 1.0
+ * /landing_trial_controller/yaw_rate_limit_rad_s: 0.35
+ * /landing_trial_controller/yaw_reference_rad: 0.0
+ * /rosdistro: noetic
+ * /rosversion: 1.16.0
+
+NODES
+  /
+    landing_trial (aruco_landing/landing_trial_node.py)
+    landing_trial_controller (aruco_landing/landing_controller_node.py)
+
+[1mROS_MASTER_URI=http://127.0.0.1:11357[0m
+]2;/home/ml/drone-stack-docker/ws/aruco-landing/src/aruco_landing/launch/landing_trial.launch http://127.0.0.1:11357
+[1mprocess[landing_trial_controller-1]: started with pid [2295736][0m
+[1mprocess[landing_trial-2]: started with pid [2295737][0m
+[landing_trial-2] killing on exit
+[landing_trial_controller-1] killing on exit
+shutting down processing monitor...
+... shutting down processing monitor complete
+[1mdone[0m

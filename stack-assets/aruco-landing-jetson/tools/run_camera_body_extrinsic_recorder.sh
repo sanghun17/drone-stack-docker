@@ -6,6 +6,8 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 CONTAINER="${DSD_CONTAINER:-drone-stack-aruco-landing-jetson}"
 CONFIG=/work/stack-assets/aruco-landing-jetson/config/camera_body_extrinsic_recorder.yaml
 
+__C="$CONTAINER"
+__R="$ROOT"
 source "$ROOT/modules/ensure_container.sh"
 docker start "$CONTAINER" >/dev/null 2>&1
 

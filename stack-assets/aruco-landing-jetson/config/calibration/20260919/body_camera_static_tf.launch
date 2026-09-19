@@ -1,0 +1,6 @@
+<launch>
+  <!-- Fixed physical Body-to-Camera mount, fixed_body_20260919_v2. Pure must equal current FLU Body. -->
+  <!-- No global-pad TF: pad placement is learned separately each session. -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="measured_body_camera_tf"
+        args="0.1253561321764021 7.830621472088443e-05 -0.006854967546666358 0.7181588566960311 0.6958776420997435 -0.001463258680127507 0.0001504951360613198 base_link see3cam_optical_frame"/>
+</launch>
