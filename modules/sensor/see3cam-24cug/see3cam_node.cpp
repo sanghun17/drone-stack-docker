@@ -80,7 +80,7 @@ class See3Cam {
              width_, height_, fps_, pixel_format_.c_str());
   }
 
-  ~See3Cam() { if (opened_) camera_.shutdown(); }
+  // UsbCam owns its resources and releases them in its destructor.
 
   void spin() {
     ros::WallRate rate(fps_);

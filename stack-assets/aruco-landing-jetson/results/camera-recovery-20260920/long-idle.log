@@ -1,0 +1,29 @@
+one-shot 0 1280 720 1789836808.0078344
+idle None ['capture=idle raw_subscribers=0 color_subscribers=0 rect_subscribers=0 empty_polls=0 stream_restarts=0 captured_frames=2 raw_published=2 rectified_frames=0']
+one-shot 1 1280 720 1789836838.3263178
+idle None ['capture=idle raw_subscribers=0 color_subscribers=0 rect_subscribers=0 empty_polls=2 stream_restarts=0 captured_frames=4 raw_published=4 rectified_frames=0']
+one-shot 2 1280 720 1789836868.671705
+idle None ['capture=idle raw_subscribers=0 color_subscribers=0 rect_subscribers=0 empty_polls=4 stream_restarts=0 captured_frames=6 raw_published=6 rectified_frames=0']
+one-shot 3 1280 720 1789836899.0046268
+idle None ['capture=idle raw_subscribers=0 color_subscribers=0 rect_subscribers=0 empty_polls=6 stream_restarts=0 captured_frames=8 raw_published=8 rectified_frames=0']
+one-shot 4 1280 720 1789836929.3388748
+idle None ['capture=idle raw_subscribers=0 color_subscribers=0 rect_subscribers=0 empty_polls=8 stream_restarts=0 captured_frames=10 raw_published=10 rectified_frames=0']
+{"second": 10, "frames": 584, "recent_hz": 58.4, "status": ["capture=active raw_subscribers=1 color_subscribers=0 rect_subscribers=0 empty_polls=10 stream_restarts=0 captured_frames=550 raw_published=550 rectified_frames=0"]}
+{"second": 20, "frames": 1184, "recent_hz": 60.0, "status": ["capture=active raw_subscribers=1 color_subscribers=0 rect_subscribers=0 empty_polls=10 stream_restarts=0 captured_frames=1156 raw_published=1156 rectified_frames=0"]}
+{"second": 30, "frames": 1767, "recent_hz": 58.3, "status": ["capture=active raw_subscribers=1 color_subscribers=0 rect_subscribers=0 empty_polls=13 stream_restarts=0 captured_frames=1746 raw_published=1746 rectified_frames=0"]}
+{"second": 40, "frames": 2335, "recent_hz": 56.8, "status": ["capture=active raw_subscribers=1 color_subscribers=0 rect_subscribers=0 empty_polls=18 stream_restarts=0 captured_frames=2318 raw_published=2318 rectified_frames=0"]}
+{"second": 50, "frames": 2905, "recent_hz": 57.0, "status": ["capture=active raw_subscribers=1 color_subscribers=0 rect_subscribers=0 empty_polls=23 stream_restarts=0 captured_frames=2891 raw_published=2891 rectified_frames=0"]}
+{"second": 60, "frames": 3491, "recent_hz": 58.6, "status": ["capture=active raw_subscribers=1 color_subscribers=0 rect_subscribers=0 empty_polls=26 stream_restarts=0 captured_frames=3479 raw_published=3479 rectified_frames=0"]}
+{"second": 70, "frames": 4092, "recent_hz": 60.1, "status": ["capture=active raw_subscribers=1 color_subscribers=0 rect_subscribers=0 empty_polls=26 stream_restarts=0 captured_frames=4084 raw_published=4084 rectified_frames=0"]}
+{"second": 80, "frames": 4693, "recent_hz": 60.1, "status": ["capture=active raw_subscribers=1 color_subscribers=0 rect_subscribers=0 empty_polls=26 stream_restarts=0 captured_frames=4690 raw_published=4690 rectified_frames=0"]}
+{"second": 90, "frames": 5294, "recent_hz": 60.1, "status": ["capture=active raw_subscribers=1 color_subscribers=0 rect_subscribers=0 empty_polls=26 stream_restarts=0 captured_frames=5296 raw_published=5296 rectified_frames=0"]}
+{"second": 100, "frames": 5894, "recent_hz": 60.0, "status": ["capture=active raw_subscribers=1 color_subscribers=0 rect_subscribers=0 empty_polls=26 stream_restarts=0 captured_frames=5901 raw_published=5901 rectified_frames=0"]}
+{"second": 110, "frames": 6495, "recent_hz": 60.1, "status": ["capture=active raw_subscribers=1 color_subscribers=0 rect_subscribers=0 empty_polls=26 stream_restarts=0 captured_frames=6447 raw_published=6447 rectified_frames=0"]}
+{"second": 120, "frames": 7096, "recent_hz": 60.1, "status": ["capture=active raw_subscribers=1 color_subscribers=0 rect_subscribers=0 empty_polls=26 stream_restarts=0 captured_frames=7053 raw_published=7053 rectified_frames=0"]}
+{"second": 130, "frames": 7696, "recent_hz": 60.0, "status": ["capture=active raw_subscribers=1 color_subscribers=0 rect_subscribers=0 empty_polls=26 stream_restarts=0 captured_frames=7661 raw_published=7661 rectified_frames=0"]}
+{"second": 140, "frames": 8297, "recent_hz": 60.1, "status": ["capture=active raw_subscribers=1 color_subscribers=0 rect_subscribers=0 empty_polls=26 stream_restarts=0 captured_frames=8268 raw_published=8268 rectified_frames=0"]}
+{"second": 150, "frames": 8898, "recent_hz": 60.1, "status": ["capture=active raw_subscribers=1 color_subscribers=0 rect_subscribers=0 empty_polls=26 stream_restarts=0 captured_frames=8874 raw_published=8874 rectified_frames=0"]}
+{"second": 160, "frames": 9498, "recent_hz": 60.0, "status": ["capture=active raw_subscribers=1 color_subscribers=0 rect_subscribers=0 empty_polls=26 stream_restarts=0 captured_frames=9479 raw_published=9479 rectified_frames=0"]}
+{"second": 170, "frames": 10099, "recent_hz": 60.0, "status": ["capture=active raw_subscribers=1 color_subscribers=0 rect_subscribers=0 empty_polls=26 stream_restarts=0 captured_frames=10084 raw_published=10084 rectified_frames=0"]}
+{"second": 180, "frames": 10700, "recent_hz": 60.1, "status": ["capture=active raw_subscribers=1 color_subscribers=0 rect_subscribers=0 empty_polls=26 stream_restarts=0 captured_frames=10691 raw_published=10691 rectified_frames=0"]}
+{"frames": 10700, "duration": 180.21095979099982, "hz": 59.374857180769446, "max_gap_s": 0.29626763799979017, "duplicate_stamps": 0, "exit": null, "status": ["capture=active raw_subscribers=1 color_subscribers=0 rect_subscribers=0 empty_polls=26 stream_restarts=0 captured_frames=10691 raw_published=10691 rectified_frames=0", "capture=idle raw_subscribers=0 color_subscribers=0 rect_subscribers=0 empty_polls=26 stream_restarts=0 captured_frames=10710 raw_published=10710 rectified_frames=0", "capture=idle raw_subscribers=0 color_subscribers=0 rect_subscribers=0 empty_polls=26 stream_restarts=0 captured_frames=10710 raw_published=10710 rectified_frames=0"], "preview_counts": {}, "perception_status": [], "estimator_exit": null, "processing_hz_median": null, "passed": true}

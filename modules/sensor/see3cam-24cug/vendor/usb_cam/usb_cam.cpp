@@ -378,13 +378,11 @@ std::string fcc2s(unsigned int val)
 
 UsbCam::UsbCam()
   : io_(IO_METHOD_MMAP), fd_(-1), buffers_(NULL), n_buffers_(0), avframe_camera_(NULL),
-    avframe_rgb_(NULL), avcodec_(NULL), avoptions_(NULL), avcodec_context_(NULL),
+    avframe_rgb_(NULL), avcodec_(NULL), avoptions_(NULL), avcodec_context_(NULL), avparser_context_(NULL),
     avframe_camera_size_(0), avframe_rgb_size_(0), video_sws_(NULL), image_(NULL), is_capturing_(false) {
 }
 UsbCam::~UsbCam()
 {
-  av_parser_close(avparser_context_);
-  avcodec_free_context(&avcodec_context_);
   shutdown();
 }
 
@@ -656,6 +654,17 @@ int UsbCam::read_frame()
 
       assert(buf.index < n_buffers_);
       len = buf.bytesused;
+      // Never convert an errored or partial UYVY buffer into a plausible ROS
+      // image. The remaining mmap bytes can belong to an older frame.
+      if ((buf.flags & V4L2_BUF_FLAG_ERROR) ||
+          (pixelformat_ == V4L2_PIX_FMT_UYVY &&
+           len != image_->width * image_->height * 2))
+      {
+        ROS_WARN_THROTTLE(2, "Discarding incomplete/error V4L2 frame: bytes=%d flags=0x%x", len, buf.flags);
+        if (-1 == xioctl(fd_, VIDIOC_QBUF, &buf))
+          errno_exit("VIDIOC_QBUF");
+        return 0;
+      }
       process_image(buffers_[buf.index].start, len, image_);
 
       if (-1 == xioctl(fd_, VIDIOC_QBUF, &buf))
@@ -796,6 +805,7 @@ void UsbCam::start_capturing(void)
 
 void UsbCam::uninit_device(void)
 {
+  if (!buffers_) return;
   unsigned int i;
 
   switch (io_)
@@ -817,6 +827,8 @@ void UsbCam::uninit_device(void)
   }
 
   free(buffers_);
+  buffers_ = NULL;
+  n_buffers_ = 0;
 }
 
 void UsbCam::init_read(unsigned int buffer_size)
@@ -1110,6 +1122,7 @@ void UsbCam::init_device(int image_width, int image_height, int framerate)
 
 void UsbCam::close_device(void)
 {
+  if (fd_ < 0) return;
   if (-1 == close(fd_))
     errno_exit("close");
 
@@ -1215,20 +1228,19 @@ void UsbCam::shutdown(void)
   uninit_device();
   close_device();
 
-  if (avcodec_context_)
+  if (avparser_context_) av_parser_close(avparser_context_);
+  avparser_context_ = NULL;
+  avcodec_free_context(&avcodec_context_);
+  av_frame_free(&avframe_camera_);
+  av_frame_free(&avframe_rgb_);
+  av_dict_free(&avoptions_);
+  if (image_)
   {
-    avcodec_close(avcodec_context_);
-    av_free(avcodec_context_);
-    avcodec_context_ = NULL;
-  }
-  if (avframe_camera_)
-    av_free(avframe_camera_);
-  avframe_camera_ = NULL;
-  if (avframe_rgb_)
-    av_free(avframe_rgb_);
-  avframe_rgb_ = NULL;
-  if(image_)
+    // BGR24 uses an mmap alias in the upstream converter; other formats own
+    // the RGB output allocation. In particular, UYVY must release that buffer.
+    if (pixelformat_ != V4L2_PIX_FMT_BGR24) free(image_->image);
     free(image_);
+  }
   image_ = NULL;
 }
 

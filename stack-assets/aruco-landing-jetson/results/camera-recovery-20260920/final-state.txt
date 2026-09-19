@@ -1,0 +1,20 @@
+gain: 1
+exposure_auto: 1
+exposure_absolute: 150
+Format Video Capture:
+	Width/Height      : 1280/720
+	Pixel Format      : 'UYVY' (UYVY 4:2:2)
+	Field             : None
+	Bytes per Line    : 2560
+	Size Image        : 1843200
+	Colorspace        : sRGB
+	Transfer Function : Rec. 709
+	YCbCr/HSV Encoding: ITU-R 601
+	Quantization      : Default (maps to Limited Range)
+	Flags             :
+Streaming Parameters Video Capture:
+	Capabilities     : timeperframe
+	Frames per second: 60.000 (60/1)
+	Read buffers     : 0
+1.1.1
+auto

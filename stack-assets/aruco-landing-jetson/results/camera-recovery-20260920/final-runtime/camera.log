@@ -1,0 +1,37 @@
+-- Using CATKIN_DEVEL_PREFIX: /work/.build/see3cam-demand/aarch64/devel
+-- Using CMAKE_PREFIX_PATH: /opt/ros/noetic
+-- This workspace overlays: /opt/ros/noetic
+-- Found PythonInterp: /usr/bin/python3 (found suitable version "3.8.10", minimum required is "3")
+-- Using PYTHON_EXECUTABLE: /usr/bin/python3
+-- Using Debian Python package layout
+-- Using empy: /usr/lib/python3/dist-packages/em.py
+-- Using CATKIN_ENABLE_TESTING: ON
+-- Call enable_testing()
+-- Using CATKIN_TEST_RESULTS_DIR: /work/.build/see3cam-demand/aarch64/test_results
+-- Forcing gtest/gmock from source, though one was otherwise available.
+-- Found gtest sources under '/usr/src/googletest': gtests will be built
+-- Found gmock sources under '/usr/src/googletest': gmock will be built
+-- Found PythonInterp: /usr/bin/python3 (found version "3.8.10")
+-- Using Python nosetests: /usr/bin/nosetests3
+-- catkin 0.8.12
+-- BUILD_SHARED_LIBS is on
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /work/.build/see3cam-demand/aarch64
+[100%] Built target see3cam_node
+>> Configuring See3CAM exposure/gain (USB control timeout: 15 s)
+>> See3CAM calibration: /work/modules/sensor/see3cam-24cug/calibration/1A3958060A020900.yaml
+>> See3CAM /dev/v4l/by-id/usb-e-con_systems_See3CAM_24CUG_1A3958060A020900-video-index0 1280x720@60 uyvy exposure=150 gain=1
+[0m[INFO] [1789837589.390577218]: camera calibration URL: file:///work/modules/sensor/see3cam-24cug/calibration/1A3958060A020900.yaml[0m
+[0m[INFO] [1789837589.392063865]: See3CAM ready: 1280x720@60 uyvy; capture starts when an image subscriber connects[0m
+[0m[INFO] [1789837590.963027552]: Image subscriber connected: camera opened[0m
+[0m[INFO] [1789837591.060163532]: No image subscribers: camera capture paused[0m
+[0m[INFO] [1789837592.994440203]: Image subscriber connected: camera capture resumed[0m
+[0m[INFO] [1789837593.146339340]: No image subscribers: camera capture paused[0m
+[0m[INFO] [1789837595.097132413]: Image subscriber connected: camera capture resumed[0m
+[0m[INFO] [1789837595.266242537]: No image subscribers: camera capture paused[0m
+[0m[INFO] [1789837597.200263685]: Image subscriber connected: camera capture resumed[0m
+[0m[INFO] [1789837597.382286745]: No image subscribers: camera capture paused[0m
+[0m[INFO] [1789837599.333030409]: Image subscriber connected: camera capture resumed[0m
+[0m[INFO] [1789837599.498188948]: No image subscribers: camera capture paused[0m
+[0m[INFO] [1789837601.448930869]: Image subscriber connected: camera capture resumed[0m

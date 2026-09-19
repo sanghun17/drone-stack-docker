@@ -1,0 +1,30 @@
+... logging to /root/.ros/log/b502e672-b447-11f1-97c1-dc9009e58a85/roslaunch-ubuntu-365.log
+Checking log directory for disk usage. This may take a while.
+Press Ctrl-C to interrupt
+Done checking log file disk usage. Usage is <1GB.
+]2;roscore
+[1mstarted roslaunch server http://127.0.0.1:41937/[0m
+ros_comm version 1.17.4
+
+
+SUMMARY
+========
+
+PARAMETERS
+ * /rosdistro: noetic
+ * /rosversion: 1.17.4
+
+NODES
+
+auto-starting new master
+[1mprocess[master]: started with pid [373][0m
+[1mROS_MASTER_URI=http://127.0.0.1:11359/[0m
+]2;roscore http://127.0.0.1:11359/
+[1msetting /run_id to b502e672-b447-11f1-97c1-dc9009e58a85[0m
+[1mprocess[rosout-1]: started with pid [383][0m
+started core service [/rosout]
+[rosout-1] killing on exit
+[master] killing on exit
+shutting down processing monitor...
+... shutting down processing monitor complete
+[1mdone[0m

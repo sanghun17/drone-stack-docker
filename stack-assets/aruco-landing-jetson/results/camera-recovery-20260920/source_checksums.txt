@@ -1,0 +1,2 @@
+a4d8c6ff82e432619a380b08be491eea76fb0deee8afd139dbb769868fa4eb3a  /tmp/seecam-recovery/public_sources.tbz2
+4ec1a214b9ba80cffa74189e1bcff5e4f1cc3388980af1742f9586e6504071b1  /tmp/seecam-recovery/kernel_src.tbz2

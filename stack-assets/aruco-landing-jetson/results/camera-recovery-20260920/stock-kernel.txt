@@ -1,0 +1,16 @@
+frames:  35351
+packets: 1804744
+empty:   0
+errors:  0
+invalid: 0
+pts: 0 early, 35351 initial, 35351 ok
+scr: 35351 count ok, 0 diff ok
+sof: 0 <= sof <= 0, freq 0.000 kHz
+[   44.446236]  mmcblk0: p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11 p12 p13 p14 p15
+[  377.290435] cgroup: cgroup: disabling cgroup2 socket matching due to net_prio or net_cls activation
+[  494.127129] usb 2-3.1: usbfs: process 10474 (probe) did not claim interface 0 before use
+[  529.405532] uvcvideo: Found UVC 1.00 device See3CAM_24CUG (2560:c128)
+[  529.648038] input: See3CAM_24CUG as /devices/platform/3610000.xhci/usb2/2-3/2-3.1/2-3.1:1.0/input/input7
+[ 1152.349326] cpufreq: cpu0,cur:1494000,set:2201600,set ndiv:172
+[ 1152.350952] cpufreq: cpu4,cur:1449000,set:1574400,set ndiv:123
+[ 1154.390671] cpufreq: cpu0,cur:1050000,set:1267200,set ndiv:99

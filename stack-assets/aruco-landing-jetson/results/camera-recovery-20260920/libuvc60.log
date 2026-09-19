@@ -1,0 +1,166 @@
+init: 0
+find: 0
+open: 0
+DEVICE CONFIGURATION (2560:c128/1A3958060A020900) ---
+Status: idle
+VideoControl:
+	bcdUVC: 0x0100
+VideoStreaming(1):
+	bEndpointAddress: 131
+	Formats:
+	UncompressedFormat(1)
+		  bits per pixel: 16
+		  GUID: 5559565900001000800000aa00389b71 (UYVY)
+		  default frame: 2
+		  aspect ratio: 0x0
+		  interlace flags: 00
+		  copy protect: 00
+			FrameDescriptor(1)
+			  capabilities: 00
+			  size: 1280x720
+			  bit rate: 1769472000-1769472000
+			  max frame size: 1843200
+			  default interval: 1/120
+			  interval[0]: 1/120
+			  interval[1]: 1/60
+			FrameDescriptor(2)
+			  capabilities: 00
+			  size: 1920x1080
+			  bit rate: 1990656000-1990656000
+			  max frame size: 4147200
+			  default interval: 1/60
+			  interval[0]: 1/60
+			FrameDescriptor(3)
+			  capabilities: 00
+			  size: 1920x1200
+			  bit rate: 2027520000-2027520000
+			  max frame size: 4608000
+			  default interval: 1/55
+			  interval[0]: 1/55
+			StillFrameDescriptor
+			  bEndPointAddress: 00
+			  wWidth(1) = 1280
+			  wHeight(1) = 720
+			  wWidth(2) = 1920
+			  wHeight(2) = 1080
+			  wWidth(3) = 1920
+			  wHeight(3) = 1200
+	MJPEGFormat(2)
+		  bits per pixel: 0
+		  GUID: 4d4a5047000000000000000000000000 (MJPG)
+		  default frame: 2
+		  aspect ratio: 0x0
+		  interlace flags: 00
+		  copy protect: 00
+			FrameDescriptor(1)
+			  capabilities: 00
+			  size: 1280x720
+			  bit rate: 1769472000-1769472000
+			  max frame size: 1843200
+			  default interval: 1/120
+			  interval[0]: 1/120
+			  interval[1]: 1/60
+			FrameDescriptor(2)
+			  capabilities: 00
+			  size: 1920x1080
+			  bit rate: -313655296--313655296
+			  max frame size: 4147200
+			  default interval: 1/120
+			  interval[0]: 1/120
+			  interval[1]: 1/60
+			  interval[2]: 1/30
+			FrameDescriptor(3)
+			  capabilities: 00
+			  size: 1920x1200
+			  bit rate: -92471296--92471296
+			  max frame size: 4608000
+			  default interval: 1/114
+			  interval[0]: 1/114
+			  interval[1]: 1/60
+			StillFrameDescriptor
+			  bEndPointAddress: 00
+			  wWidth(1) = 1280
+			  wHeight(1) = 720
+			  wWidth(2) = 1920
+			  wHeight(2) = 1080
+			  wWidth(3) = 1920
+			  wHeight(3) = 1200
+END DEVICE CONFIGURATION
+negotiate: 0
+bmHint: 0000
+bFormatIndex: 1
+bFrameIndex: 1
+dwFrameInterval: 166666
+wKeyFrameRate: 0
+wPFrameRate: 0
+wCompQuality: 0
+wCompWindowSize: 0
+wDelay: 0
+dwMaxVideoFrameSize: 1843200
+dwMaxPayloadTransferSize: 36864
+manual_exposure: 0
+exposure150: 0
+bInterfaceNumber: 1
+gain1: 0
+start: 0
+second=1 total=58 fps=58 bad=0 sequence=58
+second=2 total=118 fps=60 bad=0 sequence=118
+second=3 total=178 fps=60 bad=0 sequence=178
+second=4 total=238 fps=60 bad=0 sequence=238
+second=5 total=298 fps=60 bad=0 sequence=298
+second=6 total=358 fps=60 bad=0 sequence=358
+second=7 total=418 fps=60 bad=0 sequence=418
+second=8 total=478 fps=60 bad=0 sequence=478
+second=9 total=538 fps=60 bad=0 sequence=538
+second=10 total=598 fps=60 bad=0 sequence=598
+second=11 total=658 fps=60 bad=0 sequence=658
+second=12 total=718 fps=60 bad=0 sequence=718
+second=13 total=778 fps=60 bad=0 sequence=778
+second=14 total=838 fps=60 bad=0 sequence=838
+second=15 total=898 fps=60 bad=0 sequence=898
+second=16 total=955 fps=57 bad=1 sequence=955
+second=17 total=1015 fps=60 bad=1 sequence=1015
+second=18 total=1075 fps=60 bad=1 sequence=1075
+second=19 total=1135 fps=60 bad=1 sequence=1135
+second=20 total=1192 fps=57 bad=2 sequence=1192
+second=21 total=1252 fps=60 bad=2 sequence=1252
+second=22 total=1309 fps=57 bad=3 sequence=1309
+second=23 total=1369 fps=60 bad=3 sequence=1369
+second=24 total=1426 fps=57 bad=4 sequence=1426
+second=25 total=1486 fps=60 bad=4 sequence=1486
+second=26 total=1543 fps=57 bad=5 sequence=1543
+second=27 total=1603 fps=60 bad=5 sequence=1603
+second=28 total=1660 fps=57 bad=6 sequence=1660
+second=29 total=1720 fps=60 bad=6 sequence=1720
+second=30 total=1777 fps=57 bad=7 sequence=1777
+second=31 total=1837 fps=60 bad=7 sequence=1837
+second=32 total=1894 fps=57 bad=8 sequence=1894
+second=33 total=1954 fps=60 bad=8 sequence=1954
+second=34 total=2011 fps=57 bad=9 sequence=2011
+second=35 total=2071 fps=60 bad=9 sequence=2071
+second=36 total=2128 fps=57 bad=10 sequence=2128
+second=37 total=2188 fps=60 bad=10 sequence=2188
+second=38 total=2245 fps=57 bad=11 sequence=2245
+second=39 total=2305 fps=60 bad=11 sequence=2305
+second=40 total=2362 fps=57 bad=12 sequence=2362
+second=41 total=2422 fps=60 bad=12 sequence=2422
+second=42 total=2479 fps=57 bad=13 sequence=2479
+second=43 total=2539 fps=60 bad=13 sequence=2539
+second=44 total=2596 fps=57 bad=14 sequence=2596
+second=45 total=2656 fps=60 bad=14 sequence=2656
+second=46 total=2713 fps=57 bad=15 sequence=2713
+second=47 total=2773 fps=60 bad=15 sequence=2773
+second=48 total=2830 fps=57 bad=16 sequence=2830
+second=49 total=2890 fps=60 bad=16 sequence=2890
+second=50 total=2950 fps=60 bad=16 sequence=2950
+second=51 total=3010 fps=60 bad=16 sequence=3010
+second=52 total=3070 fps=60 bad=16 sequence=3070
+second=53 total=3130 fps=60 bad=16 sequence=3130
+second=54 total=3190 fps=60 bad=16 sequence=3190
+second=55 total=3250 fps=60 bad=16 sequence=3250
+second=56 total=3310 fps=60 bad=16 sequence=3310
+second=57 total=3370 fps=60 bad=16 sequence=3370
+second=58 total=3430 fps=60 bad=16 sequence=3430
+second=59 total=3490 fps=60 bad=16 sequence=3490
+second=60 total=3550 fps=60 bad=16 sequence=3550
+closed exit=2

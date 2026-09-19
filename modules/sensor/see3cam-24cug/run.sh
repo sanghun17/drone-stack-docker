@@ -59,7 +59,16 @@ fi
 # This camera's auto exposure selected ~31 ms during the 60 Hz test, reducing
 # the delivered stream to ~15 Hz. Keep exposure below one frame period by
 # default; all controls remain overridable for different lighting.
-v4l2-ctl --device="$SEE3CAM_DEVICE" --set-ctrl="exposure_auto=${SEE3CAM_EXPOSURE_AUTO},exposure_absolute=${SEE3CAM_EXPOSURE_ABSOLUTE},gain=${SEE3CAM_GAIN}"
+echo ">> Configuring See3CAM exposure/gain (USB control timeout: 15 s)"
+if timeout --kill-after=2s 15s v4l2-ctl --device="$SEE3CAM_DEVICE" --set-ctrl="exposure_auto=${SEE3CAM_EXPOSURE_AUTO},exposure_absolute=${SEE3CAM_EXPOSURE_ABSOLUTE},gain=${SEE3CAM_GAIN}"; then
+  :
+else
+  control_rc=$?
+  echo "ERROR: See3CAM control setup failed (exit $control_rc): $SEE3CAM_DEVICE" >&2
+  echo "       Capture has not started. An 'unknown control' can also follow failed USB control enumeration." >&2
+  echo "       Check v4l2-ctl --list-ctrls and host kernel USB/UVC logs; requested exposure/gain were not confirmed." >&2
+  exit "$control_rc"
+fi
 
 calib="/work/modules/sensor/see3cam-24cug/calibration/${SEE3CAM_SERIAL}.yaml"
 camera_info_arg=()
