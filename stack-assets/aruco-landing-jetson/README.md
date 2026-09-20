@@ -110,3 +110,14 @@ The [physical estimator guide](docs/physical_pad_estimator.md) lists pad-body,
 marker-derived odom-body, session-only alignment and annotated-image topics.
 Pad geometry is in `config/physical_pad.yaml`; global pad placement is learned
 online for each execution and is never loaded from a calibration YAML.
+
+## September 20 hardware handoff
+
+The operator reported landing completed. The latest camera checks passed after
+USB cable replacement on battery power, including an approximately 90-second
+post-reboot observation before the operator requested shutdown. These checks do
+not establish the electrical root cause or guarantee sustained 60 Hz in every
+condition. See the [camera/cable validation report](results/camera-cable-validation-20260920/README.md)
+for measured rates, failed software experiments, repository revisions and final
+stopped-node state. The [landing trial guide](docs/landing_trial.md) describes the
+current OptiTrack-based OFFBOARD workflow and landing policies.

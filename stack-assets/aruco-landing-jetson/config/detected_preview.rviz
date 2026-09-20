@@ -1,23 +1,150 @@
 Panels:
-- Class: rviz/Displays
-  Name: Displays
+  - Class: rviz/Displays
+    Help Height: 71
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /Global Options1
+        - /Status1
+        - /marker_pose1
+        - /TF1/Frames1
+      Splitter Ratio: 0.5
+    Tree Height: 340
+Preferences:
+  PromptSaveOnExit: true
+Toolbars:
+  toolButtonStyle: 2
 Visualization Manager:
-  Class: ''
+  Class: ""
+  Displays:
+    - Class: rviz/Image
+      Enabled: true
+      Image Topic: /landing/debug/image
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
+      Name: Detected markers
+      Normalize Range: true
+      Queue Size: 1
+      Transport Hint: compressed
+      Unreliable: false
+      Value: true
+    - Alpha: 1
+      Axes Length: 1
+      Axes Radius: 0.10000000149011612
+      Class: rviz/Pose
+      Color: 0; 0; 255
+      Enabled: true
+      Head Length: 0.30000001192092896
+      Head Radius: 0.10000000149011612
+      Name: Optitrack_Pose
+      Queue Size: 10
+      Shaft Length: 1
+      Shaft Radius: 0.05000000074505806
+      Shape: Arrow
+      Topic: /vrpn_client_node/pure/pose
+      Unreliable: false
+      Value: true
+    - Alpha: 1
+      Axes Length: 1
+      Axes Radius: 0.10000000149011612
+      Class: rviz/Pose
+      Color: 255; 25; 0
+      Enabled: true
+      Head Length: 0.30000001192092896
+      Head Radius: 0.10000000149011612
+      Name: marker_pose
+      Queue Size: 10
+      Shaft Length: 1
+      Shaft Radius: 0.05000000074505806
+      Shape: Arrow
+      Topic: /landing/vision_pose_marker
+      Unreliable: false
+      Value: true
+    - Class: rviz/TF
+      Enabled: true
+      Filter (blacklist): ""
+      Filter (whitelist): ""
+      Frame Timeout: 15
+      Frames:
+        All Enabled: false
+        base_link:
+          Value: false
+        base_link_frd:
+          Value: false
+        map:
+          Value: false
+        map_ned:
+          Value: false
+        odom:
+          Value: false
+        odom_ned:
+          Value: false
+        pure:
+          Value: false
+      Marker Alpha: 1
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Tree:
+        base_link:
+          base_link_frd:
+            {}
+        map:
+          map_ned:
+            {}
+        odom:
+          odom_ned:
+            {}
+          pure:
+            {}
+      Update Interval: 0
+      Value: true
+  Enabled: true
   Global Options:
     Background Color: 30; 30; 30
-    Fixed Frame: see3cam_optical_frame
+    Default Light: true
+    Fixed Frame: odom
     Frame Rate: 30
-  Displays:
-  - Class: rviz/Image
-    Name: Detected markers
-    Enabled: true
-    Image Topic: /landing/debug/image
-    Transport Hint: compressed
-    Queue Size: 1
-    Normalize Range: true
-  Enabled: true
+  Name: root
   Tools:
-  - Class: rviz/Interact
+    - Class: rviz/Interact
+      Hide Inactive Objects: true
+  Value: true
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Distance: 8.643013000488281
+      Enable Stereo Rendering:
+        Stereo Eye Separation: 0.05999999865889549
+        Stereo Focal Distance: 1
+        Swap Stereo Eyes: false
+        Value: false
+      Field of View: 0.7853981852531433
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0
+      Focal Shape Fixed Size: true
+      Focal Shape Size: 0.05000000074505806
+      Invert Z Axis: false
+      Name: Current View
+      Near Clip Distance: 0.009999999776482582
+      Pitch: 1.5247962474822998
+      Target Frame: <Fixed Frame>
+      Yaw: 1.2203986644744873
+    Saved: ~
 Window Geometry:
-  Width: 1450
+  Detected markers:
+    collapsed: false
+  Displays:
+    collapsed: false
   Height: 850
+  Hide Left Dock: false
+  Hide Right Dock: false
+  QMainWindow State: 000000ff00000000fd000000010000000000000156000002f7fc0200000002fb00000020004400650074006500630074006500640020006d00610072006b006500720073010000003e000001190000001600fffffffb000000100044006900730070006c006100790073010000015d000001d8000000cb00ffffff0000044e000002f700000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  Width: 1450
+  X: 67
+  Y: 1

@@ -73,3 +73,9 @@ config/stack.env.local
 # Per-checkout, host-local selection for shared module launchers.
 config/active_stack.local
 config/.active-stack-*
+
+# Local See3CAM hardware runs; curated evidence lives in stack-assets/*/results/.
+/experiments/seecam-*/
+/experiments/adapter-camera-check/
+/experiments/battery-camera-recheck/
+/experiments/powered-camera-check/

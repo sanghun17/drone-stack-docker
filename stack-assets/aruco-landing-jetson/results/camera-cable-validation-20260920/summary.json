@@ -1,0 +1,262 @@
+{
+  "seecam-stack-load-20260920-141617": {
+    "duration": 180.80984447800006,
+    "topics": {
+      "raw": {
+        "count": 10810,
+        "hz": 59.78656765735619,
+        "max_gap_s": 0.044005941000023086,
+        "duplicate_stamps": 0
+      },
+      "rect_jpeg": {
+        "count": 3617,
+        "hz": 20.004441740671354,
+        "max_gap_s": 0.065757944999973,
+        "duplicate_stamps": 0
+      },
+      "detected_jpeg": {
+        "count": 1804,
+        "hz": 9.977332844946398,
+        "max_gap_s": 0.11326834199996938,
+        "duplicate_stamps": 0
+      },
+      "optitrack": {
+        "count": 6657,
+        "hz": 36.8176855592063,
+        "max_gap_s": 0.5198299819999193,
+        "duplicate_stamps": 0
+      },
+      "imu": {
+        "count": 0,
+        "hz": 0.0,
+        "max_gap_s": null,
+        "duplicate_stamps": 0
+      },
+      "local_pose": {
+        "count": 0,
+        "hz": 0.0,
+        "max_gap_s": null,
+        "duplicate_stamps": 0
+      }
+    },
+    "last_camera_status": [
+      "capture=active raw_subscribers=2 color_subscribers=0 rect_subscribers=1 empty_polls=0 stream_restarts=0 captured_frames=15385 raw_published=15385 rectified_frames=3608"
+    ],
+    "last_mavros_state": [
+      {
+        "connected": false,
+        "armed": false,
+        "mode": ""
+      }
+    ],
+    "detector_hz_median": 59.752235032351415
+  },
+  "powered-camera-check": {
+    "duration": 180.55886679399998,
+    "topics": {
+      "raw": {
+        "count": 0,
+        "hz": 0.0,
+        "max_gap_s": null,
+        "duplicate_stamps": 0
+      },
+      "rect_jpeg": {
+        "count": 0,
+        "hz": 0.0,
+        "max_gap_s": null,
+        "duplicate_stamps": 0
+      },
+      "detected_jpeg": {
+        "count": 0,
+        "hz": 0.0,
+        "max_gap_s": null,
+        "duplicate_stamps": 0
+      },
+      "optitrack": {
+        "count": 17317,
+        "hz": 95.90777959277405,
+        "max_gap_s": 0.07999152899998307,
+        "duplicate_stamps": 0
+      },
+      "imu": {
+        "count": 9030,
+        "hz": 50.0113905250765,
+        "max_gap_s": 0.028251984000007724,
+        "duplicate_stamps": 0
+      },
+      "local_pose": {
+        "count": 5417,
+        "hz": 30.001295955076344,
+        "max_gap_s": 0.04637322700000368,
+        "duplicate_stamps": 0
+      }
+    },
+    "last_camera_status": [
+      "capture=stalled raw_subscribers=2 color_subscribers=0 rect_subscribers=1 empty_polls=1816 stream_restarts=3 captured_frames=96 raw_published=96 rectified_frames=0"
+    ],
+    "last_mavros_state": [
+      {
+        "connected": true,
+        "armed": false,
+        "mode": "POSCTL"
+      }
+    ],
+    "detector_hz_median": 0.0
+  },
+  "adapter-camera-check": {
+    "duration": 180.740404231,
+    "topics": {
+      "raw": {
+        "count": 10650,
+        "hz": 58.9242900352734,
+        "max_gap_s": 0.10896129299999302,
+        "duplicate_stamps": 0
+      },
+      "rect_jpeg": {
+        "count": 3604,
+        "hz": 19.940201059823973,
+        "max_gap_s": 0.14059214400000997,
+        "duplicate_stamps": 0
+      },
+      "detected_jpeg": {
+        "count": 1776,
+        "hz": 9.82624780306531,
+        "max_gap_s": 0.11029622199998812,
+        "duplicate_stamps": 0
+      },
+      "optitrack": {
+        "count": 332,
+        "hz": 1.836888665888335,
+        "max_gap_s": 6.639879691000004,
+        "duplicate_stamps": 0
+      },
+      "imu": {
+        "count": 9026,
+        "hz": 49.93902740454251,
+        "max_gap_s": 0.028635460999993256,
+        "duplicate_stamps": 0
+      },
+      "local_pose": {
+        "count": 5414,
+        "hz": 29.954563967227248,
+        "max_gap_s": 0.044724263000006204,
+        "duplicate_stamps": 0
+      }
+    },
+    "last_camera_status": [
+      "capture=active raw_subscribers=2 color_subscribers=0 rect_subscribers=1 empty_polls=0 stream_restarts=0 captured_frames=10615 raw_published=10615 rectified_frames=3592"
+    ],
+    "last_mavros_state": [
+      {
+        "connected": true,
+        "armed": false,
+        "mode": "POSCTL"
+      }
+    ],
+    "detector_hz_median": 59.471767077012714
+  },
+  "battery-camera-recheck": {
+    "duration": 180.558292712,
+    "topics": {
+      "raw": {
+        "count": 61,
+        "hz": 0.3378410322991823,
+        "max_gap_s": 179.16084666400002,
+        "duplicate_stamps": 0
+      },
+      "rect_jpeg": {
+        "count": 21,
+        "hz": 0.11630592915217751,
+        "max_gap_s": 179.146576488,
+        "duplicate_stamps": 0
+      },
+      "detected_jpeg": {
+        "count": 0,
+        "hz": 0.0,
+        "max_gap_s": null,
+        "duplicate_stamps": 0
+      },
+      "optitrack": {
+        "count": 17851,
+        "hz": 98.86557815692956,
+        "max_gap_s": 0.04999836100000721,
+        "duplicate_stamps": 0
+      },
+      "imu": {
+        "count": 9003,
+        "hz": 49.8620133408121,
+        "max_gap_s": 0.03075925599998186,
+        "duplicate_stamps": 0
+      },
+      "local_pose": {
+        "count": 5402,
+        "hz": 29.918315680002994,
+        "max_gap_s": 0.04080573399998855,
+        "duplicate_stamps": 0
+      }
+    },
+    "last_camera_status": [
+      "capture=stalled raw_subscribers=2 color_subscribers=0 rect_subscribers=1 empty_polls=1782 stream_restarts=3 captured_frames=61 raw_published=61 rectified_frames=21"
+    ],
+    "last_mavros_state": [
+      {
+        "connected": true,
+        "armed": false,
+        "mode": "POSCTL"
+      }
+    ],
+    "detector_hz_median": 0.0
+  },
+  "seecam-cable-recheck": {
+    "duration": 180.89618966499984,
+    "topics": {
+      "raw": {
+        "count": 10754,
+        "hz": 59.44846057794387,
+        "max_gap_s": 0.04350352599999496,
+        "duplicate_stamps": 0
+      },
+      "rect_jpeg": {
+        "count": 3595,
+        "hz": 19.873276527590498,
+        "max_gap_s": 0.06602528999997048,
+        "duplicate_stamps": 0
+      },
+      "detected_jpeg": {
+        "count": 1794,
+        "hz": 9.917290150346968,
+        "max_gap_s": 0.11347721299989644,
+        "duplicate_stamps": 0
+      },
+      "optitrack": {
+        "count": 14414,
+        "hz": 79.681059212431,
+        "max_gap_s": 29.929550914999936,
+        "duplicate_stamps": 0
+      },
+      "imu": {
+        "count": 9048,
+        "hz": 50.017637280010796,
+        "max_gap_s": 0.028753700999914145,
+        "duplicate_stamps": 0
+      },
+      "local_pose": {
+        "count": 5429,
+        "hz": 30.011687974489238,
+        "max_gap_s": 0.04866911900012383,
+        "duplicate_stamps": 0
+      }
+    },
+    "last_camera_status": [
+      "capture=active raw_subscribers=2 color_subscribers=0 rect_subscribers=1 empty_polls=0 stream_restarts=0 captured_frames=10729 raw_published=10729 rectified_frames=3586"
+    ],
+    "last_mavros_state": [
+      {
+        "connected": true,
+        "armed": false,
+        "mode": "POSCTL"
+      }
+    ],
+    "detector_hz_median": 59.99596149862123
+  }
+}

@@ -1,0 +1,144 @@
+-- Using CATKIN_DEVEL_PREFIX: /work/.build/see3cam-demand/aarch64/devel
+-- Using CMAKE_PREFIX_PATH: /opt/ros/noetic
+-- This workspace overlays: /opt/ros/noetic
+-- Found PythonInterp: /usr/bin/python3 (found suitable version "3.8.10", minimum required is "3") 
+-- Using PYTHON_EXECUTABLE: /usr/bin/python3
+-- Using Debian Python package layout
+-- Using empy: /usr/lib/python3/dist-packages/em.py
+-- Using CATKIN_ENABLE_TESTING: ON
+-- Call enable_testing()
+-- Using CATKIN_TEST_RESULTS_DIR: /work/.build/see3cam-demand/aarch64/test_results
+-- Forcing gtest/gmock from source, though one was otherwise available.
+-- Found gtest sources under '/usr/src/googletest': gtests will be built
+-- Found gmock sources under '/usr/src/googletest': gmock will be built
+-- Found PythonInterp: /usr/bin/python3 (found version "3.8.10") 
+-- Using Python nosetests: /usr/bin/nosetests3
+-- catkin 0.8.12
+-- BUILD_SHARED_LIBS is on
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /work/.build/see3cam-demand/aarch64
+-- Using CATKIN_DEVEL_PREFIX: /work/.build/see3cam-demand/aarch64/devel
+-- Using CMAKE_PREFIX_PATH: /opt/ros/noetic
+-- This workspace overlays: /opt/ros/noetic
+-- Found PythonInterp: /usr/bin/python3 (found suitable version "3.8.10", minimum required is "3") 
+-- Using PYTHON_EXECUTABLE: /usr/bin/python3
+-- Using Debian Python package layout
+-- Using empy: /usr/lib/python3/dist-packages/em.py
+-- Using CATKIN_ENABLE_TESTING: ON
+-- Call enable_testing()
+-- Using CATKIN_TEST_RESULTS_DIR: /work/.build/see3cam-demand/aarch64/test_results
+-- Forcing gtest/gmock from source, though one was otherwise available.
+-- Found gtest sources under '/usr/src/googletest': gtests will be built
+-- Found gmock sources under '/usr/src/googletest': gmock will be built
+-- Found PythonInterp: /usr/bin/python3 (found version "3.8.10") 
+-- Using Python nosetests: /usr/bin/nosetests3
+-- catkin 0.8.12
+-- BUILD_SHARED_LIBS is on
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /work/.build/see3cam-demand/aarch64
+make[2]: Warning: File 'CMakeFiles/see3cam_node.dir/flags.make' has modification time 1789812202 s in the future
+make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+make[2]: Warning: File 'CMakeFiles/see3cam_node.dir/flags.make' has modification time 1789812202 s in the future
+make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+[100%] Built target see3cam_node
+>> Configuring See3CAM exposure/gain (USB control timeout: 15 s)
+>> See3CAM calibration: /work/modules/sensor/see3cam-24cug/calibration/1A3958060A020900.yaml
+>> See3CAM /dev/v4l/by-id/usb-e-con_systems_See3CAM_24CUG_1A3958060A020900-video-index0 1280x720@60 uyvy exposure=150 gain=1
+[0m[INFO] [64.864392384]: camera calibration URL: file:///work/modules/sensor/see3cam-24cug/calibration/1A3958060A020900.yaml[0m
+[0m[INFO] [64.865984960]: See3CAM ready: 1280x720@60 uyvy; capture starts when an image subscriber connects[0m
+[0m[INFO] [1789894674.455955806]: Image subscriber connected: camera opened[0m
+[33m[WARN] [1789894676.498231230]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894678.501573374]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894680.505078558]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894680.505244350]: Camera stalled: restarting V4L2 stream (attempt 1/3)[0m
+[33m[WARN] [1789894682.580575582]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894684.583847294]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894685.585486462]: Camera stalled: restarting V4L2 stream (attempt 2/3)[0m
+[33m[WARN] [1789894686.658762269]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894688.661945862]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894690.665125007]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894690.665304597]: Camera stalled: restarting V4L2 stream (attempt 3/3)[0m
+[33m[WARN] [1789894692.740518264]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894694.744337071]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894696.747630631]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894698.751108032]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894700.754480536]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894702.757751196]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894704.761180652]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894706.764305083]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894708.767559623]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894710.770823093]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894712.773978072]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894714.777392415]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894716.780446605]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894718.783717134]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894720.786871820]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894722.790555900]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894724.793789271]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894726.796922250]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894728.800317645]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894730.803376939]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894732.806535971]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894734.809984998]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894736.813518365]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894738.816767943]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894740.820151164]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894742.823998766]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894744.827421383]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894746.830887341]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894748.834177729]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894750.837993099]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894752.841462382]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894754.844903431]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894756.848134417]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894758.852044981]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894760.855943492]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894762.859369260]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894764.862657506]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894766.865928045]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894768.869445068]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894770.872685889]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894772.875897145]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894774.879282261]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894776.882673256]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894778.885993633]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894780.889423370]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894782.892861251]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894784.896451465]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894786.899954416]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894788.903120965]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894790.906199800]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894792.909362897]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894794.912733940]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894796.915841596]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894798.919044742]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894800.922191657]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894802.925668923]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894804.928790022]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894806.932175838]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894808.935646477]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894810.939024887]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894812.942145539]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894814.945312629]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894816.948594831]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894818.951891504]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894820.955008147]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894822.958162902]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894824.961403058]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894826.964411678]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894828.967873043]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894830.971115876]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894832.974301222]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894834.977676107]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894836.980648676]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894838.983819426]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894840.986976598]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894842.990238381]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894844.993448660]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894846.996512185]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894848.999927400]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894851.003165932]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894853.006167118]: No fresh camera frame; polling without publishing stale images[0m
+[33m[WARN] [1789894855.009503707]: No fresh camera frame; polling without publishing stale images[0m
