@@ -133,3 +133,31 @@ restart and requires a visible target inside the crop. Cropping limits detection
 field of view; it does not add a pad-center arrival condition to the planner.
 
 Single-marker update: physical PnP, pose router and trial now accept one valid marker. Zero markers still withhold pose; reprojection, freshness, alignment and pose-agreement checks remain active.
+
+## Selecting the printed Baseline or Proposed 1 pad
+
+After deploying the matching committed estimator package and its calibrated YAMLs,
+select the pad when starting perception:
+
+```bash
+./scripts/perception_aruco-landing.sh pad:=baseline
+./scripts/perception_aruco-landing.sh pad:=proposed1
+```
+
+Run only the command for the physical pad in use. This starts perception; it does
+not arm the vehicle or initiate a landing. Selection takes effect at estimator
+startup. `pad:=legacy` retains the previous physical_pad.yaml configuration and
+remains the default. An explicit `pad_configuration:=/path/to/file.yaml` overrides
+the named choice.
+
+Named choices use `config/paper_pad_layout_physical_20260920_runtime.yaml` and
+`config/proposed_pad_1_layout_physical_20260920_runtime.yaml` inside the
+`aruco_landing` ROS package. These are metric `center_m/side_m/yaw_deg` manifests
+for the canonical physical detector, converted from the adjacent calibrated
+simulation-style layouts. Do not pass the simulation-style x/y/size YAML directly
+to `physical_pad_estimator.py`. No separate pad_size_m argument is required for
+the metric runtime manifests. Both use the pad center and yaw-zero axes +X forward
+(image up), +Y left, +Z out of paper.
+
+The calibration exporter regenerates both formats. The original simulation maps
+and previous physical_pad.yaml remain unchanged.
