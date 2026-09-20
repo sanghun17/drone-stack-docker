@@ -15,14 +15,15 @@ environment:
   # Bench lighting: gain 10 saturated 31.6% of pixels and erased marker edges.
   # Keep this scenario-specific instead of changing the reusable camera module.
   SEE3CAM_GAIN: "1"
-  # First-flight policy: the adapter may estimate/publish a marker shadow pose,
-  # but only OptiTrack is allowed to feed MAVROS/EKF2.
-  LANDING_ALLOW_MARKER_SWITCH: "false"
-  LANDING_AUTO_SWITCH: "false"
+  # Trial-gated router; stack runtime.env selects the generic MUX external input.
+  LANDING_ALLOW_MARKER_SWITCH: "true"
+  LANDING_AUTO_SWITCH: "true"
+  LANDING_AUTO_FALLBACK_TO_OPTITRACK: "true"
+  LANDING_MARKER_LOSS_TIMEOUT_S: "0.5"
 modules:
   - sensor/see3cam-24cug
   - perception/aruco-landing
-  - odometry/landing-vision-pose
+  # planner/aruco-landing launches its trial-gated pose router.
   - planner/aruco-landing
   - control/mavros
   - control/flight-safety

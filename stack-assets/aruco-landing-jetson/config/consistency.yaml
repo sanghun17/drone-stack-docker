@@ -1,0 +1,3 @@
+# OptiTrack versus EKF2 position difference, metres. ArUco policy.
+warn_m: 0.20
+error_m: 0.50

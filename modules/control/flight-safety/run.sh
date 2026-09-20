@@ -44,4 +44,7 @@ fi
 recorder_args=("allow_external_termination:=${FLIGHT_SAFETY_ALLOW_EXTERNAL_TERMINATION:-false}")
 [ -z "${FLIGHT_SAFETY_RECORDER_CONFIG:-}" ] || recorder_args+=("recorder_config:=$FLIGHT_SAFETY_RECORDER_CONFIG")
 [ -z "${FLIGHT_SAFETY_GEOFENCE_CONFIG:-}" ] || recorder_args+=("geofence_config:=$FLIGHT_SAFETY_GEOFENCE_CONFIG")
+[ -z "${FLIGHT_SAFETY_ESTIMATION_SOURCE:-}" ] || recorder_args+=("estimation_source:=$FLIGHT_SAFETY_ESTIMATION_SOURCE")
+[ -z "${FLIGHT_SAFETY_EXTERNAL_POSE_TOPIC:-}" ] || recorder_args+=("external_pose_topic:=$FLIGHT_SAFETY_EXTERNAL_POSE_TOPIC")
+[ -z "${FLIGHT_SAFETY_CONSISTENCY_CONFIG:-}" ] || recorder_args+=("consistency_config:=$FLIGHT_SAFETY_CONSISTENCY_CONFIG")
 exec taskset -c "${CPUS_POOL:?config/ros_env.sh not sourced}" roslaunch flight_safety safety.launch "${recorder_args[@]}" "$@"

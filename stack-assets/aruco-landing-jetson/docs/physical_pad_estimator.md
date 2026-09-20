@@ -44,7 +44,7 @@ values remain only in calibration experiment/report records.
 | `/landing/markers/ids` | Int32MultiArray | Detected IDs in current image |
 | `/landing/estimator/inlier_ids` | Int32MultiArray | Fully accepted marker IDs for current pose |
 | `/landing/estimator/status` | String (JSON) | Alignment, freshness, measured rates, processing times and image counters |
-| `/landing/debug/image` | Image, bgr8 | Annotated original image; default 10 Hz |
+| `/landing/debug/image` | Image, bgr8 | Annotated 720×720 center crop; default 10 Hz |
 | `/landing/debug/image/compressed` | CompressedImage | Same overlay as JPEG; encoded only when subscribed |
 
 In RViz, add **Image**, set topic `/landing/debug/image` and transport
@@ -116,3 +116,20 @@ and 9.98 Hz detected JPEG images. Real scenes with insufficient markers withhold
 pose outputs; initial learning can drop frames. The live estimator was started
 on the normal Jetson master and confirmed to wait for camera input with a fresh,
 unlearned alignment. The camera remains under its existing sensor script.
+
+
+### Processing crop (2026-09-20)
+
+The physical estimator detects and estimates on a 720×720 center crop of the
+calibrated 1280×720 raw input (columns 280 through 999). Both detected-image
+outputs show that same crop. The principal point is shifted by (-280, 0);
+focal lengths and distortion coefficients remain unchanged. PnP accounts for
+lens distortion; the preview itself is not rectified. Camera raw/rect topics
+and their CameraInfo remain full resolution. The launch arguments
+`processing_width` and `processing_height` default to 720.
+
+Restart perception while disarmed to apply. Session alignment is relearned after
+restart and requires a visible target inside the crop. Cropping limits detection
+field of view; it does not add a pad-center arrival condition to the planner.
+
+Single-marker update: physical PnP, pose router and trial now accept one valid marker. Zero markers still withhold pose; reprojection, freshness, alignment and pose-agreement checks remain active.

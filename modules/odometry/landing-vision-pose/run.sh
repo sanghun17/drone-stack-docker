@@ -27,11 +27,18 @@ source /work/modules/ensure_roscore.sh
 
 : "${LANDING_ALLOW_MARKER_SWITCH:=false}"
 : "${LANDING_AUTO_SWITCH:=false}"
+: "${LANDING_AUTO_FALLBACK_TO_OPTITRACK:=false}"
+: "${LANDING_MARKER_LOSS_TIMEOUT_S:=0.5}"
 
 echo "[landing-vision-pose] OptiTrack is the initial source; marker switch allowed=$LANDING_ALLOW_MARKER_SWITCH auto=$LANDING_AUTO_SWITCH"
 echo "[landing-vision-pose] candidate output: /landing/vision_pose_selected (flight-safety MUX chooses EKF2 input)"
+echo "[landing-vision-pose] OptiTrack fallback=$LANDING_AUTO_FALLBACK_TO_OPTITRACK after ${LANDING_MARKER_LOSS_TIMEOUT_S}s marker loss"
 exec taskset -c "${CPUS_ESTIMATION:?config/ros_env.sh not sourced}" \
   roslaunch aruco_landing landing_vision_pose_adapter.launch \
     allow_marker_switch:="$LANDING_ALLOW_MARKER_SWITCH" \
     auto_switch:="$LANDING_AUTO_SWITCH" \
+    auto_fallback_to_optitrack:="$LANDING_AUTO_FALLBACK_TO_OPTITRACK" \
+    marker_loss_timeout_s:="$LANDING_MARKER_LOSS_TIMEOUT_S" \
+    require_trial_enable:="${LANDING_REQUIRE_TRIAL_ENABLE:-false}" \
+    reject_inconsistent_marker:="${LANDING_REJECT_INCONSISTENT_MARKER:-false}" \
     "$@"

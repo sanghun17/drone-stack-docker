@@ -92,10 +92,12 @@ publishes `/landing/vision_pose_marker`. `odometry/landing-vision-pose` only
 selects between that already aligned pose and `/vrpn_client_node/pure/pose`.
 It does not estimate or publish a second global-pad transform.
 
-Hardware switching remains disabled by default (`LANDING_ALLOW_MARKER_SWITCH=false`,
-`LANDING_AUTO_SWITCH=false`). The existing flight-safety vision mux currently
-owns the hardware MAVROS input. Do not run the adapter alongside that mux on
-the same output; its startup check rejects an existing publisher.
+The hardware profile enables trial-gated switching and 0.5 s marker-loss fallback.
+`planner_aruco-landing.sh` launches the router; do not launch a second adapter.
+The router publishes `/landing/vision_pose_selected`; the existing common
+flight-safety MUX remains the sole MAVROS vision publisher. Before pilot OFFBOARD,
+the router forwards OptiTrack only. See [the landing workflow](docs/landing_trial.md)
+for qualification, rejection, failed-hold behavior and restart requirements.
 
 The September 19 **static pose-bag** replay passed source transition and external
 vision fusion checks in isolated PX4 v1.11.3 SITL. The subsequent three-approach hand-carried replay passed with an explicit

@@ -15,8 +15,9 @@ import yaml
 ROOT=Path(__file__).resolve().parents[3]
 CUT=os.environ.get('TEST_TERMINATION')=='1'
 AUTO=os.environ.get('TEST_AUTO_PLANNER')=='1'
-PORT=11357
-OUT=ROOT/'stack-assets/aruco-landing-jetson/results/trial-preparation-20260919'
+TRANSITION=os.environ.get('TEST_TRANSITION')=='1'
+PORT=11358 if TRANSITION else 11357
+OUT=ROOT/('experiments/aruco-landing/trial-transition-integration' if TRANSITION else 'experiments/aruco-landing/trial-regression')
 
 
 def main():
@@ -72,14 +73,15 @@ def main():
         rospy.init_node('trial_integration_test',disable_signals=True)
         rospy.Service('/mavros/cmd/command',CommandLong,force)
         rospy.Service('/mavros/set_mode',SetMode,mode);rospy.Service('/mavros/param/get',ParamGet,param)
-        spawn('vision_mux',['rosrun','topic_tools','mux','/mavros/vision_pose/pose','/vrpn_client_node/pure/pose','/estimation/external_pose','__name:=vision_pose_mux','mux:=vision_pose_mux'])
+        spawn('vision_mux',['rosrun','topic_tools','mux','/mavros/vision_pose/pose','/vrpn_client_node/pure/pose','/estimation/external_pose','__name:=vision_pose_mux','mux:=vision_pose_mux'] + (['_initial_topic:=/landing/vision_pose_selected','/landing/vision_pose_selected'] if TRANSITION else []) )
         rospy.set_param('/flight_safety_response',yaml.safe_load((ROOT/'ws/flight-safety/src/flight_safety/config/response.yaml').read_text()))
         rospy.set_param('/flight_safety_response/allow_external_termination',CUT)
         spawn('safety',['python3',str(ROOT/'ws/flight-safety/src/flight_safety/scripts/response_node.py')])
-        spawn('trial',['roslaunch',str(ROOT/'ws/aruco-landing/src/aruco_landing/launch/landing_trial.launch'),'dry_run:=false','landing_finish_mode:='+('force_disarm' if CUT else 'auto_land'),'auto_start_on_offboard:='+str(AUTO).lower(),'config_root:='+str(ROOT/'stack-assets/aruco-landing-jetson/config')])
+        spawn('trial',['roslaunch',str(ROOT/'ws/aruco-landing/src/aruco_landing/launch/landing_trial.launch'),'dry_run:=false','landing_finish_mode:='+('force_disarm' if CUT else 'auto_land'),'auto_start_on_offboard:='+str(AUTO).lower(),'estimation_transition:='+str(TRANSITION).lower(),'config_root:='+str(ROOT/'stack-assets/aruco-landing-jetson/config')])
         pubs={}
-        for key,topic,kind in [('mocap','/vrpn_client_node/pure/pose',PoseStamped),('local','/mavros/local_position/pose',PoseStamped),('state','/mavros/state',State),('extended','/mavros/extended_state',ExtendedState),('pad','/landing/pad_pose_global',PoseStamped),('ready','/landing/alignment/ready',Bool),('visible','/landing/target_visible',Bool),('inliers','/landing/estimator/inlier_ids',Int32MultiArray),('body','/landing/vehicle_pose_pad',PoseWithCovarianceStamped),('camera','/landing/camera_pose_pad',PoseWithCovarianceStamped)]:pubs[key]=rospy.Publisher(topic,kind,queue_size=10)
+        for key,topic,kind in [('marker','/landing/vision_pose_marker',PoseStamped),('mocap','/vrpn_client_node/pure/pose',PoseStamped),('local','/mavros/local_position/pose',PoseStamped),('state','/mavros/state',State),('extended','/mavros/extended_state',ExtendedState),('pad','/landing/pad_pose_global',PoseStamped),('ready','/landing/alignment/ready',Bool),('visible','/landing/target_visible',Bool),('inliers','/landing/estimator/inlier_ids',Int32MultiArray),('body','/landing/vehicle_pose_pad',PoseWithCovarianceStamped),('camera','/landing/camera_pose_pad',PoseWithCovarianceStamped)]:pubs[key]=rospy.Publisher(topic,kind,queue_size=10)
         rospy.Subscriber('/landing/trial/status',String,status)
+        rospy.Subscriber('/landing/pose_transition/status',String,lambda m:latest.update(router=json.loads(m.data)))
         rospy.Subscriber('/mavros/setpoint_raw/local',PositionTarget,lambda m:commands.append((time.monotonic(),m)))
         X=np.array(yaml.safe_load((ROOT/'stack-assets/aruco-landing-jetson/config/calibration/20260919/base_link_to_see3cam_optical_frame.yaml').read_text())['matrix_row_major']).reshape(4,4)
         def feed():
@@ -88,12 +90,15 @@ def main():
                 mc=pose(G);pubs['mocap'].publish(mc);pubs['local'].publish(pose(G,frame='map'))
                 st=State();st.header.stamp=rospy.Time.now();st.connected=True;st.armed=sim['armed'];st.mode=sim['mode'];pubs['state'].publish(st)
                 ex=ExtendedState();ex.header.stamp=rospy.Time.now();ex.landed_state=ExtendedState.LANDED_STATE_ON_GROUND if sim['landed']else ExtendedState.LANDED_STATE_IN_AIR;pubs['extended'].publish(ex)
-                pubs['visible'].publish(Bool(sim['visible']));pubs['inliers'].publish(Int32MultiArray(data=[1,2,3]if sim['visible']else []))
+                pubs['visible'].publish(Bool(sim['visible']));pubs['inliers'].publish(Int32MultiArray(data=([1] if os.environ.get('TEST_SINGLE_MARKER')=='1' else [1,2,3])if sim['visible']else []))
                 if sim['visible']:
                     pubs['pad'].publish(pose(np.eye(4)));pubs['ready'].publish(Bool(True))
                     b=pose(G,PoseWithCovarianceStamped,'physical_landing_pad');b.header.stamp=mc.header.stamp-rospy.Duration(.04)
                     c=pose(G@X,PoseWithCovarianceStamped,'physical_landing_pad');c.header.stamp=mc.header.stamp-rospy.Duration(.04)
                     pubs['body'].publish(b);pubs['camera'].publish(c)
+                    marker=pose(G);marker.header.stamp=b.header.stamp
+                    marker.pose.position.x+=sim.get('marker_dx',0.)
+                    pubs['marker'].publish(marker)
                 time.sleep(.01)
         thread=threading.Thread(target=feed,daemon=True);thread.start()
         rospy.wait_for_service('/landing_trial/start',timeout=10)
@@ -102,22 +107,41 @@ def main():
         if AUTO:
             wait_for(lambda:latest['status']['offboard_entry_ready'])
             time.sleep(1.2);assert latest['status']['phase']=='IDLE';assert not mode_calls
+            if TRANSITION:assert latest['router']['source']=='optitrack'
             sim.update(armed=True,landed=False);time.sleep(.2)
         else:assert start().success
         time.sleep(1.2);assert not mode_calls
         sim['visible']=False;sim['mode']='OFFBOARD';wait_for(lambda:latest['status']['phase']=='APPROACH')
         time.sleep(.15);sp=commands[-1][1];assert sp.velocity.x<0 and abs(sp.velocity.z)<1e-9 and abs(sp.position.z-1.2)<.01
-        sim['visible']=True;dwell_start=time.monotonic();wait_for(lambda:latest['status']['phase']=='DESCEND',5)
+        sim['visible']=True;dwell_start=time.monotonic()
+        time.sleep(.25)
+        assert latest['status']['phase']=='APPROACH'
+        assert abs(commands[-1][1].velocity.x)<1e-9
+        if TRANSITION:assert latest['router']['source']=='optitrack'
+        wait_for(lambda:latest['status']['phase']=='DESCEND',5)
+        if TRANSITION:assert latest['router']['source']=='marker' and latest['status']['estimation_source']=='marker'
         assert time.monotonic()-dwell_start>=.95
         time.sleep(.15)
         assert commands[-1][1].velocity.z<-.1
+        if TRANSITION:
+            assert latest['router']['last_output_source']=='marker'
+            # A still-visible but inconsistent pose must not keep descending.
+            sim['marker_dx']=.3
+            time.sleep(.12)
+            assert latest['router']['switch_check']['consistent'] is False
+            assert commands[-1][1].type_mask & PositionTarget.IGNORE_VZ
+            sim['marker_dx']=0.
+            wait_for(lambda:latest['router']['switch_check']['consistent'])
+            wait_for(lambda:commands[-1][1].velocity.z<-.1)
         # A failed trial must latch a POSITION hover and never resume on rediscovery.
         sim['x']=.7;sim['visible']=False;lost_at=time.monotonic()
         wait_for(lambda:latest['status']['phase']=='FAILED_HOLD',2)
         loss_delay=time.monotonic()-lost_at;assert .45<loss_delay<.7
         wait_for(lambda:abs(commands[-1][1].position.x-.7)<.02,1.)
+        if TRANSITION:wait_for(lambda:latest['router']['source']=='optitrack',1.)
         sp=commands[-1][1];assert not sp.type_mask&PositionTarget.IGNORE_PX and sp.type_mask&PositionTarget.IGNORE_VZ
         sim['visible']=True;time.sleep(1.3);assert latest['status']['phase']=='FAILED_HOLD';assert not mode_calls
+        if TRANSITION:assert latest['router']['source']=='optitrack'
         sim['mode']='POSCTL';wait_for(lambda:latest['status']['phase']=='CANCELLED')
         if not AUTO:assert reset().success
         # Explicit second attempt reaches the height handoff and waits for real ground+disarm flags.
@@ -132,7 +156,7 @@ def main():
             time.sleep(.3);assert len(kill_calls)==1
             producers=dict(master.getSystemState('/trial_test')[2][0])
             assert producers['/mavros/setpoint_raw/local']==['/flight_safety_response']
-            report=dict(result='PASS',transport='localhost mock FCU; real safety/planner/MUX',kill_calls=kill_calls,mode_calls=mode_calls,final=latest['status'])
+            report=dict(result='PASS',transition=TRANSITION,loss_to_failed_hold_s=loss_delay,router=latest.get('router'),transport='localhost mock FCU; real safety/planner/MUX',kill_calls=kill_calls,mode_calls=mode_calls,final=latest['status'])
             (OUT/'ros_force_disarm.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2));return
         wait_for(lambda:'AUTO.LAND'in mode_calls,3)
         assert latest['status']['phase']=='AUTO_LAND'

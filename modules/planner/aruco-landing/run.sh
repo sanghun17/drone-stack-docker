@@ -25,4 +25,11 @@ source /work/ws/flight-safety/devel/setup.bash --extend
 set -u
 source /work/modules/ensure_roscore.sh
 
-exec taskset -c "${CPUS_CONTROL:?}" roslaunch aruco_landing landing_trial.launch "$@"
+exec taskset -c "${CPUS_CONTROL:?}" roslaunch aruco_landing landing_trial.launch \
+  auto_start_on_offboard:="${LANDING_TRIAL_AUTO_START:-false}" \
+  dry_run:="${LANDING_TRIAL_DRY_RUN:-true}" \
+  estimation_transition:="${LANDING_ALLOW_MARKER_SWITCH:-false}" \
+  router_auto_switch:="${LANDING_AUTO_SWITCH:-false}" \
+  router_fallback:="${LANDING_AUTO_FALLBACK_TO_OPTITRACK:-false}" \
+  marker_loss_s:="${LANDING_MARKER_LOSS_TIMEOUT_S:-0.5}" \
+  router_launch_prefix:="taskset -c ${CPUS_ESTIMATION:?}" "$@"
