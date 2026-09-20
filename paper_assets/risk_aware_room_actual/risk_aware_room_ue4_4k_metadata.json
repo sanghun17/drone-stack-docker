@@ -1,0 +1,161 @@
+{
+  "renderer": "Unreal Engine 4.27 editor Vulkan, actual scene render",
+  "map": "/Game/RiskAwareRoomFigure/Room",
+  "room_size_m": [
+    12,
+    15
+  ],
+  "wall_height_m": 2.5,
+  "wall_thickness_m": 0.25,
+  "partition_thickness_m": 0.35,
+  "camera_projection": "perspective",
+  "camera_pitch_deg": -90,
+  "camera_location_ue_cm": [
+    780,
+    600,
+    1800
+  ],
+  "horizontal_fov_deg": 50,
+  "actual_camera_rotation": "<Struct 'Rotator' (0x7f1c816b2660) {pitch: -90.000000, yaw: 0.000000, roll: 0.000000}>",
+  "actual_camera_forward": "<Struct 'Vector' (0x7f1c816b2660) {x: 0.000000, y: 0.000000, z: -1.000000}>",
+  "resolution": [
+    3072,
+    3840
+  ],
+  "floor_source": "/Game/StarterContent/Textures/T_Wood_Floor_Walnut_D",
+  "wall_source": "/Game/StarterContent/Materials/M_Basic_Wall",
+  "smoke_source": "/Game/SmokePackage/Fx/Niagara/NS_Fx_Smoke02_Rise",
+  "floor_roughness": 1.0,
+  "floor_specular": 0.0,
+  "smoke_location_ue_cm": [
+    1060,
+    350,
+    35
+  ],
+  "smoke_parameters": {
+    "SmokeSize": 4.0,
+    "GroundRange": 1.2,
+    "SpawnRate": 20.0,
+    "LifeTime": 2.0,
+    "InitialVelocity": 0.15,
+    "WindStrength": 0.0,
+    "ScaleColor": 2.0
+  },
+  "actors": [
+    {
+      "label": "Figure_Floor",
+      "class": "StaticMeshActor",
+      "location": "<Struct 'Vector' (0x7f1cf673fda0) {x: 750.000000, y: 600.000000, z: -5.000000}>",
+      "rotation": "<Struct 'Rotator' (0x7f1cf673fda0) {pitch: 0.000000, yaw: 0.000000, roll: 0.000000}>",
+      "bounds": "(<Vector object at 0x7f1cf673fd70>, <Vector object at 0x7f1cf673fe70>)",
+      "scale": "<Struct 'Vector' (0x7f1cf673fda0) {x: 15.000000, y: 12.000000, z: 0.100000}>"
+    },
+    {
+      "label": "Figure_ExitFloor",
+      "class": "StaticMeshActor",
+      "location": "<Struct 'Vector' (0x7f1cf673fea0) {x: 1575.000000, y: 900.000000, z: -5.000000}>",
+      "rotation": "<Struct 'Rotator' (0x7f1cf673fea0) {pitch: 0.000000, yaw: 0.000000, roll: 0.000000}>",
+      "bounds": "(<Vector object at 0x7f1cf673fe70>, <Vector object at 0x7f1cf673fef0>)",
+      "scale": "<Struct 'Vector' (0x7f1cf673fea0) {x: 1.500000, y: 6.000000, z: 0.100000}>"
+    },
+    {
+      "label": "Figure_LeftWall",
+      "class": "StaticMeshActor",
+      "location": "<Struct 'Vector' (0x7f1cf674be60) {x: 750.000000, y: -12.500000, z: 125.000000}>",
+      "rotation": "<Struct 'Rotator' (0x7f1cf674be60) {pitch: 0.000000, yaw: 0.000000, roll: 0.000000}>",
+      "bounds": "(<Vector object at 0x7f1cf674be30>, <Vector object at 0x7f1cf674be70>)",
+      "scale": "<Struct 'Vector' (0x7f1cf674be60) {x: 15.500000, y: 0.250000, z: 2.500000}>"
+    },
+    {
+      "label": "Figure_RightWall",
+      "class": "StaticMeshActor",
+      "location": "<Struct 'Vector' (0x7f1cf674bea0) {x: 750.000000, y: 1212.500000, z: 125.000000}>",
+      "rotation": "<Struct 'Rotator' (0x7f1cf674bea0) {pitch: 0.000000, yaw: 0.000000, roll: 0.000000}>",
+      "bounds": "(<Vector object at 0x7f1cf674be70>, <Vector object at 0x7f1cf6751430>)",
+      "scale": "<Struct 'Vector' (0x7f1cf674bea0) {x: 15.500000, y: 0.250000, z: 2.500000}>"
+    },
+    {
+      "label": "Figure_BottomWall",
+      "class": "StaticMeshActor",
+      "location": "<Struct 'Vector' (0x7f1cf6751460) {x: -12.500000, y: 600.000000, z: 125.000000}>",
+      "rotation": "<Struct 'Rotator' (0x7f1cf6751460) {pitch: 0.000000, yaw: 0.000000, roll: 0.000000}>",
+      "bounds": "(<Vector object at 0x7f1cf6751430>, <Vector object at 0x7f1cf67514b0>)",
+      "scale": "<Struct 'Vector' (0x7f1cf6751460) {x: 0.250000, y: 12.000000, z: 2.500000}>"
+    },
+    {
+      "label": "Figure_TopLeftWall",
+      "class": "StaticMeshActor",
+      "location": "<Struct 'Vector' (0x7f1cf67515e0) {x: 1512.500000, y: 287.500000, z: 125.000000}>",
+      "rotation": "<Struct 'Rotator' (0x7f1cf67515e0) {pitch: 0.000000, yaw: 0.000000, roll: 0.000000}>",
+      "bounds": "(<Vector object at 0x7f1cf67515b0>, <Vector object at 0x7f1cf675a270>)",
+      "scale": "<Struct 'Vector' (0x7f1cf67515e0) {x: 0.250000, y: 6.250000, z: 2.500000}>"
+    },
+    {
+      "label": "Figure_L_Vertical",
+      "class": "StaticMeshActor",
+      "location": "<Struct 'Vector' (0x7f1cf675a2a0) {x: 250.000000, y: 800.000000, z: 125.000000}>",
+      "rotation": "<Struct 'Rotator' (0x7f1cf675a2a0) {pitch: 0.000000, yaw: 0.000000, roll: 0.000000}>",
+      "bounds": "(<Vector object at 0x7f1cf675a270>, <Vector object at 0x7f1cf675a2f0>)",
+      "scale": "<Struct 'Vector' (0x7f1cf675a2a0) {x: 5.000000, y: 0.350000, z: 2.500000}>"
+    },
+    {
+      "label": "Figure_L_Horizontal",
+      "class": "StaticMeshActor",
+      "location": "<Struct 'Vector' (0x7f1cf675a320) {x: 500.000000, y: 1000.000000, z: 125.000000}>",
+      "rotation": "<Struct 'Rotator' (0x7f1cf675a320) {pitch: 0.000000, yaw: 0.000000, roll: 0.000000}>",
+      "bounds": "(<Vector object at 0x7f1cf675a2f0>, <Vector object at 0x7f1cf67e3230>)",
+      "scale": "<Struct 'Vector' (0x7f1cf675a320) {x: 0.350000, y: 4.350000, z: 2.500000}>"
+    },
+    {
+      "label": "Figure_Key",
+      "class": "DirectionalLight",
+      "location": "<Struct 'Vector' (0x7f1cf67e3260) {x: 750.000000, y: 600.000000, z: 1400.000000}>",
+      "rotation": "<Struct 'Rotator' (0x7f1cf67e3260) {pitch: -64.999992, yaw: -35.000004, roll: 0.000000}>",
+      "bounds": "(<Vector object at 0x7f1cf67e3230>, <Vector object at 0x7f1cf680ba30>)",
+      "scale": "<Struct 'Vector' (0x7f1cf67e3260) {x: 2.500000, y: 2.500000, z: 2.500000}>"
+    },
+    {
+      "label": "Figure_Fill",
+      "class": "DirectionalLight",
+      "location": "<Struct 'Vector' (0x7f1cf67e3260) {x: 750.000000, y: 600.000000, z: 1400.000000}>",
+      "rotation": "<Struct 'Rotator' (0x7f1cf67e3260) {pitch: -54.999981, yaw: 144.999939, roll: 0.000006}>",
+      "bounds": "(<Vector object at 0x7f1cf67e3230>, <Vector object at 0x7f1cf680ba30>)",
+      "scale": "<Struct 'Vector' (0x7f1cf67e3260) {x: 2.500000, y: 2.500000, z: 2.500000}>"
+    },
+    {
+      "label": "Figure_Ambient",
+      "class": "SkyLight",
+      "location": "<Struct 'Vector' (0x7f1cf680baa0) {x: 750.000000, y: 600.000000, z: 1000.000000}>",
+      "rotation": "<Struct 'Rotator' (0x7f1cf680baa0) {pitch: 0.000000, yaw: 0.000000, roll: 0.000000}>",
+      "bounds": "(<Vector object at 0x7f1cf680ba70>, <Vector object at 0x7f1cf680bab0>)",
+      "scale": "<Struct 'Vector' (0x7f1cf680baa0) {x: 1.000000, y: 1.000000, z: 1.000000}>"
+    },
+    {
+      "label": "Figure_Camera",
+      "class": "CameraActor",
+      "location": "<Struct 'Vector' (0x7f1cf680bb20) {x: 780.000000, y: 600.000000, z: 1800.000000}>",
+      "rotation": "<Struct 'Rotator' (0x7f1cf680bb20) {pitch: -90.000000, yaw: 0.000000, roll: 0.000000}>",
+      "bounds": "(<Vector object at 0x7f1cf680baf0>, <Vector object at 0x7f1cf680bb30>)",
+      "scale": "<Struct 'Vector' (0x7f1cf680bb20) {x: 1.000000, y: 1.000000, z: 1.000000}>"
+    },
+    {
+      "label": "Figure_RenderCamera",
+      "class": "SceneCapture2D",
+      "location": "<Struct 'Vector' (0x7f1cf680bb60) {x: 780.000000, y: 600.000000, z: 1800.000000}>",
+      "rotation": "<Struct 'Rotator' (0x7f1cf680bb60) {pitch: -90.000000, yaw: 0.000000, roll: 0.000000}>",
+      "bounds": "(<Vector object at 0x7f1cf680bb30>, <Vector object at 0x7f1cf680bb70>)",
+      "scale": "<Struct 'Vector' (0x7f1cf680bb60) {x: 1.000000, y: 1.000000, z: 1.000000}>"
+    },
+    {
+      "label": "Figure_Smoke",
+      "class": "NiagaraActor",
+      "location": "<Struct 'Vector' (0x7f1cf680bbe0) {x: 1060.000000, y: 350.000000, z: 35.000000}>",
+      "rotation": "<Struct 'Rotator' (0x7f1cf680bbe0) {pitch: 0.000000, yaw: 0.000000, roll: 0.000000}>",
+      "bounds": "(<Vector object at 0x7f1cf680bbb0>, <Vector object at 0x7f1cf680bbf0>)",
+      "scale": "<Struct 'Vector' (0x7f1cf680bbe0) {x: 1.000000, y: 1.000000, z: 1.000000}>"
+    }
+  ],
+  "output": "/home/ml/drone-stack-docker/paper_assets/risk_aware_room_actual/risk_aware_room_ue4_4k.png",
+  "capture_method": "UE4 AutomationLibrary native viewport high-resolution screenshot",
+  "image_processing": "None; native Unreal PNG, without retouching or compositing"
+}

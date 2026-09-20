@@ -1,0 +1,70 @@
+{
+  "renderer": "Unreal Engine 4.27 editor Vulkan, native viewport HighResShot",
+  "map": "/Game/RiskAwareRoomFigure/Room",
+  "resolution": [
+    640,
+    360
+  ],
+  "coordinate_convention": "UE +X = overhead image top; UE +Y = overhead image right",
+  "temporary_fpv_environment": {
+    "wall_height_cm": 650.0,
+    "corridor_x_range_cm": [
+      1500.0,
+      2300.0
+    ],
+    "corridor_y_range_cm": [
+      600.0,
+      1200.0
+    ],
+    "saved_map_modified": false
+  },
+  "temporary_smoke_parameters": {
+    "SpawnRate": 9.0,
+    "ScaleColor": 0.8,
+    "ColorAlpha": 0.45
+  },
+  "poses": [
+    {
+      "name": "smoke",
+      "output": "/home/ml/drone-stack-docker/paper_assets/risk_aware_room_actual/risk_aware_room_fpv_smoke_preview_v2.png",
+      "location": [
+        760.0,
+        620.0,
+        145.0
+      ],
+      "target": [
+        1060.0,
+        350.0,
+        155.0
+      ],
+      "horizontal_fov_deg": 82.0,
+      "description": "closer middle-right flight position, looking directly into smoke",
+      "rotation_deg": {
+        "pitch": 1.4192968606948853,
+        "yaw": -41.987213134765625,
+        "roll": 0.0
+      }
+    },
+    {
+      "name": "clear",
+      "output": "/home/ml/drone-stack-docker/paper_assets/risk_aware_room_actual/risk_aware_room_fpv_clear_preview_v2.png",
+      "location": [
+        800.0,
+        700.0,
+        145.0
+      ],
+      "target": [
+        2200.0,
+        900.0,
+        0.0
+      ],
+      "horizontal_fov_deg": 82.0,
+      "description": "middle flight position, looking through the extended upper-right corridor",
+      "rotation_deg": {
+        "pitch": -5.85410737991333,
+        "yaw": 8.130102157592773,
+        "roll": 0.0
+      }
+    }
+  ]
+}

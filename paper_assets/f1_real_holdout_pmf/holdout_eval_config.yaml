@@ -1,0 +1,189 @@
+augmentation:
+  chroma:
+    enabled: false
+    probability: 0.5
+  jitter:
+    clip: 0.05
+    enabled: false
+    sigma: 0.01
+  point_dropout:
+    enabled: false
+    ratio: 0.1
+  state_noise:
+    enabled: false
+    intensity: 0.02
+  target_noise:
+    enabled: false
+    intensity: 0.02
+  temporal_dropout:
+    enabled: false
+    max_ratio: 0.5
+    min_ratio: 0.0
+  voxel_dropout:
+    enabled: false
+    ratio: 0.1
+data:
+  data_dir: /home/ml/data/raw/bulk/VIO/motion_primitives
+  discard_boundary_samples: false
+  input_duration: 2.1
+  intermediate_dir: /home/ml/data/data_intermediate
+  num_workers_ratio: 0.4
+  prefetch_factor: 1
+  skip_preprocessing: true
+  split_seed: 42
+  stride_pkls: 5
+  target_filter_enabled: true
+  train_ratio: 0.8
+  trim_end_sec: 0.3
+  trim_front_sec: 0.0
+  use_shared_memory: true
+  v22_sim_windows_dir: /home/ml/data/stage1/bulk
+  val_ratio: 0.2
+model:
+  attention_axis_aligned_heads: false
+  attention_covis_direct_pooling: true
+  attention_covis_only: true
+  attention_residual_ffn_enabled: true
+  attention_value_projection_enabled: false
+  aux_mean_head_enabled: false
+  axis_conditioned_queries: false
+  bin_range_max: 1.5
+  bin_range_min: -1.5
+  compile_cross_attention: false
+  compile_dirichlet_head: false
+  compile_kinetic_encoder: false
+  compile_mode: default
+  context_extra_channels:
+  - roll_pitch
+  covis_d_max: 5.0
+  covis_d_min: 0.3
+  covis_enabled: true
+  covis_eps: 1.0e-08
+  covis_fov_h_deg_real: 55.4
+  covis_fov_h_deg_sim: 79.3
+  covis_fov_v_deg_real: 43.0
+  covis_fov_v_deg_sim: 63.7
+  covis_lambda_init: 0.2
+  covis_per_t: true
+  covis_tau_ang: 0.15
+  covis_tau_front: 0.1
+  covis_tau_range: 0.15
+  covis_warmup_epochs: 5
+  dirichlet_alpha_min: 0.1
+  dirichlet_axis_linear_sharing: shared_trunk
+  dirichlet_direct_evidence: false
+  dirichlet_direct_n: false
+  dirichlet_dn_fixed_log_n: null
+  dirichlet_emd_weight: 1.0
+  dirichlet_entropy_weight: 1.0e-05
+  dirichlet_hidden_dim: 64
+  dirichlet_log_n_clamp_max: 7.0
+  dirichlet_log_n_clamp_min: -20.0
+  dirichlet_num_bins: 31
+  dirichlet_num_film_layers: 1
+  dirichlet_num_hidden_layers: 2
+  dirichlet_uce_weight: 1.0
+  evora_joint_latent_dim: 32
+  evora_joint_num_radial_layers: 8
+  evora_joint_pmf_input: shared_latent
+  feature_dim: 64
+  kinetic_hidden_dim: 64
+  kinetic_input_dim: 10
+  kinetic_stats_path: data_final_ctx10_p1_fullrun_r28/kinetic_statistics.pt
+  layernorm_gain_scale: 1.0
+  map_base_channels: 32
+  map_bottleneck_reduction: 2
+  map_input_channels: 64
+  map_meta_channels_enabled: false
+  map_meta_num_channels: 2
+  map_norm: groupnorm
+  map_physical_x: 18.0
+  map_physical_y: 18.0
+  map_physical_z: 5.0
+  map_ragged_all_sparse: true
+  map_truncation: none
+  max_map_voxels: 0
+  n_axes: 4
+  n_output_steps: 7
+  num_attention_heads: 1
+  num_downsample_stages: 0
+  output_distribution_mode: evora_joint
+  query_time_embedding_enabled: false
+  target_normalization: vio_gt_ratio
+  target_stats_path: data_final_ctx10_p1_fullrun_r28/target_statistics.pt
+  target_timestep_end: 7
+  target_timestep_start: 0
+  vfe_batchnorm_enabled: true
+  vfe_dynamic_feedback_enabled: true
+  vfe_hidden_channels: 64
+  vfe_hidden_relu_enabled: true
+  vfe_in_channels: 6
+  vfe_out_channels: 64
+  vfe_output_relu_enabled: true
+  vfe_split_pooling: false
+  vfe_two_layer: true
+  vfe_upstream_coordinate_semantics_enabled: true
+  voxel_size_before: 0.25
+planner:
+  dt: 0.3
+  horizon_steps: 7
+regularization:
+  dropout_attention: 0.3
+  dropout_edl_head: 0.1
+  dropout_kinetic_encoder: 0.1
+  dropout_map_encoder: 0.3
+seed: 42
+training:
+  amp: false
+  apply_symlog: false
+  aux_mean_weight: 0.0
+  batch_size: 8
+  best_val_min_epoch: 3
+  debug_nan: true
+  enable_normalization: false
+  evora_flow_only: false
+  grad_clip: 10.0
+  horizon_loss_weighting: physical_std
+  loss_weighting: none
+  lr: 0.0001
+  map_token_aux_weight: 0.0
+  min_delta: 0.001
+  min_lr: 2.0e-05
+  minimal_logging: true
+  num_epochs: 40
+  patience: 40
+  save_every: 10
+  target_clip_max: 1.5
+  target_clip_min: -1.5
+  target_scale:
+  - - 4.39
+    - 3.9
+    - 5.5
+    - 17.37
+  - - 2.41
+    - 2.14
+    - 2.88
+    - 9.97
+  - - 1.67
+    - 1.57
+    - 1.97
+    - 7.93
+  - - 1.34
+    - 1.33
+    - 1.47
+    - 6.62
+  - - 1.23
+    - 1.19
+    - 1.17
+    - 5.79
+  - - 1.12
+    - 1.1
+    - 0.97
+    - 5.35
+  - - 0.99
+    - 0.98
+    - 0.84
+    - 4.76
+  vectorized_loss: true
+  weight_decay: 0.01
+  world_size: 1

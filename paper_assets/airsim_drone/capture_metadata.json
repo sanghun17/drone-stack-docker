@@ -1,0 +1,54 @@
+{
+  "source": "/AirSim/Blueprints/BP_FlyingPawn",
+  "renderer": "UE4 native viewport",
+  "resolution": [
+    4096,
+    4096
+  ],
+  "background": "transparent, native custom-depth screenshot mask",
+  "bounds": {
+    "centre": "<Struct 'Vector' (0x7f3752c116e0) {x: 0.000000, y: 0.000000, z: -3.318598}>",
+    "extent": "<Struct 'Vector' (0x7f36e29307a0) {x: 49.084709, y: 49.084717, z: 14.649588}>"
+  },
+  "camera_distance_cm": 189.96648398288642,
+  "camera_pitch_deg": -90,
+  "camera_fov_deg": 40,
+  "components": [
+    {
+      "name": "Prop1",
+      "mesh": "<Object '/AirSim/Models/QuadRotor1/Propeller.Propeller' (0x7f36ecfc7630) Class 'StaticMesh'>",
+      "visible": true,
+      "location": "<Struct 'Vector' (0x7f37527a53a0) {x: -25.000000, y: -25.000000, z: 0.100000}>"
+    },
+    {
+      "name": "Prop0",
+      "mesh": "<Object '/AirSim/Models/QuadRotor1/Propeller.Propeller' (0x7f36ecfc7630) Class 'StaticMesh'>",
+      "visible": true,
+      "location": "<Struct 'Vector' (0x7f37527a53e0) {x: 25.000000, y: 25.000000, z: 0.100000}>"
+    },
+    {
+      "name": "Prop2",
+      "mesh": "<Object '/AirSim/Models/QuadRotor1/Propeller.Propeller' (0x7f36ecfc7630) Class 'StaticMesh'>",
+      "visible": true,
+      "location": "<Struct 'Vector' (0x7f37527a5420) {x: 25.000000, y: -25.000000, z: 0.100000}>"
+    },
+    {
+      "name": "Prop3",
+      "mesh": "<Object '/AirSim/Models/QuadRotor1/Propeller.Propeller' (0x7f36ecfc7630) Class 'StaticMesh'>",
+      "visible": true,
+      "location": "<Struct 'Vector' (0x7f37527a5460) {x: -25.000000, y: 25.000000, z: 0.100000}>"
+    },
+    {
+      "name": "BodyMesh",
+      "mesh": "<Object '/AirSim/Models/QuadRotor1/Quadrotor1.Quadrotor1' (0x7f36ecfc7e10) Class 'StaticMesh'>",
+      "visible": true,
+      "location": "<Struct 'Vector' (0x7f37527a54e0) {x: 0.000000, y: 0.000000, z: 0.000000}>"
+    }
+  ],
+  "source_blueprint_sha256": "3026364c6a575096077a47a68ebd613d030402d3f105a3a1d19c28c370868849",
+  "capture_context": "Original AirSim BP_FlyingPawn spawned in an isolated UE4 editor scene; no flight simulation.",
+  "alpha_verified": {
+    "background": 0,
+    "drone": 255
+  }
+}

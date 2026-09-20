@@ -1,0 +1,13 @@
+{
+  "FileVersion": 3,
+  "EngineAssociation": "4.27",
+  "Category": "Research",
+  "Description": "Isolated risk-aware room figure capture using copied original assets",
+  "Plugins": [
+    {"Name": "PythonScriptPlugin", "Enabled": true},
+    {"Name": "EditorScriptingUtilities", "Enabled": true},
+    {"Name": "Niagara", "Enabled": true},
+    {"Name": "SteamVR", "Enabled": false},
+    {"Name": "OculusVR", "Enabled": false}
+  ]
+}
