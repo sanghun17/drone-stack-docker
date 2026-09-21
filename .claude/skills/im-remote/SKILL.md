@@ -79,7 +79,7 @@ DOCKER_HOST=unix:///tmp/docker-ssd.sock docker ps
   CONTAINER_USER=$(id -u):$(id -g) ./setup.sh build ete-train-4090 &&
   DOCKER_HOST=unix:///tmp/docker-ssd.sock CONTAINER_USER=$(id -u):$(id -g) ./setup.sh
   up ete-train-4090` — 4090은 불량 GPU가 없는 단일 카드라 `GPU_UUIDS`는 불필요
-  (`docs/ETE_TRAIN_GPU_HOSTS.md`). **현재 떠 있는 컨테이너는 `CONTAINER_USER` 없이
+  (`modules/training/ete-net/DEPLOYMENT.md`). **현재 떠 있는 컨테이너는 `CONTAINER_USER` 없이
   기동돼 root 소유로 파일이 쓰임** — 다음 재기동 때 반영 고려(사용자 결정 사항, 지금
   임의로 재기동하지 말 것).
 
@@ -116,7 +116,7 @@ DOCKER_HOST=unix:///tmp/docker-ssd.sock docker exec \
 전체 수동 제어(임의 `train.py` 플래그, `integrity_check.py`, spconv smoke test 등)가
 필요하면: `DOCKER_HOST=unix:///tmp/docker-ssd.sock docker exec -it
 drone-stack-ete-train-4090 bash`로 들어가 `ete_net.train`을 직접 구동
-(`docs/ETE_TRAIN_GPU_HOSTS.md` 참조, 컨테이너 내부 작업 디렉토리는
+(`modules/training/ete-net/DEPLOYMENT.md` 참조, 컨테이너 내부 작업 디렉토리는
 `/work/ws/risk-aware/src/risk_aware_planning/uncertainty_predictor/src`).
 
 ⚠️ 같은 gap이 `ete-train-loop` 스킬(ML
@@ -126,7 +126,7 @@ drone-stack-ete-train-4090 bash`로 들어가 `ete_net.train`을 직접 구동
 ## GPU
 
 RTX 4090 1장 (sm_89), driver 535.183.01 → **CUDA ≤12.2 컨테이너만** 구동 가능
-(`nvidia/cuda:12.2.2-devel-ubuntu20.04` 베이스, `stacks/ete-train-4090.yml`). 불량
+(`nvidia/cuda:12.2.2-devel-ubuntu20.04` 베이스, `stacks/ete-train-4090/stack.yml`). 불량
 카드 없음 — `GPU_UUIDS` 지정 불필요(ml 데스크톱의 죽은 2080Ti 카드 문제와 다름).
 
 ## claude_portable_home — 보안 주의

@@ -1,3 +1,0 @@
-logging to /home/ml/drone-stack-docker/stack-assets/aruco-landing-jetson/results/trial-preparation-20260919/roslog/b4f70a08-b43a-11f1-bb4b-a760e04399b3/rosout.log
-re-publishing aggregated messages to /rosout_agg
-subscribed to /rosout

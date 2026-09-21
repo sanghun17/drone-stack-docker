@@ -2,7 +2,7 @@
 # Bind-mounted file: changes apply on the next module launch without rebuilding.
 _dsd_repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 if [[ "${DSD_STACK_NAME:-}" =~ ^[a-zA-Z0-9_-]+$ ]]; then
-  _dsd_runtime_policy="$_dsd_repo_root/stack-assets/$DSD_STACK_NAME/config/runtime.env"
+  _dsd_runtime_policy="$_dsd_repo_root/stacks/$DSD_STACK_NAME/config/runtime.env"
   [ ! -f "$_dsd_runtime_policy" ] || source "$_dsd_runtime_policy"
 fi
 unset _dsd_repo_root _dsd_runtime_policy

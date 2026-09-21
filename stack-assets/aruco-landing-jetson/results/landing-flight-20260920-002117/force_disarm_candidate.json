@@ -1,9 +1,0 @@
-{
-  "scope": "Offline candidate using recorded planner marker-valid decision and OptiTrack-derived camera pose; not actuation or a full callback-timing replay",
-  "first_candidate": {
-    "bag_time_s": 24.04836416244507,
-    "marker_camera_height_m": 0.19649161085506223,
-    "mocap_camera_height_m": 0.20463295968297004,
-    "mocap_topic_receipt_age_s": 0.0008952617645263672
-  }
-}

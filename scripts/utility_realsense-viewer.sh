@@ -1,5 +1,5 @@
 #!/bin/bash
-source "$(dirname "$(readlink -f "$0")")/../modules/select_stack.sh"
+source "$(dirname "$(readlink -f "$0")")/lib/select_stack.sh"
 dsd_select_stack sensor/realsense-d435i || exit $?
 # realsense-viewer over the shared headless noVNC chain (see scripts/_vnc_gui.sh).
 # Browser:  http://<jetson-ip>:6080/vnc.html?resize=scale&quality=0&compression=9

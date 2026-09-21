@@ -1,0 +1,28 @@
+# One-time camera-to-body extrinsic calibration capture. The aircraft is moved
+# by hand while the pad/marker stays fixed. No FC, MAVROS, controller, pose
+# transition adapter, or external webcam service is required.
+bag_dir: /work/flight_logs/aruco-landing/camera-body-extrinsic
+prefix: camera-body-extrinsic
+trigger_mode: service
+webcam_enable: false
+lz4: true
+stop_timeout_s: 12.0
+record_all: false
+topics:
+  - /session_recorder/active
+  - /session_recorder/status
+
+  # Lossless original RGB frames (bag-level LZ4); detections are solved offline.
+  # Only the camera and OptiTrack nodes are needed for this capture.
+  - /landing/camera/image_raw
+  - /landing/camera/camera_info
+  - /landing/camera/stream_status
+
+  # T_global_body. The Motive rigid-body origin/axes must represent base_link.
+  - /vrpn_client_node/pure/pose
+  - /diagnostics
+
+  # Preserve any camera calibration/static frame metadata published at capture.
+  # Do not publish a guessed base_link -> camera transform for this measurement.
+  - /tf
+  - /tf_static

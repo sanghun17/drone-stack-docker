@@ -1,0 +1,50 @@
+# Same recording core as simulation. The adapters differ: MAVROS arming owns
+# the session edge and hardware also calls the existing ml-host webcam service.
+bag_dir: /work/flight_logs/aruco-landing/hardware-sessions
+prefix: aruco-hardware
+trigger_mode: mavros_arming
+start_on_initial_true: true
+webcam_enable: true
+webcam_start_service: /recorder/start
+webcam_stop_service: /recorder/stop
+webcam_timeout_s: 5.0
+lz4: true
+stop_timeout_s: 12.0
+record_all: false
+topics:
+  - /session_recorder/active
+  - /session_recorder/status
+  # Compressed transport keeps 1280x720@60 recording practical. The estimator
+  # still consumes the raw topic directly, so this measures the recording load.
+  - /landing/camera/image_raw/compressed
+  - /landing/camera/camera_info
+  - /landing/markers/ids
+  - /landing/markers/poses_camera
+  - /landing/estimator/inlier_ids
+  - /landing/estimator/processing_ms
+  - /landing/target_visible
+  - /landing/target_pose_camera
+  - /landing/camera_pose_pad
+  - /landing/vehicle_pose_pad
+  - /landing/cmd_vel_pad
+  - /landing/yaw_cmd
+  - /landing/controller/active
+  - /landing/controller/abort
+  - /landing/controller/touchdown
+  - /landing/controller/state
+  # Localization-source transition evidence. The first flight keeps the source
+  # at optitrack while recording the globally aligned marker pose in shadow.
+  - /vrpn_client_node/pure/pose
+  - /landing/vision_pose_marker
+  - /landing/pad_pose_global
+  - /landing/vision_pose_source
+  - /landing/pose_transition/ready
+  - /landing/pose_transition/status
+  - /mavros/vision_pose/pose
+  - /mavros/local_position/pose
+  - /mavros/local_position/odom
+  - /mavros/estimator_status
+  - /diagnostics
+  - /mavros/state
+  - /tf
+  - /tf_static

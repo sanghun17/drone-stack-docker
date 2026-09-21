@@ -17,13 +17,13 @@ description: ETE-Net 학습-분석-수정 루프. uncertainty_predictor의 ete_n
 
 ### 컨테이너 실행 (표준)
 
-- 스택: `stacks/ete-train-2080ti.yml`(ml 데스크톱 자신, RTX 2080 Ti x3, sm75) /
+- 스택: `stacks/ete-train-2080ti/stack.yml`(ml 데스크톱 자신, RTX 2080 Ti x3, sm75) /
   `ete-train-4090.yml`(sm89) / `ete-train-5090.yml`(sm120) — 모듈 구성은 동일
-  (`compute/torch` + `compute/spconv` + `training/ete-net`), `gpu_arch`만 다름.
+  (`libraries/torch` + `libraries/spconv` + `training/ete-net`), `gpu_arch`만 다름.
   준비: `cd ~/drone-stack-docker && GPU_UUIDS=<healthy-uuid> CONTAINER_USER=$(id -u):$(id -g) ./setup.sh build ete-train-2080ti && GPU_UUIDS=<healthy-uuid> CONTAINER_USER=$(id -u):$(id -g) ./setup.sh up ete-train-2080ti`
   — `GPU_UUIDS`/`CONTAINER_USER`는 `config/stack.env`에 기본 blank로 남아 있고
   invocation마다 export하는 관례(호스트별로 다른 값이라 공유 파일에 하드코딩 안 함).
-  상세 절차·GPU 지정·트러블슈팅 전체: `~/drone-stack-docker/docs/ETE_TRAIN_GPU_HOSTS.md`.
+  상세 절차·GPU 지정·트러블슈팅 전체: `~/drone-stack-docker/modules/training/ete-net/DEPLOYMENT.md`.
 - **컨테이너 내부 작업 디렉토리**: `modules/training/ete-net/train.sh`가 `cd`하는 경로는
   호스트 실경로가 아니라 컨테이너 마운트 타겟(정확한 문자열은 `train.sh`/`module.yml`의
   `mounts:` 항목 참고)이다 — 표기가 은퇴한 구 코드 트리의 이름을 우연히 재사용하고 있을
@@ -50,13 +50,13 @@ description: ETE-Net 학습-분석-수정 루프. uncertainty_predictor의 ete_n
 - ⚠ **GPU 고정은 반드시 UUID, 그리고 privileged 컨테이너에서는 `NVIDIA_VISIBLE_DEVICES`만으로
   안심하지 말 것**: 이 데스크톱은 죽은 카드(PCI `1a:00.0`, NVML enumerate 불가)가 섞여 있어
   `--gpus all`/인덱스 지정이 실패하거나 죽은 카드를 잡을 수 있다 — `GPU_UUIDS=GPU-<uuid>`로
-  `./setup.sh {build,up}` 시점에 고정한다(`tools/gen_dockerfile_compose.py`가 amd64+GPU_UUIDS일 때
+  `./setup.sh {build,up}` 시점에 고정한다(`scripts/gen_dockerfile_compose.py`가 amd64+GPU_UUIDS일 때
   `runtime: nvidia` + `NVIDIA_VISIBLE_DEVICES` 조합으로 생성). 다만 dsd 컨테이너는 (이
-  스택 포함) **모두 `privileged: true`로 뜬다**(`tools/gen_dockerfile_compose.py`, 스택
+  스택 포함) **모두 `privileged: true`로 뜬다**(`scripts/gen_dockerfile_compose.py`, 스택
   공통) — privileged 모드에서는 GPU 격리가 `NVIDIA_VISIBLE_DEVICES`만으로 보장되지
   않으므로, 학습/평가/스모크테스트를 실제로 `docker exec`/`./setup.sh run`으로 띄울 때는
   매번 **`CUDA_VISIBLE_DEVICES=<one-healthy-uuid>`를 그 호출에 직접 넣어 GPU를 다시
-  고정**한다(`docs/ETE_TRAIN_GPU_HOSTS.md`의 GPU validation protocol이 실제로 이 이중
+  고정**한다(`modules/training/ete-net/DEPLOYMENT.md`의 GPU validation protocol이 실제로 이 이중
   고정 패턴을 쓴다). 이 데스크톱은 UE4/AirSim(`sim-x86` 스택)이 특정 GPU를 점유하는
   경우가 있으므로, 그 GPU와 겹치지 않는 healthy UUID를 `CUDA_VISIBLE_DEVICES`로 명시할 것.
 - **CONTAINER_USER**: 안 하면 체크포인트/tensorboard/캐시가 root 소유로 쓰여 sudo 없이

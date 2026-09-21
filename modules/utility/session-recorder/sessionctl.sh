@@ -5,13 +5,13 @@
 set -eo pipefail
 
 if [ ! -f /.dockerenv ]; then
-  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/select_stack.sh"
+  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)/scripts/lib/select_stack.sh"
   dsd_select_stack "utility/session-recorder" || exit $?
   : "${DSD_CONTAINER:?set DSD_CONTAINER or invoke through './setup.sh run <stack> utility/session-recorder/sessionctl.sh'}"
   __C="$DSD_CONTAINER"
   __S="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
   __R="$(cd "$(dirname "$__S")/../../.." && pwd)"
-  source "$__R/modules/ensure_container.sh"
+  source "$__R/scripts/lib/ensure_container.sh"
   docker start "$__C" >/dev/null 2>&1
   __TT=$([ -t 1 ] && echo -it || echo -i)
   exec docker exec "$__TT" "$__C" bash "/work/${__S#$__R/}" "$@"

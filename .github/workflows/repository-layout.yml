@@ -1,0 +1,19 @@
+name: Repository layout
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  layout:
+    name: repository-layout
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check committed layout
+        run: python3 scripts/check_layout.py --revision HEAD --worktree
+      - name: Exercise rejection paths and Git hooks
+        run: python3 -m unittest discover -s scripts/tests -p test_layout_guard.py -v

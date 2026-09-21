@@ -29,5 +29,5 @@ RANSAC method. The user selected joint-corner PnP for the unified runtime.
 
 Camera capture, OptiTrack, landing control, MAVROS and flight-safety retain
 independent lifecycles. See the stack's
-`stack-assets/aruco-landing-jetson/docs/physical_pad_estimator.md` for pose topics,
+`stacks/aruco-landing-jetson/docs/physical_pad_estimator.md` for pose topics,
 frame conventions, placement reset and detected-image viewing.

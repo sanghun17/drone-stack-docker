@@ -11,7 +11,7 @@ mode is 1280x720 UYVY at 60 Hz. Do not copy the D435i intrinsics.
 
 The installed serial-specific YAML is the 2026-09-15 colleague result
 (61 views, 0.481465 px fitting RMS). See
-[intrinsic preview provenance](../../../../stack-assets/aruco-landing-jetson/docs/intrinsic_preview.md).
+[intrinsic preview provenance](../../../../stacks/aruco-landing-jetson/docs/intrinsic_preview.md).
 
 Generate the standard target used by this module:
 

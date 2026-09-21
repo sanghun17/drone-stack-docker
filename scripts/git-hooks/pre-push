@@ -1,0 +1,6 @@
+#!/bin/bash
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+checker="$(git show HEAD:scripts/check_layout.py)"
+# stdin is Git's list of ref updates; inspect every outgoing commit, not just HEAD.
+python3 -c "$checker" --pre-push "$1"

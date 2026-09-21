@@ -1,4 +1,0 @@
-/proc/390/status:Threads:	6
-/proc/390/status:Cpus_allowed_list:	0-1
-/proc/525/status:Threads:	14
-/proc/525/status:Cpus_allowed_list:	2-3

@@ -8,7 +8,7 @@ from flight_safety.diagnosis.geofence import GeofenceDiag,INSIDE,APPROACHING,OUT
 ROOT=Path(__file__).resolve().parents[4]
 class ProfilesTest(unittest.TestCase):
     def node(self,stack):
-        cfg=yaml.safe_load((ROOT/'stack-assets'/stack/'config/geofence.yaml').read_text())
+        cfg=yaml.safe_load((ROOT/'stacks'/stack/'config/geofence.yaml').read_text())
         with patch('rospy.Subscriber'),patch('rospy.Publisher'),patch('rospy.Timer'):
             n=GeofenceDiag(cfg)
         n.pos=(0.,0.,0.);n.last_rx=rospy.Time.from_sec(10.)
@@ -32,6 +32,6 @@ class ProfilesTest(unittest.TestCase):
         self.assertEqual(n.status(rospy.Time.from_sec(11.))[0],UNKNOWN)
         self.assertEqual(len(self.node('d435i-voxblox')._fence_edges()),12)
     def test_risk_profile_matches_legacy_boundary_settings(self):
-        new=yaml.safe_load((ROOT/'stack-assets/d435i-voxblox/config/geofence.yaml').read_text())
+        new=yaml.safe_load((ROOT/'stacks/d435i-voxblox/config/geofence.yaml').read_text())
         old=yaml.safe_load((ROOT/'ws/flight-safety/src/flight_safety/config/diagnosis.yaml').read_text())['geofence']
         self.assertEqual(new.pop('enabled_axes'),['x','y','z']);self.assertEqual(new,old)

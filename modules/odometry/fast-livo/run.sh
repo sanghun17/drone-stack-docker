@@ -3,13 +3,13 @@
 set -e
 
 if [ ! -f /.dockerenv ]; then
-  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/select_stack.sh"
+  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)/scripts/lib/select_stack.sh"
   dsd_select_stack "odometry/fast-livo" || exit $?
   : "${DSD_CONTAINER:?set DSD_CONTAINER or invoke through './setup.sh run <stack> odometry/fast-livo'}"
   __C="$DSD_CONTAINER"
   __S="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
   __R="$(cd "$(dirname "$__S")/../../.." && pwd)"
-  source "$__R/modules/ensure_container.sh"
+  source "$__R/scripts/lib/ensure_container.sh"
   docker start "$__C" >/dev/null 2>&1
   __PROFILE="$(docker exec "$__C" printenv FAST_LIVO_PROFILE 2>/dev/null || true)"
   case "${__PROFILE:-hardware}" in
@@ -30,7 +30,7 @@ case "${FAST_LIVO_PROFILE:-hardware}" in
   hardware)
     source /work/ws/fast-livo/devel/setup.bash
     source /work/config/ros_env.sh
-    source /work/modules/ensure_roscore.sh
+    source /work/scripts/lib/ensure_roscore.sh
     exec taskset -c "${CPUS_POOL:?config/ros_env.sh not sourced}" \
       roslaunch fast_livo mapping_d435i.launch "$@"
     ;;
@@ -38,7 +38,7 @@ case "${FAST_LIVO_PROFILE:-hardware}" in
     source /work/ws/fast-livo-sim/devel/setup.bash
     source /work/config/sim.env
     source /work/config/ros_env.sh
-    source /work/modules/ensure_roscore.sh
+    source /work/scripts/lib/ensure_roscore.sh
     exec roslaunch fast_livo mapping_simulator_openvins.launch "$@"
     ;;
   *)

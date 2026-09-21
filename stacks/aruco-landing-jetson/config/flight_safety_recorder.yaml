@@ -1,0 +1,107 @@
+# Stack-owned ARM recording profile; shared recorder and webcam trigger are unchanged.
+bag_dir: /work/flight_logs
+prefix: safety
+record_all: false
+exclude: ''
+lz4: true
+stop_settle: 10.0
+webcam_enable: true
+webcam_start_srv: /recorder/start
+webcam_stop_srv: /recorder/stop
+webcam_timeout: 5.0
+odom_history_enable: false
+odom_history_start_srv: /robot_odom_history/start
+odom_history_stop_srv: /robot_odom_history/stop
+odom_history_timeout: 1.0
+runtime_manifest_enable: true
+runtime_manifest_suffix: .runtime_manifest.yaml
+runtime_manifest_command_timeout_s: 6.0
+runtime_manifest_git_diff_max_bytes: 262144
+runtime_manifest_repo_paths:
+  drone_stack: /work
+  flight_safety: /work/ws/flight-safety/src/flight_safety
+  aruco_landing: /work/ws/aruco-landing/src/aruco_landing
+runtime_manifest_config_paths:
+  geofence: /work/stacks/aruco-landing-jetson/config/geofence.yaml
+  aruco_runtime: /work/stacks/aruco-landing-jetson/config/runtime.env
+  aruco_pad: /work/stacks/aruco-landing-jetson/config/physical_pad.yaml
+  aruco_trial: /work/ws/aruco-landing/src/aruco_landing/launch/landing_trial.launch
+  aruco_controller: /work/ws/aruco-landing/src/aruco_landing/config/common_experiment.yaml
+  flight_safety_recorder: /work/stacks/aruco-landing-jetson/config/flight_safety_recorder.yaml
+topics:
+- /vrpn_client_node/pure/pose
+- /landing/vision_pose_marker
+- /landing/vehicle_pose_pad
+- /landing/target_pose_camera
+- /landing/pad_pose_global
+- /landing/target_visible
+- /landing/alignment/ready
+- /landing/estimator/inlier_ids
+- /landing/estimator/status
+- /landing/camera/camera_info
+- /landing/debug/image/compressed
+- /landing/debug/image/mouse_click
+- /mavros/imu/data_raw
+- /mavros/state
+- /mavros/vision_pose/pose
+- /tf
+- /tf_static
+- /landing/camera_pose_pad
+- /landing/camera/stream_status
+- /landing/vision_pose_selected
+- /landing/vision_pose_source
+- /landing/pose_transition/ready
+- /landing/pose_transition/status
+- /landing/manual_audit/status
+- /vision_pose_mux/selected
+- /mux/selected
+- /mavros/local_position/pose
+- /mavros/local_position/odom
+- /mavros/local_position/velocity_local
+- /mavros/imu/data
+- /mavros/estimator_status
+- /mavros/extended_state
+- /mavros/statustext/recv
+- /mavros/rc/in
+- /mavros/battery
+- /mavros/timesync_status
+- /mavros/setpoint_raw/local
+- /mavros/setpoint_raw/target_local
+- /local_controller/setpoint_raw/local
+- /flight_safety/fault
+- /flight_safety/state
+- /diagnostics
+- /rosout_agg
+- /landing/shadow/optitrack/vehicle_pose_pad
+- /landing/shadow/optitrack/camera_pose_pad
+- /landing/shadow/optitrack/valid
+- /landing/shadow/optitrack/cmd_vel_pad
+- /landing/shadow/optitrack/yaw_cmd
+- /landing/shadow/optitrack/yaw_error
+- /landing/shadow/optitrack/controller/state
+- /landing/shadow/optitrack/controller/active
+- /landing/shadow/optitrack/controller/abort
+- /landing/shadow/optitrack/controller/touchdown
+- /landing/shadow/transition/vehicle_pose_pad
+- /landing/shadow/transition/camera_pose_pad
+- /landing/shadow/transition/valid
+- /landing/shadow/transition/cmd_vel_pad
+- /landing/shadow/transition/yaw_cmd
+- /landing/shadow/transition/yaw_error
+- /landing/shadow/transition/controller/state
+- /landing/shadow/transition/controller/active
+- /landing/shadow/transition/controller/abort
+- /landing/shadow/transition/controller/touchdown
+- /mavlink/from
+
+# Hardware trial lifecycle and actual control inputs.
+- /control/mission_status
+- /landing/trial/status
+- /landing/trial/setpoint_preview
+- /landing/trial/body_pose_pad
+- /landing/trial/camera_pose_pad
+- /landing/trial/control_valid
+- /landing/trial/landing_cmd_pad
+- /landing/trial/yaw_cmd
+- /landing/trial/yaw_error
+- /landing/trial/controller/state

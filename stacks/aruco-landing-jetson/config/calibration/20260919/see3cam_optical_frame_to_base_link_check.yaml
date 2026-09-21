@@ -1,0 +1,51 @@
+parent_frame: see3cam_optical_frame
+child_frame: base_link
+convention: T_parent_child maps child coordinates into parent coordinates
+translation_m:
+  x: -0.004043371271405688
+  y: -0.12530369382509965
+  z: -0.006617556097531221
+rotation_xyzw:
+  x: -0.7181588566960309
+  y: -0.6958776420997436
+  z: 0.001463258680127507
+  w: 0.00015049513606131974
+matrix_row_major:
+- 0.031504332199472615
+- 0.999500943274735
+- -0.0023111567624014904
+- -0.004043371271405688
+- 0.9995018241279918
+- -0.03150856915383059
+- -0.0018203391705140027
+- -0.12530369382509965
+- -0.001892251960682165
+- -0.0022526568299224468
+- -0.9999956724504983
+- -0.006617556097531221
+- 0.0
+- 0.0
+- 0.0
+- 1.0
+validation_result: PASS
+validation_scope: Offline held-out multi-session geometry and actual SessionAlignment
+  replay. Real marker-fed PX4/offboard flight is not validated.
+calibration_id: fixed_body_20260919_v2
+body_definition: 'Current Pure equals Body: +X forward, +Y left, +Z up (FLU). Origin
+  is vehicle centre per user; no independently surveyed origin.'
+historical_frame_handling: Old Pure local axes were mapped into current Body using
+  gyro-measured rotation; no exact 90-degree correction was imposed. Equal mechanical
+  origins across recordings assumed.
+source_bags:
+- /home/ml/drone-stack-archive/20260921-cleanup/experiments/aruco-landing/camera-body-extrinsic/extrinsic-pad-anchor30mm-01_2026-09-19-10-14-42.bag
+- /home/ml/drone-stack-archive/20260921-cleanup/experiments/aruco-landing/pose-transition/handcarried-20260919-120243-437248.bag
+- /home/ml/drone-stack-archive/20260921-cleanup/experiments/aruco-landing/manual-flight/manual-flight-20260919-131105-329410.bag
+anchor_id: 21
+anchor_side_m: 0.03
+image_to_body_time_offset_s: -0.041589316816677754
+timing_note: Runtime time correction unchanged. Session-specific fitted timing offsets
+  in the diagnostic report are not deployed.
+validation_report: /home/ml/drone-stack-archive/20260921-cleanup/stack-assets/aruco-landing-jetson/results/manual-flight-20260919/frame-audit/fixed-body-refit/README.md
+invariant: Body-camera mount stays fixed. Do not redefine Pure local axes/origin without
+  an explicit Pure-to-Body transform and revalidation. Global-pad alignment is learned
+  per session, never saved as runtime calibration.

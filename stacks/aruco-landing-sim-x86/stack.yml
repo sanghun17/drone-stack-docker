@@ -1,0 +1,22 @@
+# AirSim/Unreal runs on the ml host. The simulation module talks to its RPC
+# server and publishes the same normalized ROS camera interface used by the
+# real stack; ArUco perception/control remain simulator-agnostic. The matching
+# stacks/aruco-landing-sim-x86 directory owns the map and experiment tools.
+arch: [amd64]
+gpu_arch: nogpu
+gpu: false
+# Landing and the existing AirSim experiment are mutually exclusive, so reuse
+# the host's normal AirSim roscore instead of maintaining a second bridge/master.
+ros_master_port: 11311
+ros_master_host: 192.168.50.12
+environment:
+  AIRSIM_CAMERA_CONFIG: /work/stacks/aruco-landing-sim-x86/config/landing_camera.yaml
+  AIRSIM_CAMERA_BRIDGE_BIN: /work/.build/aruco-landing-camera-bridge/airsim_landing_camera_bridge
+  AIRSIM_CAMERA_BRIDGE_BUILD_SCRIPT: /work/stacks/aruco-landing-sim-x86/scripts/build_camera_bridge.sh
+  SESSION_RECORDER_PROFILE: simulation
+  SESSION_RECORDER_CONFIG: /work/stacks/aruco-landing-sim-x86/config/session_recorder.yaml
+modules:
+  - simulation/airsim
+  - perception/aruco-landing
+  - control/aruco-landing
+  - utility/session-recorder

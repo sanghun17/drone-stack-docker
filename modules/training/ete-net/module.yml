@@ -3,16 +3,16 @@ group: training
 description: >
   ETE-Net (uncertainty_predictor) training container. group=training (not "ml" --
   renamed 2026-07-14: the group axis is role-based (sensor/odometry/planner/control/
-  compute/utility), and "ml" was a technology name that also reads ambiguously
+  libraries/utility), and "ml" was a technology name that also reads ambiguously
   against inference/deployment, which would also be "ml"). Training is ROS-free (see
-  docs/ETE_TRAIN_GPU_HOSTS.md dependency audit -- rosbag/rospy only appear in the lazy
+  modules/training/ete-net/DEPLOYMENT.md dependency audit -- rosbag/rospy only appear in the lazy
   Stage-0 raw-bag-to-pkl path and offline eval tools, never in train.py's call chain
-  when caches already exist). Pulls compute/torch + compute/spconv (amd64_sm120 combo
+  when caches already exist). Pulls libraries/torch + libraries/spconv (amd64_sm120 combo
   for Blackwell) but does NOT need sensor/odometry/planner/control modules. `base`
   (ROS Noetic) is still installed because the schema always includes it, but is unused
-  here -- see stacks/ete-train-5090.yml for the minimal module list this actually needs.
+  here -- see stacks/ete-train-5090/stack.yml for the minimal module list this actually needs.
 
-needs: [compute/torch, compute/spconv]
+needs: [libraries/torch, libraries/spconv]
 
 deps:
   pip:
@@ -36,11 +36,11 @@ deps:
     # it's used inside a function body, not a top-level `import sklearn` line.
     # Version matches the ML desktop's actual pinned version (`pip freeze`).
     - scikit-learn==0.24.0
-  # numpy is pinned by compute/torch's install.sh already (1.24.3, both arches) --
+  # numpy is pinned by libraries/torch's install.sh already (1.24.3, both arches) --
   # deliberately not re-listed here to avoid a second, possibly-conflicting resolve.
   # No amd64_sm120 combo needed for this module: none of these packages vary by GPU
   # micro-arch (only CUDA-linked packages like torch/spconv do) -- included as the
-  # "doesn't need the new dimension" counter-example to compute/spconv's combo usage.
+  # "doesn't need the new dimension" counter-example to libraries/spconv's combo usage.
 
 # Live checkout bind-mount, NOT a clone.sh + pinned-branch clone (unlike
 # planner/risk-aware) -- this is an active training-code iteration host, not a pinned

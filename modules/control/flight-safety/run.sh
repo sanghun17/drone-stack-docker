@@ -3,7 +3,7 @@
 # + estimator mux in one roslaunch, plus the rqt_runtime_monitor /diagnostics view in a browser.
 # Actuation gated by require_armed. Ctrl-C kills all of it.
 if [ ! -f /.dockerenv ]; then
-  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/select_stack.sh"
+  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)/scripts/lib/select_stack.sh"
   dsd_select_stack "control/flight-safety" || exit $?
   : "${DSD_CONTAINER:?set DSD_CONTAINER or invoke through './setup.sh run <stack> control/flight-safety'}"
 fi
@@ -18,10 +18,10 @@ __killall(){ docker exec "$__C" pkill -INT -f "$__M"    >/dev/null 2>&1
 if [ ! -f /.dockerenv ]; then
   __S="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
   __R="$(cd "$(dirname "$__S")/../../.." && pwd)"
-  source "$__R/modules/ensure_container.sh"
+  source "$__R/scripts/lib/ensure_container.sh"
   docker start "$__C" >/dev/null 2>&1
   docker exec "$__C" bash /work/modules/control/mavros/check_runtime.sh messages-only || exit $?
-  docker exec "$__C" bash -lc 'source /work/config/ros_env.sh; source /work/modules/ensure_roscore.sh'  # master up before the GUI
+  docker exec "$__C" bash -lc 'source /work/config/ros_env.sh; source /work/scripts/lib/ensure_roscore.sh'  # master up before the GUI
   "$__R/scripts/_vnc_gui.sh" 99 5900 6080 monitor \
     rqt --standalone rqt_runtime_monitor.runtime_monitor.RuntimeMonitor || true   # diagnostic GUI (best-effort)
   __TT=$([ -t 1 ] && echo -it || echo -i)
@@ -35,7 +35,7 @@ source /opt/ros/noetic/setup.bash
 bash /work/modules/control/mavros/check_runtime.sh messages-only
 source /work/ws/flight-safety/devel/setup.bash --extend   # flight_safety pkg + Fault/FlightState msgs
 source /work/config/ros_env.sh
-source /work/modules/ensure_roscore.sh
+source /work/scripts/lib/ensure_roscore.sh
 # Optional Jetson status LED (control_lane -> APA102). The safety capability is
 # usable on non-Jetson hosts without Jetson.GPIO or /dev/gpiochip0.
 if python3 -c 'import Jetson.GPIO' >/dev/null 2>&1 && [ -e /dev/gpiochip0 ]; then

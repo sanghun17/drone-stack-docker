@@ -6,7 +6,7 @@
 # `./setup.sh run ete-train-5090 training/ete-net`, or for full ad-hoc control
 # (arbitrary train.py flags, integrity_check.py, the spconv smoke test, etc.) just
 # `./setup.sh sh ete-train-5090` and drive ete_net/train.py directly -- see
-# docs/ETE_TRAIN_GPU_HOSTS.md for the exact commands (5090 validation protocol).
+# modules/training/ete-net/DEPLOYMENT.md for the exact commands (5090 validation protocol).
 #
 # No default config path here on purpose (project convention carried over from
 # risk-aware_planning: config parameters must halt, not silently fall back, when
@@ -25,7 +25,7 @@
 # (non-lazy) `import sensor_msgs.point_cloud2`. That only resolves if ROS's Python
 # path is already on PYTHONPATH -- true by default in a normal ROS-sourced shell on
 # bare metal, NOT true in this container unless set explicitly here. This also means
-# the "ROS is not in the training path" audit in docs/ETE_TRAIN_GPU_HOSTS.md needed a
+# the "ROS is not in the training path" audit in modules/training/ete-net/DEPLOYMENT.md needed a
 # correction: ROS isn't in the *runtime call path*, but `sensor_msgs` IS a hard
 # *import-time* dependency of the `ete_net` package as a whole.
 set -e

@@ -67,7 +67,7 @@ ssh jetson "docker exec drone-stack-d435i-voxblox <command>"    # 컨테이너 �
    - 처음 빌드하거나 catkin config가 의심스러우면(예: voxblox가 Debug/-O0로 잘못
      구성돼 heap이 깨지는 사고 재발 방지) dsd 스크립트로 전체 재확정:
      `ssh jetson "cd ~/drone-stack-docker && ./setup.sh build-ws d435i-voxblox"`
-     — 이 스택의 모든 모듈(`compute/torch`, `compute/spconv`, `compute/jax`,
+     — 이 스택의 모든 모듈(`libraries/torch`, `libraries/spconv`, `libraries/jax`,
      `odometry/fast-livo`, `sensor/realsense-d435i`, `planner/risk-aware`,
      `control/mavros`, `control/flight-safety`, `control/local-controller`,
      `utility/rviz`, `utility/rqt`, `odometry/optitrack`)를 `-DCMAKE_BUILD_TYPE=RelWithDebInfo`로

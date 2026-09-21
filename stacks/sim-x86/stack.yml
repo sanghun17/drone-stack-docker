@@ -1,0 +1,38 @@
+# sim-x86 — AirSim/UE4 simulator bring-up on the ml desktop (amd64, RTX 2080 Ti x3 /
+# Turing / sm_75, same GPU-arch combo as ete-train-2080ti). UE4/AirSim + roscore stay
+# on the HOST (Window 0, see the sim-start skill) — this stack only containerizes the
+# odometry/mapping/planner/control chain that Window 1 used to run bare-metal:
+# fast-livo(ml branch, mapping_simulator_openvins.launch) -> voxblox -> exploration ->
+# JAX MPPI -> SO(3) control. network_mode:host (compose default) lets the container
+# share the host's roscore (192.168.50.12:11311) directly — see config/sim.env.
+#
+# gpu_uuids_env: sim-x86 uses its OWN GPU_UUIDS source key (SIM_GPU_UUIDS in
+# config/stack.env) instead of the shared/blank-by-default `GPU_UUIDS` env var that
+# the ete-train-* amd64 stacks use (see scripts/gen_dockerfile_compose.py's
+# gpu_uuids_env lookup) — so generating this stack never depends on (or clobbers) an
+# ete-train invocation's `GPU_UUIDS=... ./setup.sh up ete-train-2080ti` shell export,
+# and vice versa. Value = the same phys0,1 UUID pair `tmux_common.sh`'s
+# CUDA_VISIBLE_DEVICES="0,1" + ours_jax.launch gpu:=1 select on the host.
+arch: [amd64]
+gpu_arch: sm75
+gpu_uuids_env: SIM_GPU_UUIDS
+# host 는 localhost 가 아니라 이 PC 의 LAN IP 다 (config/sim.env 와 동일):
+# 이 PC 에서 젯슨(192.168.50.36) 마스터를 붙어 보는 일이 있고, ROS_IP/ROS_HOSTNAME
+# 은 상대가 '콜백해 오는' 주소라 127.0.0.1 로 두면 등록은 되는데 데이터가 안 온다.
+# LAN 광고가 필요 없어지면 localhost 로 바꿔도 된다.
+ros_master_port: 11311
+ros_master_host: 192.168.50.12
+environment:
+  FAST_LIVO_PROFILE: airsim
+  RISK_AWARE_PROFILE: airsim
+mounts:
+  - "${SIM_RISK_AWARE_ASSETS}:${SIM_RISK_AWARE_ASSETS}"
+modules:
+  - libraries/torch          # amd64/sm75 branch (source-built torch 2.2.2, ABI=1 --
+                            # unconditional as of 2026-07-26, same wheel ete-train-*
+                            # now uses too) — hours to build, keep at the top
+  - libraries/spconv
+  - libraries/jax
+  - simulation/airsim       # reusable AirSim Python client; map/trials stay in this stack directory
+  - odometry/fast-livo       # AirSim profile selects the divergent ml branch/launch
+  - planner/risk-aware       # same planner capability; AirSim launch entrypoints are profile-specific

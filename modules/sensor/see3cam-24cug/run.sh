@@ -6,12 +6,12 @@
 set -eo pipefail
 
 if [ ! -f /.dockerenv ]; then
-  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/select_stack.sh"
+  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)/scripts/lib/select_stack.sh"
   dsd_select_stack "sensor/see3cam-24cug" || exit $?
   __C="$DSD_CONTAINER"
   __S="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
   __R="$(cd "$(dirname "$__S")/../../.." && pwd)"
-  source "$__R/modules/ensure_container.sh"
+  source "$__R/scripts/lib/ensure_container.sh"
   docker start "$__C" >/dev/null 2>&1
   __TT=$([ -t 1 ] && echo -it || echo -i)
   cleanup(){ docker exec "$__C" pkill -INT -x see3cam_node >/dev/null 2>&1 || true; }
@@ -24,7 +24,7 @@ fi
 source /work/config/ros_env.sh
 source /opt/ros/noetic/setup.bash
 set -u
-source /work/modules/ensure_roscore.sh
+source /work/scripts/lib/ensure_roscore.sh
 
 : "${SEE3CAM_SERIAL:=1A3958060A020900}"
 : "${SEE3CAM_DEVICE:=/dev/v4l/by-id/usb-e-con_systems_See3CAM_24CUG_${SEE3CAM_SERIAL}-video-index0}"

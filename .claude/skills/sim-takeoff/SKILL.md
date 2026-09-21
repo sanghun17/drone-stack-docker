@@ -92,12 +92,12 @@ sleep 5
 
 # Eval Data Recording
 tmux new-window -t risk_aware_planning -n eval 2>/dev/null || true
-tmux send-keys -t risk_aware_planning:eval "bash /home/ml/drone-stack-docker/stack-assets/sim-x86/tools/run_eval.sh" C-m
+tmux send-keys -t risk_aware_planning:eval "bash /home/ml/drone-stack-docker/stacks/sim-x86/scripts/run_eval.sh" C-m
 sleep 1
 
 # SO(3) Control Bridge (traj_server + so3_control_bridge — provides /control_bridge/toggle_running)
 tmux new-window -t risk_aware_planning -n so3 2>/dev/null || true
-tmux send-keys -t risk_aware_planning:so3 "bash /home/ml/drone-stack-docker/stack-assets/sim-x86/tools/run_so3.sh" C-m
+tmux send-keys -t risk_aware_planning:so3 "bash /home/ml/drone-stack-docker/stacks/sim-x86/scripts/run_so3.sh" C-m
 sleep 3
 ```
 

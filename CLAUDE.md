@@ -11,7 +11,7 @@
 
 Jetson AGX Orin (and x86) drone-autonomy stack, ROS Noetic. Modular: each module declares its
 own deps; a "stack" composes them into ONE Docker image + ONE container. Human overview: README.md.
-Design: docs/MODULARIZATION.md, docs/MODULE_SCHEMA.md.
+Design: modules/README.md, modules/SCHEMA.md.
 
 ## Working here — READ FIRST (tooling)
 
@@ -27,7 +27,7 @@ Design: docs/MODULARIZATION.md, docs/MODULE_SCHEMA.md.
 - **Reuse existing scripts before hand-rolling a docker/ROS command.** This repo has one already for
   almost everything: `setup.sh <cmd> <stack>` (clone/up/build-ws/run/sh/down/ls), each module's own
   `run.sh` / `build_ws.sh` / `clone.sh` (correct sourcing order, CPU affinity via `taskset`, container
-  entry + cleanup traps already baked in), `tools/` (host analysis/eval), `docs/` (architecture). A
+  entry + cleanup traps already baked in), `scripts/` (shared orchestration), module/stack-local documentation. A
   hand-rolled `docker exec ... catkin build <pkgs>` or `docker exec ... roslaunch ...` skips whatever
   the real script does beyond the obvious call — e.g. `build-ws` re-asserts
   `-DCMAKE_BUILD_TYPE=RelWithDebInfo` every run (voxblox corrupts the heap under `-O0`/Debug — a real
@@ -39,18 +39,19 @@ Design: docs/MODULARIZATION.md, docs/MODULE_SCHEMA.md.
 
 - `setup.sh <cmd> <stack>` — `clone` (run each module's clone.sh → ws/<m>/src), `up` (gen+build+start
   container, idle), `build-ws` (catkin-build in container), `run <stack> <module>`, `sh`, `down`, `ls`.
-  Container = `drone-stack-<stack>`, image = `drone-stack:<stack>`. Stacks live in `stacks/*.yml`.
+  Container = `drone-stack-<stack>`, image = `drone-stack:<stack>`. Stacks live in `stacks/*/stack.yml`.
 - `modules/<group>/<name>/` — one reusable capability = one image/runtime contribution: `module.yml` (deps apt/pip/source
   + mounts + run, arch-aware), `install.sh` (optional source builds), `run.sh` (launch its ROS nodes),
-  `clone.sh` (fetch its src repo), `config/`. Groups: base, compute(jax/torch/spconv),
+  `clone.sh` (fetch its src repo), `config/`. Groups: base, libraries(jax/torch/spconv),
   control(flight-safety/local-controller/mavros/aruco-landing), odometry(fast-livo/optitrack),
   perception(aruco-landing), planner(risk-aware), sensor(realsense-d435i/see3cam-24cug),
   simulation(airsim), training(ete-net), utility(gui-vnc/rqt/rviz).
-- `stack-assets/<stack>/` — maps, scenario profiles, trial/evaluation tools and other
+- `stacks/<stack>/` — maps, scenario profiles, launch/calibration tools and other
   deployment-owned assets that are not reusable module capabilities.
 - `ws/<module>/` — per-module catkin workspace. `src/<pkg>` = a SEPARATE git repo (own remote+branch,
   cloned by that module's clone.sh). `build/ devel/ logs/` = artifacts. `/ws/` is gitignored in MAIN.
-- `tools/` host analysis/eval · `config/` shared ros_env.sh + stack.env · `scripts/` · `flight_logs/` (bags, gitignored).
+- `scripts/` shared commands + `lib/` helpers · `config/` shared ros_env.sh + stack.env · `flight_logs/` current runtime recordings (gitignored).
+- Offline research, paper figures, historical results and inactive worktrees belong outside this checkout. The 2026-09-21 migration archive is `~/drone-stack-archive/20260921-cleanup/`; see its README and `migration/moves.json`.
 
 ## Component repos (separate gits under ws/ — commit/push in THEIR repo, NOT in MAIN)
 

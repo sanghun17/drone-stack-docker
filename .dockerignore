@@ -1,6 +1,10 @@
 .git
 .build
 ws
-docs
+flight_logs
+.claude
+.agents
+.codex
+**/__pycache__
 *.md
 *.bag

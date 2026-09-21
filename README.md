@@ -10,9 +10,47 @@ sensor, estimation, planning, control, simulation, and training capabilities int
 |------|--------|--------|
 | Docker environment | `https://github.com/sanghun17/drone-stack-docker.git` | `main` |
 
+## Layout
+
+Only build, deployment, operation, calibration and runtime validation belong here.
+
+```text
+modules/       reusable capabilities; base/ and libraries/{jax,torch,spconv}/
+stacks/        <name>/stack.yml + config/, scripts/ and required simulator assets
+scripts/       shared commands, image generator and lib/ shell helpers
+config/        shared host/ROS environment and untracked local overrides
+ws/            active component repositories and their build workspaces
+flight_logs/   new flight, simulation and bench recordings (not tracked)
+.build/        generated Docker/Compose files and local build products (not tracked)
+```
+
+`modules/base` installs the container's foundation (CUDA/L4T, ROS and toolchain).
+`scripts/lib` contains orchestration helpers; it is not an image module.
+Keep shared environment settings in `config`, device calibration with its module,
+and deployment-specific policy in `stacks/<name>/config`.
+
+Research worktrees, past experiments, offline analysis, paper figures and backups
+were moved to `~/drone-stack-archive/20260921-cleanup/` on ML. Its `README.md` and
+`migration/moves.json` locate the preserved files. Keep future research outputs
+outside this checkout; runtime recordings go under `flight_logs/`.
+
+The migration preserves stack names and `setup.sh` commands. Existing containers
+retain their old environment until recreated by `./setup.sh up <stack>`.
+Deploy matching component revisions as well: ArUco launch/audit defaults now use
+`stacks/aruco-landing-jetson/`, and flight-safety's optional VIO preflight reads
+its preserved provenance inputs from `modules/odometry/fast-livo/qualification/`.
+The corresponding migration commits are
+[ArUco 2c5b5a9](https://github.com/sanghun17/aruco_landing/commit/2c5b5a9)
+and [flight-safety 406efbf](https://github.com/sanghun17/flight_safety/commit/406efbf).
+
 ## Idea: declare modules → one image, one container
 
-- **A `stack` (`stacks/*.yml`) just lists the modules you want** + the target arch.
+Layout is enforced by versioned pre-commit/pre-push hooks, a required GitHub
+`repository-layout` check on main, and a checkout check before setup operations.
+Run `./setup.sh install-hooks` once after cloning (normal setup usage also installs
+them). See [layout enforcement](scripts/LAYOUT_GUARD.md) for rules and exceptions.
+
+- **A `stack` (`stacks/*/stack.yml`) just lists the modules you want** + the target arch.
 - **Each module (`modules/<group>/<name>/module.yml`) declares its own dependencies**
   (apt / pip / source builds), its source mounts, and its run scripts.
 - **`./setup.sh <cmd> <stack>`** reads the stack, gathers every selected module's deps
@@ -20,7 +58,7 @@ sensor, estimation, planning, control, simulation, and training capabilities int
   **one container** with the merged mounts + run scripts.
 
 ```
-stacks/d435i-voxblox.yml          modules/<group>/<name>/
+stacks/d435i-voxblox/stack.yml          modules/<group>/<name>/
   arch: arm64                       module.yml   # deps (apt/pip/source) + mounts + run, arch-aware
   modules:                          install.sh   # (optional) complex source builds
     - base                          run.sh       # launch this module's ROS node(s)
@@ -39,7 +77,7 @@ stacks/d435i-voxblox.yml          modules/<group>/<name>/
 
 ## arch (arm64 / amd64)
 
-`stacks/*.yml` sets `arch:`. `setup.sh` builds natively on a matching host and passes
+`stacks/*/stack.yml` sets `arch:`. `setup.sh` builds natively on a matching host and passes
 `TARGETARCH` so each module's `module.yml` `deps.arm64 / deps.amd64` selects the
 right wheels/SDK (for example Jetson versus x86 CUDA dependencies).
 
@@ -65,10 +103,10 @@ right wheels/SDK (for example Jetson versus x86 CUDA dependencies).
 
 ## Status
 
-See `docs/MODULE_SCHEMA.md` for the manifest spec.
+See `modules/SCHEMA.md` for the manifest spec.
 
 Large risk-aware model files and generated/packaged Unreal artifacts remain
 outside Git and Docker images. Authored stack-specific map/config/tooling lives
-under `stack-assets/`; reusable AirSim client functionality lives in
+under `stacks/`; reusable AirSim client functionality lives in
 `modules/simulation/airsim`. External asset paths, hashes and transfer procedure are recorded
-in [`docs/RISK_AWARE_DEPLOYMENT_ASSETS.md`](docs/RISK_AWARE_DEPLOYMENT_ASSETS.md).
+in [`modules/planner/risk-aware/ASSETS.md`](modules/planner/risk-aware/ASSETS.md).

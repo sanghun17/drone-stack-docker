@@ -57,7 +57,7 @@ docker exec drone-stack-sim-x86 pkill -INT -f "roslaunch active_3d_planning_app_
 tmux send-keys -t risk_aware_planning:exploration C-c 2>/dev/null
 docker exec drone-stack-sim-x86 pkill -INT -f "roslaunch active_3d_planning_app_reconstruction exploration_planner.launch" 2>/dev/null
 
-# Eval data recording (stack-assets/sim-x86/tools/run_eval.sh)
+# Eval data recording (stacks/sim-x86/scripts/run_eval.sh)
 tmux send-keys -t risk_aware_planning:eval C-c 2>/dev/null
 docker exec drone-stack-sim-x86 pkill -INT -f "roslaunch active_3d_planning_app_reconstruction runtime_evaluator.launch" 2>/dev/null
 

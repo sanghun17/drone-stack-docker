@@ -1,0 +1,6 @@
+#!/bin/bash
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+# Run the staged checker and policy, not an unstaged working-copy substitute.
+checker="$(git show :scripts/check_layout.py)"
+python3 -c "$checker" --staged --worktree

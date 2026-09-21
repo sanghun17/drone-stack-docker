@@ -8,7 +8,7 @@ case "${1:-}" in
 esac
 command="$1"
 if [ ! -f /.dockerenv ]; then
-  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../modules" && pwd)/select_stack.sh"
+  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/lib" && pwd)/select_stack.sh"
   dsd_select_stack "perception/aruco-landing"
   exec docker exec "$DSD_CONTAINER" bash /work/scripts/record_aruco-manual.sh "$command"
 fi
@@ -20,4 +20,4 @@ source /work/ws/flight-safety/devel/setup.bash --extend
 source /work/config/ros_env.sh
 args=("$command")
 [ "$tool" != capture.py ] || args+=(--profile manual-flight)
-exec python3 "/work/stack-assets/aruco-landing-jetson/tools/pose_transition/$tool" "${args[@]}"
+exec python3 "/work/stacks/aruco-landing-jetson/scripts/pose_transition/$tool" "${args[@]}"

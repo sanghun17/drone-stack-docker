@@ -3,13 +3,13 @@
 set -e
 
 if [ ! -f /.dockerenv ]; then
-  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/select_stack.sh"
+  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)/scripts/lib/select_stack.sh"
   dsd_select_stack "planner/risk-aware" || exit $?
   : "${DSD_CONTAINER:?set DSD_CONTAINER or invoke through './setup.sh run <stack> planner/risk-aware/run_voxblox.sh'}"
   __C="$DSD_CONTAINER"
   __S="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
   __R="$(cd "$(dirname "$__S")/../../.." && pwd)"
-  source "$__R/modules/ensure_container.sh"
+  source "$__R/scripts/lib/ensure_container.sh"
   docker start "$__C" >/dev/null 2>&1
   __PROFILE="$(docker exec "$__C" printenv RISK_AWARE_PROFILE 2>/dev/null || true)"
   case "${__PROFILE:-hardware}" in
@@ -31,7 +31,7 @@ if [ "${RISK_AWARE_PROFILE:-hardware}" = airsim ]; then
   source /work/config/sim.env
 fi
 source /work/config/ros_env.sh
-source /work/modules/ensure_roscore.sh
+source /work/scripts/lib/ensure_roscore.sh
 
 case "${RISK_AWARE_PROFILE:-hardware}" in
   hardware)

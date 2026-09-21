@@ -3,7 +3,7 @@ group: base
 description: Architecture module — CUDA/L4T base image + ROS Noetic + common toolchain. Always included.
 
 # Arch-specific base image (FROM). arm64 = NVIDIA Jetson L4T+CUDA; amd64 = x86 CUDA
-# devel, itself further split by gpu_arch combo key (see tools/gen_dockerfile_compose.py
+# devel, itself further split by gpu_arch combo key (see scripts/gen_dockerfile_compose.py
 # -- combo key `<arch>_<gpu_arch>` is tried first, falls back to the plain `<arch>` key).
 base_image:
   arm64: nvcr.io/nvidia/l4t-jetpack:r35.4.1

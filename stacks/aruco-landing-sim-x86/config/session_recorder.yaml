@@ -1,0 +1,31 @@
+bag_dir: /work/flight_logs/aruco-landing/simulation-sessions
+prefix: aruco-sim
+trigger_mode: service
+start_on_initial_true: false
+webcam_enable: false
+lz4: true
+stop_timeout_s: 12.0
+record_all: false
+topics:
+  - /session_recorder/active
+  - /session_recorder/status
+  - /landing/camera/image_raw
+  - /landing/camera/camera_info
+  - /landing/markers/ids
+  - /landing/markers/poses_camera
+  - /landing/estimator/inlier_ids
+  - /landing/estimator/processing_ms
+  - /landing/target_visible
+  - /landing/target_pose_camera
+  - /landing/camera_pose_pad
+  - /landing/vehicle_pose_pad
+  - /landing/cmd_vel_pad
+  - /landing/yaw_cmd
+  - /landing/controller/active
+  - /landing/controller/abort
+  - /landing/controller/touchdown
+  - /landing/controller/state
+  - /landing/safety_intervention
+  - /landing/ground_truth/airsim_local_ned
+  - /tf
+  - /tf_static

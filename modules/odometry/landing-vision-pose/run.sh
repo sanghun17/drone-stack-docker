@@ -3,13 +3,13 @@
 # receives this output only when flight-safety estimation_source:=external with external_pose_topic:=/landing/vision_pose_selected.
 # shellcheck disable=SC1090,SC1091
 if [ ! -f /.dockerenv ]; then
-  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/select_stack.sh"
+  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)/scripts/lib/select_stack.sh"
   dsd_select_stack "odometry/landing-vision-pose" || exit $?
   : "${DSD_CONTAINER:?set DSD_CONTAINER or invoke through './setup.sh run <stack> odometry/landing-vision-pose'}"
   __C="$DSD_CONTAINER"
   __S="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
   __R="$(cd "$(dirname "$__S")/../../.." && pwd)"
-  source "$__R/modules/ensure_container.sh"
+  source "$__R/scripts/lib/ensure_container.sh"
   docker start "$__C" >/dev/null 2>&1
   __TT=$([ -t 1 ] && echo -it || echo -i)
   __M="landing_vision_pose_adapter.launch"
@@ -23,7 +23,7 @@ set -e
 source /opt/ros/noetic/setup.bash
 source /work/ws/aruco-landing/devel/setup.bash
 source /work/config/ros_env.sh
-source /work/modules/ensure_roscore.sh
+source /work/scripts/lib/ensure_roscore.sh
 
 : "${LANDING_ALLOW_MARKER_SWITCH:=false}"
 : "${LANDING_AUTO_SWITCH:=false}"

@@ -14,6 +14,17 @@
 #   typical first run:  clone -> up -> build-ws -> run <camera> / <fastlivo> / <planner>
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Install versioned hooks on first host use, and fail before build/launch when
+# research directories have crept back into the checkout (even if ignored).
+# Shell access and shutdown remain available to recover an existing container.
+case "${1:-help}" in
+  install-hooks) exec bash "$ROOT/scripts/install_git_hooks.sh" ;;
+  down|sh) ;;
+  *) python3 "$ROOT/scripts/check_layout.py" --worktree
+     if [ ! -f /.dockerenv ]; then
+       bash "$ROOT/scripts/install_git_hooks.sh"
+     fi ;;
+esac
 # shellcheck disable=SC1091
 # set -a: stack.env 값을 export — clone.sh 등 자식 프로세스(bash modules/*/clone.sh)가
 # RISK_AWARE_BRANCH 등을 실제로 받게 한다. (export 없이는 자식이 못 봐 clone.sh 기본값이
@@ -33,7 +44,7 @@ ARCH=$(uname -m); case "$ARCH" in aarch64) ARCH=arm64;; x86_64) ARCH=amd64;; esa
 cmd="${1:-help}"; stack="${2:-}"
 # Explicit setup.sh stack arguments override the saved selection and shell defaults.
 if [ -n "$stack" ]; then
-  context_exports="$(python3 "$ROOT/tools/stack_context.py" resolve --stack "$stack" --shell)"
+  context_exports="$(python3 "$ROOT/scripts/stack_context.py" resolve --stack "$stack" --shell)"
   eval "$context_exports"
   stack="$DSD_STACK"
 fi
@@ -45,7 +56,7 @@ need_buildx(){ docker buildx version >/dev/null 2>&1 || {
   echo "  install the buildx CLI plugin -> ~/.docker/cli-plugins/docker-buildx"
   echo "  (releases: https://github.com/docker/buildx/releases , arm64 asset: buildx-*.linux-arm64)"
   exit 1; }; }
-gen(){ python3 "$ROOT/tools/gen_dockerfile_compose.py" "$stack" --arch "$ARCH"; }
+gen(){ python3 "$ROOT/scripts/gen_dockerfile_compose.py" "$stack" --arch "$ARCH"; }
 DF(){ echo "$ROOT/.build/$stack/Dockerfile"; }
 CF(){ echo "$ROOT/.build/$stack/compose.yml"; }
 
@@ -61,7 +72,7 @@ case "$cmd" in
   run)   need_stack; mod="${3:?need <module> e.g. sensor/realsense-d435i}"
          module_key="$mod"
          [ ! -f "$ROOT/modules/$mod" ] || module_key="${mod%/*}"
-         python3 "$ROOT/tools/stack_context.py" resolve --stack "$stack" --module "$module_key" >/dev/null
+         python3 "$ROOT/scripts/stack_context.py" resolve --stack "$stack" --module "$module_key" >/dev/null
          [ -f "$ROOT/modules/$mod" ] || mod="$mod/run.sh"   # allow dir or explicit script
          # `docker exec` does NOT inherit the caller's environment, so a module run
          # script that reads env vars (training/ete-net/run.sh needs ETE_CONFIG, and
@@ -78,7 +89,7 @@ case "$cmd" in
          done
          # Keep the container's compose-pinned ROS_MASTER_* values. Exporting the
          # host-wide stack.env port here made every named multi-master stack fall
-         # back onto 11311, despite its stacks/*.yml ros_master_port setting.
+         # back onto 11311, despite its stacks/*/stack.yml ros_master_port setting.
          docker exec -it ${envargs[@]+"${envargs[@]}"} "drone-stack-$stack" bash -lc \
            "source /opt/ros/noetic/setup.bash; bash /work/modules/$mod" ;;
   sh)    need_stack; docker exec -it "drone-stack-$stack" bash ;;

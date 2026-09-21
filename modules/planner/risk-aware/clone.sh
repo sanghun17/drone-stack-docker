@@ -6,7 +6,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 DST="$ROOT/ws/risk-aware/src/risk_aware_planning"
 REPO="${RISK_AWARE_REPO:-git@github.com:sanghun17/risk-aware_planning.git}"
 BRANCH="${RISK_AWARE_BRANCH:-main}"
-bash "$ROOT/modules/_common/clone_repo.sh" "$DST" "$REPO" "$BRANCH"
+bash "$ROOT/scripts/lib/clone_repo.sh" "$DST" "$REPO" "$BRANCH"
 
 # The former risk-aware-deploy/risk-aware-sim modules used sibling source
 # checkouts in this same catkin workspace.  Keep those local trees recoverable,

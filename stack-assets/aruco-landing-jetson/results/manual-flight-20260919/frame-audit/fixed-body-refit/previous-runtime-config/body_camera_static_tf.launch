@@ -1,5 +1,0 @@
-<launch>
-  <!-- Measured T_body_camera; quaternion xyzw. No global-pad TF: placement is session-specific. -->
-  <node pkg="tf2_ros" type="static_transform_publisher" name="measured_body_camera_tf"
-        args="0.00139668500433 -0.122546316369 9.93260331813e-05 0.999818741437 -0.011972291506 0.00830756977261 0.0122528687352 base_link see3cam_optical_frame"/>
-</launch>

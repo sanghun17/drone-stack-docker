@@ -2,7 +2,7 @@ name: risk-aware
 group: planner
 description: Risk-aware exploration capability — uncertainty-aware voxblox mapping, global exploration, and JAX MPPI local planning. Hardware and AirSim launch profiles share one source workspace.
 
-needs: [compute/torch, compute/spconv, compute/jax]   # torch/spconv (model) + jax (MPPI)
+needs: [libraries/torch, libraries/spconv, libraries/jax]   # torch/spconv (model) + jax (MPPI)
 
 deps:
   # build deps for the ETH-ASL workspace: catkin_grpc builds grpc from source

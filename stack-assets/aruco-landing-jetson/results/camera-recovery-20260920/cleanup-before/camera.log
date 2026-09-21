@@ -1,9 +1,0 @@
->> Configuring See3CAM exposure/gain (USB control timeout: 15 s)
->> See3CAM calibration: /work/modules/sensor/see3cam-24cug/calibration/1A3958060A020900.yaml
->> See3CAM /dev/v4l/by-id/usb-e-con_systems_See3CAM_24CUG_1A3958060A020900-video-index0 1280x720@60 uyvy exposure=150 gain=1
-[0m[INFO] [1789837342.523916108]: camera calibration URL: file:///work/modules/sensor/see3cam-24cug/calibration/1A3958060A020900.yaml[0m
-[0m[INFO] [1789837342.525339236]: See3CAM ready: 1280x720@60 uyvy; capture starts when an image subscriber connects[0m
-[0m[INFO] [1789837345.367632789]: Image subscriber connected: camera opened[0m
-[0m[INFO] [1789837345.466092399]: No image subscribers: camera capture paused[0m
-[0m[INFO] [1789837347.400278141]: Image subscriber connected: camera capture resumed[0m
-[0m[INFO] [1789837357.494139511]: No image subscribers: camera capture paused[0m

@@ -1,0 +1,9 @@
+# Oneshot: rsync finished flight bags (+runtime manifest/extrinsic) to the ml PC.
+# Runs as root (can remove the root-owned .ready markers the container writes) but authenticates to
+# the ml PC with hmcl's ssh key (SSH_KEY in the script), which is the one registered on the ml PC.
+[Unit]
+Description=rsync finished flight bags (+runtime manifest/extrinsic) to the ml PC
+
+[Service]
+Type=oneshot
+ExecStart=/home/hmcl/drone-stack-docker/modules/utility/session-recorder/scripts/flightlog_sync.sh

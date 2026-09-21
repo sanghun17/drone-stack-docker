@@ -183,7 +183,7 @@ if $INIT_SIM_ALIVE; then
   echo "[OK] initialize_simulator node alive"
 else
   echo "[WARN] initialize_simulator not running — restarting..."
-  tmux send-keys -t risk_aware_planning:init_sim "bash /home/ml/drone-stack-docker/stack-assets/sim-x86/tools/run_init_sim.sh" C-m
+  tmux send-keys -t risk_aware_planning:init_sim "bash /home/ml/drone-stack-docker/stacks/sim-x86/scripts/run_init_sim.sh" C-m
   # Wait for node to appear (max 10s)
   for i in $(seq 1 10); do
     sleep 1

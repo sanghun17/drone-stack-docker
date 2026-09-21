@@ -1,5 +1,5 @@
 #!/bin/bash
-source "$(dirname "$(readlink -f "$0")")/../modules/select_stack.sh"
+source "$(dirname "$(readlink -f "$0")")/lib/select_stack.sh"
 dsd_select_stack utility/rqt || exit $?
 # Headless rqt you view in a BROWSER (zero install) — renders on Xvfb + software GL, served via
 # x11vnc + noVNC/websockify. Run this ON THE JETSON HOST (plain `ssh` is fine; no ssh -X needed).

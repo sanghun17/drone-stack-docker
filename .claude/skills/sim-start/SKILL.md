@@ -233,9 +233,9 @@ timeout 5 rostopic echo /camera/depth/image_raw/header -n 1 > /dev/null 2>&1 && 
 ```bash
 tmux split-window -t risk_aware_planning:infra 2>/dev/null || true
 tmux send-keys -t risk_aware_planning:infra.3 \
-  "bash /home/ml/drone-stack-docker/stack-assets/sim-x86/tools/run_sensor_pub.sh" C-m
+  "bash /home/ml/drone-stack-docker/stacks/sim-x86/scripts/run_sensor_pub.sh" C-m
 ```
-Doc-equivalent: `cd /home/ml/drone-stack-docker && bash /home/ml/drone-stack-docker/stack-assets/sim-x86/tools/run_sensor_pub.sh`.
+Doc-equivalent: `cd /home/ml/drone-stack-docker && bash /home/ml/drone-stack-docker/stacks/sim-x86/scripts/run_sensor_pub.sh`.
 Defaults to `localization:=gt` (matches the old pane's `localization:=gt`) — override with
 `LOC=vio` exported before the `bash` call for the vio scenario.
 
@@ -281,9 +281,9 @@ rosservice list 2>/dev/null | grep -q "/initialize_simulator/teleport_to_positio
 ```bash
 tmux new-window -t risk_aware_planning -n init_sim 2>/dev/null || true
 tmux send-keys -t risk_aware_planning:init_sim \
-  "bash /home/ml/drone-stack-docker/stack-assets/sim-x86/tools/run_init_sim.sh" C-m
+  "bash /home/ml/drone-stack-docker/stacks/sim-x86/scripts/run_init_sim.sh" C-m
 ```
-Doc-equivalent: `cd /home/ml/drone-stack-docker && bash /home/ml/drone-stack-docker/stack-assets/sim-x86/tools/run_init_sim.sh`.
+Doc-equivalent: `cd /home/ml/drone-stack-docker && bash /home/ml/drone-stack-docker/stacks/sim-x86/scripts/run_init_sim.sh`.
 
 ### Re-verify (max 20s, check every 4s)
 ```bash

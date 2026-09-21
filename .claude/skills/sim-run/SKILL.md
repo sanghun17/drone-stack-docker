@@ -42,7 +42,7 @@ docker exec drone-stack-sim-x86 bash -lc 'source /opt/ros/noetic/setup.bash && s
 Full pipeline: stop old nodes → drone position → FAST-LIVO2 → LA-Planner → enable exploration.
 
 > **la_planner_bridge**: unlike FAST-LIVO2/voxblox/exploration/jax/so3/sensor-pub/init-sim/eval
-> above, no dedicated module or `stack-assets/sim-x86/tools/run_*.sh` entrypoint wraps it — but it runs fine inside
+> above, no dedicated module or `stacks/sim-x86/scripts/run_*.sh` entrypoint wraps it — but it runs fine inside
 > `drone-stack-sim-x86` (package resolves, built under `ws/risk-aware/build/la_planner_bridge`; it
 > lives at `ws/risk-aware/src/risk_aware_planning/la_planner/la_planner_bridge`, same bind-mounted
 > tree). It's launched with a one-line `docker exec` instead of a `bash <script>` pane. **`/sim-la-planner`

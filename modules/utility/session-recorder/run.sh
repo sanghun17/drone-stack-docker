@@ -6,13 +6,13 @@
 set -eo pipefail
 
 if [ ! -f /.dockerenv ]; then
-  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/select_stack.sh"
+  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)/scripts/lib/select_stack.sh"
   dsd_select_stack "utility/session-recorder" || exit $?
   : "${DSD_CONTAINER:?set DSD_CONTAINER or invoke through './setup.sh run <stack> utility/session-recorder'}"
   __C="$DSD_CONTAINER"
   __S="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
   __R="$(cd "$(dirname "$__S")/../../.." && pwd)"
-  source "$__R/modules/ensure_container.sh"
+  source "$__R/scripts/lib/ensure_container.sh"
   docker start "$__C" >/dev/null 2>&1
   __TT=$([ -t 1 ] && echo -it || echo -i)
   cleanup(){ docker exec "$__C" pkill -INT -f "[s]ession_recorder_node.py" >/dev/null 2>&1 || true; }
@@ -24,7 +24,7 @@ fi
 
 source /opt/ros/noetic/setup.bash
 source /work/config/ros_env.sh
-source /work/modules/ensure_roscore.sh
+source /work/scripts/lib/ensure_roscore.sh
 
 : "${SESSION_RECORDER_CONFIG:?stack must set SESSION_RECORDER_CONFIG}"
 if [ ! -f "$SESSION_RECORDER_CONFIG" ]; then

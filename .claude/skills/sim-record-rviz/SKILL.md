@@ -27,7 +27,7 @@ docker exec drone-stack-sim-x86 bash -lc 'source /opt/ros/noetic/setup.bash && s
 
 ## Note: container era — two separate `/rviz` nodes can exist, this skill deliberately stays host-side
 
-`stack-assets/sim-x86/tools/run_sensor_pub.sh` (containerized `airsim_sensor_punlisher.launch`)
+`stacks/sim-x86/scripts/run_sensor_pub.sh` (containerized `airsim_sensor_punlisher.launch`)
 now brings up its OWN `rviz` node too, but with a different, more basic config
 (`active_3d_planning_app_reconstruction/cfg/gazebo.rviz`, sensor/TF debugging) — and it registers
 under the exact same ROS node name `/rviz`. This skill deliberately keeps using the richer

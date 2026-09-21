@@ -5,13 +5,13 @@
 
 # (host) auto-enter the dsd container; (inside) run the node.
 if [ ! -f /.dockerenv ]; then
-  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/select_stack.sh"
+  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)/scripts/lib/select_stack.sh"
   dsd_select_stack "control/mavros" || exit $?
   : "${DSD_CONTAINER:?set DSD_CONTAINER or invoke through './setup.sh run <stack> control/mavros'}"
   __C="$DSD_CONTAINER"
   __S="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
   __R="$(cd "$(dirname "$__S")/../../.." && pwd)"
-  source "$__R/modules/ensure_container.sh"   # recreate $__C if missing / stale-mounted (repo moved)
+  source "$__R/scripts/lib/ensure_container.sh"   # recreate $__C if missing / stale-mounted (repo moved)
   docker start "$__C" >/dev/null 2>&1
   docker exec "$__C" bash /work/modules/control/mavros/check_runtime.sh || exit $?
   __TT=$([ -t 1 ] && echo -it || echo -i)
@@ -34,7 +34,7 @@ source /work/config/ros_env.sh   # ROS_MASTER_URI / ROS_IP — single source, ed
 : "${GCS_URL:?GCS_URL missing from /work/config/stack.env}"
 export FCU_URL GCS_URL
 
-source /work/modules/ensure_roscore.sh   # master up on $ROS_MASTER_PORT — TCP probe, not a blind sleep 4
+source /work/scripts/lib/ensure_roscore.sh   # master up on $ROS_MASTER_PORT — TCP probe, not a blind sleep 4
 
 # The distro px4.launch has literal defaults, not $(optenv FCU_URL ...).
 # Explicit forwarding prevents accidentally opening /dev/ttyACM0 at 57600 baud.

@@ -10,7 +10,7 @@ case "$PROFILE" in
   hardware)
     DST="$ROOT/ws/fast-livo/src"
     BRANCH="${FASTLIVO_BRANCH:-jetson-orin-agx}"
-    bash "$ROOT/modules/_common/clone_repo.sh" "$DST" "$REPO" "$BRANCH"
+    bash "$ROOT/scripts/lib/clone_repo.sh" "$DST" "$REPO" "$BRANCH"
     ;;
   airsim)
     SRC="$ROOT/ws/fast-livo-sim/src"
@@ -18,7 +18,7 @@ case "$PROFILE" in
     VIKIT_REPO="${VIKIT_REPO:-https://github.com/xuankuzcr/rpg_vikit.git}"
     VIKIT_COMMIT="${VIKIT_COMMIT:-6c886c8}"
     mkdir -p "$SRC"
-    bash "$ROOT/modules/_common/clone_repo.sh" "$SRC/FAST-LIVO2" "$REPO" "$BRANCH"
+    bash "$ROOT/scripts/lib/clone_repo.sh" "$SRC/FAST-LIVO2" "$REPO" "$BRANCH"
     if [ -d "$SRC/rpg_vikit/.git" ]; then
       git -C "$SRC/rpg_vikit" fetch origin
       git -C "$SRC/rpg_vikit" checkout "$VIKIT_COMMIT"

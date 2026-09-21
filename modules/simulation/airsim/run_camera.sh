@@ -7,7 +7,7 @@ if [ ! -f /.dockerenv ]; then
   __C="$DSD_CONTAINER"
   __S="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
   __R="$(cd "$(dirname "$__S")/../../.." && pwd)"
-  source "$__R/modules/ensure_container.sh"
+  source "$__R/scripts/lib/ensure_container.sh"
   docker start "$__C" >/dev/null 2>&1
   __TT=$([ -t 1 ] && echo -it || echo -i)
   cleanup(){
@@ -23,7 +23,7 @@ fi
 source /work/config/ros_env.sh
 source /opt/ros/noetic/setup.bash
 set -u
-source /work/modules/ensure_roscore.sh
+source /work/scripts/lib/ensure_roscore.sh
 
 : "${AIRSIM_CAMERA_CONFIG:?stack must set AIRSIM_CAMERA_CONFIG}"
 if [ -n "${AIRSIM_CAMERA_BRIDGE_BIN:-}" ]; then
