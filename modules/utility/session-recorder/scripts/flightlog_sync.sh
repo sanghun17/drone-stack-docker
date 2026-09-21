@@ -17,7 +17,7 @@ LOGS="$ROOT/flight_logs"
 EXTRINSICS="${WEBCAM_EXTRINSICS:-$HERE/../config/webcam_extrinsics.json}"
 RVIZ_CFG="$ROOT/modules/utility/rviz/config/default.rviz"
 ML="${ML_HOST:-ml@192.168.50.12}"
-ML_RECORDINGS="/home/ml/webcam_recorder/recordings"
+ML_RECORDINGS="${ML_RECORDINGS:-/home/ml/drone-data/shared/results/webcam-recordings}"
 SSH_KEY="${SSH_KEY:-/home/hmcl/.ssh/id_ed25519}"
 SSH="ssh -i $SSH_KEY -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=6"
 
