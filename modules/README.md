@@ -28,12 +28,10 @@ stack environment selects the implementation profile.
 | control | `mavros`, `flight-safety`, `local-controller`, `aruco-landing` |
 | simulation | `airsim` |
 | libraries | `torch`, `spconv`, `jax` |
-| training | `ete-net` |
 | utility | `gui-vnc`, `rviz`, `rqt`, `session-recorder` |
 
 The ArUco perception and landing planner share the `aruco_landing` checkout and
-catkin workspace. `planner/aruco-landing` is the canonical landing entrypoint;
-`control/aruco-landing` remains a compatibility alias.
+catkin workspace. `planner/aruco-landing` is the single landing entrypoint and launches its pose router.
 
 `odometry/fast-livo` selects `hardware` or `airsim` through
 `FAST_LIVO_PROFILE`. The upstream branches genuinely differ, so each profile

@@ -18,5 +18,5 @@ environment:
 modules:
   - simulation/airsim
   - perception/aruco-landing
-  - control/aruco-landing
+  - planner/aruco-landing
   - utility/session-recorder

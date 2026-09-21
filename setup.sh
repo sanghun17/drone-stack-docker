@@ -80,17 +80,10 @@ case "$cmd" in
          [ ! -f "$ROOT/modules/$mod" ] || module_key="${mod%/*}"
          python3 "$ROOT/scripts/stack_context.py" resolve --stack "$stack" --module "$module_key" >/dev/null
          [ -f "$ROOT/modules/$mod" ] || mod="$mod/run.sh"   # allow dir or explicit script
-         # `docker exec` does NOT inherit the caller's environment, so a module run
-         # script that reads env vars (training/ete-net/run.sh needs ETE_CONFIG, and
-         # halts via `:?` without it — no silent default, by project convention) would
-         # always halt when invoked through here. Forward the ones the caller actually
-         # exported; RUN_ENV adds arbitrary extra names, e.g.
-         #   ETE_CONFIG=config/ablation/v23_P1_DEPLOY1.yaml ./setup.sh run ete-train-4090 training/ete-net
-         #   RUN_ENV="MY_VAR OTHER" MY_VAR=1 ./setup.sh run <stack> <module>
-         # (2026-07-26: found on im — the working command had to be a hand-written
-         # `docker exec -e ...`, which is exactly what this script exists to replace.)
+         # Forward explicitly requested caller environment variables into the container.
+         # Example: RUN_ENV="MY_VAR OTHER" MY_VAR=1 ./setup.sh run <stack> <module>
          envargs=()
-         for v in ETE_CONFIG ETE_SEED ETE_OUTPUT_DIR ${RUN_ENV:-}; do
+         for v in ${RUN_ENV:-}; do
            [ -n "${!v+x}" ] && envargs+=(-e "$v")
          done
          # Keep the container's compose-pinned ROS_MASTER_* values. Exporting the

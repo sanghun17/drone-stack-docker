@@ -7,9 +7,9 @@ dsd_select_stack utility/rviz || exit $?
 # point here too) so they show up in ONE browser tab. openbox hosts each as its own window — scroll the empty
 # desktop to switch workspace, or right-click the title bar -> Send To Desktop to split them. Each
 # app stays an independent process: this re-run restarts ONLY rviz; the shared display + other apps
-# stay up. The infra logic (Xvfb + mesa GL, x11vnc, noVNC) lives in scripts/_vnc_gui.sh.
+# stay up. The infra logic (Xvfb + mesa GL, x11vnc, noVNC) lives in scripts/lib/vnc_gui.sh.
 ARGS=("$@"); [ ${#ARGS[@]} -eq 0 ] && ARGS=(-d "${DSD_RVIZ_CONFIG:-/work/modules/utility/rviz/config/default.rviz}")   # default: load the repo's modules/utility/rviz/config/default.rviz
 # restart on re-run: kill the old rviz so _vnc_gui starts a fresh one (reloads the .rviz config).
 # Separate docker exec -> pkill excludes its own pid; the VNC infra stays up so the browser reconnects.
 docker exec "$DSD_CONTAINER" pkill -f "rviz" 2>/dev/null || true; sleep 1
-exec "$(dirname "$(readlink -f "$0")")/_vnc_gui.sh" 99 5900 6080 rviz rviz "${ARGS[@]}"
+exec "$(dirname "$(readlink -f "$0")")/lib/vnc_gui.sh" 99 5900 6080 rviz rviz "${ARGS[@]}"

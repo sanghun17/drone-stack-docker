@@ -7,16 +7,16 @@
 # a headless display), x11vnc turns that display into a VNC stream, and websockify serves noVNC so you
 # view it in ANY BROWSER with zero install — no VNC client, no ssh -X. Just `ssh` in, run this, open URL.
 #
-#   _vnc_gui.sh <display-num> <vnc-port> <web-port> <app-name> <app-cmd> [app-args...]
-#   e.g.  _vnc_gui.sh 99 5900 6080 rviz rviz -d /work/modules/utility/rviz/config/default.rviz
-#         _vnc_gui.sh 99 5900 6080 rqt  rqt    # SAME display/port -> rviz+rqt share ONE browser tab
+#   vnc_gui.sh <display-num> <vnc-port> <web-port> <app-name> <app-cmd> [app-args...]
+#   e.g.  vnc_gui.sh 99 5900 6080 rviz rviz -d /work/modules/utility/rviz/config/default.rviz
+#         vnc_gui.sh 99 5900 6080 rqt  rqt    # SAME display/port -> rviz+rqt share ONE browser tab
 #
 # Idempotency is decided by ACTUAL liveness — xdpyinfo (display up?), socket connects (vnc/web ports
 # up?), and xwininfo (app window present?) — NOT by pgrep. The container's pid1 is `sleep infinity`
 # which never reaps children, so dead Xvfb/x11vnc/app linger as zombies that would fool pgrep.
 # Re-running is safe: it attaches to whatever is already up and only (re)starts what's actually dead.
 set -e
-source "$(dirname "$(readlink -f "$0")")/lib/select_stack.sh"
+source "$(dirname "$(readlink -f "$0")")/select_stack.sh"
 dsd_select_stack utility/gui-vnc
 C="$DSD_CONTAINER"
 DN="${DSD_GUI_DISPLAY:-$1}"; P="${DSD_GUI_VNC_PORT:-$2}"; WP="${DSD_GUI_WEB_PORT:-$3}"; APPNAME="$4"; shift 4   # remaining "$@" = the app command + its args

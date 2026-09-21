@@ -1,7 +1,7 @@
 # drone-stack
 
 A **modular, composable** Jetson/x86 drone-autonomy stack (ROS Noetic). It turns
-sensor, estimation, planning, control, simulation, and training capabilities into
+sensor, estimation, planning, control, and simulation capabilities into
 **interchangeable modules** assembled per stack.
 
 ## Repository branches
@@ -26,7 +26,7 @@ flight_logs/   new flight, simulation and bench recordings (not tracked)
 
 `modules/base` installs the container's foundation (CUDA/L4T, ROS and toolchain).
 `scripts/lib` contains orchestration helpers; it is not an image module.
-Keep shared environment settings in `config`, device calibration with its module,
+Keep shared environment settings in `config`, active device calibration with its module,
 and deployment-specific policy in `stacks/<name>/config`.
 
 Research worktrees, past experiments, offline analysis, paper figures and backups
@@ -34,7 +34,7 @@ were moved to `~/drone-stack-archive/20260921-cleanup/` on ML. Its `README.md` a
 `migration/moves.json` locate the preserved files. Keep future research outputs
 outside this checkout; runtime recordings go under `flight_logs/`.
 
-The migration preserves stack names and `setup.sh` commands. Existing containers
+Runtime stack names and `setup.sh` commands remain unchanged. Existing containers
 retain their old environment until recreated by `./setup.sh up <stack>`.
 Deploy matching component revisions as well: ArUco launch/audit defaults now use
 `stacks/aruco-landing-jetson/`, and flight-safety's optional VIO preflight reads
@@ -42,6 +42,14 @@ its preserved provenance inputs from `modules/odometry/fast-livo/qualification/`
 The corresponding migration commits are
 [ArUco 2c5b5a9](https://github.com/sanghun17/aruco_landing/commit/2c5b5a9)
 and [flight-safety 406efbf](https://github.com/sanghun17/flight_safety/commit/406efbf).
+
+Training modules and the three `ete-train-*` stacks now live in
+`~/ete-training-docker/` as an independent local Git repository. Use its own
+`setup.sh`; its source checkout and default training outputs stay outside this tree.
+D435i EEPROM backups/raw measurements and retired entrypoints are preserved in
+`~/drone-stack-archive/20260921-internal-cleanup/` with checksums in `moves.json`.
+The D435i uses EEPROM calibration during normal operation; its runtime launch
+configuration remains in `modules/sensor/realsense-d435i/d435i.launch`.
 
 ## Idea: declare modules → one image, one container
 

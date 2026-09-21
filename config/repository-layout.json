@@ -4,7 +4,7 @@
   "tracked_hidden_directories": [".agents", ".claude", ".codex", ".github"],
   "local_hidden_directories": [".git", ".build", ".vscode", ".idea"],
   "untracked_roots": ["ws", "flight_logs", ".build", ".git", ".vscode", ".idea"],
-  "module_groups": ["base", "libraries", "control", "odometry", "perception", "planner", "sensor", "simulation", "training", "utility"],
+  "module_groups": ["base", "libraries", "control", "odometry", "perception", "planner", "sensor", "simulation", "utility"],
   "module_documents": ["README.md", "SCHEMA.md"],
   "stack_entries": ["stack.yml", "README.md", "config", "scripts", "cpp", "patches", "unreal", "tests", "docs"],
   "forbidden_directories": ["tools", "compute", "_common", "stack-assets", "experiments", "paper_assets", "scratchpad", "results", "backups", "archive", "__pycache__", "build", "devel", "logs", "Testing", ".pytest_cache", ".catkin_tools"],
@@ -13,17 +13,8 @@
   "runtime_artifacts": {
     "modules/libraries/jax/wheels/jaxlib-0.4.13-cp38-cp38-manylinux2014_aarch64.whl": 104857600,
     "modules/libraries/spconv/wheels/cumm-0.4.11-cp38-cp38-linux_aarch64.whl": 104857600,
-    "modules/libraries/spconv/wheels/spconv-2.3.6-cp38-cp38-linux_aarch64.whl": 104857600,
-    "modules/sensor/realsense-d435i/calibration/923322070596/depth_cal_table.bin": 1048576,
-    "modules/sensor/realsense-d435i/calibration/923322070596/imu_calibration.bin": 1048576
+    "modules/libraries/spconv/wheels/spconv-2.3.6-cp38-cp38-linux_aarch64.whl": 104857600
   },
-  "local_generated_directories": [
-    "stacks/aruco-landing-sim-x86/unreal/ArucoLandingBaseline/Binaries",
-    "stacks/aruco-landing-sim-x86/unreal/ArucoLandingBaseline/Build",
-    "stacks/aruco-landing-sim-x86/unreal/ArucoLandingBaseline/Content",
-    "stacks/aruco-landing-sim-x86/unreal/ArucoLandingBaseline/DerivedDataCache",
-    "stacks/aruco-landing-sim-x86/unreal/ArucoLandingBaseline/Intermediate",
-    "stacks/aruco-landing-sim-x86/unreal/ArucoLandingBaseline/Plugins",
-    "stacks/aruco-landing-sim-x86/unreal/ArucoLandingBaseline/Saved"
-  ]
+  "local_generated_directories": ["stacks/aruco-landing-sim-x86/unreal/ArucoLandingBaseline/Binaries", "stacks/aruco-landing-sim-x86/unreal/ArucoLandingBaseline/Build", "stacks/aruco-landing-sim-x86/unreal/ArucoLandingBaseline/Content", "stacks/aruco-landing-sim-x86/unreal/ArucoLandingBaseline/DerivedDataCache", "stacks/aruco-landing-sim-x86/unreal/ArucoLandingBaseline/Intermediate", "stacks/aruco-landing-sim-x86/unreal/ArucoLandingBaseline/Plugins", "stacks/aruco-landing-sim-x86/unreal/ArucoLandingBaseline/Saved"],
+  "forbidden_path_prefixes": ["modules/training", "modules/control/aruco-landing", "modules/odometry/landing-vision-pose", "modules/sensor/realsense-d435i/calibration/923322070596", "scripts/_vnc_gui.sh", "stacks/ete-train-2080ti", "stacks/ete-train-4090", "stacks/ete-train-5090"]
 }

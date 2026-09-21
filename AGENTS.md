@@ -19,6 +19,10 @@
   for research, offline analysis, paper figures and historical results.
 - The 2026-09-21 cleanup archive is `~/drone-stack-archive/20260921-cleanup/`.
   Its README and `migration/moves.json` locate preserved pre-migration files.
+- Training orchestration belongs in `~/ete-training-docker`, and device recovery
+  backups/raw calibration samples belong in home storage. Keep only calibration
+  files consumed at runtime and operational calibration tools here. Retired
+  module wrappers must not return; use `planner/aruco-landing` for landing.
 - Run `python3 scripts/check_layout.py --worktree` before finishing changes.
   Versioned Git hooks validate the index and outgoing commits; GitHub's required
   `repository-layout` check protects main. Do not disable the guards to work

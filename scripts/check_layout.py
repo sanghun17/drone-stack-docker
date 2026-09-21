@@ -29,6 +29,9 @@ def path_errors(path, policy, directory=False):
     parts = PurePosixPath(path).parts
     if not parts or any(p in {'.', '..'} for p in parts):
         return ['invalid path: ' + repr(path)]
+    for prefix in policy.get('forbidden_path_prefixes', []):
+        if path == prefix or path.startswith(prefix + '/'):
+            return [path + ': retired/external path; use its current owner or home storage']
     first = parts[0]
     if first in policy['untracked_roots']:
         return [path + ': local workspaces, build products and logs must not be tracked']

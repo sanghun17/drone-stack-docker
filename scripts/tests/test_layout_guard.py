@@ -137,6 +137,28 @@ class LayoutGuardTest(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn('exceeds allowed', result.stderr)
 
+    def test_external_and_retired_paths_cannot_return(self):
+        paths = [
+            'modules/training/demo/module.yml',
+            'modules/control/aruco-landing/module.yml',
+            'modules/odometry/landing-vision-pose/module.yml',
+            'modules/sensor/realsense-d435i/calibration/923322070596/imu_raw_accel.txt',
+            'scripts/_vnc_gui.sh',
+            'stacks/ete-train-5090/stack.yml',
+        ]
+        for path in paths:
+            self.write(path, 'retired fixture\n')
+        self.git('add', '.')
+        result = self.check('--staged', ok=False)
+        self.assertNotEqual(result.returncode, 0)
+        for path in paths:
+            self.assertIn(path, result.stderr)
+        self.write('.gitignore', 'modules/\nstacks/\n')
+        result = self.check('--worktree', ok=False)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('modules/training', result.stderr)
+        self.assertIn('stacks/ete-train-5090', result.stderr)
+
     def test_symlink_cannot_hide_an_archive_in_scripts(self):
         (self.root / 'scripts/archive_link').symlink_to('/tmp')
         self.git('add', '.')

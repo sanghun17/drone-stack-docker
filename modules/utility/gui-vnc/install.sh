@@ -1,6 +1,6 @@
 #!/bin/bash
 # Install a modern noVNC (browser-side VNC client) to /opt/novnc, served by websockify (see
-# scripts/_vnc_gui.sh). The apt 'novnc' on focal is 1.0.0 — no Quality/Compression UI and no
+# scripts/lib/vnc_gui.sh). The apt 'novnc' on focal is 1.0.0 — no Quality/Compression UI and no
 # resize/quality URL params. 1.4.0 has both. Pure static JS: no arch dependence, no build step.
 # Runs at image-build time via deps.source; also safe to re-run live inside a container.
 set -e

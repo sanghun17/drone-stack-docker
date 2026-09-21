@@ -32,6 +32,10 @@ Only the six visible root directories and declared root files are allowed.
 Modules must use a declared group and own a module.yml; stacks must own stack.yml.
 Research/results directories, tracked ws/build/log trees, output/media archives,
 unapproved binaries, oversized files, symlinks and nested submodules are rejected.
+Training modules are outside this runtime repository. `forbidden_path_prefixes`
+rejects the retired training stacks, controller/pose wrappers and device-backup
+location, including ignored directories. These nested paths are rejected by the
+layout checks and Git hooks; immediate filesystem blocking applies only at the root.
 Necessary runtime binary assets are exact-path exceptions with explicit size caps.
 To add a real runtime asset or change ownership conventions, update the policy
 and its tests in the same reviewed change.

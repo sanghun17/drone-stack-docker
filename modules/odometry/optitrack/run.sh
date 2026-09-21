@@ -4,7 +4,7 @@
 # Publishes /vrpn_client_node/<Tracker>/pose per rigid body (auto-discovered).
 # A stack-owned adapter subscribes to /vrpn_client_node/pure/pose and is the sole
 # producer of /mavros/vision_pose/pose. For ArUco landing this is
-# odometry/landing-vision-pose; risk-aware may continue using its estimator mux.
+# the planner/aruco-landing pose router; risk-aware may continue using its estimator mux.
 
 # (host) auto-enter the dsd container; (inside) run the node.
 if [ ! -f /.dockerenv ]; then

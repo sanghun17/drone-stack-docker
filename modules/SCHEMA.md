@@ -5,7 +5,7 @@ Every reusable capability lives at `modules/<group>/<name>/module.yml`.
 ```yaml
 name: local-controller
 group: control               # base, sensor, perception, odometry, planner,
-                             # control, simulation, libraries, training, utility
+                             # control, simulation, libraries, utility
 description: Standard trajectory-to-MAVROS controller
 
 deps:

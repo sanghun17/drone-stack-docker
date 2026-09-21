@@ -9,7 +9,7 @@
 #     runtime JIT compile.
 #   amd64/sm_120 = deps.amd64_sm120.pip already soft-tried `spconv-cu120`; this script
 #     builds from source only if that import still fails (genuinely unverified sm_120
-#     wheel coverage, see modules/training/ete-net/DEPLOYMENT.md).
+#     wheel coverage, see ~/ete-training-docker/modules/training/ete-net/DEPLOYMENT.md).
 #   amd64/sm_89, amd64/sm_75 = deps.amd64_sm{89,75}.pip hard-required `spconv-cu120`
 #     already (no allow_pip_fail -- a pip-install-time failure already aborted the
 #     build before this script even runs). This script still re-verifies the import
@@ -46,7 +46,7 @@ if [ "${TARGETARCH:-arm64}" = "amd64" ]; then
 
   echo ">> spconv: no working wheel import (gpu_arch=${GPU_ARCH:-unset}) -- building cumm+spconv from source"
   # UNVERIFIED on real Blackwell hardware: sm_120 kernel coverage of this cumm/spconv
-  # line is unknown (2.3.6/0.4.11 predate Blackwell -- see modules/training/ete-net/DEPLOYMENT.md).
+  # line is unknown (2.3.6/0.4.11 predate Blackwell -- see ~/ete-training-docker/modules/training/ete-net/DEPLOYMENT.md).
   # Arch list includes a few recent amd64 archs for portability, not just sm_120.
   export CUMM_CUDA_ARCH_LIST="8.6;8.9;9.0;12.0"
 

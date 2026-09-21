@@ -88,7 +88,7 @@ master at the same time.
 ## OptiTrack-first localization transition
 
 `physical_pad_estimator` owns the session-only OptiTrack-pad alignment and
-publishes `/landing/vision_pose_marker`. `odometry/landing-vision-pose` only
+publishes `/landing/vision_pose_marker`. the router launched by `planner/aruco-landing`
 selects between that already aligned pose and `/vrpn_client_node/pure/pose`.
 It does not estimate or publish a second global-pad transform.
 

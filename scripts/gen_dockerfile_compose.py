@@ -21,7 +21,7 @@ d435i-voxblox's generated Dockerfile/compose.yml pre/post this patch.
 (2026-07-25 to 2026-07-26: a `build_env:` dimension briefly existed here to scope
 sim-x86's source-built ABI=1 torch wheel to one stack without touching the shared
 (cpu_arch, gpu_arch) combo keys — removed 2026-07-26 once that wheel became
-libraries/torch's unconditional sm89/sm75 default, see modules/training/ete-net/DEPLOYMENT.md's
+libraries/torch's unconditional sm89/sm75 default, see ~/ete-training-docker/modules/training/ete-net/DEPLOYMENT.md's
 "torch unification" section.)
 """
 import os, sys, argparse, re, shlex, yaml
@@ -318,7 +318,7 @@ def gen_compose(mods, arch, stack, env, gpu_uuids_key="GPU_UUIDS", gpu=True,
     #
     # GPU_UUIDS (optional, config/stack.env): comma-separated GPU UUIDs (`nvidia-smi
     # -L`). Needed on hosts with a dead/NVML-broken card mixed in with usable ones
-    # (see modules/training/ete-net/DEPLOYMENT.md's 2080ti section) -- CONFIRMED on real
+    # (see ~/ete-training-docker/modules/training/ete-net/DEPLOYMENT.md's 2080ti section) -- CONFIRMED on real
     # hardware 2026-07-14 (ml desktop, dead card at PCI 1a:00.0): the modern
     # `deploy.resources.reservations.devices` mechanism (what compose translates
     # `--gpus`/device reservations into) fails ENTIRELY on such a host -- even

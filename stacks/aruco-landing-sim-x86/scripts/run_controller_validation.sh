@@ -107,7 +107,7 @@ if [ -n "$KP" ] || [ -n "$KD" ]; then
   controller_args="override_gains:=true kp_xy:=$KP kd_xy:=$KD"
 fi
 docker exec -d "$CONTAINER" bash -lc \
-  "exec /work/modules/control/aruco-landing/run.sh $controller_args >'$LOG_DIR_CONTAINER/controller.log' 2>&1"
+  "exec /work/modules/planner/aruco-landing/run.sh $controller_args >'$LOG_DIR_CONTAINER/controller.log' 2>&1"
 docker exec -d "$CONTAINER" bash -lc \
   "exec /work/stacks/aruco-landing-sim-x86/scripts/run_control.sh >'$LOG_DIR_CONTAINER/control.log' 2>&1"
 if [ "$RECORD_BAGS" = 1 ]; then

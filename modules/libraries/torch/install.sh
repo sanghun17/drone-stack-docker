@@ -44,7 +44,7 @@ case "${TARGETARCH:-arm64}" in
         # 2026-07-26: unified onto this (formerly `build_env: {TORCH_VARIANT: src-abi1}`,
         # opt-in-per-stack) source-built wheel -- now the ONLY sm89/sm75 path. Replaces
         # the old default of the stock pip torch==2.1.2+cu121 (ABI=0) wheel. See
-        # modules/training/ete-net/DEPLOYMENT.md's "torch unification" section for the validation
+        # ~/ete-training-docker/modules/training/ete-net/DEPLOYMENT.md's "torch unification" section for the validation
         # that preceded this swap (6-gate pass on real RTX 4090, byte-identical Dockerfile
         # regen for the other stacks before/after).
         #

@@ -22,7 +22,7 @@ if [ ! -f /.dockerenv ]; then
   docker start "$__C" >/dev/null 2>&1
   docker exec "$__C" bash /work/modules/control/mavros/check_runtime.sh messages-only || exit $?
   docker exec "$__C" bash -lc 'source /work/config/ros_env.sh; source /work/scripts/lib/ensure_roscore.sh'  # master up before the GUI
-  "$__R/scripts/_vnc_gui.sh" 99 5900 6080 monitor \
+  "$__R/scripts/lib/vnc_gui.sh" 99 5900 6080 monitor \
     rqt --standalone rqt_runtime_monitor.runtime_monitor.RuntimeMonitor || true   # diagnostic GUI (best-effort)
   __TT=$([ -t 1 ] && echo -it || echo -i)
   trap '__killall; exit 130' INT TERM HUP

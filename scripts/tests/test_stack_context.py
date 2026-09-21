@@ -88,5 +88,29 @@ class StackContextTest(unittest.TestCase):
         self.assertEqual(result.returncode,2)
         self.assertIn('not part',result.stderr)
 
+    def test_gui_wrappers_reach_relocated_helper(self):
+        # Stop at the dependency probe; no real Docker or GUI process is started.
+        import json
+        with tempfile.TemporaryDirectory() as tmp:
+            directory=Path(tmp);log=directory/'calls.jsonl'
+            docker=directory/'docker'
+            docker.write_text("#!/usr/bin/python3\nimport json,os,sys\nwith open(os.environ['TRACE_DOCKER'],'a') as f:f.write(json.dumps(sys.argv[1:])+'\\n')\nsys.exit(0 if sys.argv[1]=='start' else 99)\n")
+            docker.chmod(0o755)
+            for script in ['utility_rviz.sh','utility_rqt.sh','utility_realsense-viewer.sh']:
+                log.write_text('')
+                env={k:v for k,v in os.environ.items() if not k.startswith('DSD_')}
+                env.update(DSD_STACK='risk-aware',TRACE_DOCKER=str(log),PATH=str(directory)+':'+env['PATH'])
+                result=subprocess.run(['bash',str(ROOT/'scripts'/script)],env=env,text=True,capture_output=True)
+                self.assertEqual(result.returncode,1,result.stderr)
+                self.assertIn('websockify, or the noVNC files are missing',result.stdout)
+                calls=[json.loads(line) for line in log.read_text().splitlines()]
+                self.assertIn(['start','drone-stack-d435i-voxblox'],calls)
+
+    def test_landing_stacks_use_single_planner_entrypoint(self):
+        for name in ['aruco-landing-jetson','aruco-landing-sim-x86']:
+            resolved=context.resolve({},explicit=name,module='planner/aruco-landing')
+            self.assertNotIn('control/aruco-landing',resolved['modules'])
+            self.assertNotIn('odometry/landing-vision-pose',resolved['modules'])
+
 
 if __name__=='__main__':unittest.main()

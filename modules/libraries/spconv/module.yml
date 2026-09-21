@@ -33,7 +33,7 @@ deps:
   # `allow_pip_fail` is read PER COMBO (not module-wide) — see scripts/gen_dockerfile_compose.py.
   amd64_sm120:
     # spconv-cu120 may not exist / may not cover sm_120 SASS at all -- spconv-cu118
-    # ==2.3.6 predates Blackwell entirely (see modules/training/ete-net/DEPLOYMENT.md) -- so this is
+    # ==2.3.6 predates Blackwell entirely (see ~/ete-training-docker/modules/training/ete-net/DEPLOYMENT.md) -- so this is
     # soft: allowed to fail, and install.sh's source-build fallback runs instead (it
     # re-checks `import spconv.pytorch` before deciding to build).
     pip: [spconv-cu120]

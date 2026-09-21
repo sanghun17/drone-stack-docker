@@ -1,6 +1,0 @@
-name: aruco-landing-controller
-group: control
-description: Compatibility alias for planner/aruco-landing.
-needs: [planner/aruco-landing]
-run: [run.sh]
-provides: [landing-controller, landing-command]

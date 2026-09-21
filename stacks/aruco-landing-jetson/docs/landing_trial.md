@@ -7,7 +7,7 @@ and `FLIGHT_SAFETY_EXTERNAL_POSE_TOPIC=/landing/vision_pose_selected` supplied b
 the ArUco runtime profile. Other stacks keep their existing source defaults.
 
 Start camera, OptiTrack, MAVROS, perception and flight-safety. The planner launcher
-starts its own pose router; **do not launch odometry/landing-vision-pose separately**.
+starts its own pose router; **do not launch a second pose router separately**.
 The MUX must select `/landing/vision_pose_selected` and vision output must match
 that candidate stream. Before pilot OFFBOARD, the router forwards OptiTrack only.
 The planner validates current router status, output identity, local pose and safety.

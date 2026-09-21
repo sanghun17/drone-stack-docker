@@ -98,7 +98,7 @@ docker exec -d "$CONTAINER" bash -lc \
 docker exec -d "$CONTAINER" bash -lc \
   "exec /work/modules/perception/aruco-landing/run.sh pad_configuration:='$LAYOUT_CONTAINER' >'$LOG_CONTAINER/estimator.log' 2>&1"
 docker exec -d "$CONTAINER" bash -lc \
-  "exec /work/modules/control/aruco-landing/run.sh >'$LOG_CONTAINER/controller.log' 2>&1"
+  "exec /work/modules/planner/aruco-landing/run.sh >'$LOG_CONTAINER/controller.log' 2>&1"
 docker exec -d "$CONTAINER" bash -lc \
   "exec /work/modules/utility/session-recorder/run.sh >'$LOG_CONTAINER/session_recorder.log' 2>&1"
 
