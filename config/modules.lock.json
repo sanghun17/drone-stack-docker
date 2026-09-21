@@ -386,7 +386,7 @@
     "odometry/optitrack": {
       "files": {
         "build_ws.sh": "ba6c42482201bbc80291eb4e4617a31196f9492c14342a5e8e2c61b5d3766a5a",
-        "clone.sh": "a4988cbce7c9bb1c93e09e2b0f5c10c952a96bd49cde356f836b2c09d1bd5378",
+        "clone.sh": "e0bfb35523a01839810c51f72acff5e3b741f61d5dc3c034a78ee81b1ec22bf3",
         "module.yml": "9fd2e264685d009740efecb063a5001db3543a356ec3caf5f410fdd131110a71",
         "optitrack.launch": "b11517cd7ffc6f8c62e1d22654cf233e6be85529c224c275190cf77dd10ea8b8",
         "run.sh": "6dd808636669bb9af24ad9c37e2e5a3e202697e7a6575532ef10933445cb1da8"
@@ -417,7 +417,7 @@
         "workspace": "/work/ws/optitrack"
       },
       "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
-      "revision": "362b85edb562baf5a9dfbeda7b1df3569581ac3a",
+      "revision": "02dbe8b734cf7aaef11cc21cf1d10516d9ac6a65",
       "subdir": "deployment/stack-modules/odometry/optitrack"
     },
     "perception/aruco-landing": {
