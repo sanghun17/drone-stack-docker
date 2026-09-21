@@ -18,6 +18,15 @@ recording, unavailable worker/receiver, missing manifest or incomplete video
 blocks arm. If OFFBOARD was selected before readiness, return to POSCTL and select
 OFFBOARD again after `data_sync_ready` and `offboard_entry_ready` become true.
 
+For the pilot, leave the aircraft disarmed in POSCTL and watch the status LED:
+**solid cyan** means ground-start readiness, including sync and preparation dwell,
+has completed; select OFFBOARD then. Blue/white alternating means still preparing.
+Kill/fault indicators keep their priority: red is not a ready signal. After landing,
+switch to POSCTL first and wait for solid cyan before selecting OFFBOARD again.
+Do not manually arm in this mode. Green/white in OFFBOARD means a failed hold;
+return to POSCTL to prepare again. Shared LED logic consumes optional generic
+`ground_start_enabled`/`offboard_entry_ready` fields on the mission-status topic.
+
 The phases are:
 
 1. ARMING: request arm once and wait for the FCU armed state; reject/timeout fails.

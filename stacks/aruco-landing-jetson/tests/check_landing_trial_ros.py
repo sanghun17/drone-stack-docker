@@ -98,6 +98,7 @@ def main():
         pubs={}
         for key,topic,kind in [('marker','/landing/vision_pose_marker',PoseStamped),('velocity','/mavros/local_position/velocity_local',TwistStamped),('mocap','/vrpn_client_node/pure/pose',PoseStamped),('local','/mavros/local_position/pose',PoseStamped),('state','/mavros/state',State),('extended','/mavros/extended_state',ExtendedState),('pad','/landing/pad_pose_global',PoseStamped),('ready','/landing/alignment/ready',Bool),('visible','/landing/target_visible',Bool),('inliers','/landing/estimator/inlier_ids',Int32MultiArray),('body','/landing/vehicle_pose_pad',PoseWithCovarianceStamped),('camera','/landing/camera_pose_pad',PoseWithCovarianceStamped)]:pubs[key]=rospy.Publisher(topic,kind,queue_size=10)
         rospy.Subscriber('/landing/trial/status',String,status)
+        rospy.Subscriber('/control/mission_status',String,lambda m:latest.update(mission=json.loads(m.data)))
         rospy.Subscriber('/landing/pose_transition/status',String,lambda m:latest.update(router=json.loads(m.data)))
         rospy.Subscriber('/mavros/setpoint_raw/local',PositionTarget,command)
         X=np.array(yaml.safe_load((ROOT/'stacks/aruco-landing-jetson/config/calibration/20260919/base_link_to_see3cam_optical_frame.yaml').read_text())['matrix_row_major']).reshape(4,4)
@@ -135,6 +136,8 @@ def main():
         start=rospy.ServiceProxy('/landing_trial/start',Trigger);reset=rospy.ServiceProxy('/landing_trial/reset',Trigger)
         wait_for(lambda:latest.get('status',{}).get('healthy'),10)
         if REPEAT:
+            wait_for(lambda:latest.get('mission',{}).get('ground_start_enabled') is True)
+            assert latest['mission']['offboard_entry_ready'] is False
             time.sleep(1.3);sim['mode']='OFFBOARD'
             wait_for(lambda:latest['status']['phase']=='FAILED_HOLD')
             assert not arm_calls
@@ -143,6 +146,7 @@ def main():
             targets=[]
             for number in [1,2]:
                 wait_for(lambda:latest['status']['offboard_entry_ready'],8)
+                wait_for(lambda:latest.get('mission',{}).get('offboard_entry_ready') is True)
                 sim['mode']='OFFBOARD'
                 wait_for(lambda:len(arm_calls)==number,5)
                 wait_for(lambda:latest['status']['phase']=='RANDOM_POSITION',35)
