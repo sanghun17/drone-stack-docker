@@ -46,9 +46,12 @@ and [flight-safety 406efbf](https://github.com/sanghun17/flight_safety/commit/40
 ## Idea: declare modules → one image, one container
 
 Layout is enforced by versioned pre-commit/pre-push hooks, a required GitHub
-`repository-layout` check on main, and a checkout check before setup operations.
-Run `./setup.sh install-hooks` once after cloning (normal setup usage also installs
-them). See [layout enforcement](scripts/LAYOUT_GUARD.md) for rules and exceptions.
+`repository-layout` check on main, and filesystem protection of the checkout root.
+Run `./setup.sh install-hooks` once after cloning (normal host setup usage also
+installs the hooks and root lock). New top-level entries are rejected immediately;
+existing child directories stay writable. Root-file replacement or a pull that
+changes root files needs `python3 scripts/root_guard.py maintain -- git pull --ff-only`.
+See [layout enforcement](scripts/LAYOUT_GUARD.md) for the scope and maintenance rules.
 
 - **A `stack` (`stacks/*/stack.yml`) just lists the modules you want** + the target arch.
 - **Each module (`modules/<group>/<name>/module.yml`) declares its own dependencies**

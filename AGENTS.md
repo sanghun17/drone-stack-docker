@@ -24,3 +24,11 @@
   `repository-layout` check protects main. Do not disable the guards to work
   around a layout violation. Declare legitimate runtime artifact exceptions in
   `config/repository-layout.json` with the corresponding tests instead.
+- The checkout root is write-locked to block new top-level entries immediately.
+  Existing child directories remain writable. Do not run chmod, unlock the root,
+  use Docker/root privileges, or replace the checkout directory to get around a
+  rejected creation. Put files in their allowed owner directory or home storage.
+- For user-authorized root-file replacement or Git updates, use
+  `python3 scripts/root_guard.py maintain -- <command>`; it relocks on completion
+  or ordinary command failure. Run maintenance without other agents writing to
+  the checkout. `./setup.sh root-status` reports the actual protection state.

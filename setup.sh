@@ -14,15 +14,21 @@
 #   typical first run:  clone -> up -> build-ws -> run <camera> / <fastlivo> / <planner>
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# Install versioned hooks on first host use, and fail before build/launch when
+# Install versioned hooks/root creation protection on first host use, and fail before build/launch when
 # research directories have crept back into the checkout (even if ignored).
 # Shell access and shutdown remain available to recover an existing container.
 case "${1:-help}" in
-  install-hooks) exec bash "$ROOT/scripts/install_git_hooks.sh" ;;
+  install-hooks)
+    bash "$ROOT/scripts/install_git_hooks.sh"
+    exec python3 "$ROOT/scripts/root_guard.py" lock ;;
+  lock-root) exec python3 "$ROOT/scripts/root_guard.py" lock ;;
+  unlock-root) exec python3 "$ROOT/scripts/root_guard.py" unlock ;;
+  root-status) exec python3 "$ROOT/scripts/root_guard.py" status ;;
   down|sh) ;;
   *) python3 "$ROOT/scripts/check_layout.py" --worktree
      if [ ! -f /.dockerenv ]; then
        bash "$ROOT/scripts/install_git_hooks.sh"
+       python3 "$ROOT/scripts/root_guard.py" lock
      fi ;;
 esac
 # shellcheck disable=SC1091
