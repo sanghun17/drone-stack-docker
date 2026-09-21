@@ -1,0 +1,1079 @@
+{
+  "keep": {
+    "flight_2026-09-22_03-07-39": "proposed1",
+    "flight_2026-09-22_03-15-03": "proposed1",
+    "flight_2026-09-22_03-15-47": "proposed1",
+    "flight_2026-09-22_03-16-25": "proposed1",
+    "flight_2026-09-22_03-17-04": "proposed1",
+    "flight_2026-09-22_03-17-41": "proposed1",
+    "flight_2026-09-22_03-18-20": "proposed1",
+    "flight_2026-09-22_03-19-01": "proposed1",
+    "flight_2026-09-22_03-19-40": "proposed1",
+    "flight_2026-09-22_03-20-18": "proposed1",
+    "flight_2026-09-22_03-20-57": "proposed1",
+    "flight_2026-09-22_03-21-37": "proposed1",
+    "flight_2026-09-22_03-22-15": "proposed1",
+    "flight_2026-09-22_03-22-55": "proposed1",
+    "flight_2026-09-22_03-29-25": "baseline",
+    "flight_2026-09-22_03-30-49": "baseline",
+    "flight_2026-09-22_03-31-25": "baseline",
+    "flight_2026-09-22_03-35-14": "baseline",
+    "flight_2026-09-22_03-38-07": "baseline",
+    "flight_2026-09-22_03-38-42": "baseline",
+    "flight_2026-09-22_03-39-15": "baseline",
+    "flight_2026-09-22_03-40-18": "baseline",
+    "flight_2026-09-22_03-41-54": "baseline",
+    "flight_2026-09-22_03-42-27": "baseline",
+    "flight_2026-09-22_03-43-02": "baseline",
+    "flight_2026-09-22_03-43-37": "baseline",
+    "flight_2026-09-22_03-44-14": "baseline",
+    "flight_2026-09-22_03-44-49": "baseline",
+    "flight_2026-09-22_03-45-26": "baseline",
+    "flight_2026-09-22_03-46-03": "baseline",
+    "flight_2026-09-22_03-46-39": "baseline",
+    "flight_2026-09-22_03-47-15": "baseline",
+    "flight_2026-09-22_03-47-52": "baseline",
+    "flight_2026-09-22_03-48-26": "baseline",
+    "flight_2026-09-22_03-49-24": "baseline",
+    "flight_2026-09-22_03-50-00": "baseline",
+    "flight_2026-09-22_03-50-31": "baseline"
+  },
+  "delete_sessions": [
+    "flight_2026-09-19_22-11-14",
+    "flight_2026-09-19_22-11-37",
+    "flight_2026-09-20_00-21-17",
+    "flight_2026-09-20_00-30-17",
+    "flight_2026-09-20_00-43-41",
+    "flight_2026-09-20_18-32-03",
+    "flight_2026-09-20_19-05-50",
+    "flight_2026-09-20_19-30-05",
+    "flight_2026-09-20_19-30-52",
+    "flight_2026-09-20_19-38-19",
+    "flight_2026-09-21_02-26-36",
+    "flight_2026-09-21_02-28-38",
+    "flight_2026-09-21_02-32-46",
+    "flight_2026-09-21_02-33-37",
+    "flight_2026-09-21_02-38-35",
+    "flight_2026-09-22_01-16-42",
+    "flight_2026-09-22_01-22-41",
+    "flight_2026-09-22_01-26-48",
+    "flight_2026-09-22_01-27-30",
+    "flight_2026-09-22_03-05-38"
+  ],
+  "delete_local_payloads": [
+    "/home/ml/aruco-stack-docker/data/results/aruco-landing-jetson/flight-20260922-012241/flight_2026-09-22_01-22-41.runtime_manifest.yaml",
+    "/home/ml/aruco-stack-docker/data/results/aruco-landing-jetson/flight-20260922-012241/flight_2026-09-22_01-22-41.bag",
+    "/home/ml/aruco-stack-docker/data/results/aruco-landing-jetson/two-landings-20260922-012648/flight_2026-09-22_01-26-48.bag",
+    "/home/ml/aruco-stack-docker/data/results/aruco-landing-jetson/two-landings-20260922-012648/flight_2026-09-22_01-27-30.runtime_manifest.yaml",
+    "/home/ml/aruco-stack-docker/data/results/aruco-landing-jetson/two-landings-20260922-012648/flight_2026-09-22_01-27-30.bag",
+    "/home/ml/aruco-stack-docker/data/results/aruco-landing-jetson/two-landings-20260922-012648/flight_2026-09-22_01-26-48.runtime_manifest.yaml",
+    "/home/ml/aruco-stack-docker/data/results/aruco-landing-jetson/manual-flight-20260922-011642/flight_2026-09-22_01-16-42.bag",
+    "/home/ml/aruco-stack-docker/data/results/aruco-landing-jetson/manual-flight-20260922-011642/flight_2026-09-22_01-16-42.runtime_manifest.yaml",
+    "/home/ml/aruco-stack-docker/data/results/aruco-landing-jetson/landing-five-trials-20260920-183203/normalized_bags/flight_2026-09-20_19-05-50.bag",
+    "/home/ml/aruco-stack-docker/data/results/aruco-landing-jetson/landing-five-trials-20260920-183203/normalized_bags/flight_2026-09-20_19-38-19.bag",
+    "/home/ml/aruco-stack-docker/data/results/aruco-landing-jetson/landing-five-trials-20260920-183203/normalized_bags/flight_2026-09-20_19-30-05.bag",
+    "/home/ml/aruco-stack-docker/data/results/aruco-landing-jetson/landing-five-trials-20260920-183203/normalized_bags/flight_2026-09-20_19-30-52.bag",
+    "/home/ml/aruco-stack-docker/data/results/aruco-landing-jetson/landing-five-trials-20260920-183203/normalized_bags/flight_2026-09-20_18-32-03.bag",
+    "/home/ml/aruco-stack-docker/data/results/experiments/aruco-landing/manual-flight/manual-flight-20260919-131105-329410.bag"
+  ],
+  "protected_sessions": [
+    "flight_2026-08-03_04-26-56_good1",
+    "flight_2026-09-14_16-23-39",
+    "flight_2026-09-14_16-57-06",
+    "flight_2026-09-14_17-11-38",
+    "flight_2026-09-14_17-18-41",
+    "flight_2026-09-14_17-21-30",
+    "nominal_flight_2026-08-05_02-19-50_0(near_crash)",
+    "nominal_flight_2026-08-05_02-22-12_1(near_crash)",
+    "nominal_flight_2026-08-05_02-24-06_2",
+    "nominal_flight_2026-08-05_02-25-51_3",
+    "planner_debug_20260725_091939",
+    "pure_flight_2026-08-04_21-10-27_0",
+    "pure_flight_2026-08-04_21-29-26_1",
+    "pure_flight_2026-08-04_21-33-28_2",
+    "pure_flight_2026-08-04_21-35-19_3",
+    "pure_flight_2026-08-05_01-46-24_4",
+    "pure_flight_2026-08-05_01-48-54_5",
+    "pure_flight_2026-08-05_01-50-28_6",
+    "pure_mean_flight_2026-08-05_02-00-30_0",
+    "pure_mean_flight_2026-08-05_02-03-46_1",
+    "pure_mean_flight_2026-08-05_02-05-15_2",
+    "pure_mean_flight_2026-08-05_02-07-42_3",
+    "pure_mean_flight_2026-08-05_02-09-04_4",
+    "pure_mean_flight_2026-08-05_02-11-39_5",
+    "pure_wodz_flight_2026-08-04_05-26-39_1",
+    "pure_wodz_flight_2026-08-04_05-28-45_2",
+    "pure_wodz_flight_2026-08-04_05-30-18_3",
+    "pure_wodz_flight_2026-08-04_05-32-23_4"
+  ],
+  "jetson_pending": true,
+  "records": [
+    {
+      "session": "flight_2026-09-22_03-07-39",
+      "group": "proposed1",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-07-39.bag",
+          "bytes": 11089578,
+          "sha256": "a4777809d5021f9b7747b10fb034c04778f34674306d82031151efaa932d38cf"
+        },
+        {
+          "path": "flight_2026-09-22_03-07-39.runtime_manifest.yaml",
+          "bytes": 204073,
+          "sha256": "f98975fbca963c6398abdf3c56c129868713b92ba803aa90b402f05a16ebf5f6"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-07-39_cam1.mp4",
+          "bytes": 105554027,
+          "sha256": "59334a38a97ee790d567cb8b5c85ab1c6bd190359697f7b361bf1f1cf3daa8c5"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-07-39_cam2.mp4",
+          "bytes": 87782692,
+          "sha256": "f11a92f01f98f3c985c8add9cdf81c5b86975b381bad095f92255dc4a1db7279"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-15-03",
+      "group": "proposed1",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-15-03.bag",
+          "bytes": 12332135,
+          "sha256": "2d3d1286e750a549243eb3c9eb3e284f59147715ecdfdefbfa943621de18366f"
+        },
+        {
+          "path": "flight_2026-09-22_03-15-03.runtime_manifest.yaml",
+          "bytes": 204746,
+          "sha256": "509ba78ccc74c16856845d35a8eba19285cf86be6921fab4156f6099cb1b6012"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-15-03_cam1.mp4",
+          "bytes": 119406308,
+          "sha256": "11d7747dd3cb7b5c5ada71af97259ae8206043c119a02e0101e54bb0bfdd50c9"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-15-03_cam2.mp4",
+          "bytes": 99020316,
+          "sha256": "50a09aa0fb87c0007ed1b04267741329277812e7fa4d9cf751367327cb0bb39f"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-15-47",
+      "group": "proposed1",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-15-47.bag",
+          "bytes": 11812747,
+          "sha256": "df4bd859ea1a580039422c61e5891449cc16d899ba55ced369b37760c9053137"
+        },
+        {
+          "path": "flight_2026-09-22_03-15-47.runtime_manifest.yaml",
+          "bytes": 204745,
+          "sha256": "2889559392ac807fc3c2f86012c9800d7fab5c0722d603e85bcbcbaf55d390c9"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-15-47_cam1.mp4",
+          "bytes": 109034924,
+          "sha256": "4c523e38fcbbf130032e8603cb77a31e81da466d1eee4c534a0bad508e3b0b28"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-15-47_cam2.mp4",
+          "bytes": 90712442,
+          "sha256": "dfe20e1746364ec7635b7787b11dba3a57f3a05a4277f8b46c2e981418861c7b"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-16-25",
+      "group": "proposed1",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-16-25.bag",
+          "bytes": 12438529,
+          "sha256": "941b4d09746aef30787e45ecb4a842c3506da37a7991ddce7b8ae6d34d32c675"
+        },
+        {
+          "path": "flight_2026-09-22_03-16-25.runtime_manifest.yaml",
+          "bytes": 204746,
+          "sha256": "6dd8f49b7099d6a31b33d271213cba87f41910c41e4f0d814caeee16b3d095a0"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-16-25_cam1.mp4",
+          "bytes": 119604599,
+          "sha256": "946f3c7288946a89876b27a99ab450d17ef84ff43318160a1380ce7e6fac4cc9"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-16-25_cam2.mp4",
+          "bytes": 99002987,
+          "sha256": "56b220931b51f81f116d351ef13f1bba4b498e46dcf1897456274663bbb4e6b7"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-17-04",
+      "group": "proposed1",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-17-04.bag",
+          "bytes": 11716723,
+          "sha256": "21e7085c9832b501080b7f7bff1527fe6f4787bef923292a38ad858b473cc3ce"
+        },
+        {
+          "path": "flight_2026-09-22_03-17-04.runtime_manifest.yaml",
+          "bytes": 204746,
+          "sha256": "e72d93253920d4bcb6079b494522e0239f668d656de0a48881cfee339dcbb79d"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-17-04_cam1.mp4",
+          "bytes": 114514370,
+          "sha256": "9df0f1d8b427672893d123d535ee3be58741f03915d22e13a51fbbfe56dbd980"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-17-04_cam2.mp4",
+          "bytes": 95203969,
+          "sha256": "2896c8a19b0eba766c1e19064341e05631ddb7817bf9f762730999f8dc54ea42"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-17-41",
+      "group": "proposed1",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-17-41.bag",
+          "bytes": 12804271,
+          "sha256": "1fee07de4e3e813108af5a77b370e4c863335d087345a0b1bbf63f68c3a76cb5"
+        },
+        {
+          "path": "flight_2026-09-22_03-17-41.runtime_manifest.yaml",
+          "bytes": 204745,
+          "sha256": "89a4611ede2a1cb4e796cfb74eb067aa74cd354acbb6895148181c7393a0b68d"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-17-41_cam1.mp4",
+          "bytes": 119007542,
+          "sha256": "45475caa2a7d7e577c18a01237e87d78805268d5b2c02fe2ee0a83013eeaabae"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-17-41_cam2.mp4",
+          "bytes": 98809002,
+          "sha256": "e041b79628ebddda457fbe8609825374deda4966a99d19ea7020d310b26d70a8"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-18-20",
+      "group": "proposed1",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-18-20.bag",
+          "bytes": 13757453,
+          "sha256": "26dba8ca95aa5dc27322e7d4a069c0d4d90818b17b05c0a6cfca749fb82bed37"
+        },
+        {
+          "path": "flight_2026-09-22_03-18-20.runtime_manifest.yaml",
+          "bytes": 204748,
+          "sha256": "9cb2f95ea847ec31687617bd0b8dcb247093df1dde4a06ae0570c3c004d13b08"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-18-20_cam1.mp4",
+          "bytes": 128261100,
+          "sha256": "9d91d520cd86ebb9395110ce7b4e3ead43eea2ce2afec0d5d81a85d1bf4b2894"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-18-20_cam2.mp4",
+          "bytes": 106659562,
+          "sha256": "9fadc8e42061675b2e2fbe00020628e8ccd91ab89f14b7fdefef3f13b62b8534"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-19-01",
+      "group": "proposed1",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-19-01.bag",
+          "bytes": 12998176,
+          "sha256": "51981afb85a3cf5cce5ccd5867dbe3660bc808a345bb0ac7c4d44c5ef8853bd8"
+        },
+        {
+          "path": "flight_2026-09-22_03-19-01.runtime_manifest.yaml",
+          "bytes": 204747,
+          "sha256": "ee2342b06c198540bafce144fb27f63dd06ec93f66be8c8090c097294893d2cc"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-19-01_cam1.mp4",
+          "bytes": 123449206,
+          "sha256": "81dc04ccb34942dcae73c0614191c38c3f1af80f40d36076a1c68aa7694f6cde"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-19-01_cam2.mp4",
+          "bytes": 102708383,
+          "sha256": "c98975f3780ceb2bc947d8d3b22ab532158edd4511e2fa984b95f57666ba1f7a"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-19-40",
+      "group": "proposed1",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-19-40.bag",
+          "bytes": 13225100,
+          "sha256": "6b6cfd02f1787b29e96e6bf31b9879bb57b26d0967fa4a70ec9b25e897f4820e"
+        },
+        {
+          "path": "flight_2026-09-22_03-19-40.runtime_manifest.yaml",
+          "bytes": 204748,
+          "sha256": "3ffbb66c5e52d03d5911f2cc6ea82a2445708d774a1cc59239a29b3885f8fa34"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-19-40_cam1.mp4",
+          "bytes": 123555650,
+          "sha256": "cc12ea653b1edb88e8e28d1da3450b921a42e3b66bd1aa66ddfbf835bb078abb"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-19-40_cam2.mp4",
+          "bytes": 102977685,
+          "sha256": "37676a428b9d0b50a82cecf63a119b4a12aff5efe169a34689e6f7fd4049ffb0"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-20-18",
+      "group": "proposed1",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-20-18.bag",
+          "bytes": 12138393,
+          "sha256": "79aaad1622f187f9c32905044c3fe55d583140be63968a90c88ae7d6874c0ee0"
+        },
+        {
+          "path": "flight_2026-09-22_03-20-18.runtime_manifest.yaml",
+          "bytes": 204746,
+          "sha256": "7ff63883fe607a7aaa737192a4029457055aa7ef3a46f6c33099e19876aa866f"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-20-18_cam1.mp4",
+          "bytes": 114583366,
+          "sha256": "ace7632dd6ac662ea4e1e1c65548802aa778d3d7c4a844b8c8c583925565781e"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-20-18_cam2.mp4",
+          "bytes": 95716446,
+          "sha256": "39f506acff9af674ab36a681c0eb863bdc0908c98daa5518c4a0ecc62ccf8638"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-20-57",
+      "group": "proposed1",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-20-57.bag",
+          "bytes": 13432039,
+          "sha256": "9e349ec66b27816cce9108b5d98c1919f188be2b259b35c3fc37af49c151b8ed"
+        },
+        {
+          "path": "flight_2026-09-22_03-20-57.runtime_manifest.yaml",
+          "bytes": 204748,
+          "sha256": "92e5d978e4c18d95b9ded5f6ced01850e3c69ad0065b51a1427763fd57b743a5"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-20-57_cam1.mp4",
+          "bytes": 128118817,
+          "sha256": "b0dd974463dbc3f5b90208c9bd52f9a6775cb5d0a721c1048f23bb5c3ee1441d"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-20-57_cam2.mp4",
+          "bytes": 106784767,
+          "sha256": "824f4fa51ea7a87d45aa6d9e2e27edf54c929190c0f3c2556879b61a08f918fb"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-21-37",
+      "group": "proposed1",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-21-37.bag",
+          "bytes": 11751368,
+          "sha256": "99f2bed65c1776834794ee923e876e6f16d043b1b5d97e32a40a0e624c811b6c"
+        },
+        {
+          "path": "flight_2026-09-22_03-21-37.runtime_manifest.yaml",
+          "bytes": 204746,
+          "sha256": "7fae84f02640042750bcfe30855d2cdbb951cfef1c0c73085953b0e3bd9bec8c"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-21-37_cam1.mp4",
+          "bytes": 109882842,
+          "sha256": "4b23db764e4b600b8ab1ccaa43bd7fb4b1ae6c976561c9ab9b8c2db17a337118"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-21-37_cam2.mp4",
+          "bytes": 91099474,
+          "sha256": "6b0e38d1a62159ad474e86d3553fb792e7ea897e78cd415e532d1d04c2c690ff"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-22-15",
+      "group": "proposed1",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-22-15.bag",
+          "bytes": 12653768,
+          "sha256": "f8f7726793e931475ccb51b9681930bf7b0dbadee7f7a0e15489e5b48eed103a"
+        },
+        {
+          "path": "flight_2026-09-22_03-22-15.runtime_manifest.yaml",
+          "bytes": 204746,
+          "sha256": "de8756df2464baf27ff39e7cc0172d3e0bdc99a758fc0d44a7624e39b8f2c463"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-22-15_cam1.mp4",
+          "bytes": 119210702,
+          "sha256": "c95efdd77d07ca68d4aa051be19d31ee420f134d1a99ce45eda468aca336b8c3"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-22-15_cam2.mp4",
+          "bytes": 99006808,
+          "sha256": "aa31419b2daf3249e0e00492e4c1fc41dbd571d5035bed65928bcd56b89f23d9"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-22-55",
+      "group": "proposed1",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-22-55.bag",
+          "bytes": 13427350,
+          "sha256": "4c4049f1e21ee13ab2fc7a4666412ff3dc29172e901d592598d9a144719ea781"
+        },
+        {
+          "path": "flight_2026-09-22_03-22-55.runtime_manifest.yaml",
+          "bytes": 204748,
+          "sha256": "d1077bbedd36d972b30904de2f49907117c0e36a8551dbb099d8522daa13f192"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-22-55_cam1.mp4",
+          "bytes": 128122220,
+          "sha256": "c321a0247149ff929c7585e0b6bfae057908b28eb19bcda6a2c54b69aa32c1af"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-22-55_cam2.mp4",
+          "bytes": 106532673,
+          "sha256": "c873b2ee1d245daececf2fe76fe2b0c30f1fa6c26dd0fadf0c5b390befa84988"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-29-25",
+      "group": "baseline",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-29-25.bag",
+          "bytes": 14546313,
+          "sha256": "a735b5b6003c73d0a3766cb2cfe7881839a526e75e5c3485ccd2c51939f872a0"
+        },
+        {
+          "path": "flight_2026-09-22_03-29-25.runtime_manifest.yaml",
+          "bytes": 204065,
+          "sha256": "5f6e0d9269b32d33ab41cc9f1bc69f47adc03b05dff5b7d6d673ec9727dfe9fa"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-29-25_cam1.mp4",
+          "bytes": 96924019,
+          "sha256": "5ddf0e5da06febd046ce23c8b0c9fa66a10603b4a28f3297e6b9a8355747b79b"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-29-25_cam2.mp4",
+          "bytes": 80575308,
+          "sha256": "7e6b1d9ce2d4418ab79bad0cfd4cd6cbc115035e872d29ae5222329d6c482c28"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-30-49",
+      "group": "baseline",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-30-49.bag",
+          "bytes": 14717794,
+          "sha256": "144983a0534e4681560c6384d263f7f39698c3458a98b7ea8aefa2db38d6dda2"
+        },
+        {
+          "path": "flight_2026-09-22_03-30-49.runtime_manifest.yaml",
+          "bytes": 204065,
+          "sha256": "64eb10747662f58fd72e3022d3bed2618ca2a8b94dd0e9809865c0fa52db418f"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-30-49_cam1.mp4",
+          "bytes": 106352874,
+          "sha256": "83b6fa01d7781f04f38124610f0fec037c0bbcd1a552f214078d87e9394d517f"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-30-49_cam2.mp4",
+          "bytes": 88094720,
+          "sha256": "090dd5f721f77f7bc81d8fc44d2b91b1c454151f01b59d7a5bed4960879a65cf"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-31-25",
+      "group": "baseline",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-31-25.bag",
+          "bytes": 15104490,
+          "sha256": "f80439a70e6f703ebd160c7d1551c69405d993d24f517801f6150300f2d901b7"
+        },
+        {
+          "path": "flight_2026-09-22_03-31-25.runtime_manifest.yaml",
+          "bytes": 204063,
+          "sha256": "48f123a4a0f1aafa85cc3ff107fae6ed1054ee00ff6f9cef106a3948d37beb34"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-31-25_cam1.mp4",
+          "bytes": 110841112,
+          "sha256": "3cf839a12056618a895856d75da334a90abea27971dd917ca99172eb917d81c5"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-31-25_cam2.mp4",
+          "bytes": 92570563,
+          "sha256": "279b11c69973e75dfd1dfd9c896458e9d908ea2b6f29d84d11167ca975c39da8"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-35-14",
+      "group": "baseline",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-35-14.bag",
+          "bytes": 13999772,
+          "sha256": "9af9f8a139caef86c82992b731ed5c031d5124654fbcf08241bdbdf731d81c2f"
+        },
+        {
+          "path": "flight_2026-09-22_03-35-14.runtime_manifest.yaml",
+          "bytes": 204063,
+          "sha256": "b636830b18cc1823763d6a463e5b22febd63b406367a6a1248c4018da2b576b6"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-35-14_cam1.mp4",
+          "bytes": 101797530,
+          "sha256": "e7ddeb8ed0c836c4e6489485e5f65ba1f01808da0d238d35cbebc48e7f5422a7"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-35-14_cam2.mp4",
+          "bytes": 84599151,
+          "sha256": "54f7afd3bc3617ea2b06501a98f99a2cc4f25c21f55166edc5264dcdb27f153f"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-38-07",
+      "group": "baseline",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-38-07.bag",
+          "bytes": 14919436,
+          "sha256": "ae6d7711737b6713c482319ff29b75939972411a151de287a4dd8c31c94a3cfe"
+        },
+        {
+          "path": "flight_2026-09-22_03-38-07.runtime_manifest.yaml",
+          "bytes": 204736,
+          "sha256": "de7fa6749829be0a40d0d6d231cd05e93bc2b0476595e6583996d48a27b4a6a1"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-38-07_cam1.mp4",
+          "bytes": 106000756,
+          "sha256": "4dfc936292d8f1b0f003c188a34b9dd9429b8d9eec319e0329324bf53c3575bd"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-38-07_cam2.mp4",
+          "bytes": 88183120,
+          "sha256": "668a0eca3ff9f04c141caaaf9de9f52d15401a8e5721a95179e4508d21504471"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-38-42",
+      "group": "baseline",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-38-42.bag",
+          "bytes": 13795581,
+          "sha256": "6d6b263c37ebf27c2b503e7c390b27cf9370ce17e56680195269a910e645bca5"
+        },
+        {
+          "path": "flight_2026-09-22_03-38-42.runtime_manifest.yaml",
+          "bytes": 204734,
+          "sha256": "1ea42558a4758b50551a953f94155d5941a9c935b0c292d48418cec1cbc2332f"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-38-42_cam1.mp4",
+          "bytes": 97337891,
+          "sha256": "79102149351bedbd5338a568fd52c1ed23454722a693c5d5ec01e5cc2ebdcdff"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-38-42_cam2.mp4",
+          "bytes": 80721152,
+          "sha256": "799d12a765135c4ec9117745bc96b6dcd0d1a6f58ff749d07ca93280091f4d21"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-39-15",
+      "group": "baseline",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-39-15.bag",
+          "bytes": 14765870,
+          "sha256": "cb3557becb67844489cf0dbdbb66c17dafd49adbf836473cf612e81d8942fcad"
+        },
+        {
+          "path": "flight_2026-09-22_03-39-15.runtime_manifest.yaml",
+          "bytes": 204735,
+          "sha256": "699c5f8cdd2a60ed7619a9941a228d295ff999fa2514c2cb7b3f0c264ea388c6"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-39-15_cam1.mp4",
+          "bytes": 102212170,
+          "sha256": "4967d3fe1fecd5ba8036880e38fb78b727e03843fd7cb5a5495367e8d9844e12"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-39-15_cam2.mp4",
+          "bytes": 84898989,
+          "sha256": "5fe406b3a3d880af9b5a9c5fc749d71a584ade6d7975c64131dfd9a94f2e8c6a"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-40-18",
+      "group": "baseline",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-40-18.bag",
+          "bytes": 15367655,
+          "sha256": "3767d383be4219362707f751d57dd73af37dfc1d1640fc89fca924423f650a0e"
+        },
+        {
+          "path": "flight_2026-09-22_03-40-18.runtime_manifest.yaml",
+          "bytes": 204736,
+          "sha256": "4c613a20065cb82a53f9cfe6ef8743311c71721bf32d8b48723c4d266f002ca3"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-40-18_cam1.mp4",
+          "bytes": 105931250,
+          "sha256": "d756c7a2af02cea7941b9999a0fc44868e950ff625c9d7bd75a7910e915f4944"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-40-18_cam2.mp4",
+          "bytes": 88107249,
+          "sha256": "4a1cc0089ec6c04291cd09a72d025240d1197016760ed1ae94db0d0bd6bbabe7"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-41-54",
+      "group": "baseline",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-41-54.bag",
+          "bytes": 14168402,
+          "sha256": "16d09208ae9e0079dc6159d81a95dd32e8d8ee3a1a0904a200a91c59f4a0e2c0"
+        },
+        {
+          "path": "flight_2026-09-22_03-41-54.runtime_manifest.yaml",
+          "bytes": 204736,
+          "sha256": "754e47fc893d53047b23780152d3a9f38524e4055b65be32683a9110a86472f8"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-41-54_cam1.mp4",
+          "bytes": 101614129,
+          "sha256": "866842ce1f22bf2efb1f6729628d60acc27e3878a907600b41e4d0d893ca62d8"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-41-54_cam2.mp4",
+          "bytes": 84511217,
+          "sha256": "769d7d35fc5e49cb6b86b63551b41a80874e23f8430b44b0cf1c2b1d2fe36d8a"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-42-27",
+      "group": "baseline",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-42-27.bag",
+          "bytes": 15398985,
+          "sha256": "ca4627185b121bfb3b6a8d278b0d9369a947a18fca80560cbd828b50856e08f8"
+        },
+        {
+          "path": "flight_2026-09-22_03-42-27.runtime_manifest.yaml",
+          "bytes": 204735,
+          "sha256": "d752d627903fa71e55d8e78377298155979b5ca5429aa8718da00ef1f2550635"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-42-27_cam1.mp4",
+          "bytes": 106148291,
+          "sha256": "f277681b0a50cddb66fffd80af1a9eef11d25d60030ab68db9c912f9314114c5"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-42-27_cam2.mp4",
+          "bytes": 88328767,
+          "sha256": "181ad4291eda01275be4ee54011f25f963aef693a0c5b912268ba2bb3d5f813a"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-43-02",
+      "group": "baseline",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-43-02.bag",
+          "bytes": 15169359,
+          "sha256": "06a0ea8c0c151de81be4f191c7026881b031f6de86952d6126131ce8447ca95f"
+        },
+        {
+          "path": "flight_2026-09-22_03-43-02.runtime_manifest.yaml",
+          "bytes": 204736,
+          "sha256": "c95017522499ddaf6ac1ce9f5f051f2395d664948a126f48151707d3c279db61"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-43-02_cam1.mp4",
+          "bytes": 105815718,
+          "sha256": "8245ad688a04607fcdaad513833d4f69074fcec6ae70f3239aa52a1287e7cb22"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-43-02_cam2.mp4",
+          "bytes": 88090682,
+          "sha256": "e0aed40bdd43c69c119d18d98dd609b9d2fb49a17f71533326bb781a3a18944b"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-43-37",
+      "group": "baseline",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-43-37.bag",
+          "bytes": 15630505,
+          "sha256": "eb5fe9b69ca7aa3f1746b674d2307f049622f9c38b89978b8f921c38aa83c924"
+        },
+        {
+          "path": "flight_2026-09-22_03-43-37.runtime_manifest.yaml",
+          "bytes": 204736,
+          "sha256": "bc800f5ec5ecd171ff47902e9e30a2666ec409af1d3c1be87564189780814fc8"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-43-37_cam1.mp4",
+          "bytes": 110634841,
+          "sha256": "629bb3f0cdcdef69df3fc4f1e7e4f28cfb2578e397ebb15c6855c4a9ed6a81b8"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-43-37_cam2.mp4",
+          "bytes": 91793159,
+          "sha256": "921b3714164639714cb33ad6776ac301a462a791ba9822aadd7dbd2cb9f653ed"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-44-14",
+      "group": "baseline",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-44-14.bag",
+          "bytes": 15286715,
+          "sha256": "e2d2a2306c88ca0ea5366df7ce16667ea03b2ce728ef5e35a4664866644a4418"
+        },
+        {
+          "path": "flight_2026-09-22_03-44-14.runtime_manifest.yaml",
+          "bytes": 204735,
+          "sha256": "774735ed4c1d6f57ea791870d241934a2251f54ff5522cc5cb92dacacd1a7038"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-44-14_cam1.mp4",
+          "bytes": 110584990,
+          "sha256": "86ba97fcf4492b2d838705755d7cdf52488e55a2d40bc8ff8646e940fcdac328"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-44-14_cam2.mp4",
+          "bytes": 92087245,
+          "sha256": "67d3e0513631ba5c21a6093c61740e909d3ff49dcb2a264ee4adde2a3d507a89"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-44-49",
+      "group": "baseline",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-44-49.bag",
+          "bytes": 15925540,
+          "sha256": "931b863f12ec25d590f37ee1fc41ec03f41879f89474ef6e07a279a9b48f59f7"
+        },
+        {
+          "path": "flight_2026-09-22_03-44-49.runtime_manifest.yaml",
+          "bytes": 204735,
+          "sha256": "d8fedd28e4a05aaa394be01d6877bb05eb67061bc7c58bc437ee4a5a7d5c402c"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-44-49_cam1.mp4",
+          "bytes": 116393063,
+          "sha256": "20367d97a091a1c54c5343fc1567d245b9d443cf7c37eda299dafd0fe30b63a8"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-44-49_cam2.mp4",
+          "bytes": 97300567,
+          "sha256": "98a85bba177795d18084939f128bd68737e42a64b3b12ed55fa283461c98eea8"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-45-26",
+      "group": "baseline",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-45-26.bag",
+          "bytes": 16060601,
+          "sha256": "bdb5ed325d4b47517e52304881fa0da3976e147fb571b3d7a0eb94b2480fa718"
+        },
+        {
+          "path": "flight_2026-09-22_03-45-26.runtime_manifest.yaml",
+          "bytes": 204736,
+          "sha256": "e061e86c87da0d0ced8129f3dc40f99e49ca3efc109f5c61f2666a27fdc4f6e3"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-45-26_cam1.mp4",
+          "bytes": 120069456,
+          "sha256": "7dfb690955bd93446b673f24eaa5fabb383c8d25108a14d902174b8aa12887f6"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-45-26_cam2.mp4",
+          "bytes": 99880310,
+          "sha256": "bb3cee107b26ff73e964007539d3579333356ee369607a355f4bb556f6e64255"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-46-03",
+      "group": "baseline",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-46-03.bag",
+          "bytes": 14350808,
+          "sha256": "9784290fcb35796034c3dc8461d71e197e567dc82ac42684dfea9cca12403049"
+        },
+        {
+          "path": "flight_2026-09-22_03-46-03.runtime_manifest.yaml",
+          "bytes": 204736,
+          "sha256": "5643e460570efcef3c2fa230571da25b3eedeed58d74e54dfa900b89a20eae6c"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-46-03_cam1.mp4",
+          "bytes": 106457579,
+          "sha256": "337ec7a49de029d5b8c711ea3512b81c08a8754348f3dc571611b2971ee10ce5"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-46-03_cam2.mp4",
+          "bytes": 88312025,
+          "sha256": "9eae5eb31e50c1966445fc91a670a9a2f86f5cae6ef16ee6e23ff233cf57a9ad"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-46-39",
+      "group": "baseline",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-46-39.bag",
+          "bytes": 14603232,
+          "sha256": "eedd4f41e296ca04a9cda4a576e6d2731cbb36ce6d95894218e4ffe0241d81ac"
+        },
+        {
+          "path": "flight_2026-09-22_03-46-39.runtime_manifest.yaml",
+          "bytes": 204736,
+          "sha256": "593367605422aee3ab3264cb7612f29400a8c595a8b84f8abf5771167ca009ae"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-46-39_cam1.mp4",
+          "bytes": 101968937,
+          "sha256": "78023395e0fc84603d611758f95386e7289fc9dc1c64bec10e9c7afae8f2a9c2"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-46-39_cam2.mp4",
+          "bytes": 84514641,
+          "sha256": "f413f59b63b9a410922c27590546adc9db32fd67deb0801454b79d8d1cd2059f"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-47-15",
+      "group": "baseline",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-47-15.bag",
+          "bytes": 14967698,
+          "sha256": "05d7cbbe5aad0a71d39f5d873df77df4e6d272cccea2c7b471b379bf365782a2"
+        },
+        {
+          "path": "flight_2026-09-22_03-47-15.runtime_manifest.yaml",
+          "bytes": 204734,
+          "sha256": "3fd5bceb311cb155428a9221b288b2859e6b67ff7d9642d49b3a98ea3dc613bb"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-47-15_cam1.mp4",
+          "bytes": 110480124,
+          "sha256": "f968860b99abebc4ccc73846066af87b60674cbaad247db029ceefd26e1f853b"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-47-15_cam2.mp4",
+          "bytes": 92036240,
+          "sha256": "15f16e0daa3c0d46d0a46642c29766e48042b9528eed5124bf2d7375d5c3d98a"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-47-52",
+      "group": "baseline",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-47-52.bag",
+          "bytes": 14498150,
+          "sha256": "b4815f1b84856b2d7877a91520fd5909f9e590a476e20aa124036e0aebaeea10"
+        },
+        {
+          "path": "flight_2026-09-22_03-47-52.runtime_manifest.yaml",
+          "bytes": 204735,
+          "sha256": "7f64be166b889777f3d0cd1ab1076fa3450f8849b605859e0227bf3f66388f55"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-47-52_cam1.mp4",
+          "bytes": 106287190,
+          "sha256": "077aa8a649d22411915887d7acd889698b2ecbb190c3fbb13032ac3eadca324c"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-47-52_cam2.mp4",
+          "bytes": 88346185,
+          "sha256": "504e7ee7ab3bc15b3396676014c0fe562d615bacb11471c9a2340db4578b0bef"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-48-26",
+      "group": "baseline",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-48-26.bag",
+          "bytes": 14754855,
+          "sha256": "5c5865422ccf984e1d793da02b7e8e0a28e78f38518b9bb281f40e4cd1281dea"
+        },
+        {
+          "path": "flight_2026-09-22_03-48-26.runtime_manifest.yaml",
+          "bytes": 204734,
+          "sha256": "448e831a1bd362784ffaed2300c8933381e6f0344eb71b8650e61630d448ef9b"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-48-26_cam1.mp4",
+          "bytes": 101665883,
+          "sha256": "275500d65b78b3c7b5d7926a347551f1cfa4dafe273733b8a8b731c6805a5f27"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-48-26_cam2.mp4",
+          "bytes": 84460917,
+          "sha256": "b8332ae1e205227b334ac7baf43b0e942f9721caa7999d0224b1e818417799d7"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-49-24",
+      "group": "baseline",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-49-24.bag",
+          "bytes": 15706173,
+          "sha256": "9a74bd1b8d957f3860ef5d454a88cc3dac5330d7f5192a2e2e5b8841c5014ab0"
+        },
+        {
+          "path": "flight_2026-09-22_03-49-24.runtime_manifest.yaml",
+          "bytes": 204736,
+          "sha256": "a802de36275a28973ff8fa587a256a5d48cc587162d3c1f822aa381dbdc9bac6"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-49-24_cam1.mp4",
+          "bytes": 111183788,
+          "sha256": "d9472b60d41c2af835ab793d11f32fcb9fc4948779380347f04c051c67331474"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-49-24_cam2.mp4",
+          "bytes": 92192671,
+          "sha256": "87ec1e2393177fe4155d611598ed3851a0f220b9dbdeb81abf9fe1b10bc51ce1"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-50-00",
+      "group": "baseline",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-50-00.bag",
+          "bytes": 13633575,
+          "sha256": "4b5fc85486dfe16a4a79915a002206097fdd5383a39e63856ffcda16eebde984"
+        },
+        {
+          "path": "flight_2026-09-22_03-50-00.runtime_manifest.yaml",
+          "bytes": 204734,
+          "sha256": "69058826ba04e7d6680b7bec1036098f9be23ae1b9f06e03c2f1a5ca643cb7b8"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-50-00_cam1.mp4",
+          "bytes": 92783537,
+          "sha256": "7f91ffce42aa56807f8292bee6e9194312ae426e41d0b1aba7d83270dd586ad1"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-50-00_cam2.mp4",
+          "bytes": 76809059,
+          "sha256": "950d578e7545f400910c0186c03881e2528f2b1d0528f481ed49215542b7f5e7"
+        }
+      ]
+    },
+    {
+      "session": "flight_2026-09-22_03-50-31",
+      "group": "baseline",
+      "files": [
+        {
+          "path": "flight_2026-09-22_03-50-31.bag",
+          "bytes": 15819505,
+          "sha256": "b5652a2bdcb514517db82358bfb34805024a31d966d2db1337925513a432f3b1"
+        },
+        {
+          "path": "flight_2026-09-22_03-50-31.runtime_manifest.yaml",
+          "bytes": 204735,
+          "sha256": "1d97eef76240d298a267a62481982d32f100663821ae602739f5b0a09ec64df1"
+        },
+        {
+          "path": "cam1/flight_2026-09-22_03-50-31_cam1.mp4",
+          "bytes": 106082864,
+          "sha256": "ee78d9c6d7876a37969cdf88733456b86c2759f3427ff691962fc0bfe28ceb4a"
+        },
+        {
+          "path": "cam2/flight_2026-09-22_03-50-31_cam2.mp4",
+          "bytes": 88104689,
+          "sha256": "4501646f48d8ec72e82af111db745a076fb8edbe0f3e66f300aa6cfe34d63ad5"
+        }
+      ]
+    }
+  ],
+  "canonical_root": "/home/ml/aruco-stack-docker/data/results/aruco-landing-jetson/20260922-pad-comparison",
+  "deleted_bytes": 11318526873,
+  "webcam_index_rows_removed": 40,
+  "protected_sessions_unchanged": true,
+  "compatibility_symlinks": true
+}
