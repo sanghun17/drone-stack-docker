@@ -1,0 +1,14 @@
+# OptiTrack body position in the global frame; not height above the arming pose.
+height_m: 2.0
+speed_mps: 0.5
+vertical_speed_mps: 0.5
+position_tolerance_m: 0.10
+velocity_tolerance_mps: 0.10
+settle_s: 1.0
+stage_timeout_s: 30.0
+arm_timeout_s: 5.0
+ground_max_z_m: 0.5
+extra_geofence_margin_m: 0.3
+random_min_radius_m: 0.75
+random_seed: null
+sync_status_file: /work/flight_logs/.sync_gate.json

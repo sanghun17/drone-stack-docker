@@ -27,6 +27,8 @@ runtime_manifest_config_paths:
   aruco_pad: /work/stacks/aruco-landing-jetson/config/physical_pad.yaml
   aruco_trial: /work/ws/aruco-landing/src/aruco_landing/launch/landing_trial.launch
   aruco_controller: /work/ws/aruco-landing/src/aruco_landing/config/common_experiment.yaml
+  repeat_trial: /work/stacks/aruco-landing-jetson/config/repeat_trial.yaml
+  module_sources: /work/config/modules.lock.json
   flight_safety_recorder: /work/stacks/aruco-landing-jetson/config/flight_safety_recorder.yaml
 topics:
 - /vrpn_client_node/pure/pose

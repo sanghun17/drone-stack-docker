@@ -57,7 +57,7 @@
     "control/flight-safety": {
       "files": {
         "build_ws.sh": "ebe313a5d0f7d5a4178dc06a5ed96b983b3ef28088b1538f05ee8cbf73c46049",
-        "clone.sh": "643343f5cbb6d01aa94b6eb28af51a888e392224d95ba6596dba9176b8eade24",
+        "clone.sh": "809993010199d0fe6e39d5370bc9a1fcfde5f9f61c0e02f30d2543016693d88c",
         "fs_led_node.py": "22ae3893866ad90a491207b137fbe5be01bef58184af217b9dde6a6dfe0b1a0c",
         "module.yml": "de508fb37f65245a80cccfd2efc48304372a44a578df4d4a14db8a4754e3edf2",
         "run.sh": "a963f76fbd16a4c4240d0cbe52064df05476a7aaabc3113691f0338c85a4d30d",
@@ -96,7 +96,7 @@
         "workspace": "/work/ws/flight-safety"
       },
       "repository": "https://github.com/sanghun17/flight_safety.git",
-      "revision": "f93b1a752dec2bf1f50b6fd0c44115723dbf874b",
+      "revision": "91ef6abb02e98ac7061a1377f89ecb0674e3a8a1",
       "subdir": "deployment/stack-modules/control/flight-safety"
     },
     "control/local-controller": {
@@ -424,7 +424,7 @@
       "files": {
         "README.md": "5dc7ffe588e3ed195f733e231b36bcf76ae40307dcbaf0b0bf8284fd18868871",
         "build_ws.sh": "e11767fbad1541b58fbeb57a0d3f3c69d28e1e9dc20132a7d3262b1a42cbb48f",
-        "clone.sh": "22f1a813c631f5cd5b485b750ec5ddde1f0073fe68f403320a567dc3ae7e84ee",
+        "clone.sh": "1a7fcdddad9563002950b9f67eb7879bea77edcc73867ecfc91eafcc3ae356ac",
         "install_aruco_cpp.sh": "1d7a1b7097a9515a2544943efdcf2cb62783f39bc2aa13994c46edec3149fc34",
         "module.yml": "2002a35ae7d2a2eefa7f4b72e070f5cbb59d1991a35de39c9331afd8e4cdbf3e",
         "run.sh": "c3c5e9161faecad0b41840d04d5630fc5cca66d58eb0f218121baaf18ddfae5e",
@@ -469,7 +469,7 @@
         "workspace": "/work/ws/aruco-landing"
       },
       "repository": "https://github.com/sanghun17/aruco_landing.git",
-      "revision": "bcf6c4317b4ccdc92fdfa6f6d02acf50611e3128",
+      "revision": "97bdfc7e5b0c747ef29ab1c1400200c3d261e024",
       "subdir": "deployment/stack-modules/perception/aruco-landing"
     },
     "planner/aruco-landing": {
@@ -494,7 +494,7 @@
         ]
       },
       "repository": "https://github.com/sanghun17/aruco_landing.git",
-      "revision": "bcf6c4317b4ccdc92fdfa6f6d02acf50611e3128",
+      "revision": "97bdfc7e5b0c747ef29ab1c1400200c3d261e024",
       "subdir": "deployment/stack-modules/planner/aruco-landing"
     },
     "planner/la-planner": {
@@ -899,8 +899,11 @@
         "module.yml": "6a3e17d5f533bcb7aead491b96eddafbc46addeb9b48dfd210621ea25ad63014",
         "run.sh": "8d5c37f844dacd92b5ac4689a3eeeefd0b7731480b4c94e69265fb5e7a8e1b94",
         "scripts/flightlog_sync.sh": "939b96bb1d2443819f09ee3d57dc0098c8346441ce22ecb5d086b46abb7fb1d1",
+        "scripts/install_verified_sync.py": "a12a4b2e5bd16e2a876159a7eedbd1ebe33ecf766b3fc304918cdffe6f9161a2",
+        "scripts/verified_flight_sync.py": "613619aec769521c2119bae00a42f1c45dea3e9076e4990376f1063f1d13f929",
         "session_recorder_node.py": "3fc5e083020294b64c2da56ef81659d2343b36461c658e5a4410cd2b136bc4c9",
-        "sessionctl.sh": "94cbec8e465c4d555ee2e33db316abe740d893a5e330ed7d39e0b0f9fcfc0662"
+        "sessionctl.sh": "94cbec8e465c4d555ee2e33db316abe740d893a5e330ed7d39e0b0f9fcfc0662",
+        "tests/test_verified_flight_sync.py": "5e6019f7305fe6ffce35e23c15202d13a8369e2bd1928d1d0fa659f535d39744"
       },
       "manifest": {
         "deps": {
@@ -921,7 +924,7 @@
         ]
       },
       "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
-      "revision": "362b85edb562baf5a9dfbeda7b1df3569581ac3a",
+      "revision": "a8264eec8dbcb50e98bd1a15e1b84ed04c90f2d0",
       "subdir": "deployment/stack-modules/utility/session-recorder"
     }
   },
