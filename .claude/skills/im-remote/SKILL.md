@@ -68,8 +68,8 @@ DOCKER_HOST=unix:///tmp/docker-ssd.sock docker ps
   (`modules/training/ete-net/module.yml`이 별도 코드 마운트 없이 dsd 루트 마운트에
   얹혀 자동 노출되는 방식 — clone.sh가 `ws/risk-aware/src/risk_aware_planning`으로
   git clone).
-- 데이터 정본: `/media/im/ETE4090/data` — 컨테이너 안 `/home/ml/data`(`ETE_DATA_DIR`
-  마운트, `config/stack.env`), 컨테이너 env `DATA_ROOT=/home/ml/data`
+- 데이터 정본: `/media/im/ETE4090/data` — 컨테이너 안 `/home/ml/drone-data/training/assets/datasets`(`ETE_DATA_DIR`
+  마운트, `config/stack.env`), 컨테이너 env `DATA_ROOT=/home/ml/drone-data/training/assets/datasets`
   (`modules/training/ete-net/module.yml`의 `env:`). `raw/`/`stage1/`/`stage2/` 티어
   구조는 ml 쪽과 동일 레이아웃 — `DATA_MAP.md`가 SSD에도 사본으로 있음.
 - 컨테이너 상태 확인: `DOCKER_HOST=unix:///tmp/docker-ssd.sock docker ps` (기대:
@@ -111,7 +111,7 @@ DOCKER_HOST=unix:///tmp/docker-ssd.sock docker exec \
 
 ⚠️ `setup.sh run`은 `docker exec -it`이라 **TTY가 없는 곳(백그라운드/스크립트)에서는 못 쓴다.**
 장기 학습을 붙여두려면 위의 직접 `docker exec -d ... > <로그> 2>&1` 형태를 쓴다.
-로그 관례: `/home/ml/data/_train_logs/<name>.log` (호스트 `/media/im/ETE4090/data/_train_logs/`).
+로그 관례: `/home/ml/drone-data/training/assets/datasets/_train_logs/<name>.log` (호스트 `/media/im/ETE4090/data/_train_logs/`).
 
 전체 수동 제어(임의 `train.py` 플래그, `integrity_check.py`, spconv smoke test 등)가
 필요하면: `DOCKER_HOST=unix:///tmp/docker-ssd.sock docker exec -it

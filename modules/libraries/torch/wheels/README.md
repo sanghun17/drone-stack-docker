@@ -17,7 +17,7 @@ bash modules/libraries/torch/wheels/stage_from_archive.sh
 `b090688066a81b756c7800f5b03eecce`. Its runtime has cuDNN disabled despite the
 original build request; do not assume cuDNN is available from requested flags.
 
-The ML host archive is `/home/ml/risk_aware_assets/wheels_x86/`. Staging uses a
+The ML host archive is `/home/ml/drone-data/shared/assets/wheels/torch/`. Staging uses a
 hardlink when possible, otherwise a copy. The original build history is preserved
-in `~/drone-stack-archive/20260921-internal-cleanup/documentation/`.
+in `~/drone-data/shared/archive/previous-cleanups/20260921-internal-cleanup/documentation/`.
 Training deployment documentation lives in `~/ete-training-docker/`.

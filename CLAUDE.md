@@ -51,7 +51,7 @@ Design: modules/README.md, modules/SCHEMA.md.
 - `ws/<module>/` — per-module catkin workspace. `src/<pkg>` = a SEPARATE git repo (own remote+branch,
   cloned by that module's clone.sh). `build/ devel/ logs/` = artifacts. `/ws/` is gitignored in MAIN.
 - `scripts/` shared commands + `lib/` helpers · `config/` shared ros_env.sh + stack.env · `flight_logs/` current runtime recordings (gitignored).
-- Offline research, paper figures, historical results and inactive worktrees belong outside this checkout. The 2026-09-21 migration archive is `~/drone-stack-archive/20260921-cleanup/`; see its README and `migration/moves.json`.
+- Offline research, paper figures, historical results and inactive worktrees belong outside this checkout. The 2026-09-21 migration archive is `~/drone-data/shared/archive/previous-cleanups/20260921-cleanup/`; see its README and `migration/moves.json`.
 
 ## Component repos (separate gits under ws/ — commit/push in THEIR repo, NOT in MAIN)
 

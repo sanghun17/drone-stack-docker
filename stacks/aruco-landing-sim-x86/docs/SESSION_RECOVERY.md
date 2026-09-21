@@ -49,7 +49,7 @@
 - 하향 카메라: 자산 루트 아래 `config/landing_camera.yaml`.
 - 재사용 가능한 공통 AirSim 코드: `modules/simulation/airsim/`.
 - 생성 설정: `.build/aruco-landing-sim-x86/baseline/settings.json`.
-- 독립 실행 패키지: `.build/aruco-landing-sim-x86/package/LinuxNoEditor/`.
+- 독립 실행 패키지: `~/drone-data/aruco/assets/simulator/package/LinuxNoEditor/`.
 
 ## 다시 밟지 않을 구현상 함정
 
@@ -81,7 +81,7 @@
 ./stacks/aruco-landing-sim-x86/scripts/package_baseline_sim.sh
 ./stacks/aruco-landing-sim-x86/scripts/run_packaged_sim.sh
 # 시뮬레이터 실행 후 별도 터미널에서:
-.//home/ml/drone-stack-archive/20260921-cleanup/stack-assets/aruco-landing-sim-x86/tools/capture_environment_figure.sh
+.//home/ml/drone-data/aruco/archive/offline-tools/aruco-landing-sim-x86/tools/capture_environment_figure.sh
 ```
 
 - 기존 환경 PNG: `flight_logs/aruco-landing/paper/simulation_environment.png`.
@@ -89,7 +89,7 @@
 - 기존 `.build/.../paper/simulation_environment.png`는 9월 7일 위 영구 경로로 이동됐다.
 - 외부 카메라 `paper_overview`: NED 위치 (-2.5, -2.5, -3.8) m,
   pitch -37°, yaw 45°, 1920×1080, HFOV 75°.
-- 캡처 구현: `/home/ml/drone-stack-archive/20260921-cleanup/stack-assets/aruco-landing-sim-x86/scripts/capture_environment_figure.py`.
+- 캡처 구현: `/home/ml/drone-data/aruco/archive/offline-tools/aruco-landing-sim-x86/scripts/capture_environment_figure.py`.
 - `simulation_environment_10_trials.png`는 환경 위 궤적 overlay로 만들었으나,
   사용자는 이후 별도 Matplotlib 3D plot을 원한다고 정정했다. 논문 그림 재사용 시 구분한다.
 

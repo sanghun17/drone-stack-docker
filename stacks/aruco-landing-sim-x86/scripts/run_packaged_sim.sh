@@ -4,7 +4,8 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 MODULE="$ROOT/stacks/aruco-landing-sim-x86"
-PACKAGE_ROOT="${ARUCO_LANDING_PACKAGE_DIR:-$ROOT/.build/aruco-landing-sim-x86/package}"
+source "$ROOT/config/sim.env"
+PACKAGE_ROOT="$ARUCO_LANDING_PACKAGE_DIR"
 EXECUTABLE="$PACKAGE_ROOT/LinuxNoEditor/ArucoLandingBaseline.sh"
 SETTINGS="$ROOT/.build/aruco-landing-sim-x86/baseline/settings.json"
 LOCK_FILE="$ROOT/.build/aruco-landing-sim-x86/simulator.lock"

@@ -109,7 +109,7 @@ this integrated physical estimator.
 
 ## Validation evidence
 
-[Jetson validation results](../../../../drone-stack-archive/20260921-cleanup/stack-assets/aruco-landing-jetson/results/online-estimator-20260919/README.md) cover
+[Jetson validation results](/home/ml/drone-data/aruco/results/aruco-landing-jetson/online-estimator-20260919/README.md) cover
 recorded-image replay, loss of OptiTrack, reset and a steady 60 Hz input test.
 After warm-up/online learning, that test produced 60.00 Hz pad/global body poses
 and 9.98 Hz detected JPEG images. Real scenes with insufficient markers withhold

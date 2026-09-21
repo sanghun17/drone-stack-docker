@@ -119,7 +119,7 @@ The operator reported landing completed. The latest camera checks passed after
 USB cable replacement on battery power, including an approximately 90-second
 post-reboot observation before the operator requested shutdown. These checks do
 not establish the electrical root cause or guarantee sustained 60 Hz in every
-condition. See the [camera/cable validation report](../../../drone-stack-archive/20260921-cleanup/stack-assets/aruco-landing-jetson/results/camera-cable-validation-20260920/README.md)
+condition. See the [camera/cable validation report](/home/ml/drone-data/aruco/results/aruco-landing-jetson/camera-cable-validation-20260920/README.md)
 for measured rates, failed software experiments, repository revisions and final
 stopped-node state. The [landing trial guide](docs/landing_trial.md) describes the
 current OptiTrack-based OFFBOARD workflow and landing policies.

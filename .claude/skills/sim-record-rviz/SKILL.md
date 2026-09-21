@@ -31,11 +31,11 @@ docker exec drone-stack-sim-x86 bash -lc 'source /opt/ros/noetic/setup.bash && s
 now brings up its OWN `rviz` node too, but with a different, more basic config
 (`active_3d_planning_app_reconstruction/cfg/gazebo.rviz`, sensor/TF debugging) — and it registers
 under the exact same ROS node name `/rviz`. This skill deliberately keeps using the richer
-`/home/ml/laplanner.rviz` config (occupancy map, trajectory, frontiers, point cloud) launched
+`/home/ml/drone-data/risk-aware/archive/rviz/laplanner.rviz` config (occupancy map, trajectory, frontiers, point cloud) launched
 HOST-side, for two concrete reasons:
-- `/home/ml/laplanner.rviz` is a host-only file — it is **not** in the `sim-x86`
+- `/home/ml/drone-data/risk-aware/archive/rviz/laplanner.rviz` is a host-only file — it is **not** in the `sim-x86`
   container mounts (only `RISK_AWARE_PLANNING_SRC`, `SIM_HOST_PY`, `SIM_RISK_AWARE_ASSETS` are
-  mounted), so `docker exec ... rviz -d /home/ml/laplanner.rviz` can't see it.
+  mounted), so `docker exec ... rviz -d /home/ml/drone-data/risk-aware/archive/rviz/laplanner.rviz` can't see it.
 - the host already has `ros-noetic-rviz` installed natively, and the container shares the host's
   X11 socket/`DISPLAY` (`compose.yml` mounts `/tmp/.X11-unix` and passes `DISPLAY` through) —
   so a host-launched RViz window is visually indistinguishable from a container one to
@@ -49,7 +49,7 @@ killed before the laplanner one starts fresh, so the two never fight over the RO
 - Python packages: `mss`, `opencv-python-headless` (host pip install if missing — this tool runs
   on the host, unrelated to the sim-x86 container)
 - `xdotool` (system package, already installed)
-- RViz config: `/home/ml/laplanner.rviz`
+- RViz config: `/home/ml/drone-data/risk-aware/archive/rviz/laplanner.rviz`
 - Screen recorder script: `/tmp/screen_record.py`
 
 ## Commands
@@ -114,7 +114,7 @@ if [ -z "$RVIZ_WID" ]; then
   # container) or a stale laplanner one; either way the node name collides, see note above.
   rosnode kill /rviz 2>/dev/null; sleep 1
 
-  rosrun rviz rviz -d /home/ml/laplanner.rviz &
+  rosrun rviz rviz -d /home/ml/drone-data/risk-aware/archive/rviz/laplanner.rviz &
 
   # Wait for window to appear (max 10s)
   for i in $(seq 1 10); do

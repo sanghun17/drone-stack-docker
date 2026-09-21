@@ -34,7 +34,7 @@ Motive `pure` represents body FLU (+X forward, +Y left, +Z up) at body center.
 
 The September 19 hand-carried capture is complete and jointly calibrated.
 The user's 30 mm central reference is verified as DICT_7X7_50 ID 21.
-See [measured transforms, map and validation](../../../../drone-stack-archive/20260921-cleanup/stack-assets/aruco-landing-jetson/results/extrinsic-20260919/README.md).
+See [measured transforms, map and validation](/home/ml/drone-data/aruco/results/aruco-landing-jetson/extrinsic-20260919/README.md).
 The held-out body-origin position RMS is 2.60 cm; AXZY closure position RMS is
 1.31 cm and orientation RMS is 1.07 degrees. Live transition validation remains
 separate from this offline calibration.

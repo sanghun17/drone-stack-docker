@@ -88,7 +88,7 @@ zero inside the marker-dropout window, and 160 after recovery. PX4 stayed disarm
 See `../results/pose-transition-sitl-20260919/static-summary.json`.
 
 The new hand-carried bag was captured by the user and all three approaches were
-replayed in SITL. See the [conditional hand-carried results](../../../../drone-stack-archive/20260921-cleanup/stack-assets/aruco-landing-jetson/results/pose-transition-sitl-20260919/handcarried/README.md),
+replayed in SITL. See the [conditional hand-carried results](/home/ml/drone-data/aruco/results/aruco-landing-jetson/pose-transition-sitl-20260919/handcarried/README.md),
 including the IMU/OptiTrack body-axis mismatch and the explicit replay-only
 yaw correction. No capture is started automatically.
 The updated source adapter is not automatically launched on the hardware graph;

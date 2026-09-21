@@ -17,12 +17,15 @@
   material in this checkout. Use `.build` for temporary build/cache files,
   `flight_logs` for current runtime recordings, and a home-directory location
   for research, offline analysis, paper figures and historical results.
-- The 2026-09-21 cleanup archive is `~/drone-stack-archive/20260921-cleanup/`.
+- The 2026-09-21 cleanup archive is `~/drone-data/shared/archive/previous-cleanups/20260921-cleanup/`.
   Its README and `migration/moves.json` locate preserved pre-migration files.
 - Training orchestration belongs in `~/ete-training-docker`, and device recovery
   backups/raw calibration samples belong in home storage. Keep only calibration
   files consumed at runtime and operational calibration tools here. Retired
   module wrappers must not return; use `planner/aruco-landing` for landing.
+- External inputs/results live in `~/drone-data/{aruco,risk-aware,training,shared}`
+  under `assets`, `results`, or `archive`. Keep historical evidence unchanged;
+  the move map is `shared/archive/home-layout-20260921/completed.json`.
 - Run `python3 scripts/check_layout.py --worktree` before finishing changes.
   Versioned Git hooks validate the index and outgoing commits; GitHub's required
   `repository-layout` check protects main. Do not disable the guards to work

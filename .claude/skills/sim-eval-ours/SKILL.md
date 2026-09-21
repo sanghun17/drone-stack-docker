@@ -31,18 +31,18 @@ docker exec drone-stack-sim-x86 bash -lc 'source /opt/ros/noetic/setup.bash && s
 ## 0. Checkpoint 배포 preflight (필수 — 여기서 실수하면 크래시가 아니라 조용한 오동작)
 
 checkpoint 주입 지점은 **config 키가 아니라 하드코딩**: `local_planner_mpc/jax_mppi_params.py:113-121`
-(경로 문자열은 :119) (`$RISK_AWARE_CHECKPOINTS`, 컨테이너에서 `/home/ml/risk_aware_assets/checkpoints` —
+(경로 문자열은 :119) (`$RISK_AWARE_CHECKPOINTS`, 컨테이너에서 `/home/ml/drone-data/risk-aware/assets/checkpoints` —
 `config/sim.env`가 export, 호스트와 동일 절대경로 마운트라 구 트리 경로가 아니다). 모델 hyperparam
 (bins/nf/hidden 등)은 `.pth` 내장 config에서 자동 로드되므로 별도 yaml 동기화 불필요.
 
 ```bash
 # 1. 현재 planner가 가리키는 checkpoint 확인 (그냥 파일 읽기 — ROS/컨테이너 불필요, 호스트 절대경로로 직접)
 grep -n "checkpoint_path" /home/ml/drone-stack-docker/ws/risk-aware/src/risk_aware_planning/mav_active_3d_planning/local_planner_mpc/jax_mppi_params.py
-ls -la /home/ml/risk_aware_assets/checkpoints/
+ls -la /home/ml/drone-data/risk-aware/assets/checkpoints/
 ```
 
 체크리스트 (새 checkpoint 배포 시):
-1. `.pth`를 `$RISK_AWARE_CHECKPOINTS/<dir>/checkpoints/`(=`/home/ml/risk_aware_assets/checkpoints/<dir>/checkpoints/`)에
+1. `.pth`를 `$RISK_AWARE_CHECKPOINTS/<dir>/checkpoints/`(=`/home/ml/drone-data/risk-aware/assets/checkpoints/<dir>/checkpoints/`)에
    복사, `jax_mppi_params.py` 경로 갱신.
 2. **`kinetic_statistics.pt`가 그 checkpoint의 학습 정규화와 일치해야 함** — 학습 쪽
    `uncertainty_predictor/.../data/kinetic_statistics.pt`와 대조. 다르면 백업 후 교체.
@@ -182,7 +182,7 @@ docker exec drone-stack-sim-x86 bash -lc 'source /opt/ros/noetic/setup.bash && s
 - SO3 스택은 이제 conda 불필요 — `run_so3.sh`는 `network_mode: host`로 AirSim RPC(127.0.0.1:41451)에
   직접 붙는다, 컨테이너 안엔 `airsim` pip 패키지만 있으면 됨(module.yml).
 - voxblox는 VFE traced 모델(`sparse_vfe_traced.pt`) 없으면 시작 즉시 크래시 — `RISK_AWARE_CHECKPOINTS`가
-  (컨테이너 `HOME=/root`라 `~/risk_aware_assets` fallback이 깨지는 문제 때문에) `config/sim.env`에서
+  (컨테이너 `HOME=/root`라 `~/drone-data/risk-aware/assets` fallback이 깨지는 문제 때문에) `config/sim.env`에서
   명시 export되는 걸로 해결돼 있다(2026-07-25). 크래시하면 이 env가 실제로 보이는지부터 확인.
 - `run_jax.sh`도 `gpu:=1`을 하드코딩한다(automation과 동일 관례) — ml desktop 디스크리트 GPU 기준.
 

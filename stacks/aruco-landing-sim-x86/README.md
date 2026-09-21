@@ -34,11 +34,11 @@ simulator and should only be used with the intended simulation ROS master.
 
 For a standalone simulator, use `scripts/package_baseline_sim.sh` followed by
 `scripts/run_packaged_sim.sh`. Packages remain under
-`.build/aruco-landing-sim-x86/package/LinuxNoEditor`. Changing the map or vehicle
+`~/drone-data/aruco/assets/simulator/package/LinuxNoEditor`. Changing the map or vehicle
 requires repackaging; camera settings remain an external JSON file.
 
 New recordings and validation results go under `flight_logs/aruco-landing/`.
 Paper campaigns, metrics/figure generators and old results are preserved under
-`~/drone-stack-archive/20260921-cleanup/stack-assets/aruco-landing-sim-x86/`;
+`~/drone-data/aruco/archive/offline-tools/aruco-landing-sim-x86/`;
 previous recordings are in the archive's `experiments/aruco-landing/`. They are
 not runtime dependencies. See the archive README for the original documentation.

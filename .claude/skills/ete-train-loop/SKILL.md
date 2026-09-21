@@ -37,8 +37,8 @@ description: ETE-Net 학습-분석-수정 루프. uncertainty_predictor의 ete_n
   들어가 `ete_net.train`을 직접 구동.
 - **데이터 마운트/DATA_ROOT**: 코드와 데이터 마운트는 분리돼 있다 — 코드는
   `RISK_AWARE_PLANNING_SRC`(`config/stack.env`, 정본 `ws/risk-aware/src/risk_aware_planning`)를
-  위 경로로, 데이터는 `ETE_DATA_DIR`(`config/stack.env`, 정본 루트 **`/home/ml/data`**)를
-  컨테이너의 `/home/ml/data`로 그대로 마운트하고, 컨테이너 env `DATA_ROOT=/home/ml/data`를
+  위 경로로, 데이터는 `ETE_DATA_DIR`(`config/stack.env`, 정본 루트 **`/home/ml/drone-data/training/assets/datasets`**)를
+  컨테이너의 `/home/ml/drone-data/training/assets/datasets`로 그대로 마운트하고, 컨테이너 env `DATA_ROOT=/home/ml/drone-data/training/assets/datasets`를
   세팅한다(`modules/training/ete-net/module.yml`). `ete_train_config.yaml`의
   `data.final_dir`/`intermediate_dir`/`v22_sim_windows_dir` 등은 `${DATA_ROOT}` 확장을
   쓰므로 이 값이 실제로 해당 config가 참조하는 하위 경로(`raw/`/`stage1/`/`stage2/`
@@ -134,7 +134,7 @@ python3 -m ete_net.evaluate_ete_net --checkpoint outputs/<run>/checkpoints/best_
 ## 이 프로젝트 특유의 함정 (필독)
 
 1. **캐시 해시와 재전처리**: `data.input_duration/stride_pkls`, `model.target_normalization/n_output_steps/voxel_size_before/map_physical_*`, 또는 `dataset/data_processor/*.py` 코드 변경 → Stage1부터 전체 재생성(수 시간, data_intermediate 46GB + data_final 79GB 재작성). `training.target_clip_*` 변경 → Stage2 필터 재적용 + 통계 재계산. 의도치 않은 재전처리가 시작되면 즉시 사용자에게 알릴 것.
-2. **kinetic/target statistics**: `data/data/{kinetic,target}_statistics.pt`는 데이터 변경 시 자동 재계산되지만, 배포용 `~/risk_aware_assets/checkpoints/kinetic_statistics.pt`는 **수동 복사본** — 재학습 후 배포하려면 함께 갱신해야 함.
+2. **kinetic/target statistics**: `data/data/{kinetic,target}_statistics.pt`는 데이터 변경 시 자동 재계산되지만, 배포용 `~/drone-data/risk-aware/assets/checkpoints/kinetic_statistics.pt`는 **수동 복사본** — 재학습 후 배포하려면 함께 갱신해야 함.
 3. **Gen-A/Gen-B 세대**: state_dict 키로 판별 — Gen-A(구, 배포 baseline): `film_cond*.N.net.*` + `nf.layers.N.net.*`(realnvp), Gen-B(신, 현 코드): `film_cond*.N.embedding`(DirectFiLM) + `nf.layers.N.param_net.*`(radial). 현 working tree는 Gen-B 전용 — Gen-A checkpoint를 로드하는 코드(planner 포함)를 이 tree에서 돌리면 load_state_dict 실패. Gen-A가 필요하면 커밋 5147a84의 dirichlet_head.py/film_modules.py.
 4. **DataParallel checkpoint**: 과거 run의 checkpoint 키에 `module.` prefix가 있을 수 있음 — evaluate_ete_net의 load_model이 strip 처리하지만 직접 로드할 땐 주의.
 5. **config silent default 금지**: `utils/config.py`가 학습 영향 키 누락 시 KeyError로 halt함(의도된 동작). 키를 지우지 말고 값을 바꿀 것.

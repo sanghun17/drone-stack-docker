@@ -37,15 +37,15 @@ historical_frame_handling: Old Pure local axes were mapped into current Body usi
   gyro-measured rotation; no exact 90-degree correction was imposed. Equal mechanical
   origins across recordings assumed.
 source_bags:
-- /home/ml/drone-stack-archive/20260921-cleanup/experiments/aruco-landing/camera-body-extrinsic/extrinsic-pad-anchor30mm-01_2026-09-19-10-14-42.bag
-- /home/ml/drone-stack-archive/20260921-cleanup/experiments/aruco-landing/pose-transition/handcarried-20260919-120243-437248.bag
-- /home/ml/drone-stack-archive/20260921-cleanup/experiments/aruco-landing/manual-flight/manual-flight-20260919-131105-329410.bag
+- /home/ml/drone-data/aruco/results/experiments/aruco-landing/camera-body-extrinsic/extrinsic-pad-anchor30mm-01_2026-09-19-10-14-42.bag
+- /home/ml/drone-data/aruco/results/experiments/aruco-landing/pose-transition/handcarried-20260919-120243-437248.bag
+- /home/ml/drone-data/aruco/results/experiments/aruco-landing/manual-flight/manual-flight-20260919-131105-329410.bag
 anchor_id: 21
 anchor_side_m: 0.03
 image_to_body_time_offset_s: -0.041589316816677754
 timing_note: Runtime time correction unchanged. Session-specific fitted timing offsets
   in the diagnostic report are not deployed.
-validation_report: /home/ml/drone-stack-archive/20260921-cleanup/stack-assets/aruco-landing-jetson/results/manual-flight-20260919/frame-audit/fixed-body-refit/README.md
+validation_report: /home/ml/drone-data/aruco/results/aruco-landing-jetson/manual-flight-20260919/frame-audit/fixed-body-refit/README.md
 invariant: Body-camera mount stays fixed. Do not redefine Pure local axes/origin without
   an explicit Pure-to-Body transform and revalidation. Global-pad alignment is learned
   per session, never saved as runtime calibration.

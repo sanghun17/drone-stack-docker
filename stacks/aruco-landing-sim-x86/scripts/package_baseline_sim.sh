@@ -6,10 +6,10 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 MODULE="$ROOT/stacks/aruco-landing-sim-x86"
 PROJECT="$MODULE/unreal/ArucoLandingBaseline/ArucoLandingBaseline.uproject"
 MAP="$MODULE/unreal/ArucoLandingBaseline/Content/Maps/BaselineMap.umap"
-OUTPUT="${ARUCO_LANDING_PACKAGE_DIR:-$ROOT/.build/aruco-landing-sim-x86/package}"
 
 # shellcheck disable=SC1090
 source "$ROOT/config/sim.env"
+OUTPUT="$ARUCO_LANDING_PACKAGE_DIR"
 : "${UE4_ROOT:=/home/ml/UnrealEngine}"
 
 if [ ! -f "$MAP" ]; then

@@ -30,7 +30,7 @@ Keep shared environment settings in `config`, active device calibration with its
 and deployment-specific policy in `stacks/<name>/config`.
 
 Research worktrees, past experiments, offline analysis, paper figures and backups
-were moved to `~/drone-stack-archive/20260921-cleanup/` on ML. Its `README.md` and
+were moved to `~/drone-data/shared/archive/previous-cleanups/20260921-cleanup/` on ML. Its `README.md` and
 `migration/moves.json` locate the preserved files. Keep future research outputs
 outside this checkout; runtime recordings go under `flight_logs/`.
 
@@ -47,9 +47,16 @@ Training modules and the three `ete-train-*` stacks now live in
 `~/ete-training-docker/` as an independent local Git repository. Use its own
 `setup.sh`; its source checkout and default training outputs stay outside this tree.
 D435i EEPROM backups/raw measurements and retired entrypoints are preserved in
-`~/drone-stack-archive/20260921-internal-cleanup/` with checksums in `moves.json`.
+`~/drone-data/shared/archive/previous-cleanups/20260921-internal-cleanup/` with checksums in `moves.json`.
 The D435i uses EEPROM calibration during normal operation; its runtime launch
 configuration remains in `modules/sensor/realsense-d435i/d435i.launch`.
+
+Home storage is organized under `~/drone-data/{aruco,risk-aware,training,shared}/`:
+`assets/` holds consumed inputs, `results/` holds outputs and `archive/` holds
+historical material. The storage README and
+`shared/archive/home-layout-20260921/completed.json` locate all migrated files.
+Runtime development remains here; risk-aware algorithm source is the separate
+Git checkout at `ws/risk-aware/src/risk_aware_planning/`.
 
 ## Idea: declare modules → one image, one container
 

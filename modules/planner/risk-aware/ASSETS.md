@@ -15,14 +15,14 @@ an AirSim requirement:
 | Host (`ml`) | `drone-stack-sim-x86` container |
 |---|---|
 | Packaged Unreal executable | ROS simulation/planning stack |
-| `~/risk_aware_assets/simulation/airsim/AirSim_vanila/ros` and `airsim_node` | risk-aware sensor publisher |
+| `~/drone-data/risk-aware/assets/simulation/airsim/AirSim_vanila/ros` and `airsim_node` | risk-aware sensor publisher |
 | AirSim PythonClient used by collection scripts | FAST-LIVO simulation nodes |
 | GPU/display or `-RenderOffScreen` ownership | training-data collection consumers |
 
 The container uses host networking and connects to the AirSim RPC server on
 port 41451 (the second collection rig uses 41452). The active bring-up scripts
 also source the host workspace at
-`~/risk_aware_assets/simulation/airsim/AirSim_vanila/ros/devel/setup.bash`.
+`~/drone-data/risk-aware/assets/simulation/airsim/AirSim_vanila/ros/devel/setup.bash`.
 Keeping Unreal and this bridge on the
 host avoided rebuilding that environment in the container and keeps the
 NVIDIA/Unreal display boundary simple.
@@ -37,7 +37,7 @@ assumption that `drone-stack-docker` already replaces it.
 The source itself is versioned separately:
 
 - canonical path:
-  `/home/ml/risk_aware_assets/simulation/airsim/AirSim_vanila`
+  `/home/ml/drone-data/risk-aware/assets/simulation/airsim/AirSim_vanila`
 - remote: `https://github.com/sanghun17/AirSim_custom.git`
 - verified commit: `64cd82eef084936ab2e8c3cd7805e4ea6615df94`
 - verified state: clean
@@ -56,20 +56,20 @@ Use these three classes when moving or backing up the stack:
 Large binaries should not be committed to `drone-stack-docker` or copied into a
 Docker image. The deploy container bind-mounts the Jetson host directory
 `/home/hmcl/risk_aware_assets` at `/root/risk_aware_assets`; the x86 simulation
-stack mounts `/home/ml/risk_aware_assets` at the same absolute host path inside
+stack mounts `/home/ml/drone-data/risk-aware/assets` at the same absolute host path inside
 the container.
 
 The mount roots are configured in:
 
 - `config/stack.env`: `RISK_AWARE_ASSETS=/home/hmcl/risk_aware_assets`
-- `config/stack.env`: `SIM_RISK_AWARE_ASSETS=/home/ml/risk_aware_assets`
-- `config/sim.env`: `RISK_AWARE_CHECKPOINTS=/home/ml/risk_aware_assets/checkpoints`
+- `config/stack.env`: `SIM_RISK_AWARE_ASSETS=/home/ml/drone-data/risk-aware/assets`
+- `config/sim.env`: `RISK_AWARE_CHECKPOINTS=/home/ml/drone-data/risk-aware/assets/checkpoints`
 - `stacks/d435i-voxblox/stack.yml` and `stacks/sim-x86/stack.yml`
 
 The canonical ML layout is now:
 
 ```text
-/home/ml/risk_aware_assets/
+/home/ml/drone-data/risk-aware/assets/
 ├── checkpoints/                 # ML and Jetson runtime models
 ├── gt/                          # simulation ground truth
 ├── simulation/
@@ -98,7 +98,7 @@ The current `jax_mppi_params.py` default is **DEPLOY1_s42**, not the older
 SWsplitfix checkpoint. On `ml`, the canonical bundle is:
 
 ```text
-/home/ml/risk_aware_assets/checkpoints/
+/home/ml/drone-data/risk-aware/assets/checkpoints/
 ├── sparse_vfe_traced.pt
 └── DEPLOY1_s42/
     ├── checkpoints/
@@ -168,11 +168,11 @@ and in the container:
 
 ```bash
 rsync -avh --checksum \
-  /home/ml/risk_aware_assets/checkpoints/DEPLOY1_s42/ \
+  /home/ml/drone-data/risk-aware/assets/checkpoints/DEPLOY1_s42/ \
   hmcl@192.168.50.36:/home/hmcl/risk_aware_assets/checkpoints/DEPLOY1_s42/
 
 rsync -avh --checksum \
-  /home/ml/risk_aware_assets/checkpoints/sparse_vfe_traced.pt \
+  /home/ml/drone-data/risk-aware/assets/checkpoints/sparse_vfe_traced.pt \
   hmcl@192.168.50.36:/home/hmcl/risk_aware_assets/checkpoints/sparse_vfe_traced.pt
 
 ssh hmcl@192.168.50.36 \
@@ -201,23 +201,23 @@ executable are also required.
 
 | Use | Packaged root | Approx. size | Primary PAK SHA-256 |
 |---|---|---:|---|
-| Default stack-1 / normal risk-aware simulation | `/home/ml/risk_aware_assets/simulation/unreal/packaged/test9_vio_velocity/LinuxNoEditor` | 3.9 GB | `fed0970f9fce2b1ba5802169bf972f30a08f5b573058c4e73e3a905a24ad96fb` |
-| Parallel collection rig 2 | `/home/ml/risk_aware_assets/simulation/unreal/packaged/modern_livingroom_v6/LinuxNoEditor` | 3.3 GB | `b176c866a7a6455e9dfb4462cf20016119d17376d13ffcd68f40b6fd103daa56` |
-| Blocks/warehouse, retained secondary environment | `/home/ml/risk_aware_assets/simulation/unreal/packaged/blocks` | 481 MB | `90cb6f2129b670eb2bea4a90fa744f551cc418ecc4258c278ee09099355659af` |
+| Default stack-1 / normal risk-aware simulation | `/home/ml/drone-data/risk-aware/assets/simulation/unreal/packaged/test9_vio_velocity/LinuxNoEditor` | 3.9 GB | `fed0970f9fce2b1ba5802169bf972f30a08f5b573058c4e73e3a905a24ad96fb` |
+| Parallel collection rig 2 | `/home/ml/drone-data/risk-aware/assets/simulation/unreal/packaged/modern_livingroom_v6/LinuxNoEditor` | 3.3 GB | `b176c866a7a6455e9dfb4462cf20016119d17376d13ffcd68f40b6fd103daa56` |
+| Blocks/warehouse, retained secondary environment | `/home/ml/drone-data/risk-aware/assets/simulation/unreal/packaged/blocks` | 481 MB | `90cb6f2129b670eb2bea4a90fa744f551cc418ecc4258c278ee09099355659af` |
 
 Primary entry points and hashed files:
 
 ```text
-/home/ml/risk_aware_assets/simulation/unreal/packaged/test9_vio_velocity/LinuxNoEditor/MyFirstUE4.sh
-/home/ml/risk_aware_assets/simulation/unreal/packaged/test9_vio_velocity/LinuxNoEditor/MyFirstUE4/Binaries/Linux/MyFirstUE4
-/home/ml/risk_aware_assets/simulation/unreal/packaged/test9_vio_velocity/LinuxNoEditor/MyFirstUE4/Content/Paks/MyFirstUE4-LinuxNoEditor.pak
+/home/ml/drone-data/risk-aware/assets/simulation/unreal/packaged/test9_vio_velocity/LinuxNoEditor/MyFirstUE4.sh
+/home/ml/drone-data/risk-aware/assets/simulation/unreal/packaged/test9_vio_velocity/LinuxNoEditor/MyFirstUE4/Binaries/Linux/MyFirstUE4
+/home/ml/drone-data/risk-aware/assets/simulation/unreal/packaged/test9_vio_velocity/LinuxNoEditor/MyFirstUE4/Content/Paks/MyFirstUE4-LinuxNoEditor.pak
 
-/home/ml/risk_aware_assets/simulation/unreal/packaged/modern_livingroom_v6/LinuxNoEditor/MyFirstUE4.sh
-/home/ml/risk_aware_assets/simulation/unreal/packaged/modern_livingroom_v6/LinuxNoEditor/MyFirstUE4/Binaries/Linux/MyFirstUE4
-/home/ml/risk_aware_assets/simulation/unreal/packaged/modern_livingroom_v6/LinuxNoEditor/MyFirstUE4/Content/Paks/MyFirstUE4-LinuxNoEditor.pak
+/home/ml/drone-data/risk-aware/assets/simulation/unreal/packaged/modern_livingroom_v6/LinuxNoEditor/MyFirstUE4.sh
+/home/ml/drone-data/risk-aware/assets/simulation/unreal/packaged/modern_livingroom_v6/LinuxNoEditor/MyFirstUE4/Binaries/Linux/MyFirstUE4
+/home/ml/drone-data/risk-aware/assets/simulation/unreal/packaged/modern_livingroom_v6/LinuxNoEditor/MyFirstUE4/Content/Paks/MyFirstUE4-LinuxNoEditor.pak
 
-/home/ml/risk_aware_assets/simulation/unreal/packaged/blocks/Blocks.sh
-/home/ml/risk_aware_assets/simulation/unreal/packaged/blocks/Blocks/Content/Paks/Blocks-LinuxNoEditor.pak
+/home/ml/drone-data/risk-aware/assets/simulation/unreal/packaged/blocks/Blocks.sh
+/home/ml/drone-data/risk-aware/assets/simulation/unreal/packaged/blocks/Blocks/Content/Paks/Blocks-LinuxNoEditor.pak
 ```
 
 The normal tmux bring-up defaults to the TEST9 executable. Rig-2 scripts
@@ -232,7 +232,7 @@ These are the editable sources and are much larger than the cooked packages.
 ### MyFirstUE4 / Modern Living Room
 
 - project root:
-  `/home/ml/risk_aware_assets/simulation/unreal/editor/MyFirstUE4`
+  `/home/ml/drone-data/risk-aware/assets/simulation/unreal/editor/MyFirstUE4`
   (approximately 2.5 GB after generated-cache cleanup)
 - project file: `MyFirstUE4.uproject`, SHA-256
   `ce9249ecd75cc14f4558e1cb4d5bf74b35f06aa1cd10e8b46f0d8cc15759c77b`
@@ -252,7 +252,7 @@ version, AirSim plugin commit, packaging settings, and resulting PAK hash.
 ### Blocks / warehouse
 
 - project root:
-  `/home/ml/risk_aware_assets/simulation/unreal/editor/warehouse`
+  `/home/ml/drone-data/risk-aware/assets/simulation/unreal/editor/warehouse`
   (approximately 4.0 GB after generated-cache cleanup)
 - project file: `Blocks.uproject`, SHA-256
   `f3512a79458c21a51e34f21c918caa4b937b1853303127c08c662940246a77a9`
@@ -266,10 +266,10 @@ environment can reconstruct it.
 Two smaller editor projects are also centralized and retained even though they
 are not active simulation defaults:
 
-- `/home/ml/risk_aware_assets/simulation/unreal/editor/Break` (approximately
+- `/home/ml/drone-data/risk-aware/assets/simulation/unreal/editor/Break` (approximately
   378 MB after generated-cache cleanup), `Break.uproject` SHA-256
   `d6c623f5a27a59af64771e2d0e2308a6ec9747abc9e4a94433407684e0ad14d0`
-- `/home/ml/risk_aware_assets/simulation/unreal/editor/Break2` (approximately
+- `/home/ml/drone-data/risk-aware/assets/simulation/unreal/editor/Break2` (approximately
   1.6 GB after generated-cache cleanup), `Break2.uproject` SHA-256
   `7fd4d2674980f8c1f75af30d68d5123a52b317e10453f463c10a14b2c9d217e7`
 
@@ -277,8 +277,8 @@ are not active simulation defaults:
 
 | Use | File | SHA-256 |
 |---|---|---|
-| Default stack | `/home/ml/risk_aware_assets/simulation/airsim/user_data/settings.json` | `d7e57dd26c40a4281880326f3806b893f949f046b4ba6dbe8e6e47bdb9a801a9` |
-| Rig 2 / port 41452 | `/home/ml/risk_aware_assets/simulation/airsim/user_data/airsim_settings_b.json` | `c83030b414b88bcfd910bf49c6801b2874ebcf660d11d76782a950511ca09a6b` |
+| Default stack | `/home/ml/drone-data/risk-aware/assets/simulation/airsim/user_data/settings.json` | `d7e57dd26c40a4281880326f3806b893f949f046b4ba6dbe8e6e47bdb9a801a9` |
+| Rig 2 / port 41452 | `/home/ml/drone-data/risk-aware/assets/simulation/airsim/user_data/airsim_settings_b.json` | `c83030b414b88bcfd910bf49c6801b2874ebcf660d11d76782a950511ca09a6b` |
 
 Files such as `settings.json.backup`, `settings.json.bak`, and
 `settings_260203.json` are backups, not active defaults. A reproducible dataset
@@ -287,7 +287,7 @@ relying only on these mutable host paths.
 
 ## 7. Simulation ground-truth assets
 
-`/home/ml/risk_aware_assets/gt` is mounted for simulation evaluation and data
+`/home/ml/drone-data/risk-aware/assets/gt` is mounted for simulation evaluation and data
 collection. It is not required for Jetson flight deployment.
 
 | File | Bytes | SHA-256 | Use |
@@ -297,7 +297,7 @@ collection. It is not required for Jetson flight deployment.
 | `ModernLivingroom_long_ros.ply` | 33,244,968 | `285e46c3540285098c2d5b6fc6c9a0c63c8049ebb9e2de234a60e2526d51338f` | ROS-frame collection/evaluation geometry |
 | `ModernLivingroom_long_dense_ros.ply` | 118,126,450 | `b441694b9720451953366e7e198166948dc3003b1b73e5b193b2056f3e7322ae` | dense ROS-frame surface evaluation |
 
-Other top-level directories currently under `/home/ml/risk_aware_assets` are
+Other top-level directories currently under `/home/ml/drone-data/risk-aware/assets` are
 not flight-deployment payloads:
 
 - `wheels_x86` (approximately 524 MB): reproducible x86 Torch wheel cache
