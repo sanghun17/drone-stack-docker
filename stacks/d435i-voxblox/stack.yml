@@ -1,3 +1,4 @@
+project: risk-aware
 # d435i-voxblox — D435i + FAST-LIVO + voxblox + risk-aware planner + JAX MPPI.
 # Mirrors the legacy pure-jetson-stack (arm64 / Jetson Orin). planner/risk-aware
 # auto-pulls libraries/{torch,spconv,jax} via its `needs:`.

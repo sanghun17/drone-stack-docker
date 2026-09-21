@@ -1,0 +1,23 @@
+# Runtime profile recovered from the PURE/LA July 6–7 comparison recordings.
+# Paths are resolved by prepare_comparison.py; historical evidence stays external.
+source_revision: 7f84116dc1a5f45e0f61573eee8b6ca357abfde0
+source_repository: https://github.com/sanghun17/risk-aware_planning.git
+source_workspace: ws/risk-aware-comparison
+scenario: sim_vio
+unreal_package: test9_vio_velocity
+snapshot_relative_paths:
+  pure: cvar_n10_2026-07-06_14-01-12/iter_1/rosparams.yaml
+  la: la_n20ext_2026-07-07_01-53-04/iter_1/rosparams.yaml
+checkpoint: genb_run5_20260704/checkpoints/best_val.pth
+kinetic_statistics: kinetic_statistics.pt
+asset_sha256:
+  genb_run5_20260704/checkpoints/best_val.pth: 2a3863dcaa864c96c4ba40608761305961857e6ba6901c04768d6efbce389418
+  kinetic_statistics.pt: 87eb1ce05dc889dd21b0a65a7459ca35921affc2b65a72b999dcc66edfe376ad
+snapshot_sha256:
+  pure: 8f6600cfd3bd8dffb80a5e03020b62c440c7c48d0441b63c1ee0ae128e5d7f72
+  la: b07d754f98bb865c308eb2cd15f877bd7b4f9f6220bd0abe80d91256ecaa7376
+# ROS snapshots do not record a source commit or Python-only JAX parameters.
+# This revision is the last committed PURE configuration without the later
+# auxiliary-mean correction, and supports the archived Gen-B checkpoint.
+# It is an explicit reconstruction, not proof of a byte-identical old run.
+reconstruction_status: ros_parameters_verified_source_revision_reconstructed

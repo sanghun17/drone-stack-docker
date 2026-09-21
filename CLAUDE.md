@@ -35,33 +35,20 @@ Design: modules/README.md, modules/SCHEMA.md.
   silently skip a stale downstream package. Quick one-off commands while iterating are fine; the
   final check before calling work done should go through the real script.
 
-## Layout
+## Layout and ownership
 
-- `setup.sh <cmd> <stack>` — `clone` (run each module's clone.sh → ws/<m>/src), `up` (gen+build+start
-  container, idle), `build-ws` (catkin-build in container), `run <stack> <module>`, `sh`, `down`, `ls`.
-  Container = `drone-stack-<stack>`, image = `drone-stack:<stack>`. Stacks live in `stacks/*/stack.yml`.
-- `modules/<group>/<name>/` — one reusable capability = one image/runtime contribution: `module.yml` (deps apt/pip/source
-  + mounts + run, arch-aware), `install.sh` (optional source builds), `run.sh` (launch its ROS nodes),
-  `clone.sh` (fetch its src repo), `config/`. Groups: base, libraries(jax/torch/spconv),
-  control(flight-safety/local-controller/mavros/aruco-landing), odometry(fast-livo/optitrack),
-  perception(aruco-landing), planner(risk-aware), sensor(realsense-d435i/see3cam-24cug),
-  simulation(airsim), training(ete-net), utility(gui-vnc/rqt/rviz).
-- `stacks/<stack>/` — maps, scenario profiles, launch/calibration tools and other
-  deployment-owned assets that are not reusable module capabilities.
-- `ws/<module>/` — per-module catkin workspace. `src/<pkg>` = a SEPARATE git repo (own remote+branch,
-  cloned by that module's clone.sh). `build/ devel/ logs/` = artifacts. `/ws/` is gitignored in MAIN.
-- `scripts/` shared commands + `lib/` helpers · `config/` shared ros_env.sh + stack.env · `flight_logs/` current runtime recordings (gitignored).
-- Offline research, paper figures, historical results and inactive worktrees belong outside this checkout. The 2026-09-21 migration archive is `~/drone-data/shared/archive/previous-cleanups/20260921-cleanup/`; see its README and `migration/moves.json`.
+Follow AGENTS.md and README.md. ML has separate risk-stack-docker and
+aruco-stack-docker checkouts of the same orchestration remote/main branch.
 
-## Component repos (separate gits under ws/ — commit/push in THEIR repo, NOT in MAIN)
-
-| path | branch |
-|---|---|
-| ws/flight-safety/src/flight_safety | main |
-| ws/risk-aware/src/risk_aware_planning | main |
-| ws/fast-livo/src | jetson-orin-agx |
-| ws/optitrack/src/vrpn_client_ros | kinetic-devel |
-| ws/allan/src/allan_variance_ros | master |
+- stacks/ owns project composition and device/scenario overrides.
+- scripts/ owns stack operational commands.
+- modules/ is ignored, synchronized from config/modules.lock.json; edit module
+  deployment packages in THEIR owning repositories, then commit/push and relock.
+- ws/ contains separate component Git repositories and build workspaces.
+- data/analysis and data/manifests are tracked source/metadata locations.
+- data/assets, data/results, data/archive contain ignored local payloads.
+- config/project.local.json selects this checkout's project; do not override it
+  to launch the other project's stack here.
 
 ## Dependencies
 

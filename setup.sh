@@ -18,6 +18,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # research directories have crept back into the checkout (even if ignored).
 # Shell access and shutdown remain available to recover an existing container.
 case "${1:-help}" in
+  project) exec python3 "$ROOT/scripts/project_workspace.py" "${@:2}" ;;
   install-hooks)
     bash "$ROOT/scripts/install_git_hooks.sh"
     exec python3 "$ROOT/scripts/root_guard.py" lock ;;
@@ -62,20 +63,22 @@ need_buildx(){ docker buildx version >/dev/null 2>&1 || {
   echo "  install the buildx CLI plugin -> ~/.docker/cli-plugins/docker-buildx"
   echo "  (releases: https://github.com/docker/buildx/releases , arm64 asset: buildx-*.linux-arm64)"
   exit 1; }; }
-gen(){ python3 "$ROOT/scripts/gen_dockerfile_compose.py" "$stack" --arch "$ARCH"; }
+sync_modules(){ python3 "$ROOT/scripts/module_sources.py" sync "$stack" --arch "$ARCH" "$@"; }
+gen(){ sync_modules --no-artifacts; python3 "$ROOT/scripts/gen_dockerfile_compose.py" "$stack" --arch "$ARCH"; }
 DF(){ echo "$ROOT/.build/$stack/Dockerfile"; }
 CF(){ echo "$ROOT/.build/$stack/compose.yml"; }
 
 case "$cmd" in
+  sync)  need_stack; sync_modules ;;
   gen)   need_stack; gen ;;
-  build) need_stack; need_buildx; gen
+  build) need_stack; need_buildx; sync_modules; gen
          echo ">> docker build (native $ARCH) -> drone-stack:$stack"
          docker build $DOCKER_BUILD_OPTS -f "$(DF)" -t "drone-stack:$stack" "$ROOT" ;;
-  up)    need_stack; need_buildx; gen
+  up)    need_stack; need_buildx; sync_modules; gen
          docker build $DOCKER_BUILD_OPTS -f "$(DF)" -t "drone-stack:$stack" "$ROOT"
          docker compose -f "$(CF)" up -d
          echo ">> container drone-stack-$stack up. start nodes: ./setup.sh run $stack <module>" ;;
-  run)   need_stack; mod="${3:?need <module> e.g. sensor/realsense-d435i}"
+  run)   need_stack; sync_modules --no-artifacts; mod="${3:?need <module> e.g. sensor/realsense-d435i}"
          module_key="$mod"
          [ ! -f "$ROOT/modules/$mod" ] || module_key="${mod%/*}"
          python3 "$ROOT/scripts/stack_context.py" resolve --stack "$stack" --module "$module_key" >/dev/null

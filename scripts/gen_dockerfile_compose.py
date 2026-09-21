@@ -25,6 +25,8 @@ libraries/torch's unconditional sm89/sm75 default, see ~/ete-training-docker/mod
 "torch unification" section.)
 """
 import os, sys, argparse, re, shlex, yaml
+from pathlib import Path
+from module_sources import load_lock, verify
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -48,14 +50,26 @@ def load_env(path):
             if not line or line.startswith("#") or "=" not in line:
                 continue
             k, v = line.split("=", 1)
-            env.setdefault(k.strip(), v.split("#", 1)[0].strip())
+            if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', k.strip()):
+                continue
+            env.setdefault(k.strip(), v.split("#", 1)[0].strip().strip('\"\''))
+    env.setdefault('DSD_ROOT', ROOT)
+    env.setdefault('DSD_DATA_ROOT', os.path.join(ROOT, 'data'))
+    for key in ('SIM_RISK_AWARE_ASSETS', 'RISK_AWARE_ASSETS'):
+        env.setdefault(key, '${DSD_DATA_ROOT}/assets')
+    for key in list(env):
+        env[key] = expand(env[key], env)
     return env
 
 
 def expand(s, env):
     out = s
-    for k, v in env.items():
-        out = out.replace("${%s}" % k, v).replace("$%s" % k, v)
+    pattern = re.compile(r'\$\{([A-Za-z_][A-Za-z0-9_]*)\}|\$([A-Za-z_][A-Za-z0-9_]*)')
+    for _ in range(12):
+        updated = pattern.sub(lambda m: str(env.get(m.group(1) or m.group(2), m.group(0))), out)
+        if updated == out:
+            break
+        out = updated
     return out
 
 
@@ -68,6 +82,10 @@ def load_module(path):
     if not os.path.isfile(f):
         sys.exit("ERROR: module manifest not found: %s" % f)
     m = yaml.safe_load(open(f)) or {}
+    entries = load_lock(Path(ROOT))
+    if path not in entries:
+        sys.exit('ERROR: module is not in config/modules.lock.json: ' + path)
+    verify(Path(module_dir(path)), entries[path])
     m["_path"] = path
     return m
 

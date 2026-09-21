@@ -8,3 +8,5 @@ flight_logs
 **/__pycache__
 *.md
 *.bag
+
+data

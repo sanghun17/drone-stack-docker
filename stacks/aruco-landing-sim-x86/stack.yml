@@ -1,3 +1,4 @@
+project: aruco
 # AirSim/Unreal runs on the ml host. The simulation module talks to its RPC
 # server and publishes the same normalized ROS camera interface used by the
 # real stack; ArUco perception/control remain simulator-agnostic. The matching

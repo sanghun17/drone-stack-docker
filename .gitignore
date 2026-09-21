@@ -40,3 +40,14 @@ config/.active-stack-*
 .vscode/
 .idea/
 .nfs*
+
+# Module implementation is synchronized from its owning repository.
+/modules/*
+!/modules/README.md
+!/modules/SCHEMA.md
+
+# Research code/metadata are versioned; payloads are local or on NAS.
+/data/assets/
+/data/results/
+/data/archive/
+config/project.local.json

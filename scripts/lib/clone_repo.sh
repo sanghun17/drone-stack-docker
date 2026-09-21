@@ -24,10 +24,16 @@ DST="${1:?clone_repo.sh: missing DST (arg1)}"
 REPO="${2:?clone_repo.sh: missing REPO (arg2)}"
 BRANCH="${3:?clone_repo.sh: missing BRANCH (arg3)}"
 
-if [ -d "$DST/.git" ]; then
-  echo ">> $DST exists -> fetch + checkout $BRANCH"
-  git -C "$DST" fetch origin "$BRANCH" && git -C "$DST" checkout "$BRANCH"
+if [ -e "$DST/.git" ]; then
+  if [ -n "$(git -C "$DST" status --porcelain)" ]; then
+    echo "ERROR: preserving modified component checkout: $DST" >&2
+    exit 2
+  fi
+  git -C "$DST" fetch origin "$BRANCH"
+  git -C "$DST" checkout --detach FETCH_HEAD
 else
   mkdir -p "$(dirname "$DST")"
-  git clone -b "$BRANCH" "$REPO" "$DST"
+  git clone --no-checkout "$REPO" "$DST"
+  git -C "$DST" fetch origin "$BRANCH"
+  git -C "$DST" checkout --detach FETCH_HEAD
 fi

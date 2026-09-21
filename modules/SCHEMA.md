@@ -1,6 +1,7 @@
 # Module and stack schema
 
-Every reusable capability lives at `modules/<group>/<name>/module.yml`.
+Each owning repository defines `deployment/stack-modules/<id>/module.yml`.
+The exact package is locked and materialized at `modules/<id>/module.yml`.
 
 ```yaml
 name: local-controller
@@ -34,7 +35,7 @@ provides: [trajectory-controller]
   must not source a consumer planner's workspace merely to obtain generic
   messages or runtime packages.
 - Runtime maps, scenario config and launch/calibration tools belong to
-  `stacks/<name>/`. Offline research and archived results live outside the checkout.
+  `stacks/<name>/`. Offline research code lives in data/analysis; captured/generated payloads live in data/results or data/archive.
 
 A stack in `stacks/<name>/stack.yml` composes modules and selects deployment details:
 
@@ -58,3 +59,10 @@ Stack `environment` is written both to Compose and to
 `.build/<stack>/stack.env`, so host-side `clone.sh` can select the same profile.
 Stack `mounts` owns deployment- or scenario-specific host data. Variables are
 expanded from `config/stack.env` and its optional local override.
+
+## Verified external artifacts
+
+Packages may declare `artifacts` entries with `path`, `size`, `sha256`, optional
+`arch: [amd64, arm64]`, and `github_release: {repository, tag, asset}`. Sync
+downloads only applicable artifacts and verifies their bytes before installation.
+Large wheels must not be copied into the stack repository Git history.

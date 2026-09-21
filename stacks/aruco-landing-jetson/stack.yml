@@ -1,3 +1,4 @@
+project: aruco
 # Real-hardware stack. The landing planner starts movement only on pilot OFFBOARD entry.
 arch: [arm64]
 # Use the same master as the established risk-aware hardware stack so MAVROS

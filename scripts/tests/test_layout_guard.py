@@ -53,10 +53,10 @@ class LayoutGuardTest(unittest.TestCase):
     def check(self, *args, ok=True):
         return self.run_cmd(['python3', 'scripts/check_layout.py', *args], ok=ok)
 
-    def test_clean_tree_and_six_root_contract(self):
+    def test_clean_tree_and_project_root_contract(self):
         policy = json.loads((self.root / 'config/repository-layout.json').read_text())
         self.assertEqual(set(policy['root_directories']),
-                         {'ws', 'modules', 'scripts', 'stacks', 'config', 'flight_logs'})
+                         {'ws', 'modules', 'scripts', 'stacks', 'config', 'flight_logs', 'data'})
         self.check('--staged', '--worktree')
         self.check('--revision', 'HEAD')
 
@@ -109,33 +109,52 @@ class LayoutGuardTest(unittest.TestCase):
         self.assertIn('results', result.stderr)
         self.assertIn('figure.png', result.stderr)
 
-    def test_stack_and_module_ownership_requires_manifests(self):
+    def test_stack_manifest_required_and_remote_module_cannot_be_committed(self):
         self.write('stacks/demo/scripts/run.sh', '#!/bin/sh\n')
         self.write('modules/sensor/demo/run.sh', '#!/bin/sh\n')
         self.git('add', '.')
         result = self.check('--staged', ok=False)
         self.assertIn('missing stacks/demo/stack.yml', result.stderr)
-        self.assertIn('missing modules/sensor/demo/module.yml', result.stderr)
+        self.assertIn('remote module implementation', result.stderr)
         self.write('stacks/demo/stack.yml', 'modules: []\n')
         self.write('modules/sensor/demo/module.yml', 'name: demo\n')
         self.git('add', '.')
+        self.assertNotEqual(self.check('--staged', ok=False).returncode, 0)
+        self.git('rm', '-r', '--cached', 'modules')
         self.check('--staged')
 
-    def test_binary_allowlist_and_size_limits_are_applied_to_git_blobs(self):
-        path = 'modules/libraries/jax/wheels/jaxlib-0.4.13-cp38-cp38-manylinux2014_aarch64.whl'
-        self.write('modules/libraries/jax/module.yml', 'name: jax\n')
-        self.write(path, 'fixture wheel')
+    def test_size_limits_are_applied_to_metadata_git_blobs(self):
+        path = 'data/manifests/dataset.json'
+        self.write(path, '{"fixture": true}')
         self.git('add', '.')
         self.check('--staged')
         policy = self.root / 'config/repository-layout.json'
         value = json.loads(policy.read_text())
-        value['runtime_artifacts'][path] = 4
+        value['max_file_bytes'] = 4
         policy.write_text(json.dumps(value))
         self.git('add', 'config/repository-layout.json')
         (self.root / path).write_text('')  # smaller unstaged file must not hide large staged blob
         result = self.check('--staged', ok=False)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn('exceeds allowed', result.stderr)
+
+    def test_analysis_is_tracked_but_forced_data_payloads_are_rejected(self):
+        self.write('data/analysis/risk-aware/verify.py', 'print("verify")\n')
+        self.write('data/manifests/schema.json', '{}')
+        self.git('add', 'data')
+        self.check('--staged', '--worktree')
+        self.write('.gitignore', '/data/results/\n/data/assets/\n/data/archive/\n')
+        self.write('data/results/experiment/raw.bag', 'local recording')
+        self.check('--worktree')
+        self.git('add', '-f', 'data/results/experiment/raw.bag')
+        result = self.git('commit', '-qm', 'accidental payload', ok=False)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('local data payload', result.stderr)
+
+    def test_analysis_output_must_not_be_committed(self):
+        self.write('data/analysis/risk-aware/figure.png', 'output')
+        self.git('add', 'data')
+        self.assertIn('output/binary artifact', self.check('--staged', ok=False).stderr)
 
     def test_external_and_retired_paths_cannot_return(self):
         paths = [

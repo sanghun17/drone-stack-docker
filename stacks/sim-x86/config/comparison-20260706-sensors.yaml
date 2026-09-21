@@ -1,0 +1,152 @@
+# Common static sensor/estimator/control parameters, identical in the two archived ROS snapshots.
+airsim_node:
+  host_ip: localhost
+  is_vulkan: false
+  odom_frame_id: odom
+  publish_clock: true
+  update_airsim_control_every_n_sec: 0.005
+  update_airsim_img_response_every_n_sec: 99999.0
+  update_lidar_every_n_sec: 99999.0
+  world_frame_id: map
+common:
+  img_en: 1
+  img_topic: /camera/left/image_raw
+  imu_topic: /airsim_node/hmcl/imu/imu
+  lid_topic: /voxel_grid/output
+  lidar_en: 1
+  ros_driver_bug_fix: false
+extrin_calib:
+  Pcl:
+  - 0.0
+  - 0.0
+  - 0.0
+  Rcl:
+  - 1.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 1.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 1.0
+  extrinsic_R:
+  - 0.0
+  - 0.0
+  - 1.0
+  - -1.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - -1.0
+  - 0.0
+  extrinsic_T:
+  - 0.25
+  - 0.0
+  - 0.25
+imu:
+  acc_cov: 2.0
+  b_acc_cov: 0.0001
+  b_gyr_cov: 0.0001
+  gyr_cov: 0.1
+  imu_en: true
+  imu_int_frame: 30
+laserMapping:
+  cam_cx: 160.0
+  cam_cy: 120.0
+  cam_d0: 0.0
+  cam_d1: 0.0
+  cam_d2: 0.0
+  cam_d3: 0.0
+  cam_fx: 193.0634765625
+  cam_fy: 193.0634765625
+  cam_height: 240
+  cam_model: Pinhole
+  cam_width: 320
+  reinitialize_with_gt_odom: false
+  scale: 1.0
+lio:
+  beam_err: 0.05
+  dept_err: 0.02
+  layer_init_num:
+  - 5
+  - 5
+  - 5
+  - 5
+  - 5
+  max_iterations: 5
+  max_layer: 2
+  max_points_num: 80
+  min_eigen_value: 0.005
+  voxel_size: 1.0
+local_map:
+  half_map_size: 100
+  map_sliding_en: false
+  sliding_thresh: 8
+preprocess:
+  blind: 0.1
+  filter_size_surf: 0.25
+  lidar_type: 4
+  point_filter_num: 18
+  scan_line: 1
+publish:
+  blind_rgb_points: 0.0
+  dense_map_en: true
+  pub_effect_point_en: false
+  pub_plane_en: false
+  pub_scan_num: 1
+rgb_img:
+  compressed:
+    format: jpeg
+    jpeg_optimize: false
+    jpeg_progressive: false
+    jpeg_quality: 80
+    jpeg_restart_interval: 0
+    png_level: 9
+  compressedDepth:
+    depth_max: 10.0
+    depth_quantization: 100.0
+    format: png
+    png_level: 9
+  theora:
+    keyframe_frequency: 64
+    optimize_for: 1
+    quality: 31
+    target_bitrate: 800000
+time_offset:
+  exposure_time_init: 0.0
+  img_time_offset: 0.0
+  imu_time_offset: 0.0
+uav:
+  gravity_align_en: false
+  imu_rate_odom: true
+use_sim_time: true
+vehicle_name: hmcl
+vio:
+  exposure_estimate_en: true
+  img_point_cov: 1000
+  inv_expo_cov: 0.1
+  inverse_composition_en: false
+  max_iterations: 5
+  normal_en: true
+  outlier_threshold: 1000
+  patch_pyrimid_level: 4
+  patch_size: 8
+  raycast_en: false
+voxel_grid:
+  filter_field_name: z
+  filter_limit_max: 5.1
+  filter_limit_min: 0.1
+  filter_limit_negative: false
+  input_frame: ''
+  keep_organized: false
+  leaf_size: 0.07
+  min_points_per_voxel: 1
+  output_frame: ''
+nodelet1:
+  approximate_sync: true
+  queue_size: 10
+so3_control_bridge:
+  cmd_topic: /planning/pos_cmd
+  enable_bag: false
+  service_name: /control_bridge/toggle_running

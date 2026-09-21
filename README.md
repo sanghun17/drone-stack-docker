@@ -1,130 +1,115 @@
-# drone-stack
+# Drone project stacks
 
-A **modular, composable** Jetson/x86 drone-autonomy stack (ROS Noetic). It turns
-sensor, estimation, planning, control, and simulation capabilities into
-**interchangeable modules** assembled per stack.
+One orchestration repository, separate local project checkouts:
 
-## Repository branches
+- `~/risk-stack-docker` — risk-aware hardware and simulation.
+- `~/aruco-stack-docker` — ArUco landing hardware and simulation.
 
-| role | remote | branch |
-|------|--------|--------|
-| Docker environment | `https://github.com/sanghun17/drone-stack-docker.git` | `main` |
+Both follow the same main branch. A local project selection isolates their data
+and prevents accidentally launching the other project's stack.
 
-## Layout
-
-Only build, deployment, operation, calibration and runtime validation belong here.
+## Directory ownership
 
 ```text
-modules/       reusable capabilities; base/ and libraries/{jax,torch,spconv}/
-stacks/        <name>/stack.yml + config/, scripts/ and required simulator assets
-scripts/       shared commands, image generator and lib/ shell helpers
-config/        shared host/ROS environment and untracked local overrides
-ws/            active component repositories and their build workspaces
-flight_logs/   new flight, simulation and bench recordings (not tracked)
-.build/        generated Docker/Compose files and local build products (not tracked)
+modules/          synchronized remote deployment packages (ignored)
+stacks/           stack YAML, module wiring and scenario/device overrides
+scripts/          stack sync, build, launch and operational commands
+config/           shared configuration, module lock and local project selection
+ws/               component Git checkouts and catkin workspaces (ignored)
+flight_logs/      active runtime recordings (ignored)
+data/analysis/    maintained offline analysis/extraction/plotting code (tracked)
+data/manifests/   publishable metadata and schemas (tracked)
+data/assets/      project inputs and selected models (ignored)
+data/results/     captured/generated data, reports and figures (ignored)
+data/archive/     historical records and retired work (ignored)
+.build/           generated Docker/Compose files and disposable caches (ignored)
 ```
 
-`modules/base` installs the container's foundation (CUDA/L4T, ROS and toolchain).
-`scripts/lib` contains orchestration helpers; it is not an image module.
-Keep shared environment settings in `config`, active device calibration with its module,
-and deployment-specific policy in `stacks/<name>/config`.
+Do not ignore all of data. Source code belongs in data/analysis; generated figures
+and datasets belong in data/results. Private inventories remain with their data.
+Training orchestration stays in `~/ete-training-docker`; shared/training storage
+stays under `~/drone-data/{shared,training}`. NAS-only bags remain references.
 
-Research worktrees, past experiments, offline analysis, paper figures and backups
-were moved to `~/drone-data/shared/archive/previous-cleanups/20260921-cleanup/` on ML. Its `README.md` and
-`migration/moves.json` locate the preserved files. Keep future research outputs
-outside this checkout; runtime recordings go under `flight_logs/`.
+## Module repositories
 
-Runtime stack names and `setup.sh` commands remain unchanged. Existing containers
-retain their old environment until recreated by `./setup.sh up <stack>`.
-Deploy matching component revisions as well: ArUco launch/audit defaults now use
-`stacks/aruco-landing-jetson/`, and flight-safety's optional VIO preflight reads
-its preserved provenance inputs from `modules/odometry/fast-livo/qualification/`.
-The corresponding migration commits are
-[ArUco 2c5b5a9](https://github.com/sanghun17/aruco_landing/commit/2c5b5a9)
-and [flight-safety 406efbf](https://github.com/sanghun17/flight_safety/commit/406efbf).
+`config/modules.lock.json` fixes each deployment package's repository, exact Git
+commit, package subdirectory, manifest and file SHA-256s. Stack YAML selects module
+IDs; dependencies are resolved before dependents, with cycle detection.
 
-Training modules and the three `ete-train-*` stacks now live in
-`~/ete-training-docker/` as an independent local Git repository. Use its own
-`setup.sh`; its source checkout and default training outputs stay outside this tree.
-D435i EEPROM backups/raw measurements and retired entrypoints are preserved in
-`~/drone-data/shared/archive/previous-cleanups/20260921-internal-cleanup/` with checksums in `moves.json`.
-The D435i uses EEPROM calibration during normal operation; its runtime launch
-configuration remains in `modules/sensor/realsense-d435i/d435i.launch`.
+First-party packages live under `deployment/stack-modules/<module-id>` in
+`risk-aware_planning`, `aruco_landing`, `flight_safety` and `fast_livo2_custom`.
+Reusable upstream integration packages live in `sanghun17/drone-runtime-modules`.
+A repository can own several modules. Each owns installation, execution, default
+configuration and architecture-specific artifact declarations. Stack YAML owns
+composition, interfaces, scenario settings and device-specific overrides.
 
-Home storage is organized under `~/drone-data/{aruco,risk-aware,training,shared}/`:
-`assets/` holds consumed inputs, `results/` holds outputs and `archive/` holds
-historical material. The storage README and
-`shared/archive/home-layout-20260921/completed.json` locate all migrated files.
-Runtime development remains here; risk-aware algorithm source is the separate
-Git checkout at `ws/risk-aware/src/risk_aware_planning/`.
+Module code is materialized at its conventional modules/<id> path so install,
+launch and catkin integration paths remain stable inside `/work`. Edit the owning
+Git repository, not the synchronized snapshot. Sync refuses edited/unmanaged
+module directories. The full module implementation is not committed here.
 
-## Idea: declare modules → one image, one container
+Large wheels are release assets. Packages declare exact asset names, byte sizes
+and SHA-256; downloads are verified before installation. Access to private module
+repositories/releases requires Git/GitHub authentication (the `gh` CLI handles
+release downloads). Credentials are never stored in stack files or images.
 
-Layout is enforced by versioned pre-commit/pre-push hooks, a required GitHub
-`repository-layout` check on main, and filesystem protection of the checkout root.
-Run `./setup.sh install-hooks` once after cloning (normal host setup usage also
-installs the hooks and root lock). New top-level entries are rejected immediately;
-existing child directories stay writable. Root-file replacement or a pull that
-changes root files needs `python3 scripts/root_guard.py maintain -- git pull --ff-only`.
-See [layout enforcement](scripts/LAYOUT_GUARD.md) for the scope and maintenance rules.
-
-- **A `stack` (`stacks/*/stack.yml`) just lists the modules you want** + the target arch.
-- **Each module (`modules/<group>/<name>/module.yml`) declares its own dependencies**
-  (apt / pip / source builds), its source mounts, and its run scripts.
-- **`./setup.sh <cmd> <stack>`** reads the stack, gathers every selected module's deps
-  (arch-aware, de-duped), generates **one Dockerfile → one image**, and runs
-  **one container** with the merged mounts + run scripts.
-
-```
-stacks/d435i-voxblox/stack.yml          modules/<group>/<name>/
-  arch: arm64                       module.yml   # deps (apt/pip/source) + mounts + run, arch-aware
-  modules:                          install.sh   # (optional) complex source builds
-    - base                          run.sh       # launch this module's ROS node(s)
-    - sensor/realsense-d435i        config/      # calib / params
-    - odometry/fast-livo
-    - planner/risk-aware        →  setup.sh: union(deps) → Dockerfile → buildx → 1 image → 1 container
-```
-
-## Three layers of modularity
-
-| layer | module = | where |
-|-------|----------|-------|
-| **source** | fast_livo, risk_aware_planning, aruco_landing | separate git repos, bind-mounted (gitignored) |
-| **image**  | base, realsense, torch/jax/spconv, mavros, slam | `module.yml` `deps:`, unioned by `setup.sh` into one Dockerfile |
-| **runtime**| sensor / odometry / planner / control nodes | `run.sh` per module, run inside the one container (shared roscore) |
-
-## arch (arm64 / amd64)
-
-`stacks/*/stack.yml` sets `arch:`. `setup.sh` builds natively on a matching host and passes
-`TARGETARCH` so each module's `module.yml` `deps.arm64 / deps.amd64` selects the
-right wheels/SDK (for example Jetson versus x86 CUDA dependencies).
-
-## Prerequisites
-
-- **Docker with BuildKit / `buildx`.** The build bind-mounts `modules/` at build time
-  (`RUN --mount`) instead of `COPY`-ing it, so nothing from `modules/` (scripts, jax wheel)
-  is baked into the image — but legacy `docker build` won't work. Install the buildx CLI
-  plugin into `~/.docker/cli-plugins/docker-buildx` (arm64 asset from
-  <https://github.com/docker/buildx/releases>). `./setup.sh build` checks for it and tells
-  you how if it's missing.
-- NVIDIA Container Runtime (on Jetson it ships with JetPack). GPU stacks require
-  it; a stack can set `gpu: false` to drop all GPU runtime wiring.
-
-## Usage
+## First checkout
 
 ```bash
-./setup.sh clone d435i-voxblox
-./setup.sh up d435i-voxblox
-# inside it, start nodes per module:
-./setup.sh run d435i-voxblox sensor/realsense-d435i   # or: ./scripts/sensor_realsense-d435i.sh
+git clone <drone-stack-docker-remote> ~/risk-stack-docker
+cd ~/risk-stack-docker
+./setup.sh project risk-aware
+./setup.sh sync sim-x86
+./setup.sh clone sim-x86
+./setup.sh gen sim-x86
+# When ready to build and launch:
+./setup.sh up sim-x86
+./setup.sh build-ws sim-x86
 ```
 
-## Status
+For ArUco, clone the same repository to `~/aruco-stack-docker`, select project
+`aruco`, and use `aruco-landing-sim-x86` on ML or `aruco-landing-jetson` on Jetson.
+The hardware risk-aware stack is `d435i-voxblox`. `sync` fetches module packages
+and wheel artifacts; `clone` invokes their pinned component-source clone scripts.
+`gen` materializes code packages without downloading large wheel payloads.
 
-See `modules/SCHEMA.md` for the manifest spec.
+Use `./setup.sh run <stack> <module>` or the top-level operational shortcuts to
+launch components. Container/image names remain `drone-stack-<stack>` and
+`drone-stack:<stack>`. Selecting a project starts no ROS nodes or containers.
+`config/project.env` resolves data relative to the checkout on the host and to
+`/work/data` in the container. Host overrides belong in config/stack.env.local.
 
-Large risk-aware model files and generated/packaged Unreal artifacts remain
-outside Git and Docker images. Authored stack-specific map/config/tooling lives
-under `stacks/`; reusable AirSim client functionality lives in
-`modules/simulation/airsim`. External asset paths, hashes and transfer procedure are recorded
-in [`modules/planner/risk-aware/ASSETS.md`](modules/planner/risk-aware/ASSETS.md).
+## Updating a module
+
+1. Edit and test its deployment package in the owning source repository.
+2. Commit and push that change to the owner remote.
+3. Update its lock entry and sync:
+
+```bash
+python3 scripts/module_sources.py lock --module planner/risk-aware \
+  --repository https://github.com/sanghun17/risk-aware_planning.git \
+  --checkout ws/module-repositories/risk-aware_planning \
+  --revision <full-commit> --subdir deployment/stack-modules/planner/risk-aware
+./setup.sh sync sim-x86
+```
+
+Commit the resulting lock update here. Module package file edits invalidate its
+lock; upstream branch movement does not silently change an existing checkout.
+Do not force-reset dirty component repositories during sync or clone.
+
+## Guards and verification
+
+The root is write-locked after project initialization. Allowed child directories
+remain writable. Git hooks and required `repository-layout` CI reject module
+implementation commits, dataset payloads, misplaced outputs and unknown root
+entries. Never disable the guards to bypass a failure.
+
+```bash
+python3 scripts/check_layout.py --worktree
+python3 -m unittest discover -s scripts/tests -v
+```
+
+Authorized root-file replacement or Git updates use
+`python3 scripts/root_guard.py maintain -- <command>`, which relocks afterward.
+Jetson is deployment-only: deploy committed code through Git and preserve dirty
+remote checkouts. Do not edit/upload source files directly on Jetson.

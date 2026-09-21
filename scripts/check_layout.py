@@ -40,6 +40,15 @@ def path_errors(path, policy, directory=False):
     allowed = policy['root_directories'] + policy['tracked_hidden_directories']
     if first not in allowed:
         return [path + ': root directory is not allowed']
+    if first == 'data' and len(parts) > 1:
+        if len(parts) == 2 and parts[1] == 'README.md' and not directory:
+            return []
+        if parts[1] in policy.get('data_payload_directories', []):
+            return [] if directory else [path + ': local data payload must not be tracked']
+        if parts[1] not in ('analysis', 'manifests'):
+            return [path + ': use data/analysis, manifests, assets, results or archive']
+        if parts[1] == 'manifests' and not directory:
+            return [] if PurePosixPath(path).suffix.lower() in ('.json', '.yml', '.yaml', '.csv', '.md', '.txt') else [path + ': manifests contains metadata only']
     directories = parts if directory else parts[:-1]
     for part in directories:
         if part in policy['forbidden_directories'] or part.startswith(('_campaign_', '.tmp_')):
@@ -49,6 +58,8 @@ def path_errors(path, policy, directory=False):
             return []
         if parts[1] not in policy['module_groups']:
             return [path + ': unknown module group; shared helpers belong in scripts/lib']
+        if not directory:
+            return [path + ': remote module implementation must not be tracked; update its owner and modules.lock.json']
     if first == 'stacks' and len(parts) > 1:
         if not re.fullmatch(r'[a-zA-Z0-9][a-zA-Z0-9_-]*', parts[1]):
             return [path + ': use stacks/<name>/stack.yml']
@@ -122,12 +133,24 @@ def check_worktree(root, policy):
             errors.append(item.name + ': unexpected root file or symlink')
     # Inspect directories even if ignored. Skip only known runtime build trees
     # and Python's automatic bytecode caches; never descend into component repos.
-    for name in ('config', 'modules', 'scripts', 'stacks'):
+    locked_modules = set()
+    lockfile = root / 'config/modules.lock.json'
+    if lockfile.exists():
+        locked_modules = {'modules/' + name for name in json.loads(lockfile.read_text())['modules']}
+    for name in ('config', 'modules', 'scripts', 'stacks', 'data'):
         for base, dirs, files in os.walk(root / name, followlinks=False):
             kept = []
             for directory in dirs:
                 path = (Path(base) / directory).relative_to(root).as_posix()
                 if directory == '__pycache__' or path in policy['local_generated_directories']:
+                    continue
+                if path in locked_modules:
+                    if (Path(base) / directory).is_symlink():
+                        errors.append(path + ': module package must be a real directory')
+                    continue
+                if path in {'data/' + n for n in policy.get('data_payload_directories', [])}:
+                    if (Path(base) / directory).is_symlink():
+                        errors.append(path + ': data roots must be real directories')
                     continue
                 errors.extend(path_errors(path, policy, directory=True))
                 kept.append(directory)
@@ -178,8 +201,8 @@ def main():
             print('Repository layout rejected:', file=sys.stderr)
             for error in errors:
                 print('  - ' + error, file=sys.stderr)
-            print('Put research/results under your home directory, runtime logs in flight_logs/, '
-                  'and build products in .build/. Rules: ' + POLICY, file=sys.stderr)
+            print('Use data/analysis for research code, data/results for outputs, '
+                  'remote repositories for modules, and .build for build products. Rules: ' + POLICY, file=sys.stderr)
             return 1
         print('Repository layout OK')
         return 0

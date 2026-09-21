@@ -1,3 +1,4 @@
+project: risk-aware
 # sim-x86 — AirSim/UE4 simulator bring-up on the ml desktop (amd64, RTX 2080 Ti x3 /
 # Turing / sm_75, same GPU-arch combo as ete-train-2080ti). UE4/AirSim + roscore stay
 # on the HOST (Window 0, see the sim-start skill) — this stack only containerizes the
@@ -26,7 +27,7 @@ environment:
   FAST_LIVO_PROFILE: airsim
   RISK_AWARE_PROFILE: airsim
 mounts:
-  - "${SIM_RISK_AWARE_ASSETS}:${SIM_RISK_AWARE_ASSETS}"
+  - "${SIM_RISK_AWARE_ASSETS}:/work/data/assets"
 modules:
   - libraries/torch          # amd64/sm75 branch (source-built torch 2.2.2, ABI=1 --
                             # unconditional as of 2026-07-26, same wheel ete-train-*
@@ -36,3 +37,5 @@ modules:
   - simulation/airsim       # reusable AirSim Python client; map/trials stay in this stack directory
   - odometry/fast-livo       # AirSim profile selects the divergent ml branch/launch
   - planner/risk-aware       # same planner capability; AirSim launch entrypoints are profile-specific
+  - planner/rhem             # isolated ROVIO belief + NBVP/BSP workspace; external FAST-LIVO odometry
+  - planner/la-planner       # own runtime capability; shared source/controller dependencies

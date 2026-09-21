@@ -12,6 +12,7 @@ import tempfile
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT/'scripts'))
 ALIASES = {'aruco': 'aruco-landing-jetson', 'risk-aware': 'd435i-voxblox'}
 
 
@@ -26,6 +27,11 @@ def canonical(name, root=ROOT):
 
 def modules_for(stack, root=ROOT):
     document = yaml.safe_load((root/'stacks'/stack/'stack.yml').read_text())
+    lockfile = root/'config/modules.lock.json'
+    if lockfile.exists():
+        # Stack ownership is resolvable before private module packages are fetched.
+        from module_sources import load_lock, order
+        return document, order(document.get('modules', []), load_lock(root))
     found = set()
     def visit(module):
         if module in found:
@@ -61,6 +67,12 @@ def resolve(env=None, explicit=None, module=None, root=ROOT):
     if not stack:
         raise ValueError('select a stack first: bash scripts/stack.sh use aruco (or risk-aware); alternatively set DSD_STACK for one command')
     stack = canonical(stack, root)
+    project_file = root/'config/project.local.json'
+    if project_file.exists():
+        project = json.loads(project_file.read_text())['project']
+        owner = (yaml.safe_load((root/'stacks'/stack/'stack.yml').read_text()) or {}).get('project')
+        if owner and owner != project:
+            raise ValueError('stack %s belongs to %s; this checkout belongs to %s' % (stack, owner, project))
     expected = 'drone-stack-' + stack
     if container and container != expected:
         raise ValueError('conflicting DSD_STACK and DSD_CONTAINER: %s vs %s' % (stack, container))

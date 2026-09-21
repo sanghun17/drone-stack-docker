@@ -1,0 +1,71 @@
+# Recovered common PURE/LA runtime parameters; see comparison-20260706.yml.
+system:
+  body_frame: aft_mapped
+  camera_info_topic: /camera/left/camera_info
+  context_vel_topic: /LIVO2/imu_propagate
+  control: airsim_api
+  experiment: ModernLivingroom_long
+  imu_topic: /airsim_node/hmcl/imu/imu
+  localization: vio
+  odom_topic: /robot/odom
+  planner: ours
+  platform: sim
+  sim:
+    airsim_ip: 192.168.50.12
+    airsim_port: 41451
+    takeoff_altitude: 3.0
+    takeoff_velocity: 3.0
+    teleport:
+      x: 2.0
+      y: 1.0
+      yaw: 0.0
+      z: 1.5
+    use_vio_for_control: false
+  vio_convergence_topic: /aft_mapped_to_init_odom
+  voxel_size: 0.25
+planning:
+  la:
+    feature_max_range: 15.0
+    feature_voxel_size: 0.5
+    feature_warmup_count: 50
+    max_tol_time: 0.45
+    min_covisible_feature_num_act: 1
+    min_covisible_feature_num_plan: 3
+    min_feature_num_act: 2
+    min_feature_num_plan: 5
+    thresh_replan2: 1.0
+    thresh_replan4: 0.2
+  ours:
+    max_tracking_drift: 1.0
+    max_tracking_drift_yaw: 0.5
+    min_start_vel: 0.01
+    safety_check_hz: 10.0
+    tracking_drift_cooldown: 0.5
+  shared:
+    body_clear_radius: 0.5
+    control_rate: 50.0
+    max_a_wz: 5.0
+    max_a_xy: 5.0
+    max_a_z: 2.0
+    max_vel_xy: 2.0
+    max_vel_z: 1.0
+    max_yaw_rate: 2.0
+    replan_out: 2.0
+    replan_time: 0.045
+    sensor_max_range: 5.0
+    thresh_replan1: 0.01
+    thresh_replan3: 2.0
+target_bounding_volume:
+  x_max: 7
+  x_min: -23
+  y_max: 8
+  y_min: -3
+  z_max: 2
+  z_min: 0
+map_bounding_volume:
+  x_max: 8
+  x_min: -24
+  y_max: 9
+  y_min: -4
+  z_max: 5
+  z_min: -2

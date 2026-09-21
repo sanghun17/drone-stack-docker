@@ -1,0 +1,929 @@
+{
+  "modules": {
+    "base": {
+      "files": {
+        "install.sh": "7fbe8237bd09b9b05d30747777267595caa8a63619b2eb32ae001fc3e06bb19d",
+        "module.yml": "d6a0192943fb42f865e8ec3ef556ea378fe0cdc20c79744b95eeada13980d088"
+      },
+      "manifest": {
+        "base_image": {
+          "amd64": "nvidia/cuda:12.8.1-devel-ubuntu20.04",
+          "amd64_nogpu": "ubuntu:20.04",
+          "amd64_sm75": "nvidia/cuda:12.2.2-devel-ubuntu20.04",
+          "amd64_sm89": "nvidia/cuda:12.2.2-devel-ubuntu20.04",
+          "arm64": "nvcr.io/nvidia/l4t-jetpack:r35.4.1"
+        },
+        "deps": {
+          "apt": [
+            "curl",
+            "wget",
+            "gnupg2",
+            "lsb-release",
+            "ca-certificates",
+            "build-essential",
+            "cmake",
+            "git",
+            "unzip",
+            "pkg-config",
+            "python3-pip",
+            "python3-dev",
+            "libeigen3-dev",
+            "usbutils",
+            "udev"
+          ],
+          "source": [
+            "install.sh"
+          ]
+        },
+        "description": "Architecture module \u2014 CUDA/L4T base image + ROS Noetic + common toolchain. Always included.",
+        "env": {
+          "ROS_DISTRO": "noetic"
+        },
+        "group": "base",
+        "mounts": [
+          "/tmp/.X11-unix:/tmp/.X11-unix"
+        ],
+        "name": "base",
+        "provides": [
+          "ros-noetic",
+          "roscore"
+        ],
+        "run": []
+      },
+      "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
+      "revision": "362b85edb562baf5a9dfbeda7b1df3569581ac3a",
+      "subdir": "deployment/stack-modules/base"
+    },
+    "control/flight-safety": {
+      "files": {
+        "build_ws.sh": "ebe313a5d0f7d5a4178dc06a5ed96b983b3ef28088b1538f05ee8cbf73c46049",
+        "clone.sh": "59f5545473ad85a50c23fe91187bf856d81666f79e96e7905bfd7083821a36e4",
+        "fs_led_node.py": "22ae3893866ad90a491207b137fbe5be01bef58184af217b9dde6a6dfe0b1a0c",
+        "module.yml": "de508fb37f65245a80cccfd2efc48304372a44a578df4d4a14db8a4754e3edf2",
+        "run.sh": "a963f76fbd16a4c4240d0cbe52064df05476a7aaabc3113691f0338c85a4d30d",
+        "tests/test_geofence_profiles.py": "ca47c94619e6f6902bc8d26948c007a5b6fe643bad768a63815251ea96c27692",
+        "tests/test_led.py": "72d57494d4b1713cbb3aca156e6c68fb83b9a13aac99a5d4d852b349fee0ac3e",
+        "tests/test_termination.py": "a451d4e44e923403cd8b9eab73782c2a5db9a20cf594986ff51b613607036d2d"
+      },
+      "manifest": {
+        "clone": "clone.sh",
+        "deps": {
+          "apt": [
+            "ros-noetic-diagnostic-updater",
+            "ros-noetic-rqt-runtime-monitor",
+            "ros-noetic-topic-tools",
+            "ros-noetic-mavros-msgs"
+          ],
+          "arm64": {
+            "pip": [
+              "Jetson.GPIO"
+            ]
+          }
+        },
+        "description": "Layered standalone flight safety \u2014 diagnosis, fault monitor, response/setpoint mux, and estimator mux. Builds in ws/flight-safety and consumes the distro MAVROS message API.",
+        "group": "control",
+        "name": "flight-safety",
+        "needs": [
+          "utility/gui-vnc"
+        ],
+        "provides": [
+          "flight-safety",
+          "vision-pose"
+        ],
+        "run": [
+          "run.sh"
+        ],
+        "workspace": "/work/ws/flight-safety"
+      },
+      "repository": "https://github.com/sanghun17/flight_safety.git",
+      "revision": "0663539efd17a6c2d48c109a017903357715e57f",
+      "subdir": "deployment/stack-modules/control/flight-safety"
+    },
+    "control/local-controller": {
+      "files": {
+        "local_controller_node.py": "4f439713e4a17fdd72fbc27a21a61a90379efd4a4c3223a5b6224aeb6c4ef879",
+        "module.yml": "1687eb3c80d3cfeef134e99ef1943b27ca082f1899205294e0e426dbe9b6e106",
+        "run.sh": "7bb77270f4f0ea3672e7554573e97b48b02918dbeea44a5054c396d5c00e682e"
+      },
+      "manifest": {
+        "deps": {
+          "apt": [
+            "ros-noetic-mavros-msgs",
+            "ros-noetic-nav-msgs",
+            "ros-noetic-std-srvs",
+            "ros-noetic-tf",
+            "ros-noetic-trajectory-msgs"
+          ]
+        },
+        "description": "Standalone trajectory-to-MAVROS velocity controller. Consumes standard trajectory_msgs and nav_msgs, and publishes through a configurable safety-mux topic.",
+        "group": "control",
+        "name": "local-controller",
+        "provides": [
+          "trajectory-controller",
+          "mavros-setpoint-source"
+        ],
+        "run": [
+          "run.sh"
+        ]
+      },
+      "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
+      "revision": "362b85edb562baf5a9dfbeda7b1df3569581ac3a",
+      "subdir": "deployment/stack-modules/control/local-controller"
+    },
+    "control/mavros": {
+      "files": {
+        "check_runtime.sh": "e81b4898de7d9eab92f278a3512c1f7cb7c4cdbe2f9d317533a47cfe9b8fa87f",
+        "install.sh": "cc6f4bc44cac7e3656a037fe57c196f0d4dee49fc5c112cb2b35a7b4d84f8c05",
+        "module.yml": "a2de1cb732133546bfdfc7cb436961470eac4fab5a4dc4a1813207d4947e757a",
+        "run.sh": "69ce67bbba3992004b17e4b66ee156d018b8b2c82f76f69cf4b0453aba1b7fa6"
+      },
+      "manifest": {
+        "deps": {
+          "apt": [
+            "ros-noetic-mavlink",
+            "ros-noetic-mavros",
+            "ros-noetic-mavros-extras",
+            "ros-noetic-mavros-msgs",
+            "geographiclib-tools",
+            "libgeographic-dev"
+          ],
+          "source": [
+            "install.sh"
+          ]
+        },
+        "description": "Standalone MAVROS bridge to the PX4 FCU. Connection URLs come from config/stack.env.",
+        "group": "control",
+        "mounts": [
+          "/dev:/dev"
+        ],
+        "name": "mavros",
+        "provides": [
+          "fcu",
+          "mavros"
+        ],
+        "run": [
+          "run.sh"
+        ]
+      },
+      "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
+      "revision": "362b85edb562baf5a9dfbeda7b1df3569581ac3a",
+      "subdir": "deployment/stack-modules/control/mavros"
+    },
+    "libraries/jax": {
+      "files": {
+        "install.sh": "965f6d8743791d6ea62592831d47c2db757d02a99eadeb2c6a4c1ab4beb6f25d",
+        "module.yml": "803cac5b178af939a731d2b9beb7553686e53306fca22327d62e87f6712538f8"
+      },
+      "manifest": {
+        "artifacts": [
+          {
+            "arch": [
+              "arm64"
+            ],
+            "github_release": {
+              "asset": "jaxlib-0.4.13-cp38-cp38-manylinux2014_aarch64.whl",
+              "repository": "sanghun17/drone-runtime-modules",
+              "tag": "wheels-20260921"
+            },
+            "path": "wheels/jaxlib-0.4.13-cp38-cp38-manylinux2014_aarch64.whl",
+            "sha256": "ce7a999ec8c362264c0d127dae2c3bd66121ba205aa4e0762029dd9091e18499",
+            "size": 78847282
+          }
+        ],
+        "assets": [
+          "wheels"
+        ],
+        "deps": {
+          "source": [
+            "install.sh"
+          ]
+        },
+        "description": "jaxlib 0.4.13 + jax + flax/optax (CUDA 11.4 / Orin sm_87). py3.8 caps jax at 0.4.13. flax --no-deps (tensorstore has no aarch64 wheel).",
+        "group": "libraries",
+        "name": "jax",
+        "needs": [
+          "libraries/spconv"
+        ],
+        "provides": [
+          "jax",
+          "jaxlib",
+          "flax",
+          "optax"
+        ]
+      },
+      "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
+      "revision": "362b85edb562baf5a9dfbeda7b1df3569581ac3a",
+      "subdir": "deployment/stack-modules/libraries/jax"
+    },
+    "libraries/spconv": {
+      "files": {
+        "install.sh": "3da2a681bef519a060e10ba37cf7bf47c5934354f03127e8fde0893e13e4540d",
+        "module.yml": "744fdca7bf1e580d2f6f0f5d8712767d21a10fdbec06688833daa7dacb6a681b"
+      },
+      "manifest": {
+        "artifacts": [
+          {
+            "arch": [
+              "arm64"
+            ],
+            "github_release": {
+              "asset": "cumm-0.4.11-cp38-cp38-linux_aarch64.whl",
+              "repository": "sanghun17/drone-runtime-modules",
+              "tag": "wheels-20260921"
+            },
+            "path": "wheels/cumm-0.4.11-cp38-cp38-linux_aarch64.whl",
+            "sha256": "cf090fcddb6c667a822218dff4f7507f916590f256a897db71afcc8ebfb12970",
+            "size": 2053421
+          },
+          {
+            "arch": [
+              "arm64"
+            ],
+            "github_release": {
+              "asset": "spconv-2.3.6-cp38-cp38-linux_aarch64.whl",
+              "repository": "sanghun17/drone-runtime-modules",
+              "tag": "wheels-20260921"
+            },
+            "path": "wheels/spconv-2.3.6-cp38-cp38-linux_aarch64.whl",
+            "sha256": "52648a2060a4790a1a41debabc6469d99e45383acc6a684b8a187c85d3b5f5ce",
+            "size": 12669305
+          }
+        ],
+        "assets": [
+          "wheels"
+        ],
+        "deps": {
+          "amd64_sm120": {
+            "allow_pip_fail": true,
+            "pip": [
+              "spconv-cu120"
+            ]
+          },
+          "amd64_sm75": {
+            "pip": [
+              "spconv-cu120"
+            ]
+          },
+          "amd64_sm89": {
+            "pip": [
+              "spconv-cu120"
+            ]
+          },
+          "pip": [
+            "pccm",
+            "ccimport",
+            "pybind11",
+            "ninja",
+            "wheel"
+          ],
+          "source": [
+            "install.sh"
+          ]
+        },
+        "description": "arm64 (Orin, sm_87): cumm 0.4.11 + spconv 2.3.6 AOT wheels (CUDA 11.4). For epoch_680 map_encoder + C++ sparse_vfe -- see the NOTE at the bottom of this file for why AOT (not editable) wheels. amd64 sm_120 (RTX 5090/Blackwell): wheel first (spconv-cu120, see deps.amd64_sm120 below), falls back to a from-source cumm+spconv build targeting sm_120 in install.sh if no wheel bakes it in. amd64 sm_89 (RTX 4090, driver 535.183 -> CUDA<=12.2 containers): spconv-cu120 wheel is well-covered for sm_89 -- hard-required (no source-build fallback, no allow_pip_fail); a failure there means something real is broken. sm_75 (RTX 2080 Ti, ML desktop itself, driver 535.261): same policy as sm_89 -- spconv-cu120 also covers Turing.\n",
+        "env": {
+          "CUDA_HOME": "/usr/local/cuda",
+          "CUMM_CUDA_ARCH_LIST": "8.7",
+          "PATH": "/usr/local/cuda/bin:${PATH}"
+        },
+        "group": "libraries",
+        "name": "spconv",
+        "needs": [
+          "libraries/torch"
+        ],
+        "provides": [
+          "spconv",
+          "cumm"
+        ]
+      },
+      "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
+      "revision": "362b85edb562baf5a9dfbeda7b1df3569581ac3a",
+      "subdir": "deployment/stack-modules/libraries/spconv"
+    },
+    "libraries/torch": {
+      "files": {
+        "install.sh": "c5e73d21c94adf4101bc029910410d5234fc91455e91c5d32bc487c6c185b74c",
+        "module.yml": "58311344c2fc257596740d7ffc10e773483ed3fd9e0cf25bd3f66d9851f6a40b",
+        "wheels/README.md": "21437d72663dd04b4a83c07a314db1968b594fc2d06652f86d5936d74af1e456",
+        "wheels/build_wheel.sh": "98eaba6f9d3141cb9155a714a3ddd97d6ef5189a9ebf1c17839e9b2124c0edb4",
+        "wheels/stage_from_archive.sh": "fbf66b6ecc8d63c7f77754eb1c34b65b74f3e9cbeda644c8c6fb3643d595e7a0"
+      },
+      "manifest": {
+        "artifacts": [
+          {
+            "arch": [
+              "amd64"
+            ],
+            "github_release": {
+              "asset": "torch-2.2.2-cp38-cp38-linux_x86_64.whl",
+              "repository": "sanghun17/drone-runtime-modules",
+              "tag": "wheels-20260921"
+            },
+            "path": "wheels/torch-2.2.2-cp38-cp38-linux_x86_64.whl",
+            "sha256": "def0390706afdd765c067219138936b4ddc727e9a1357f6969b805ce68f5854c",
+            "size": 274300059
+          }
+        ],
+        "assets": [
+          "wheels"
+        ],
+        "deps": {
+          "apt": [
+            "libopenblas-dev",
+            "libomp-dev",
+            "libopenmpi-dev"
+          ],
+          "source": [
+            "install.sh"
+          ]
+        },
+        "description": "arm64 (Jetson Orin): PyTorch 2.1.0, ships libtorch (torch/lib + cmake) that voxblox C++ links against. amd64, branched by GPU_ARCH inside install.sh (see there for why this stays imperative rather than a deps.<combo>.pip entry -- torch needs a custom --index-url, which the declarative deps.pip list can't express): sm_120 (RTX 5090/ Blackwell) = official PyTorch cu128 wheels, also upgrades the image's python3 to 3.11 since cu128 wheels need >=3.9 and that base_image ships 3.8. sm_89 (RTX 4090) / sm_75 (RTX 2080 Ti), both driver-535-capped hosts = the host-source-built torch 2.2.2 wheel from wheels/ (ABI=1, CUDA-unbundled, USE_CUDNN=OFF -- see install.sh for the full rationale), unconditionally as of 2026-07-26 (previously opt-in per stack via `build_env: {TORCH_VARIANT: src-abi1}`, now the only sm_89/sm_75 path; the stock pip cu121/ABI=0 wheel it replaced is gone). That wheel is git-untracked (274MB, host-local only) -- see wheels/README.md for its provenance/rebuild procedure and modules/libraries/torch/wheels/stage_from_archive.sh to stage it on a new host (needs `TORCH_WHEEL_ARCHIVE_DIR`, config/stack.env).\n",
+        "group": "libraries",
+        "name": "torch",
+        "provides": [
+          "torch",
+          "libtorch"
+        ]
+      },
+      "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
+      "revision": "362b85edb562baf5a9dfbeda7b1df3569581ac3a",
+      "subdir": "deployment/stack-modules/libraries/torch"
+    },
+    "odometry/fast-livo": {
+      "files": {
+        "build_ws.sh": "99a45a91453b992be06fd4e7ebff86c08b37cf8cb322d6834f675773baa787bb",
+        "clone.sh": "085010216e0d1485a9f17cefed99269340d7703afdf96cc30bad001cfa194d40",
+        "install.sh": "5d48ecae4bbd72483a7c678b1eacfd3faf1332d57dd070f2e8d588226152d2e9",
+        "module.yml": "25cdec131fd095613b82e0c21e24579016926814e34e1306c4b88325da5b9c5f",
+        "qualification/README.md": "ace8d7cd2fa29377ba58d4b8ea849178975ea0c19023c1775bfe3fce02b3d8ff",
+        "qualification/build_manifest.json": "106062f0148e5fd6ab73bad15b2daca9f7685dc5f1f63f073339d366950fc339",
+        "qualification/candidate_overlay.yaml": "8c651f57273ce1d3a8a5f1b5d5cf057cbf578f08491e34b09bfb74963b625310",
+        "run.sh": "2ddee7b18f3d50c326534e0dc753dfab0f0e3f23989eb63e794ad3e0788a2329"
+      },
+      "manifest": {
+        "clone": "clone.sh",
+        "deps": {
+          "source": [
+            "install.sh"
+          ]
+        },
+        "description": "FAST-LIVO2 visual/LiDAR-inertial odometry. Hardware and AirSim source/launch profiles are implementation choices of the same odometry capability.",
+        "group": "odometry",
+        "name": "fast-livo",
+        "provides": [
+          "odometry",
+          "odom-tf"
+        ],
+        "run": [
+          "run.sh"
+        ],
+        "workspace": "/work/ws/fast-livo"
+      },
+      "repository": "https://github.com/sanghun17/fast_livo2_custom.git",
+      "revision": "e53ae8280e6cdcb1d0f126c1ce464794033a44c3",
+      "subdir": "deployment/stack-modules/odometry/fast-livo"
+    },
+    "odometry/optitrack": {
+      "files": {
+        "build_ws.sh": "ba6c42482201bbc80291eb4e4617a31196f9492c14342a5e8e2c61b5d3766a5a",
+        "clone.sh": "a4988cbce7c9bb1c93e09e2b0f5c10c952a96bd49cde356f836b2c09d1bd5378",
+        "module.yml": "9fd2e264685d009740efecb063a5001db3543a356ec3caf5f410fdd131110a71",
+        "optitrack.launch": "b11517cd7ffc6f8c62e1d22654cf233e6be85529c224c275190cf77dd10ea8b8",
+        "run.sh": "6dd808636669bb9af24ad9c37e2e5a3e202697e7a6575532ef10933445cb1da8"
+      },
+      "manifest": {
+        "clone": "clone.sh",
+        "deps": {
+          "apt": [
+            "netbase",
+            "ros-noetic-vrpn",
+            "ros-noetic-tf2-ros",
+            "ros-noetic-diagnostic-updater"
+          ]
+        },
+        "description": "OptiTrack mocap pose via vrpn_client_ros (ros-drivers fork, kinetic-devel \u2014 ROS1, builds clean on noetic). Publishes /vrpn_client_node/<Tracker>/pose + in-node /diagnostics (link/rate/dropout/freeze via flight_safety StreamDiagnostic). Downstream vision-pose routing is owned by the consuming stack adapter. Server IP from config/stack.env OPTITRACK_SERVER.",
+        "group": "odometry",
+        "name": "optitrack",
+        "needs": [
+          "control/flight-safety"
+        ],
+        "provides": [
+          "mocap",
+          "pose-gt"
+        ],
+        "run": [
+          "run.sh"
+        ],
+        "workspace": "/work/ws/optitrack"
+      },
+      "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
+      "revision": "362b85edb562baf5a9dfbeda7b1df3569581ac3a",
+      "subdir": "deployment/stack-modules/odometry/optitrack"
+    },
+    "perception/aruco-landing": {
+      "files": {
+        "README.md": "5dc7ffe588e3ed195f733e231b36bcf76ae40307dcbaf0b0bf8284fd18868871",
+        "build_ws.sh": "e11767fbad1541b58fbeb57a0d3f3c69d28e1e9dc20132a7d3262b1a42cbb48f",
+        "clone.sh": "0f5ddf3b4a1daa0bf6fae8932964aee40d8c253ab190d4bef9216b1af45ad9db",
+        "install_aruco_cpp.sh": "1d7a1b7097a9515a2544943efdcf2cb62783f39bc2aa13994c46edec3149fc34",
+        "module.yml": "2002a35ae7d2a2eefa7f4b72e070f5cbb59d1991a35de39c9331afd8e4cdbf3e",
+        "run.sh": "c3c5e9161faecad0b41840d04d5630fc5cca66d58eb0f218121baaf18ddfae5e",
+        "run_detector.sh": "1e6a6fdc1b72744fce2cadb7baa4893bca5376f3b8f7cb6f1bff2bebf5b30259",
+        "run_estimator.sh": "1e6a6fdc1b72744fce2cadb7baa4893bca5376f3b8f7cb6f1bff2bebf5b30259",
+        "run_physical_estimator.sh": "1e6a6fdc1b72744fce2cadb7baa4893bca5376f3b8f7cb6f1bff2bebf5b30259"
+      },
+      "manifest": {
+        "clone": "clone.sh",
+        "deps": {
+          "apt": [
+            "ros-noetic-cv-bridge",
+            "ros-noetic-image-transport",
+            "ros-noetic-tf",
+            "ros-noetic-tf2-geometry-msgs",
+            "ros-noetic-roscpp",
+            "ros-noetic-geometry-msgs",
+            "ros-noetic-sensor-msgs",
+            "ros-noetic-std-msgs",
+            "ros-noetic-std-srvs",
+            "ros-noetic-tf2-ros",
+            "libyaml-cpp-dev",
+            "ninja-build",
+            "python3-opencv"
+          ],
+          "source": [
+            "install_aruco_cpp.sh"
+          ]
+        },
+        "description": "ArUco detection, calibrated pad/body pose estimation, session-only global alignment, and detected-image output.",
+        "group": "perception",
+        "name": "aruco-landing-perception",
+        "provides": [
+          "aruco-detection",
+          "landing-target",
+          "pad-relative-body-pose",
+          "marker-global-body-pose"
+        ],
+        "run": [
+          "run.sh"
+        ],
+        "workspace": "/work/ws/aruco-landing"
+      },
+      "repository": "https://github.com/sanghun17/aruco_landing.git",
+      "revision": "31c8050dbcf790e90de5499e581966968e84dd37",
+      "subdir": "deployment/stack-modules/perception/aruco-landing"
+    },
+    "planner/aruco-landing": {
+      "files": {
+        "module.yml": "9596662d3c555924467985a07f3f153901580cc5c9ade5ceef57a1eb91462c8f",
+        "run.sh": "92bd574126694ee59a4e5be2403936ccd9e522b24241f03eaee75e2d21de402f"
+      },
+      "manifest": {
+        "description": "Pilot OFFBOARD triggered approach, marker qualification and landing through shared safety.",
+        "group": "planner",
+        "name": "aruco-landing-planner",
+        "needs": [
+          "perception/aruco-landing",
+          "control/flight-safety"
+        ],
+        "provides": [
+          "landing-controller",
+          "landing-command"
+        ],
+        "run": [
+          "run.sh"
+        ]
+      },
+      "repository": "https://github.com/sanghun17/aruco_landing.git",
+      "revision": "31c8050dbcf790e90de5499e581966968e84dd37",
+      "subdir": "deployment/stack-modules/planner/aruco-landing"
+    },
+    "planner/la-planner": {
+      "files": {
+        "README.md": "bc42ebe85cec1cceb8568ab6278aee544e42b7f2ccbebf4de894fd6c0d52d102",
+        "module.yml": "bc937dc9d00b5fcefffd5e7fe79aa1aec661a76f7fd811d1fed8a997069325f0",
+        "run.sh": "7d3f4b3c1d060c0e5d95b1ff16196a93214d91ce9da2524760dff43c8053f367"
+      },
+      "manifest": {
+        "description": "Localization-aware exploration, with its own runtime entrypoint over the shared planner source workspace.",
+        "group": "planner",
+        "name": "la-planner",
+        "needs": [
+          "planner/risk-aware"
+        ],
+        "provides": [
+          "localization-aware-exploration"
+        ],
+        "run": [
+          "run.sh"
+        ]
+      },
+      "repository": "https://github.com/sanghun17/risk-aware_planning.git",
+      "revision": "6ffc5bd9fc49522db4e792da4442078b99fa9d0a",
+      "subdir": "deployment/stack-modules/planner/la-planner"
+    },
+    "planner/rhem": {
+      "files": {
+        "CMakeLists.txt": "affe8af541eafb2e48dacf20c2f5609033024c99cdf81e147455f8db575b57cf",
+        "README.md": "b1be783241877d65aadb09228918ba0c71ab584ea90e0647d3c0c2be86922a63",
+        "build_ws.sh": "6f763eac65cf87a20d9b0404efadfaeac8d67fa977f8bbe39960b2194df07f06",
+        "clone.sh": "07aeaf4e779167678123c34a0db889ad236a5eb1dbfd7fdc69ccfcd8d4c0bb05",
+        "launch/rhem.launch": "a37c520491b9f9f7204a9843c865d2f42c8257aa50f4416d595ce6433f3cd444",
+        "module.yml": "6394f90614ba6eb214257a9beb8d0074856238245a37cab98305e0c658a12c79",
+        "package.xml": "b3d71b2b5807897e143956a8e893d37ba65e4778ce65e0bc3ac2d4c5fbdc0acc",
+        "patches/eigen_catkin.patch": "7a2a18e8da04ae19d1da30fe0088f81ce93e5d2efd58fb5d331d05305db68418",
+        "patches/eigen_checks.patch": "76db45865f18f639bd38139dd8160b057c7ab26990ac182a6886621e1cd0fb62",
+        "patches/gflags_catkin.patch": "3b6f942fb41be1305cfcd81ac076b715910b5a028930cc80e9b89db90c389214",
+        "patches/glog_catkin.patch": "e85a20aa71796e0df99ab009e22e77579b93d4419867ff743c04aa344452e7bc",
+        "patches/minkindr.patch": "2946b978dd14f418c4f5d3b8088990a0a8f9b3783d461948564c448c2128f3d7",
+        "patches/minkindr_ros.patch": "a2f9f1860cf4b4f5a07274524c584d9f6508a96809e9847c85bea81ac45bdfe0",
+        "patches/rhem.patch": "9da19ca95696c57d688a1234cf722f7422386c592c874c645412b68908afd4b9",
+        "patches/rovio_bsp.patch": "b6e2440664c2cfd7755576340c5f134f3e67c567d7b0787ac76f4d7c22dec013",
+        "patches/volumetric_mapping.patch": "d21c14848f448ddb291fa31a54ecf983549728b6e3956b324e00bd41c3b791f1",
+        "run.sh": "54f47510ef53ba4d5c6bf39d8fb547d7b17b6b1bae2b6bacdaa9d06c3167db14",
+        "scripts/belief_bridge.py": "83e35aeee3c41e8504dd8ef8839be3e2591c1d2394828951cfa32b2b19da3c6a",
+        "sources.yml": "534862bed3008a188028fd8bd4477852dba595c76590f47adf263a53b7498f56",
+        "tests/check_propagation_service.py": "cb823b492c0a5e8036b9968769474993d963fcb0fd7513343d5f28f4154857c2",
+        "tests/test_belief_bridge.py": "18b433070c799c3f1f657d0a6269c8cc1352f7d39e14f9a6642898e020d88ea6"
+      },
+      "manifest": {
+        "clone": "clone.sh",
+        "deps": {
+          "apt": [
+            "python3-numpy",
+            "liboctomap-dev",
+            "libgoogle-glog-dev",
+            "libgflags-dev",
+            "libyaml-cpp-dev",
+            "ros-noetic-octomap-ros",
+            "ros-noetic-octomap-msgs",
+            "ros-noetic-eigen-conversions",
+            "ros-noetic-tf-conversions",
+            "ros-noetic-image-transport",
+            "ros-noetic-cv-bridge",
+            "ros-noetic-pcl-ros",
+            "ros-noetic-cmake-modules"
+          ]
+        },
+        "description": "RHEM next-best-view exploration and ROVIO belief-space propagation, with an external odometry interface.",
+        "group": "planner",
+        "name": "rhem",
+        "provides": [
+          "rhem-exploration",
+          "belief-space-propagation"
+        ],
+        "run": [
+          "run.sh"
+        ],
+        "workspace": "/work/ws/rhem"
+      },
+      "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
+      "revision": "362b85edb562baf5a9dfbeda7b1df3569581ac3a",
+      "subdir": "deployment/stack-modules/planner/rhem"
+    },
+    "planner/risk-aware": {
+      "files": {
+        "ASSETS.md": "8cbcc98a05ce07e67ef8f1fc332e182d05f9884a1bde65ff85a0632d397c06fe",
+        "build_ws.sh": "9051bfa29a7d363b698fbd7036b3fe866599562f31491046a44610b47428c19b",
+        "clone.sh": "88ba9f51f40926d1f1ba5f19f2f94db9308c30390cd4cc777057325e47b85e31",
+        "module.yml": "ae5feefa985f3d5dc4096eb0d3ff0916c35c37ab5b33f081706a7c3f2c18df30",
+        "run_jax.sh": "365633ac64182af169d239d61991ff0f55e7ed93e759a84a1fce13ef5714dc9e",
+        "run_planner.sh": "ce81d5679b6eec62f52b5115f2a389890497191fe7b322711d1ac25a6713ca9b",
+        "run_voxblox.sh": "a5b27aa0661467541355721524b07fef62576cd59ea750406402a84a4c021202"
+      },
+      "manifest": {
+        "clone": "clone.sh",
+        "deps": {
+          "amd64": {
+            "apt": [
+              "ros-noetic-angles",
+              "libgeographic-dev",
+              "geographiclib-tools",
+              "libyaml-cpp-dev",
+              "ros-noetic-diagnostic-updater",
+              "ros-noetic-laser-geometry",
+              "ros-noetic-map-msgs",
+              "ros-noetic-resource-retriever",
+              "ros-noetic-urdf",
+              "ros-noetic-xacro",
+              "ros-noetic-rviz",
+              "ros-noetic-depth-image-proc"
+            ]
+          },
+          "apt": [
+            "rsync",
+            "libtool",
+            "autoconf",
+            "automake",
+            "pkg-config",
+            "zlib1g-dev",
+            "libssl-dev",
+            "libtbb-dev",
+            "ros-noetic-tf-conversions",
+            "ros-noetic-tf2-geometry-msgs",
+            "ros-noetic-interactive-markers",
+            "ros-noetic-geographic-msgs",
+            "ros-noetic-nlopt",
+            "python3-future",
+            "libdw-dev",
+            "ros-noetic-control-toolbox"
+          ],
+          "pip": [
+            "matplotlib",
+            "pyquaternion",
+            "open3d",
+            "tqdm",
+            "trimesh",
+            "evo"
+          ]
+        },
+        "description": "Risk-aware exploration capability \u2014 uncertainty-aware voxblox mapping, global exploration, and JAX MPPI local planning. Hardware and AirSim launch profiles share one source workspace.",
+        "group": "planner",
+        "name": "risk-aware",
+        "needs": [
+          "libraries/torch",
+          "libraries/spconv",
+          "libraries/jax"
+        ],
+        "provides": [
+          "voxblox-map",
+          "exploration",
+          "jax-mppi"
+        ],
+        "run": [
+          "run_voxblox.sh",
+          "run_planner.sh",
+          "run_jax.sh"
+        ],
+        "workspace": "/work/ws/risk-aware"
+      },
+      "repository": "https://github.com/sanghun17/risk-aware_planning.git",
+      "revision": "6ffc5bd9fc49522db4e792da4442078b99fa9d0a",
+      "subdir": "deployment/stack-modules/planner/risk-aware"
+    },
+    "sensor/realsense-d435i": {
+      "files": {
+        "d435i.launch": "72fe9fa8088093ac9d5cf6b05f72381c553e3f46a00210f89eb39ceda5d626a3",
+        "depth_overlay.py": "b6c3a3dd33e3bd0828d1ece353ad87d9aa5a93fdc8ea1384244ea18769b0b4ee",
+        "hybrid_imu.py": "9c5127ae7b4bb6d3d77ad44c6617cb25081db769627c29c6393eb107ae4b2153",
+        "hybrid_imu_core.py": "5a6b90d4259e574e14e39253dbc722200d3a90d18c691446486eda0dac6c5cbc",
+        "install.sh": "165aa5910a7dd293cb65e36297a8d1b5a72a6c24f0d561ac2ea2a920109a78ce",
+        "module.yml": "c5e56f7ef1b52bd0ec3cd59743667da1a69477e7affb907df555315ef042c3e4",
+        "package.xml": "7fc8944fe0b6a5033245dbda456f2b8e7eb17e9519c2606d434d2a244c5ec3d0",
+        "paired_drop.py": "ce4640f9bd7de719a5ed33d41d310aee91b5a8b443512dee634139d013799ebe",
+        "run.sh": "30f60643470aa3cb52dc8f394301ef5949ea0f4878683e97154ea49e9d182bb4"
+      },
+      "manifest": {
+        "deps": {
+          "apt": [
+            "ros-noetic-realsense2-camera",
+            "ros-noetic-realsense2-description"
+          ],
+          "source": [
+            "install.sh"
+          ]
+        },
+        "description": "Intel RealSense D435i driver (depth + color + IMU). All 4 streams; enable_sync:=false.",
+        "group": "sensor",
+        "mounts": [
+          "/dev:/dev"
+        ],
+        "name": "realsense-d435i",
+        "provides": [
+          "camera",
+          "depth-cloud",
+          "color",
+          "imu"
+        ],
+        "run": [
+          "run.sh"
+        ]
+      },
+      "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
+      "revision": "362b85edb562baf5a9dfbeda7b1df3569581ac3a",
+      "subdir": "deployment/stack-modules/sensor/realsense-d435i"
+    },
+    "sensor/see3cam-24cug": {
+      "files": {
+        "CMakeLists.txt": "c9fedb8af7fd17d03b62ce2044294c826dadfbedb30ae589cc6c4f67d9363c83",
+        "README.md": "f5d60a2bcdcbcdc4f2a3aa94de6f0fd69315c580cb9d87d22d980f99d7744517",
+        "build.sh": "c9f48b01f180e5f1d0893712eb4ec277b68f9b8a2ae60b24c2e64b8f6bfadf4d",
+        "calibration/1A3958060A020900.yaml": "ccbe72d5d11b6fc562d17c579fac21e863856ddd713c842e7537180e9aa0efd3",
+        "calibration/README.md": "522ed642b38a1aac258bae74b1e6dd301073444396f650c70e57cb6069ae9d7a",
+        "calibration/generate_checkerboard.py": "bb30c997071ef81757d861abb314ecf0cdfc5bebb39e30461a83a80d6f4a8d7a",
+        "module.yml": "da83a3db9d7dc6384aabc8161d1ba0c9f74b8daf110fb620ce834668cea779f4",
+        "run.sh": "734f1f9fa4f7799a41da632ddbc030f2cb15b4df70d06266578d3f7b328d63c9",
+        "see3cam_node.cpp": "d2a6ba48bdf59f0ca2accaa48f189133158dd29941fb1956473c4f148fde1efb",
+        "tests/check_camera_demand.py": "c7291045b475375c3b08a91d24884da9734ab924d586f3e88ef271eac4a48eb8",
+        "tests/check_camera_lifecycle.cpp": "5eb29da377b103cdde7c23285a351f64fe23dfa24f4b0dc1cc98ff39b01bf51a",
+        "tests/inject_bad_capture.c": "ca7b23e90dc90682be295f3e99a9500c514f0a3e512fa9c48b5d812daac516b4",
+        "vendor/usb_cam/README.md": "0b60888ad35376c4224c74a2daab1e7e36c2529601c251287c00c48188980f80",
+        "vendor/usb_cam/include/usb_cam/usb_cam.h": "f625ae2598943a1e8b10e900186aec338026abe427cfbe817998eb3362577f51",
+        "vendor/usb_cam/usb_cam.cpp": "1844d23ac14a7b710932c3ca283ddf858002376e7690fc88d597a53b07cc349b"
+      },
+      "manifest": {
+        "deps": {
+          "apt": [
+            "ros-noetic-usb-cam",
+            "ros-noetic-camera-calibration",
+            "ros-noetic-compressed-image-transport",
+            "v4l-utils",
+            "cmake",
+            "g++",
+            "pkg-config",
+            "libopencv-dev",
+            "libavcodec-dev",
+            "libswscale-dev",
+            "libavutil-dev",
+            "ros-noetic-camera-info-manager"
+          ]
+        },
+        "description": "e-con Systems See3CAM_24CUG AR0234 global-shutter UVC camera.",
+        "group": "sensor",
+        "mounts": [
+          "/dev:/dev"
+        ],
+        "name": "see3cam-24cug",
+        "provides": [
+          "camera",
+          "color",
+          "global-shutter"
+        ],
+        "run": [
+          "run.sh"
+        ]
+      },
+      "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
+      "revision": "362b85edb562baf5a9dfbeda7b1df3569581ac3a",
+      "subdir": "deployment/stack-modules/sensor/see3cam-24cug"
+    },
+    "simulation/airsim": {
+      "files": {
+        "README.md": "336e511a5ae13386d0426d57b4fb67d3def94c2fbdc7e984360ab8ad232a58ec",
+        "install.sh": "37690508e9ffd839dbd79b75acf277c3ab0955ce8da5a2dde240c5d2fd840bd4",
+        "module.yml": "4a7075b6388927a740b2b82ae8e8d7fb0f37c5b043f27b505cfe190edcc3efa0",
+        "run_camera.sh": "72ff7825fe4af833cf258d1c68d0297b2af8852ced4e779a1de83319d1306cb1",
+        "scripts/airsim_camera_bridge.py": "fdbd9406a7f0120f8cc804d83d5b975441112d43242bfedc56112a992e6042b0",
+        "scripts/generate_settings.py": "936346abd1a4c0cd926ed1447d59c7571d41bb9a1f9c82efe56276daef1b75b5"
+      },
+      "manifest": {
+        "deps": {
+          "apt": [
+            "libyaml-cpp-dev",
+            "python3-numpy",
+            "python3-yaml",
+            "ros-noetic-cv-bridge",
+            "ros-noetic-geometry-msgs",
+            "ros-noetic-nav-msgs",
+            "ros-noetic-roscpp",
+            "ros-noetic-sensor-msgs",
+            "ros-noetic-tf",
+            "ros-noetic-tf2",
+            "ros-noetic-tf2-ros"
+          ],
+          "source": [
+            "install.sh"
+          ]
+        },
+        "description": "Reusable AirSim RPC client and configurable ROS camera bridge. Maps, Unreal projects, vehicle placement, and experiment tooling are owned by each stack.\n",
+        "group": "simulation",
+        "name": "airsim",
+        "provides": [
+          "airsim-client",
+          "simulated-camera",
+          "camera-info",
+          "camera-tf"
+        ],
+        "run": [
+          "run_camera.sh"
+        ]
+      },
+      "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
+      "revision": "362b85edb562baf5a9dfbeda7b1df3569581ac3a",
+      "subdir": "deployment/stack-modules/simulation/airsim"
+    },
+    "utility/gui-vnc": {
+      "files": {
+        "install.sh": "606e6cb4a3a4c52cb31158b538cd6c8b2922159a31546ab37867811109117eb6",
+        "module.yml": "c436d22716f9caac87f377fd7c3eb37c7fcfc02f1f8191597040dff3fd874468"
+      },
+      "manifest": {
+        "deps": {
+          "apt": [
+            "xvfb",
+            "x11vnc",
+            "websockify",
+            "python3-numpy",
+            "libgl1-mesa-dri",
+            "libgl1-mesa-glx",
+            "x11-utils",
+            "openbox",
+            "zenity"
+          ],
+          "source": [
+            "install.sh"
+          ]
+        },
+        "description": "Shared headless-GUI-over-VNC chain for the utility/* GUIs (rviz, rqt, ...). GUIs render on a virtual Xvfb display with mesa software GL (the L4T nvidia GL can't direct-render Qt/OpenGL apps on a headless display), x11vnc turns that display into a VNC stream, and websockify serves a modern noVNC (installed to /opt/novnc \u2014 apt's novnc is too old) so you view it in ANY BROWSER with zero install \u2014 no VNC client and no ssh -X needed. Pulled in via `needs:` by utility/rviz, utility/rqt, etc.",
+        "group": "utility",
+        "mounts": [
+          "/tmp/.X11-unix:/tmp/.X11-unix"
+        ],
+        "name": "gui-vnc",
+        "provides": [
+          "gui-vnc"
+        ],
+        "run": []
+      },
+      "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
+      "revision": "362b85edb562baf5a9dfbeda7b1df3569581ac3a",
+      "subdir": "deployment/stack-modules/utility/gui-vnc"
+    },
+    "utility/rqt": {
+      "files": {
+        "module.yml": "4e28381062b1ca75ff8fb95be9a6a37274de7847185ec7874b87dae23c364b60"
+      },
+      "manifest": {
+        "deps": {
+          "apt": [
+            "ros-noetic-rqt",
+            "ros-noetic-rqt-common-plugins",
+            "ros-noetic-rqt-tf-tree"
+          ]
+        },
+        "description": "rqt \u2014 ROS Qt GUI framework + the common plugins (plot, graph, console, topic monitor, image view, ...). Launch headless on the Jetson host with scripts/utility_rqt.sh \u2014 same Xvfb + VNC trick as rviz (see utility/gui-vnc), shown on your screen over ssh -X.",
+        "group": "utility",
+        "name": "rqt",
+        "needs": [
+          "utility/gui-vnc"
+        ],
+        "provides": [
+          "rqt"
+        ],
+        "run": []
+      },
+      "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
+      "revision": "362b85edb562baf5a9dfbeda7b1df3569581ac3a",
+      "subdir": "deployment/stack-modules/utility/rqt"
+    },
+    "utility/rviz": {
+      "files": {
+        "config/default.rviz": "94b75a7626c78138238910f353c7d2c7a3e372c98505e8f25d38c7d10893b4d1",
+        "module.yml": "868b969da4c8a2248ccf34ff19cb6b707ecc1564c718ef24923bf83cd63b7ed4"
+      },
+      "manifest": {
+        "deps": {
+          "apt": [
+            "ros-noetic-rviz"
+          ]
+        },
+        "description": "RViz 3D visualization. Launch headless on the Jetson host with scripts/utility_rviz.sh \u2014 it renders rviz on the shared Xvfb display and shows it on your screen over ssh -X (see utility/gui-vnc for the how/why). First of the utility/* group (rqt / foxglove / qgc may follow).",
+        "group": "utility",
+        "name": "rviz",
+        "needs": [
+          "utility/gui-vnc"
+        ],
+        "provides": [
+          "rviz"
+        ],
+        "run": []
+      },
+      "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
+      "revision": "362b85edb562baf5a9dfbeda7b1df3569581ac3a",
+      "subdir": "deployment/stack-modules/utility/rviz"
+    },
+    "utility/session-recorder": {
+      "files": {
+        "config/flightlog-sync.path": "d77b1aedc2f88a8de499c6e2f7b00eb149ebe6808daf842a1a26e04655b63fe4",
+        "config/flightlog-sync.service": "94f58b3ba4ef90f9611d9bbad3a1d2154dcb40a84416f513d30c34bc0712bf79",
+        "config/webcam_extrinsics.json": "db7fd23a6b657ae1d4e87114ac706a14e897a2341c7dbbc27d20fbd9f0e50cc8",
+        "module.yml": "6a3e17d5f533bcb7aead491b96eddafbc46addeb9b48dfd210621ea25ad63014",
+        "run.sh": "8d5c37f844dacd92b5ac4689a3eeeefd0b7731480b4c94e69265fb5e7a8e1b94",
+        "scripts/flightlog_sync.sh": "939b96bb1d2443819f09ee3d57dc0098c8346441ce22ecb5d086b46abb7fb1d1",
+        "session_recorder_node.py": "3fc5e083020294b64c2da56ef81659d2343b36461c658e5a4410cd2b136bc4c9",
+        "sessionctl.sh": "94cbec8e465c4d555ee2e33db316abe740d893a5e330ed7d39e0b0f9fcfc0662"
+      },
+      "manifest": {
+        "deps": {
+          "apt": [
+            "ros-noetic-rosbag",
+            "ros-noetic-mavros-msgs"
+          ]
+        },
+        "description": "Profile-driven experiment session recorder. A common start/stop core records rosbag data; hardware optionally maps MAVROS arming to the session edge and triggers the external webcam.",
+        "group": "utility",
+        "name": "session-recorder",
+        "provides": [
+          "experiment-recording"
+        ],
+        "run": [
+          "run.sh",
+          "sessionctl.sh"
+        ]
+      },
+      "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
+      "revision": "362b85edb562baf5a9dfbeda7b1df3569581ac3a",
+      "subdir": "deployment/stack-modules/utility/session-recorder"
+    }
+  },
+  "version": 1
+}

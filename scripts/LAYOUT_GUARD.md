@@ -30,7 +30,7 @@ even when the checkout layout is invalid.
 
 Only the six visible root directories and declared root files are allowed.
 Modules must use a declared group and own a module.yml; stacks must own stack.yml.
-Research/results directories, tracked ws/build/log trees, output/media archives,
+Misplaced outputs, tracked module implementations and data payloads, tracked ws/build/log trees, output/media archives,
 unapproved binaries, oversized files, symlinks and nested submodules are rejected.
 Training modules are outside this runtime repository. `forbidden_path_prefixes`
 rejects the retired training stacks, controller/pose wrappers and device-backup
@@ -46,7 +46,7 @@ and its tests in the same reviewed change.
 (normally 0775 becomes 0555). The kernel rejects top-level `mkdir`, new files,
 symlinks, renames and deletions regardless of which agent/tool performs them.
 Only that inode changes: normal edits and new directories inside `modules`,
-`scripts`, `stacks`, `config`, `ws`, `flight_logs`, `.build` and `.git` still work.
+`scripts`, `stacks`, `config`, `data`, `ws`, `flight_logs`, `.build` and `.git` still work.
 The allowed workspace/log/build roots are created before locking a fresh clone.
 
 The lock survives agent restarts and reboot. It is local filesystem state, not a
@@ -76,3 +76,8 @@ checkout. Agents must not do these things to bypass a rejection. Strict isolatio
 against a hostile agent requires a separate restricted identity/sandbox.
 Nested directories remain writable and are checked by the Git/layout guards;
 the permission lock does not classify the semantic purpose of every source file.
+
+Project analysis source and metadata are allowed under data/analysis and
+data/manifests. The data/assets, data/results and data/archive roots are local
+payload storage; force-adding their files is rejected by the index check.
+Module snapshots are owned by their locked remote packages, not this Git index.
