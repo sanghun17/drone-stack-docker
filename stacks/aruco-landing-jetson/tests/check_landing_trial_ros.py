@@ -15,6 +15,7 @@ import yaml
 ROOT=Path(__file__).resolve().parents[3]
 CUT=os.environ.get('TEST_TERMINATION')=='1'
 AUTO=os.environ.get('TEST_AUTO_PLANNER')=='1'
+SPEEDS=os.environ.get('TEST_LANDING_SPEEDS')=='1'
 TRANSITION=os.environ.get('TEST_TRANSITION')=='1'
 PORT=11358 if TRANSITION else 11357
 OUT=ROOT/('flight_logs/aruco-landing/trial-transition-integration' if TRANSITION else 'flight_logs/aruco-landing/trial-regression')
@@ -40,7 +41,7 @@ def main():
     from std_srvs.srv import Trigger
     from aruco_landing.pose_alignment import matrix_pose
     children=[];logs=[];stop=threading.Event();latest={};commands=[];mode_calls=[];kill_calls=[]
-    sim=dict(mode='POSCTL',armed=not AUTO,visible=AUTO,z=1.2,x=1.,landed=AUTO)
+    sim=dict(mode='POSCTL',armed=not AUTO,visible=AUTO,z=1.2,x=4. if SPEEDS else 1.,landed=AUTO)
     def spawn(name,args):
         f=(OUT/(name+'.log')).open('w');logs.append(f)
         p=subprocess.Popen(args,env=env,cwd=ROOT,stdout=f,stderr=f,start_new_session=True);children.append(p)
@@ -77,7 +78,7 @@ def main():
         rospy.set_param('/flight_safety_response',yaml.safe_load((ROOT/'ws/flight-safety/src/flight_safety/config/response.yaml').read_text()))
         rospy.set_param('/flight_safety_response/allow_external_termination',CUT)
         spawn('safety',['python3',str(ROOT/'ws/flight-safety/src/flight_safety/scripts/response_node.py')])
-        spawn('trial',['roslaunch',str(ROOT/'ws/aruco-landing/src/aruco_landing/launch/landing_trial.launch'),'dry_run:=false','landing_finish_mode:='+('force_disarm' if CUT else 'auto_land'),'auto_start_on_offboard:='+str(AUTO).lower(),'estimation_transition:='+str(TRANSITION).lower(),'config_root:='+str(ROOT/'stacks/aruco-landing-jetson/config')])
+        spawn('trial',['roslaunch',str(ROOT/'ws/aruco-landing/src/aruco_landing/launch/landing_trial.launch'),'dry_run:=false','landing_finish_mode:='+('force_disarm' if CUT else 'auto_land'),'auto_start_on_offboard:='+str(AUTO).lower(),'estimation_transition:='+str(TRANSITION).lower(),'config_root:='+str(ROOT/'stacks/aruco-landing-jetson/config')]+(['approach_speed_mps:=0.5','landing_horizontal_speed_mps:=2.0','descent_speed_mps:=0.5'] if SPEEDS else []))
         pubs={}
         for key,topic,kind in [('marker','/landing/vision_pose_marker',PoseStamped),('mocap','/vrpn_client_node/pure/pose',PoseStamped),('local','/mavros/local_position/pose',PoseStamped),('state','/mavros/state',State),('extended','/mavros/extended_state',ExtendedState),('pad','/landing/pad_pose_global',PoseStamped),('ready','/landing/alignment/ready',Bool),('visible','/landing/target_visible',Bool),('inliers','/landing/estimator/inlier_ids',Int32MultiArray),('body','/landing/vehicle_pose_pad',PoseWithCovarianceStamped),('camera','/landing/camera_pose_pad',PoseWithCovarianceStamped)]:pubs[key]=rospy.Publisher(topic,kind,queue_size=10)
         rospy.Subscriber('/landing/trial/status',String,status)
@@ -113,6 +114,7 @@ def main():
         time.sleep(1.2);assert not mode_calls
         sim['visible']=False;sim['mode']='OFFBOARD';wait_for(lambda:latest['status']['phase']=='APPROACH')
         time.sleep(.15);sp=commands[-1][1];assert sp.velocity.x<0 and abs(sp.velocity.z)<1e-9 and abs(sp.position.z-1.2)<.01
+        assert abs(np.hypot(sp.velocity.x,sp.velocity.y)-.5)<1e-6
         sim['visible']=True;dwell_start=time.monotonic()
         time.sleep(.25)
         assert latest['status']['phase']=='APPROACH'
@@ -123,6 +125,10 @@ def main():
         assert time.monotonic()-dwell_start>=.95
         time.sleep(.15)
         assert commands[-1][1].velocity.z<-.1
+        if SPEEDS:
+            sp=commands[-1][1]
+            assert abs(np.hypot(sp.velocity.x,sp.velocity.y)-2.)<1e-6
+            assert abs(sp.velocity.z+.5)<1e-6
         if TRANSITION:
             assert latest['router']['last_output_source']=='marker'
             # A still-visible but inconsistent pose must not keep descending.
@@ -177,10 +183,10 @@ def main():
         sim['z']=.19-X[2,3];wait_for(lambda:len(mode_calls)==2,3)
         sim['visible']=False;wait_for(lambda:'POSCTL'in mode_calls,3)
         assert mode_calls==['AUTO.LAND','AUTO.LAND','POSCTL']
-        assert max(np.hypot(m.velocity.x,m.velocity.y) for _,m in commands)<=.500001
-        report=dict(result='PASS',transport='isolated localhost ROS; mock FCU, actual safety/vision mux/controller/trial nodes',loss_to_failed_hold_s=loss_delay,
-            checked=(['pre-arm launch with visible markers stays IDLE','automatic preparation without start/reset services','final XY command norm <= 0.5 m/s'] if AUTO else [])+['manual OFFBOARD admission','constant approach altitude','marker dwell then descent','0.5s loss -> position hold','no automatic retry','0.2m -> AUTO.LAND, no kill','ground+disarm -> complete','AUTO.LAND marker loss -> POSCTL','sole safety setpoint publisher','sole vision mux publisher'],mode_calls=mode_calls)
-        (OUT/('ros_auto_planner.json' if AUTO else 'ros_integration.json')).write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
+        assert max(np.hypot(m.velocity.x,m.velocity.y) for _,m in commands)<=(2.000001 if SPEEDS else .500001)
+        report=dict(result='PASS',phase_speed_limits_tested=SPEEDS,transport='isolated localhost ROS; mock FCU, actual safety/vision mux/controller/trial nodes',loss_to_failed_hold_s=loss_delay,
+            checked=(['pre-arm launch with visible markers stays IDLE','automatic preparation without start/reset services','phase-specific final XY command limits'] if AUTO else [])+['manual OFFBOARD admission','constant approach altitude','marker dwell then descent','0.5s loss -> position hold','no automatic retry','0.2m -> AUTO.LAND, no kill','ground+disarm -> complete','AUTO.LAND marker loss -> POSCTL','sole safety setpoint publisher','sole vision mux publisher'],mode_calls=mode_calls)
+        (OUT/('ros_landing_speeds.json' if SPEEDS else 'ros_auto_planner.json' if AUTO else 'ros_integration.json')).write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
     finally:
         stop.set()
         for p in reversed(children):
