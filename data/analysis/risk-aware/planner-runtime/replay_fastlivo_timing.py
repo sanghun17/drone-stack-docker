@@ -9,9 +9,11 @@ p.add_argument('--camera-calibration',choices=['recorded','shared-profile'],defa
 a=p.parse_args()
 with socket.socket() as probe:probe.bind(('127.0.0.1',a.port))
 a.output.mkdir(parents=True,exist_ok=False)
+driver_source=Path(__file__).read_bytes()
+(a.output/'replay_driver.py').write_bytes(driver_source)
 manifest=json.loads((a.inputs/'manifest.json').read_text());trial=Path(manifest['trial']);params=yaml.safe_load((trial/'parameters.yaml').read_text())
 os.environ.update(ROS_MASTER_URI=f'http://127.0.0.1:{a.port}',ROS_IP='127.0.0.1',ROS_HOSTNAME='127.0.0.1',ROS_HOME=str(a.output/'ros'),ROS_LOG_DIR=str(a.output/'ros/log'))
-procs=[];logs=[];subs=[];data=dict(np.load(a.inputs/'reference.npz'))
+procs=[];logs=[];subs=[];camera_pubs=[];data=dict(np.load(a.inputs/'reference.npz'));completed=False
 def launch(command,name):
  f=(a.output/(name+'.log')).open('w');logs.append(f);p=subprocess.Popen(command,stdout=f,stderr=subprocess.STDOUT,start_new_session=True);procs.append(p);return p
 try:
@@ -22,6 +24,7 @@ try:
  else:raise RuntimeError('Master did not start')
  import rospy
  from nav_msgs.msg import Odometry
+ from sensor_msgs.msg import CameraInfo
  rospy.init_node('timing_replay',disable_signals=True);rospy.set_param('/use_sim_time',True)
  corrected_extrinsics=None
  if a.camera_calibration=='shared-profile':
@@ -49,6 +52,16 @@ try:
  for name in variants:
   cfg={key:copy.deepcopy(params[key]) for key in groups}
   cfg['common'].update(img_topic='/timing/'+name+'/image',lid_topic='/timing/'+name+'/cloud',imu_topic='/timing/imu')
+  if cfg['common'].get('online_intrinsics_en',False):
+   # Preserve the estimator's native one-shot calibration path on an isolated
+   # master. Effective K lives in the archived CameraInfo, not static ROS params.
+   with rosbag.Bag(str(trial/'flight.bag')) as original:
+    info=next((m for _,m,_ in original.read_messages(topics=['/camera/left/camera_info'])),None)
+   if info is None:raise ValueError('Online calibration was enabled but no CameraInfo was archived')
+   cfg['common']['cam_info_topic']='/timing/'+name+'/camera_info'
+   pub=rospy.Publisher(cfg['common']['cam_info_topic'],CameraInfo,queue_size=1,latch=True)
+   camera_pubs.append(pub);pub.publish(info)
+   manifest['effective_camera_info']={'width':info.width,'height':info.height,'K':list(info.K),'D':list(info.D)}
   cfg['debug']={'verbose':False}
   if corrected_extrinsics is not None:cfg['extrin_calib'].update(corrected_extrinsics)
   # Keep estimator tuning and calibration identical to the recorded run.
@@ -73,10 +86,11 @@ try:
  while player.poll() is None:
   if time.monotonic()>deadline:raise RuntimeError('Replay timeout')
   if any(p.poll() is not None for p in procs[:-1]):raise RuntimeError('Estimator or master exited during replay')
-  (a.output/'progress.json').write_text(json.dumps({k:{'samples':len(v),'latest':v[-1][:4] if len(v) else None} for k,v in data.items()}))
+  (a.output/'progress.json').write_text(json.dumps({k:{'samples':len(v),'latest':list(map(float,v[-1][:4])) if len(v) else None} for k,v in data.items()}))
   time.sleep(5)
  if player.returncode:raise RuntimeError('Player failed')
  time.sleep(3)
+ completed=True
 finally:
  for p in reversed(procs):
   if p.poll() is None:os.killpg(p.pid,signal.SIGINT)
@@ -86,6 +100,10 @@ finally:
  for f in logs:f.close()
  np.savez_compressed(a.output/'states.npz',**{k:np.asarray(v) for k,v in data.items()})
  binary=Path('/work/ws/fast-livo-sim/devel/.private/fast_livo/lib/fast_livo/fastlivo_mapping')
- manifest.update(rate=a.rate,binary_sha256=hashlib.sha256(binary.read_bytes()).hexdigest(),gt_pose_fused=False,counts_output={k:len(v) for k,v in data.items()},calibration=a.camera_calibration,calibration_identical_within_pair=True)
+ manifest.update(completed=completed,rate=a.rate,binary_sha256=hashlib.sha256(binary.read_bytes()).hexdigest(),gt_pose_fused=False,counts_output={k:len(v) for k,v in data.items()},calibration=a.camera_calibration,calibration_identical_within_pair=True)
+ manifest['replay_driver_sha256']=hashlib.sha256(driver_source).hexdigest()
+ manifest['workspace_libraries_sha256']={str(lib):hashlib.sha256(lib.read_bytes()).hexdigest()
+    for lib in sorted(Path('/work/ws/fast-livo-sim/devel/.private').glob('*/lib/lib*.so')) if lib.is_file()}
+ manifest['linked_libraries']=subprocess.check_output(['ldd',str(binary)],text=True)
  (a.output/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
 print(json.dumps(manifest,indent=2))
