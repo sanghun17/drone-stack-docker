@@ -1,0 +1,54 @@
+# Shared simulation/airsim bridge profile for the packaged ModernLivingroom.
+# Mounts are AirSim body FRD; the module derives ROS FLU and optical transforms.
+# Startup verifies these values against the running simulator's settings.
+airsim:
+  ip: 127.0.0.1
+  port: 41451
+  vehicle_name: hmcl
+publish_rate_hz: 30
+# The synchronous RGB + depth renderer stalls more often with concurrent RPCs.
+# A single worker measured 24 Hz versus 20 Hz with two workers on this scene.
+rpc_workers: 1
+# Reuse the camera-quality policy used by ArUco without reducing scene texture
+# detail. These engine settings persist until simulator restart.
+render_console_commands:
+  - t.IdleWhenNotForeground 0
+  - r.VSync 0
+  - t.MaxFPS 60
+  - r.MotionBlurQuality 0
+  - r.DepthOfFieldQuality 0
+  - r.DefaultFeature.AntiAliasing 1
+  - r.PostProcessAAQuality 4
+  # Completed GPU fences already guarantee safe readback. Avoid an additional
+  # device-wide idle wait when the opt-in slot readback backend is selected.
+  - r.Vulkan.FlushOnMapStaging 0
+streams:
+  - camera_name: scene_cam1
+    image_type: 0
+    camera:
+      width: 320
+      height: 240
+      horizontal_fov_deg: 79.3
+      mount_frd: {x: 0.25, y: 0.15, z: -0.25, roll_deg: 0, pitch_deg: 0, yaw_deg: 0}
+    ros:
+      base_frame: base_link
+      camera_link_frame: camera_left_link
+      optical_frame: camera_left_optical_frame
+      image_topic: /camera/left/image_raw
+      gray_topic: /camera/left/image_gray
+      camera_info_topic: /camera/left/camera_info
+      capture_pose_topic: /camera/left/capture_pose_ned
+  - camera_name: depth_cam
+    image_type: 1
+    camera:
+      width: 320
+      height: 240
+      horizontal_fov_deg: 79.3
+      mount_frd: {x: 0.25, y: 0, z: -0.25, roll_deg: 0, pitch_deg: 0, yaw_deg: 0}
+    ros:
+      base_frame: base_link
+      camera_link_frame: camera_depth_link
+      optical_frame: camera_depth_optical_frame
+      image_topic: /camera/depth/image_raw
+      camera_info_topic: /camera/depth/camera_info
+      capture_pose_topic: /camera/depth/capture_pose_ned

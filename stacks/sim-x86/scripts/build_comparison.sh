@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -e
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 if [ ! -f /.dockerenv ]; then
+  __C=drone-stack-sim-x86
+  __R="$ROOT"
+  source "$ROOT/scripts/lib/ensure_container.sh"
+  docker start "$__C" >/dev/null
   exec docker exec -i drone-stack-sim-x86 bash /work/stacks/sim-x86/scripts/build_comparison.sh "$@"
 fi
 source /opt/ros/noetic/setup.bash

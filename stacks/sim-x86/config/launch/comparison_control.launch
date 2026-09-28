@@ -1,0 +1,10 @@
+<launch>
+  <arg name="planning_odom_topic"/>
+  <arg name="control_odom_topic"/>
+  <group>
+    <!-- Both trajectory execution initialization and SO(3) use control state.
+         Planner processes and map TF remain on the selected planning state. -->
+    <remap from="$(arg planning_odom_topic)" to="$(arg control_odom_topic)"/>
+    <include file="$(find local_controller)/launch/ours_so3_stack.launch"/>
+  </group>
+</launch>

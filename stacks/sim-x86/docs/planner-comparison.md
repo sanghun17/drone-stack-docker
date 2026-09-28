@@ -265,3 +265,60 @@ python3 scripts/check_layout.py --worktree
 보증하지 않는다. ROVIO 시작 시 원본의 extrinsics Jacobian 자체 검사 경고도 남는다.
 이 경고까지 해결된 estimator 검증으로 해석하지 않는다. 연구용 결과/장기 기록은
 저장소 밖 home storage로 옮기고, 이 checkout에는 현재 운용 검증만 보관한다.
+
+## 계획·제어 source 선택 (GT 진단)
+
+source를 바꾸기 전에 sensor/initialize/FAST-LIVO/planner/control을 중지한다.
+실행 중 source 변경은 거부한다. 원본 YAML 파일은 수정하지 않으며 다음 실행의
+ROS 파라미터만 설정한다. 기존 `use_vio_for_control`은 실제 전환 스위치가 아니다.
+
+```bash
+# 원본: planning=FAST-LIVO, control=FAST-LIVO
+bash stacks/sim-x86/scripts/run_comparison.sh config
+
+# GT 진단: planning=GT, control=GT (config-gt도 같은 뜻)
+bash stacks/sim-x86/scripts/run_comparison.sh config --planning-source gt --control-source gt
+
+# VIO 기반 계획을 유지하고 제어 위치만 GT로 진단
+bash stacks/sim-x86/scripts/run_comparison.sh config --planning-source fast-livo --control-source gt
+```
+
+`--control-source`를 생략하면 planning source와 같다. 역방향 조합도 명시적으로
+선택할 수 있지만, 서로 다른 위치 추정 결과의 오차가 그대로 계획/제어 불일치로
+나타나므로 정상 성능 평가 프로필로 간주하지 않는다.
+
+| 역할 | 실제 연결 |
+|---|---|
+| estimation source | FAST-LIVO 고정. GT 실행에서도 LA 특징점과 VIO 진단을 위해 실행 |
+| planning source | `/robot/odom`: FAST-LIVO의 body-twist relay 또는 GT mirror |
+| control source | 공통 traj_server + SO(3)에만 odometry remap 적용 |
+| RHEM belief source | 내부 ROVIO 유지; 공통 localization을 대체하지 않음 |
+
+센서 다음에는 기존 직접 FAST-LIVO 실행 대신 아래 stack entrypoint를 쓴다.
+
+```bash
+bash stacks/sim-x86/scripts/run_comparison.sh sensor
+bash stacks/sim-x86/scripts/run_comparison.sh initialize
+bash stacks/sim-x86/scripts/run_comparison.sh reset
+bash stacks/sim-x86/scripts/run_comparison.sh fast
+# 이후 선택 planner와 control, validate를 기존 절차대로 실행
+```
+
+GT 계획 모드에서는 FAST-LIVO TF를 `/diagnostics/fast_livo/tf{,_static}`로 분리한다.
+GT의 `odom -> imu -> base_link`와 VIO의 `aft_mapped -> imu`가 경쟁하지 않는다.
+계획의 body_frame도 base_link로 전환한다. 카메라 외부 파라미터, 속도/가속도 제한,
+planner 비용과 제어 gain은 변경하지 않는다.
+
+`comparison_odom_sources.py`는 FAST-LIVO의 world-frame 선속도를 body-frame으로
+변환한 `/comparison/fast_livo/odom`과 GT의 body 선속도를 world-frame으로 변환한
+`/comparison/gt/world_odom`을 제공한다. 후자는 PURE 모델의 context 전용이며
+제어 입력으로 쓰지 않는다. 자세·시각·각속도는 유지하고 선속도 관련 covariance도
+회전한다. 현재 선택은 `/comparison/sources` 및 새 validation JSON의 `sources`에 남는다.
+
+### Repeated experiments (PURE / LA / RHEM)
+
+Use the stack-owned [A–E experiment runner](repeated-experiments.md) for repeated
+reset, estimator convergence, planner launch, rosbag recording and evaluation.
+It adds RHEM OctoMap evaluation through the same historical `eval_core` metrics,
+independent planning/control source selection, checked bag flush and full
+per-trial ROVIO/map/estimator shutdown.

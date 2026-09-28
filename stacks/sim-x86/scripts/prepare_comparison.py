@@ -30,6 +30,10 @@ def main():
         dst.parent.mkdir(parents=True, exist_ok=True)
         source = str(args.source) if args.source.is_dir() else profile['source_repository']
         subprocess.run(['git', 'clone', '--no-checkout', source, str(dst)], check=True)
+        present = subprocess.run(['git', '-C', str(dst), 'cat-file', '-e', revision+'^{commit}'],
+                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if present.returncode:
+            subprocess.run(['git', '-C', str(dst), 'fetch', profile['source_repository'], revision], check=True)
         subprocess.run(['git', '-C', str(dst), 'checkout', '--detach', revision], check=True)
     actual = subprocess.check_output(['git', '-C', str(dst), 'rev-parse', 'HEAD'], text=True).strip()
     if actual != revision:

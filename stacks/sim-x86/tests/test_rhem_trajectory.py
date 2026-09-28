@@ -7,10 +7,25 @@ import numpy as np
 from scipy.interpolate import BSpline
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
-from rhem_trajectory import parameterize
+from rhem_trajectory import parameterize, collapse_collinear_samples
 
 
 class TrajectoryTest(unittest.TestCase):
+    def test_sample_density_does_not_add_stops(self):
+        endpoints = np.array([[0., 0., 1., 0.], [1., 0., 1.2, 1.5]])
+        dense = np.linspace(endpoints[0], endpoints[1], 41)
+        limits = dict(max_vel_xy=2, max_vel_z=1, max_acc_xy=5, max_acc_z=2,
+                      max_yaw_rate=2, max_yaw_acc=5)
+        sparse_result = parameterize(endpoints, limits)
+        dense_result = parameterize(dense, limits)
+        for actual, expected in zip(dense_result, sparse_result):
+            np.testing.assert_allclose(actual, expected, atol=1e-9)
+
+    def test_collapse_preserves_turns_and_yaw_changes(self):
+        points = np.array([[0.,0.,1.,0.], [1.,0.,1.,0.], [0.,0.,1.,0.],
+                           [0.,1.,1.,0.], [0.,2.,1.,1.]])
+        np.testing.assert_array_equal(collapse_collinear_samples(points), points)
+
     def test_corner_geometry_and_limits(self):
         points = np.array([[0, 0, 0, 3.0], [2, 0, 1, -3.0], [2, 3, 0.2, -1.0]])
         limits = dict(max_vel_xy=2, max_vel_z=1, max_acc_xy=5, max_acc_z=2,

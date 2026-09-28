@@ -1,8 +1,7 @@
 #!/bin/bash
-# sim-x86 stack asset: AirSim sensor bring-up (airsim_sensor_punlisher.launch —
-# yes, "punlisher" is the actual filename). Publishes RGB+depth (combined
-# simGetImages RPC) + GT odom + static TFs + depth->pointcloud->voxel_grid nodelets +
-# rviz. AirSim RPC reachable via network_mode:host (192.168.50.12:41451, see
+# sim-x86 composition over the shared simulation/airsim camera module.
+# Publishes RGB+depth with independent metadata, GT odom and depth->pointcloud
+# nodelets. AirSim RPC reachable via network_mode:host (192.168.50.12:41451, see
 # stack config). Needs UE4 + airsim_node up on the HOST (Window 0/1) — this replaces the
 # host-side sensor publisher pane, not roscore/UE4/airsim_node. No CPU pinning
 # (taskset): Jetson-only concern, doesn't apply on the ml desktop.
@@ -18,7 +17,7 @@ if [ ! -f /.dockerenv ]; then
   # Ctrl+C here -> stop the launch INSIDE the container too. docker exec does not
   # reliably forward SIGINT, so do it explicitly: SIGINT roslaunch (clean node
   # teardown). roscore is left alone — it's the HOST's shared master (Window 0).
-  __M="roslaunch active_3d_planning_app_reconstruction airsim_sensor_punlisher.launch"
+  __M="bash .*/run_airsim_sensors.sh"
   cleanup(){ docker exec "$__C" pkill -INT -f "$__M" >/dev/null 2>&1; }
   trap 'cleanup; exit 130' INT TERM HUP
   docker exec $__TT "$__C" bash "/work/${__S#$__R/}" "$@"; __rc=$?
@@ -35,4 +34,4 @@ source /work/scripts/lib/ensure_roscore.sh   # master up on $ROS_MASTER_PORT —
 # localization: gt (default, imu->base_link static TF enabled) or vio (that TF
 # disabled, odom->base_link comes from airsim_gt_odom_publisher's aft_mapped relay
 # instead) — must match /system/localization loaded by load_config.sh.
-exec roslaunch active_3d_planning_app_reconstruction airsim_sensor_punlisher.launch localization:="${LOC:-gt}" "$@"
+exec bash /work/stacks/sim-x86/scripts/run_airsim_sensors.sh localization:="${LOC:-gt}" "$@"

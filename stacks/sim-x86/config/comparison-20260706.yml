@@ -1,6 +1,9 @@
 # Runtime profile recovered from the PURE/LA July 6–7 comparison recordings.
 # Paths are resolved by prepare_comparison.py; historical evidence stays external.
-source_revision: 7f84116dc1a5f45e0f61573eee8b6ca357abfde0
+# Historical implementation plus opt-in thrust calibration. Camera acquisition
+# and calibration now belong to the shared simulation/airsim module.
+source_revision: 63f74afb1ce92af5bc2994955e66c4e1aca9cff5
+historical_source_revision: 7f84116dc1a5f45e0f61573eee8b6ca357abfde0
 source_repository: https://github.com/sanghun17/risk-aware_planning.git
 source_workspace: ws/risk-aware-comparison
 scenario: sim_vio

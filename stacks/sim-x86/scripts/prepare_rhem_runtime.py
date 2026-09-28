@@ -8,6 +8,7 @@ import rospy
 from sensor_msgs.msg import CameraInfo
 import tf2_ros
 import yaml
+from rhem_filter_config import apply_covariance_profile, apply_image_gate
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -32,6 +33,14 @@ def main():
     (output / 'camera.yaml').write_text(yaml.safe_dump(camera))
     src = ROOT / 'ws/rhem/src/rhem_planner'
     config = (src / 'rovio_bsp/cfg/rovio.info').read_text()
+    filter_profile = rospy.get_param('/comparison/rhem_filter_profile', 'historical')
+    if filter_profile in ('upstream', 'gated'):
+        config = apply_covariance_profile(config,
+            (ROOT / 'stacks/sim-x86/config/rhem_rovio_covariance.info').read_text())
+        if filter_profile == 'gated':
+            config = apply_image_gate(config, 5.99)
+    elif filter_profile != 'historical':
+        raise ValueError(f'Unknown ROVIO filter profile: {filter_profile}')
     # Tracker windows cannot connect to the host display from the runtime container.
     config = re.sub(r'(?m)^(\s*doFrameVisualisation\s+)true;', r'\g<1>false;', config)
     config = re.sub(r'(?m)^(\s*visualizePatches\s+)true;', r'\g<1>false;', config)
@@ -48,12 +57,18 @@ def main():
             raise ValueError(f'Expected one {key} in pinned ROVIO configuration, found {count}')
     (output / 'rovio.info').write_text(config)
     params = yaml.safe_load((src / 'bsp_planner/cfg/bsp_settings.yaml').read_text())
+    belief_mode = rospy.get_param('/comparison/rhem_belief_mode', 'rovio')
+    if belief_mode not in ('rovio', 'disabled'):
+        raise ValueError('Unknown RHEM belief mode')
+    if belief_mode == 'disabled' and any(rospy.get_param('/comparison/sources/'+k) != 'gt'
+            for k in ('planning_source', 'control_source')):
+        raise ValueError('Belief isolation requires GT planning and control')
     limits = rospy.get_param('/planning/shared')
     bounds = rospy.get_param('/target_bounding_volume')
     params.update({
         'system/v_max': limits['max_vel_xy'], 'system/dyaw_max': limits['max_yaw_rate'],
         'system/camera/pitch': [0.0], 'system/camera/horizontal': [fov_x],
-        'system/camera/vertical': [fov_y], 'bsp/enable': True,
+        'system/camera/vertical': [fov_y], 'bsp/enable': belief_mode == 'rovio',
         'nbvp/gain/range': limits['sensor_max_range'],
         'bbx/explorationExtensionX': 0.0, 'bbx/explorationExtensionY': 0.0,
         'bbx/explorationMinZ': bounds['z_min'], 'bbx/explorationMaxZ': 0.0,
@@ -67,6 +82,23 @@ def main():
     for axis in 'xyz':
         params[f'bbx/min{axis.upper()}'] = bounds[f'{axis}_min']
         params[f'bbx/max{axis.upper()}'] = bounds[f'{axis}_max']
+    progress_profile = rospy.get_param('/comparison/rhem_progress_profile', 'historical')
+    if progress_profile in ('persistent', 'exploratory'):
+        # Keep the existing distance penalty through the full mission instead
+        # of rewarding arbitrarily long branches after five planning cycles.
+        params['nbvp/gain/degressive_switchoffLoops'] = 2147483647
+        if progress_profile == 'exploratory':
+            # Retain distance attenuation while allowing a branch through the
+            # current room to compete with nearby, repeatedly viewed frontiers.
+            params['nbvp/gain/degressive_coeff'] = 0.15
+    elif progress_profile != 'historical':
+        raise ValueError(f'Unknown RHEM progress profile: {progress_profile}')
+    if rospy.get_param('/comparison/rhem_gt_conservative', False):
+        if any(rospy.get_param('/comparison/sources/'+k) != 'gt'
+               for k in ('planning_source', 'control_source')):
+            raise ValueError('Conservative diagnostic requires GT sources')
+        params.update({'bbx/minZ': .8, 'bbx/maxZ': 1.8,
+                       'system/bbx/z': .5, 'system/bbx/z_offset': 0.})
     (output / 'planner.yaml').write_text(yaml.safe_dump(params))
     print(f'RHEM runtime config: {output}; camera {info.width}x{info.height}, body={body}')
 

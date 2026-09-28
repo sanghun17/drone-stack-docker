@@ -1,0 +1,9 @@
+<launch>
+  <!-- Keep feature extraction and VIO diagnostics, but never let estimator TF
+       compete with AirSim's odom -> imu -> base_link ground-truth tree. -->
+  <group>
+    <remap from="/tf" to="/diagnostics/fast_livo/tf"/>
+    <remap from="/tf_static" to="/diagnostics/fast_livo/tf_static"/>
+    <include file="$(find fast_livo)/launch/mapping_simulator_openvins.launch"/>
+  </group>
+</launch>

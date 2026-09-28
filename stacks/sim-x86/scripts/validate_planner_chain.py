@@ -46,6 +46,11 @@ def main():
                       '/rhem/rhem_control_adapter/belief_trajectories': UInt32,
                       '/rhem/planner_path': NavPath})
         events.update(t for t in types if t.startswith('/rhem/'))
+    required_topics = set(types)
+    if args.planner == 'rhem':
+        # RHEM consumes ROVIO belief, not FAST-LIVO's feature cloud. Keep
+        # observing the latter as a diagnostic without gating RHEM on it.
+        required_topics.discard('/fast_livo/visual_features')
     counts = {topic: 0 for topic in types}
     last = {}
     gt_positions = []
@@ -79,7 +84,7 @@ def main():
     ready = False
     def messages_ready(all_topics=True):
         return all(n >= (1 if t in events else 2) for t, n in counts.items()
-                   if all_topics or (t not in events and t != '/planning/pos_cmd'))
+                   if t in required_topics and (all_topics or (t not in events and t != '/planning/pos_cmd')))
     while not rospy.is_shutdown() and time.monotonic() - start < args.timeout:
         with lock:
             ready = messages_ready(all_topics=args.planner != 'rhem')
@@ -144,16 +149,18 @@ def main():
         result = {
             'validation_scope': 'runtime_message_chain_and_movement_only',
             'tracking_accuracy_assessed': False,
+            'required_topics': sorted(required_topics),
             'planner': args.planner, 'messages_ready': ready,
             'flight_requested': args.fly, 'max_gt_displacement_m': displacement,
             'counts': counts, 'last_message_age_s': {t: now - ts for t, ts in last.items()},
             'elapsed_s': now - start, 'system': rospy.get_param('/system'),
             'planning': rospy.get_param('/planning'),
+            'sources': rospy.get_param('/comparison/sources', {}),
             'start_gt_position': origin,
             'end_gt_position': gt_positions[-1] if gt_positions else None,
             'diagnostic_values': values, 'error': error,
         }
-    result['passed'] = (ready and error is None and all(now - ts < 5 for t, ts in last.items() if t not in events)
+    result['passed'] = (ready and error is None and all(now - ts < 5 for t, ts in last.items() if t in required_topics and t not in events)
                         and (not args.fly or displacement >= 0.25))
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + '\n')

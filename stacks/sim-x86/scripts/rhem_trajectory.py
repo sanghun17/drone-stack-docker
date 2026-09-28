@@ -3,6 +3,27 @@ import numpy as np
 from scipy.interpolate import BSpline
 
 
+def collapse_collinear_samples(points, tolerance=1e-9):
+    """Remove only redundant samples on the same xyz/unwrapped-yaw segment.
+
+    RHEM returns densely sampled BSP edges. Those samples are not stops;
+    retaining each as a quintic endpoint makes speed depend on sample density.
+    Reversals, spatial corners and changes of yaw slope remain explicit.
+    """
+    kept = [points[0]]
+    for i in range(1, len(points)-1):
+        edge = points[i+1] - kept[-1]
+        length2 = float(edge @ edge)
+        if length2 > tolerance*tolerance:
+            fraction = float((points[i]-kept[-1]) @ edge) / length2
+            error = np.max(np.abs(points[i] - (kept[-1] + fraction*edge)))
+            if 0 <= fraction <= 1 and error <= tolerance:
+                continue
+        kept.append(points[i])
+    kept.append(points[-1])
+    return np.asarray(kept)
+
+
 def parameterize(waypoints, limits):
     """Return quintic B-spline positions and descending-power yaw polynomials.
 
@@ -18,6 +39,7 @@ def parameterize(waypoints, limits):
     points = points[np.r_[True, np.max(np.abs(delta), axis=1) > 1e-6]]
     if len(points) < 2:
         raise ValueError('Empty RHEM motion')
+    points = collapse_collinear_samples(points)
     required = ('max_vel_xy', 'max_vel_z', 'max_acc_xy', 'max_acc_z',
                 'max_yaw_rate', 'max_yaw_acc')
     if any(not np.isfinite(limits[k]) or limits[k] <= 0 for k in required):

@@ -2,13 +2,14 @@
 """Drive the generic RHEM planner through the sim stack's existing controller."""
 import threading
 import time
+import json
 
 import numpy as np
 import rospy
 from bsp_planner.srv import bsp_srv
 from geometry_msgs.msg import Point
 from nav_msgs.msg import Odometry
-from std_msgs.msg import Header, UInt32, Bool
+from std_msgs.msg import Header, UInt32, Bool, String
 from std_srvs.srv import SetBool, SetBoolResponse
 from tf.transformations import euler_from_quaternion
 from traj_utils.msg import MixTraj
@@ -28,6 +29,10 @@ class Adapter:
         if rospy.get_param('/system/platform') != 'sim':
             raise RuntimeError('This adapter requires the sim profile')
         self.frame = rospy.get_param('/system/world_frame', 'odom')
+        self.require_belief = rospy.get_param('/comparison/rhem_belief_mode', 'rovio') == 'rovio'
+        if not self.require_belief and any(rospy.get_param('/comparison/sources/'+k) != 'gt'
+                for k in ('planning_source', 'control_source')):
+            raise RuntimeError('Belief isolation requires GT planning and control')
         self.limits = rospy.get_param('/planning/shared')
         for short, full in [('max_a_xy', 'max_acc_xy'), ('max_a_z', 'max_acc_z'),
                             ('max_a_wz', 'max_yaw_acc')]:
@@ -44,6 +49,8 @@ class Adapter:
         self.publisher = rospy.Publisher('/planning/trajectory', MixTraj, queue_size=1)
         self.accepted = rospy.Publisher('~belief_trajectories', UInt32, queue_size=1)
         self.improved = rospy.Publisher('~belief_improved', Bool, queue_size=1)
+        self.status = rospy.Publisher('~status', String, queue_size=1)
+        self.last_status = 0.0
         self.subscriber = rospy.Subscriber(rospy.get_param('/system/odom_topic'), Odometry,
                                           self.receive, queue_size=1)
         self.toggle_service = rospy.Service('~toggle_running', SetBool, self.toggle)
@@ -82,6 +89,12 @@ class Adapter:
                 if not self.enabled:
                     continue
                 point, speed = self.current()
+                if time.monotonic() - self.last_status >= 1.0:
+                    self.status.publish(json.dumps(dict(time=rospy.Time.now().to_sec(),
+                        position=point.tolist(), speed=float(speed), trajectory=self.traj_id,
+                        goal=None if self.goal is None else self.goal.tolist(), finish=self.finish,
+                        goal_error=None if self.goal is None else float(np.linalg.norm(point[:3]-self.goal)))))
+                    self.last_status = time.monotonic()
                 if self.goal is not None and (rospy.Time.now().to_sec() < self.finish
                         or np.linalg.norm(point[:3] - self.goal) > 0.3):
                     continue
@@ -90,7 +103,7 @@ class Adapter:
                 response = self.planner(Header(stamp=rospy.Time.now(), frame_id=self.frame))
                 if not self.enabled:
                     continue
-                if not response.belief_space:
+                if self.require_belief and not response.belief_space:
                     raise ValueError('Path has no valid belief evaluation; keeping hover')
                 path = np.array([waypoint(p) for p in response.path])
                 if len(path) < 2:
@@ -111,8 +124,10 @@ class Adapter:
                 self.improved.publish(response.belief_improved)
                 self.goal = path[-1, :3]
                 self.finish = msg.start_time.to_sec() + msg.real_traj_duration
-                rospy.loginfo('RHEM trajectory %d: %d vertices, %.2f seconds',
-                              self.traj_id, len(path), msg.real_traj_duration)
+                rospy.loginfo('RHEM accepted path start=%s goal=%s belief_improved=%s',
+                              path[0].tolist(), path[-1].tolist(), response.belief_improved)
+                rospy.loginfo('RHEM trajectory %d: %d input samples, %d motion segments, %.2f seconds',
+                              self.traj_id, len(path), len(durations), msg.real_traj_duration)
             except (ValueError, rospy.ServiceException) as error:
                 rospy.logwarn_throttle(5, 'RHEM: %s', error)
                 time.sleep(0.5)

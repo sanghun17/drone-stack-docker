@@ -524,7 +524,7 @@
     "planner/rhem": {
       "files": {
         "CMakeLists.txt": "affe8af541eafb2e48dacf20c2f5609033024c99cdf81e147455f8db575b57cf",
-        "README.md": "b1be783241877d65aadb09228918ba0c71ab584ea90e0647d3c0c2be86922a63",
+        "README.md": "754870e97227b7b3decb5c4a24da038e8b375d2bd9de936466fc3d2b9817c6ff",
         "build_ws.sh": "6f763eac65cf87a20d9b0404efadfaeac8d67fa977f8bbe39960b2194df07f06",
         "clone.sh": "07aeaf4e779167678123c34a0db889ad236a5eb1dbfd7fdc69ccfcd8d4c0bb05",
         "launch/rhem.launch": "a37c520491b9f9f7204a9843c865d2f42c8257aa50f4416d595ce6433f3cd444",
@@ -532,18 +532,22 @@
         "package.xml": "b3d71b2b5807897e143956a8e893d37ba65e4778ce65e0bc3ac2d4c5fbdc0acc",
         "patches/eigen_catkin.patch": "7a2a18e8da04ae19d1da30fe0088f81ce93e5d2efd58fb5d331d05305db68418",
         "patches/eigen_checks.patch": "76db45865f18f639bd38139dd8160b057c7ab26990ac182a6886621e1cd0fb62",
+        "patches/exploration_memory.patch": "540cbf64bc8342a8fb8ed71912b120ab0bb49f9db14a89bc4a4164cb6bf80567",
         "patches/gflags_catkin.patch": "3b6f942fb41be1305cfcd81ac076b715910b5a028930cc80e9b89db90c389214",
         "patches/glog_catkin.patch": "e85a20aa71796e0df99ab009e22e77579b93d4419867ff743c04aa344452e7bc",
         "patches/minkindr.patch": "2946b978dd14f418c4f5d3b8088990a0a8f9b3783d461948564c448c2128f3d7",
         "patches/minkindr_ros.patch": "a2f9f1860cf4b4f5a07274524c584d9f6508a96809e9847c85bea81ac45bdfe0",
         "patches/rhem.patch": "9da19ca95696c57d688a1234cf722f7422386c592c874c645412b68908afd4b9",
         "patches/rovio_bsp.patch": "b6e2440664c2cfd7755576340c5f134f3e67c567d7b0787ac76f4d7c22dec013",
+        "patches/short_edge_belief.patch": "13589e4bb6c22611792829e286bcf24b4d69e8c3c4744074e94321b8526803e5",
         "patches/volumetric_mapping.patch": "d21c14848f448ddb291fa31a54ecf983549728b6e3956b324e00bd41c3b791f1",
         "run.sh": "54f47510ef53ba4d5c6bf39d8fb547d7b17b6b1bae2b6bacdaa9d06c3167db14",
-        "scripts/belief_bridge.py": "83e35aeee3c41e8504dd8ef8839be3e2591c1d2394828951cfa32b2b19da3c6a",
-        "sources.yml": "534862bed3008a188028fd8bd4477852dba595c76590f47adf263a53b7498f56",
+        "scripts/belief_bridge.py": "cd0772dcc9441a74214a1bc597e872fb80ab7ecf37fc59002a2d5d6477fd89a0",
+        "sources.yml": "663f653cd128833717a49946d667dfcb461f5df300fc70eef5736ed4111fc18a",
+        "tests/check_branch_memory.cpp": "caf10ae081e5399f1114f0d7355c3b0480f43989dbeae68f8b09762320c2013b",
         "tests/check_propagation_service.py": "cb823b492c0a5e8036b9968769474993d963fcb0fd7513343d5f28f4154857c2",
-        "tests/test_belief_bridge.py": "18b433070c799c3f1f657d0a6269c8cc1352f7d39e14f9a6642898e020d88ea6"
+        "tests/check_short_belief.cpp": "ab9a3c89a33a38fe11e0090a0fc3ca32984d0f2bffcdbb21ab7cea4418fdae52",
+        "tests/test_belief_bridge.py": "2a0455a2b36f570287046bac454d6d8dccc747347e832de152e31cb3e9cafe63"
       },
       "manifest": {
         "clone": "clone.sh",
@@ -577,7 +581,7 @@
         "workspace": "/work/ws/rhem"
       },
       "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
-      "revision": "362b85edb562baf5a9dfbeda7b1df3569581ac3a",
+      "revision": "44a84ca13fb6b9b328fbc23ee164b419fb6348f5",
       "subdir": "deployment/stack-modules/planner/rhem"
     },
     "planner/risk-aware": {
@@ -758,18 +762,27 @@
     },
     "simulation/airsim": {
       "files": {
-        "README.md": "336e511a5ae13386d0426d57b4fb67d3def94c2fbdc7e984360ab8ad232a58ec",
+        "README.md": "783b6e426e8f65cde84f016a2573f447d3e34c64c6bf307b6d8e389e4947ffde",
         "install.sh": "37690508e9ffd839dbd79b75acf277c3ab0955ce8da5a2dde240c5d2fd840bd4",
-        "module.yml": "4a7075b6388927a740b2b82ae8e8d7fb0f37c5b043f27b505cfe190edcc3efa0",
-        "run_camera.sh": "72ff7825fe4af833cf258d1c68d0297b2af8852ced4e779a1de83319d1306cb1",
-        "scripts/airsim_camera_bridge.py": "fdbd9406a7f0120f8cc804d83d5b975441112d43242bfedc56112a992e6042b0",
-        "scripts/generate_settings.py": "936346abd1a4c0cd926ed1447d59c7571d41bb9a1f9c82efe56276daef1b75b5"
+        "module.yml": "56c0a6bc87ab84cf8a7860760b30bbcaf04afe41b634351b451540a06ee86ef7",
+        "patches/capture_slot_readback.patch": "62a17d24d954c4b387084c776f079e75db4e1d0f9ea63aec814fe02208159846",
+        "patches/capture_timing_diagnostics.patch": "3470486ec6d5a3616eb51047434d062d3d19c75286d3f58ddfc6c9a7ae71156c",
+        "patches/rendered_pose_timestamp.patch": "54b33429e0f54a1231d034b45c87ec633733fdfe5f360719891f470e2ec1f900",
+        "run_camera.sh": "12f9617a5b1d6294e9f41193a98a9db719738f9b206b0d64e6263421d9ed6dec",
+        "scripts/airsim_camera_bridge.py": "1867e4f88f1060fd4c452be2637dce89ab2945c0b0dda96bbfb1a619773e6b5e",
+        "scripts/airsim_stream_bridge.py": "598e9a213f8f108d4326dd05052d4b3fd867949d1aadf332fe81f0a77a76d51b",
+        "scripts/camera_geometry.py": "d0799c0a0d1460dce5c785e3883940df7117e78c50c124424f6d9f648e8c8fa0",
+        "scripts/generate_settings.py": "936346abd1a4c0cd926ed1447d59c7571d41bb9a1f9c82efe56276daef1b75b5",
+        "scripts/prepare_capture_timestamps.py": "ba48b09c752b7043fd134ddf32293abaddff678ae0a5e5f6e40c8ff35b255811",
+        "tests/test_camera_contract.py": "0a911c1f3fa34304930e65c9de243e2f42f46ec55be5640d7f96acb4dc3948b6",
+        "tests/test_capture_timestamp_patch.py": "0410cdeaa7c4612c4f619842346f1ddfbf2367e18e12908ed9a452e2bdeb4666"
       },
       "manifest": {
         "deps": {
           "apt": [
             "libyaml-cpp-dev",
             "python3-numpy",
+            "python3-opencv",
             "python3-yaml",
             "ros-noetic-cv-bridge",
             "ros-noetic-geometry-msgs",
@@ -790,6 +803,7 @@
         "provides": [
           "airsim-client",
           "simulated-camera",
+          "simulated-depth",
           "camera-info",
           "camera-tf"
         ],
@@ -798,7 +812,7 @@
         ]
       },
       "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
-      "revision": "362b85edb562baf5a9dfbeda7b1df3569581ac3a",
+      "revision": "38b27c477ecc661e546c2a1f2cc8e10de1ad9875",
       "subdir": "deployment/stack-modules/simulation/airsim"
     },
     "utility/gui-vnc": {
