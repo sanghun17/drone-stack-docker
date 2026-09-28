@@ -4,6 +4,7 @@ set -eo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 source "$ROOT/config/sim.env"
 source "$ROOT/config/ros_env.sh"
+SIMULATION_SETTINGS="${SIM_AIRSIM_SETTINGS:-$AIRSIM_SETTINGS_DIR/settings.json}"
 case "${1:-}" in
   display)
     # Permit only the local container user; do not disable X access control.
@@ -36,10 +37,12 @@ PY
     source /opt/ros/noetic/setup.bash
     rosparam set /comparison/host_simulator "$(cat "$manifest")"
     rosparam set /comparison/host_simulator/launch_arguments "$(python3 -c 'import json,sys; print(json.dumps(sys.argv[1:]))' "${@:2}")"
+    rosparam set /comparison/host_simulator/settings_path "$SIMULATION_SETTINGS"
+    rosparam set /comparison/host_simulator/settings_sha256 "$(sha256sum "$SIMULATION_SETTINGS" | cut -d' ' -f1)"
     export DISPLAY="${DISPLAY:-:0}"
     "${runtime[0]}/Engine/Binaries/Linux/UE4Editor" "${runtime[1]}" \
       -game -windowed -ResX=1280 -ResY=720 -nosound -unattended \
-      "-settings=$AIRSIM_SETTINGS_DIR/settings.json" "${@:2}" &
+      "-settings=$SIMULATION_SETTINGS" "${@:2}" &
     simulator_pid=$!
     trap 'kill -TERM "$simulator_pid" 2>/dev/null || true; wait "$simulator_pid" 2>/dev/null || true; exit 130' INT TERM HUP
     wait "$simulator_pid"
@@ -52,7 +55,7 @@ PY
     rosparam set /comparison/host_simulator '{backend: historical-package, timestamp_semantics: GPU-readback-completion}'
     # UE can retain the RPC port after terminal SIGINT. Forward termination
     # explicitly and wait so a subsequent run cannot collide with this process.
-    ./MyFirstUE4 "-settings=$AIRSIM_SETTINGS_DIR/settings.json" "${@:2}" &
+    ./MyFirstUE4 "-settings=$SIMULATION_SETTINGS" "${@:2}" &
     simulator_pid=$!
     trap 'kill -TERM "$simulator_pid" 2>/dev/null || true; wait "$simulator_pid" 2>/dev/null || true; exit 130' INT TERM HUP
     wait "$simulator_pid"
@@ -61,7 +64,7 @@ PY
   airsim)
     source /opt/ros/noetic/setup.bash
     source "$AIRSIM_ROOT/ros/devel/setup.bash"
-    api_port="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("ApiServerPort", 41451))' "$AIRSIM_SETTINGS_DIR/settings.json")"
+    api_port="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("ApiServerPort", 41451))' "$SIMULATION_SETTINGS")"
     python3 "$ROOT/stacks/sim-x86/scripts/wait_airsim.py" --tcp-only --host "$ROS_MASTER_HOST" --port "$api_port"
     # Relocated catkin assets retain absolute source paths in devel/.catkin.
     # Override discovery without modifying preserved asset/build metadata.

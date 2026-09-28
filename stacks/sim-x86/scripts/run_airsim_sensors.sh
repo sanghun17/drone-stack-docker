@@ -2,7 +2,7 @@
 # Called inside a sourced ROS environment by either Risk runtime entrypoint.
 set -eo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
-export AIRSIM_CAMERA_CONFIG="$ROOT/stacks/sim-x86/config/airsim_cameras.yaml"
+export AIRSIM_CAMERA_CONFIG="$(rosparam get /comparison/airsim_camera_profile 2>/dev/null || echo "$ROOT/stacks/sim-x86/config/airsim_cameras.yaml")"
 bash "$ROOT/modules/simulation/airsim/run_camera.sh" &
 CAMERA_PID=$!
 roslaunch "$ROOT/stacks/sim-x86/config/launch/airsim_sensor_pipeline.launch" "$@" &

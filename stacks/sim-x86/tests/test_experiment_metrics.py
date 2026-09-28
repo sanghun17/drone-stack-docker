@@ -11,6 +11,8 @@ from automation_experiments import Convergence, Recorder, Trial, cleanup_stale_r
 import threading
 from unittest.mock import patch
 from nav_msgs.msg import Odometry
+from sensor_msgs.msg import Imu
+from rospy.msg import serialize_message, deserialize_messages
 import rospy
 import io
 from visualization_msgs.msg import Marker, MarkerArray
@@ -18,6 +20,23 @@ from geometry_msgs.msg import Point
 from std_msgs.msg import String
 
 class MetricsTest(unittest.TestCase):
+    def test_recorder_shared_transport_retains_imu_burst(self):
+        trial=Trial.__new__(Trial)
+        with patch('rospy.get_param',return_value='/aft_mapped_to_init_odom'), patch('rospy.Subscriber') as sub:
+            trial.subscribe()
+        options=next(c.kwargs for c in sub.call_args_list if c.kwargs['callback_args']=='imu')
+        # Real rospy wire deserialization: 0.5 s of buffered 200 Hz IMU data.
+        wire=io.BytesIO()
+        for seq in range(100):serialize_message(wire,seq,Imu())
+        payload=wire.getvalue()
+        def received(limit):
+            b=io.BytesIO(payload);b.seek(0,2);messages=[]
+            deserialize_messages(b,messages,Imu,queue_size=limit)
+            return [m.header.seq for m in messages]
+        self.assertEqual(received(20),list(range(80,100)))
+        self.assertEqual(received(options['queue_size']),list(range(100)))
+        self.assertGreaterEqual(options['buff_size'],len(payload))
+
     def test_stale_cleanup_preserves_live_and_unrelated_nodes(self):
         with patch('rosnode.get_node_names',return_value=['/rhem/dead','/rhem/live','/other']), \
              patch('rosnode.rosnode_ping',side_effect=[False,True]) as ping, \

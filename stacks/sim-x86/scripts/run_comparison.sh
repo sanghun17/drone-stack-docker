@@ -68,6 +68,9 @@ case "$COMPONENT" in
   fast)
     source "$ROOT/ws/fast-livo-sim/devel/setup.bash" --extend
     if [ "$(rosparam get /system/localization)" = gt ]; then
+      if [ "$(rosparam get /comparison/sensor_calibration 2>/dev/null || echo historical)" = airsim ]; then
+        set -- online_intrinsics:=true "$@"
+      fi
       exec roslaunch "$ROOT/stacks/sim-x86/config/launch/fast_livo_gt_diagnostic.launch" "$@"
     fi
     exec roslaunch fast_livo mapping_simulator_openvins.launch "$@"

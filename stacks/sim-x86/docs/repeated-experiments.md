@@ -172,3 +172,26 @@ and resume rejects changed choices. `clipped` retains historical preprocessing.
 `tests/check_depth_range_clearing.cpp` exercises PCL and the deployed Octomap
 library together: a 10 m return clears the cell at 4 m only when preserved;
 cells beyond 5 m remain unknown and a nearby obstacle remains occupied.
+
+`--rhem-filter-profile gated-fine` includes native-resolution photometric updates.
+It remains experimental: a favourable recorded-input replay did not reproduce
+in a fresh live mission. It is not the default profile.
+
+For explicit sensor resolution experiments, use `SIM_AIRSIM_SETTINGS=/absolute/settings.json`
+with both host simulator commands and pass `--airsim-camera-profile /work/path/profile.yaml`
+to the experiment. The common module checks the profile against the live server;
+the chosen YAML is archived as `provenance/airsim_cameras.yaml`. Keep the default
+profile consistent with the original simulator settings. RHEM and the GT-mode
+FAST-LIVO diagnostic derive camera intrinsics from the live CameraInfo.
+
+Readiness and recording subscribers now use the same 200-message receive queue.
+This avoids rospy retaining an earlier 20-message transport queue and silently
+truncating buffered IMU bursts. Frozen recorder counts verify messages received
+by the recorder; they alone do not prove lossless sensor delivery. Independent
+timing monitors provide that separate check. Historical bags remain unchanged.
+
+`--map-stale-timeout` defaults to 10 seconds. Larger belief filters can make the
+single-threaded planner callback exceed this interval while control continues
+holding its target. Any larger diagnostic budget must be explicit, is saved in
+the manifest and cannot change during resume. Sensor/clock freshness, collision
+checks and the exploration coverage threshold remain separate conditions.

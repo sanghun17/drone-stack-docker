@@ -525,7 +525,7 @@
       "files": {
         "CMakeLists.txt": "affe8af541eafb2e48dacf20c2f5609033024c99cdf81e147455f8db575b57cf",
         "README.md": "754870e97227b7b3decb5c4a24da038e8b375d2bd9de936466fc3d2b9817c6ff",
-        "build_ws.sh": "6f763eac65cf87a20d9b0404efadfaeac8d67fa977f8bbe39960b2194df07f06",
+        "build_ws.sh": "27fb87f256b06ec5d495822b52a42f57f82f2e0292250a1adfd50996cc50fabd",
         "clone.sh": "07aeaf4e779167678123c34a0db889ad236a5eb1dbfd7fdc69ccfcd8d4c0bb05",
         "launch/rhem.launch": "a37c520491b9f9f7204a9843c865d2f42c8257aa50f4416d595ce6433f3cd444",
         "module.yml": "6394f90614ba6eb214257a9beb8d0074856238245a37cab98305e0c658a12c79",
@@ -581,7 +581,7 @@
         "workspace": "/work/ws/rhem"
       },
       "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
-      "revision": "44a84ca13fb6b9b328fbc23ee164b419fb6348f5",
+      "revision": "59cf04b3f54dc3870ab795c5435cbddafdac5092",
       "subdir": "deployment/stack-modules/planner/rhem"
     },
     "planner/risk-aware": {

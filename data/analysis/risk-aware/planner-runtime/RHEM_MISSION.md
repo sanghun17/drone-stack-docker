@@ -1,5 +1,11 @@
 # GT exploration with real ROVIO belief — 2026-09-28
 
+**Outcome: the three-hour limit was reached without mission success.** Several
+pipeline defects were reproduced and fixed, and exploration reached 70–75% in
+some diagnostic trials. Stable real ROVIO belief and the unchanged 80% coverage
+criterion were not achieved together. See [final outcome](#final-timebox-outcome)
+for the final trial, restored defaults and remaining failure.
+
 ## Authorized scope and stopping conditions
 
 Started **2026-09-28 13:36:55 UTC**. Continue autonomous diagnosis and trials until
@@ -196,3 +202,129 @@ an additional standard PCL nodelet, `/voxel_grid/rays`. No camera publisher is
 forked, FAST-LIVO keeps its existing bounded feature cloud, and the RHEM mapper
 range stays 5 m. The `rays1800` trial started at **15:27:56 UTC**, retaining the
 `exploratory` profile and real ROVIO. The original overall deadline still applies.
+
+The range-ray trial reached **68.414%** but terminated `map_stale` at 570.72 s.
+Raw ROVIO exceeded 5 m error at 525.76 s and 100 m at 539.49 s. Preserving distant
+rays fixed a real exploration input defect; it did not repair filter divergence.
+
+## Resolution and recording diagnostics
+
+On the recorded `exploratory1800` inputs, including pyramid level zero in ROVIO
+(`gated-fine`) reduced the 557 s replay error to 1.426 m RMSE and 2.589 m maximum.
+The same profile then **failed in an actual fresh mission** (`fine1800`): coverage
+rose to approximately 62%, while raw ROVIO diverged to kilometres. The replay
+result is not a validated live repair and `gated-fine` is diagnostic only.
+
+An independent 200 Hz IMU monitor also exposed an archive delivery defect. The
+automation's first rospy subscription used a queue of 20; rospy shares the TCP
+transport with the later recorder and retains that original receive queue.
+A burst longer than 100 ms could therefore lose IMU samples before recording.
+The initial readiness queue now matches the recorder's 200-message capacity
+with a 16 MiB receive buffer. A real rospy serialization regression reproduces
+the old 100-to-20 sample truncation and verifies all 100 with the corrected queue.
+This fixes archive reception, not the separately subscribed online ROVIO filter.
+
+The `rgb6401800` experiment started at **15:52:16 UTC**. Only RGB dimensions changed
+from 320×240 to 640×480; depth remains 320×240, with the same FOV, mounts and
+common stream bridge. Runtime camera matrices come from actual CameraInfo.
+`SIM_AIRSIM_SETTINGS` selects the explicit simulator JSON, whose SHA-256 is
+recorded. `--airsim-camera-profile` selects a matching common bridge YAML and
+archives it under the standard provenance filename. The normal profile remains
+320×240. The experiment JSON/YAML are retained in
+`data/results/rhem-mission-20260928/rgb640-configuration/`.
+
+Independent moving-input geometry checks found no gross IMU axis/scale error:
+acceleration residual RMSE was 0.0382, 0.0412 and 0.0370 m/s² by axis. This does
+not prove all input effects absent, but rejects the suspected large acceleration
+frame error. Camera orientation versus IMU orientation at capture time had
+0.00213-degree RMSE on the asynchronous backend.
+
+The higher-resolution trial also **failed**, stopping at 426.51 s and 70.612%
+coverage. Raw position error exceeded 5 m at 359.23 s, 100 m at 369.90 s and
+1,000 m at 399.64 s after the first filter output. The contact sheet shows smoke
+occlusion followed by repeated views of a TV panel; it does not isolate a single
+cause. Resolution alone is not a repair. The recorded IMU now delivered 199.95 Hz
+with maximum gap 24.0 ms. A stamp/sequence multiset comparison found 86,467 of
+86,468 independently observed samples; the sole difference is at the exact
+recording-start boundary, with no subsequent missing samples.
+
+At **16:05:15 UTC**, `feature50` began with the same 640×480 camera, real ROVIO,
+full range rays and exploratory distance weighting. The only estimator change
+is 50 features instead of 25, in both online and belief-propagation nodes. Module
+`59cf04b` exposes the existing CMake option through `RHEM_MAX_FEATURES`; default
+remains 25. Trial provenance now includes ROVIO CMake options and hashes of both
+executables. This is an explicit diagnostic build, not an undisclosed default.
+
+That first 50-feature trial terminated `map_stale` after 100.98 s because a
+planning callback took 11.563 s and blocked its single-threaded map publisher.
+Raw ROVIO remained stable: RMSE 0.144 m, maximum 0.278 m, final 0.162 m.
+`feature50budget` restarted at **16:08:41 UTC** with an explicit
+`--map-stale-timeout 30` (historical default stays 10). This exposes the heavier
+planner computation budget in provenance; it does not change map coverage,
+the 80% criterion, collision handling or sensor freshness checks.
+
+For the following FAST-LIVO comparison, use `/LIVO2/imu_propagate` as the primary
+scored output. Source inspection confirms its header is the measured IMU stamp;
+`/aft_mapped_to_init` uses publication `ros::Time::now()` and is retained only as
+a secondary latency-affected metric. The paired runner never publishes GT.
+
+The longer 50-feature run reached **67.064%** and 46.02 m of GT travel, then
+terminated `map_stale` at 662.70 s. Tracking RMSE was 0.0424 m, but raw ROVIO
+diverged to 161.8 m and its output fell more than 30 s behind. Increasing feature
+count alone therefore did not solve the problem. A concurrent recorded-input
+bias comparison was stopped early; its partial output is not a complete result.
+
+`bounded50` started at **16:22:52 UTC**, with explicit gyro-bias initial covariance
+`1e-7`, process covariance `1e-11`, and the common camera profile at 20 Hz. It also
+diverged after roughly three minutes. These settings remain diagnostic options,
+not a claimed fix. The final timebox experiment requested `ShowFlag.Niagara 0` through a stack-owned
+common profile to isolate moving smoke. **Post-run camera inspection shows smoke
+was still rendered**, despite the command being accepted. The `no-smoke` folder
+name describes an attempted condition, not a verified removal. It cannot support
+a causal smoke-versus-no-smoke comparison.
+
+Final orchestration reuses FAST-LIVO's existing native one-shot CameraInfo
+loader. The temporary YAML-generation helper used in the resolution trials was
+removed from maintained code; those trials' original helper and effective
+parameters remain in their immutable provenance. No separate camera publisher
+was introduced.
+
+## Final timebox outcome
+
+The authorized three-hour window ran from **2026-09-28 13:36:55 UTC to
+16:36:55 UTC**. The deadline guard interrupted the final trial at 16:36:55.05;
+all flight processes were then stopped. **The mission was not completed.**
+The unchanged success threshold was 80% of the original 3,185 GT voxels at
+0.25 m resolution and the original evaluation bounds. A high final coverage
+alone is not accepted when the real inner filter has diverged.
+
+The last trial (the misleadingly named attempted `no-smoke` condition) lasted
+468.76 s after takeover, covered **65.997%**, travelled **46.54 m** in GT and
+executed 24 paths. Control tracking RMSE was **0.0684 m**, but raw ROVIO position
+RMSE was **2.859 m** and final/maximum error **22.060 m**. It remained below 1 m
+until approximately 364.6 s after its first output, then diverged. The final
+trial's `valid_evaluation` is false and cleanup reported no errors. Accepted
+console commands did not remove visible smoke; see `no-smoke-render-verification.json`
+and the saved camera contact sheet before interpreting that condition.
+
+These results distinguish a working GT controller and materially improved
+exploration inputs from an unresolved inner-estimator failure. Earlier trials
+reached 70–75% coverage, but none verified the required combination of completed
+exploration and stable real ROVIO belief. GT was never fused into raw ROVIO, and
+constant belief was not substituted. Failed resolution, feature-count and bias
+experiments remain explicit diagnostic options. The installed ROVIO build was
+restored to **25 features**, and the default shared camera profile remains
+**320×240**. Experimental UE and ROS processes have been stopped.
+
+The native FAST-LIVO CameraInfo loader also exposed a startup timing issue:
+a cold node entered a ROS-time five-second wait at time zero, then the first
+absolute `/clock` caused immediate expiry. With a 640×480 image it fell back to
+the historical 320×240 matrix and crashed. The explicit AirSim/GT wrapper now
+uses the existing native zero-timeout (indefinite one-shot wait), with camera
+startup supervised by the stack. A cold-node runtime check loaded the actual
+640×480 CameraInfo correctly. This is a startup/calibration integration fix,
+not evidence of improved estimator accuracy.
+
+The subsequent one-hour FAST-LIVO timestamp comparison is documented in
+[FAST_LIVO_TIMING.md](FAST_LIVO_TIMING.md). Its hard deadline is **17:36:55 UTC**;
+it does not extend the RHEM mission window.

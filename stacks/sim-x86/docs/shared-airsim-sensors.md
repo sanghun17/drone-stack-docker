@@ -176,3 +176,23 @@ stalls는 아직 남아 있다. 장시간 탐색과 raw ROVIO 오차 결과는
 [RHEM_MISSION.md](../../../data/analysis/risk-aware/planner-runtime/RHEM_MISSION.md)에
 별도로 기록한다. 새 공통 backend의 검증을 ArUco의 비행 성능 검증으로
 해석하면 안 된다.
+
+640×480 RGB 실험도 같은 다중 스트림 발행기에 명시적 프로필을 전달한다.
+Depth 해상도는 320×240으로 유지하며, RHEM과 GT용 FAST-LIVO 진단의 K는
+실제 CameraInfo에서 생성한다. `SIM_AIRSIM_SETTINGS`는 호스트 엔진/bridge의
+설정 파일을 선택하고, `--airsim-camera-profile`은 대응하는 공통 발행기 YAML을
+선택한다. 기본 YAML과 원본 simulator JSON은 320×240 조건을 유지한다.
+이 선택 기능은 별도 Risk 영상 발행기나 ArUco 구현 변경을 만들지 않는다.
+
+최종 GT/AirSim FAST-LIVO 실행은 별도 K 변환 도구 대신 필터에 이미 있는
+CameraInfo one-shot 로더를 사용한다. 새 노드가 ROS 시각 0에서 유한 시간
+대기를 시작하면 첫 절대 `/clock` 수신으로 즉시 timeout이 발생하는 문제를
+실행 로그에서 확인했다. 이 명시적 모드에서는 기존 로더의 timeout을 0으로
+설정해 CameraInfo를 기다리며, 센서 시작·실패 감시는 스택에서 담당한다.
+실제 cold start에서 640×480 K를 수신한 것까지 검증했다.
+
+GT 탐색 3시간 진단은 미션 성공 없이 종료했다. 촬영 시각 변경이 FAST-LIVO
+정확도에도 도움이 되는지는 같은 영상·점군·IMU의 헤더 시각만 바꾸는 비교로
+분리해 측정하며, 결과는
+[FAST_LIVO_TIMING.md](../../../data/analysis/risk-aware/planner-runtime/FAST_LIVO_TIMING.md)에
+기록한다. 입력 정합 개선 수치를 필터 위치 정확도 개선으로 대신하지 않는다.

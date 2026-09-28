@@ -111,6 +111,12 @@ class BatchTests(unittest.TestCase):
             args.rhem_map_rays='full'
             with self.assertRaises(ValueError):load_previous(args)
             args.rhem_map_rays='clipped'
+            args.map_stale_timeout=30.
+            with self.assertRaises(ValueError):load_previous(args)
+            args.map_stale_timeout=10.
+            args.airsim_camera_profile='/work/alternate-camera.yaml'
+            with self.assertRaises(ValueError):load_previous(args)
+            args.airsim_camera_profile=None
             (root/'iter_001/result.json').write_text('{}')
             with self.assertRaises(ValueError):load_previous(args)
 

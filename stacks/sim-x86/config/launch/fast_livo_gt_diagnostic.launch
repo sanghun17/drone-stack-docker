@@ -1,4 +1,5 @@
 <launch>
+  <arg name="online_intrinsics" default="false"/>
   <!-- Keep feature extraction and VIO diagnostics, but never let estimator TF
        compete with AirSim's odom -> imu -> base_link ground-truth tree. -->
   <group>
@@ -6,4 +7,11 @@
     <remap from="/tf_static" to="/diagnostics/fast_livo/tf_static"/>
     <include file="$(find fast_livo)/launch/mapping_simulator_openvins.launch"/>
   </group>
+  <!-- Reuse the estimator's existing one-shot CameraInfo loader. -->
+  <param name="common/online_intrinsics_en" value="$(arg online_intrinsics)"/>
+  <param name="common/cam_info_topic" value="/camera/left/camera_info"/>
+  <!-- A new node can receive the first absolute /clock after entering the
+       native ROS-time wait, making a positive timeout expire immediately.
+       The stack starts and supervises the camera before this one-shot wait. -->
+  <param name="common/cam_info_timeout" value="0.0" if="$(arg online_intrinsics)"/>
 </launch>

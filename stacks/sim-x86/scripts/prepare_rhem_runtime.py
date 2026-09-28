@@ -8,7 +8,7 @@ import rospy
 from sensor_msgs.msg import CameraInfo
 import tf2_ros
 import yaml
-from rhem_filter_config import apply_covariance_profile, apply_image_gate
+from rhem_filter_config import apply_covariance_profile, apply_image_gate, info_section
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -34,11 +34,27 @@ def main():
     src = ROOT / 'ws/rhem/src/rhem_planner'
     config = (src / 'rovio_bsp/cfg/rovio.info').read_text()
     filter_profile = rospy.get_param('/comparison/rhem_filter_profile', 'historical')
-    if filter_profile in ('upstream', 'gated'):
+    if filter_profile in ('upstream', 'gated', 'gated-fine', 'gated-bounded-bias'):
         config = apply_covariance_profile(config,
             (ROOT / 'stacks/sim-x86/config/rhem_rovio_covariance.info').read_text())
-        if filter_profile == 'gated':
+        if filter_profile in ('gated', 'gated-fine', 'gated-bounded-bias'):
             config = apply_image_gate(config, 5.99)
+        if filter_profile == 'gated-bounded-bias':
+            # Explicit simulator diagnostic: limit the covariance allowing
+            # erroneous visual matches to move the gyro-bias estimate.
+            for section, value in [(('Init', 'Covariance'), '1e-7'),
+                                   (('Prediction', 'PredictionNoise'), '1e-11')]:
+                first, last = info_section(config, section)
+                block, count = re.subn(r'(?m)^(\s*gyb_[012]\s+)[^;\n]+;',
+                                       lambda m: m[1] + value + ';', config[first:last])
+                if count != 3:
+                    raise ValueError('Expected three gyro-bias covariance entries')
+                config = config[:first] + block + config[last:]
+        if filter_profile == 'gated-fine':
+            # Include native-resolution texture in the photometric update.
+            config, count = re.subn(r'(?m)^(\s*endLevel\s+)[^;\n]+;', r'\g<1>0;', config)
+            if count != 1:
+                raise ValueError('Expected one ROVIO endLevel')
     elif filter_profile != 'historical':
         raise ValueError(f'Unknown ROVIO filter profile: {filter_profile}')
     # Tracker windows cannot connect to the host display from the runtime container.

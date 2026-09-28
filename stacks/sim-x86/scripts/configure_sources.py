@@ -39,4 +39,6 @@ rospy.set_param('/comparison/rhem_diagnostics', False)
 rospy.set_param('/so3_control_bridge/max_thrust', 15.60)
 rospy.set_param('/comparison/rhem_gt_conservative', False)
 rospy.set_param('/comparison/sensor_calibration', 'historical')
+if rospy.has_param('/comparison/airsim_camera_profile'):
+    rospy.delete_param('/comparison/airsim_camera_profile')
 print(json.dumps(sources, indent=2))

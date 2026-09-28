@@ -265,7 +265,12 @@ class Trial:
             ('/unreal_ros_client/collision',String,'collision'),('/planning/task_fail_reason',String,'task_fail'),
             ('/planning/trajectory',MixTraj,'trajectory'),('/rhem/belief/valid_landmarks',UInt32,'landmarks'),
             ('/rhem/propagated_uncertainty',Float64,'uncertainty')]
-        self.subscribers=[rospy.Subscriber(t, cls, self.receive, callback_args=k, queue_size=20) for t,cls,k in specs]
+        # rospy shares a transport with the later recorder subscription. Its
+        # receive queue is fixed when the first connection opens: a 20-message
+        # readiness queue discards IMU bursts after only 100 ms at 200 Hz.
+        # Match the historical recorder's 200-message queue from the outset.
+        self.subscribers=[rospy.Subscriber(t, cls, self.receive, callback_args=k,
+            queue_size=200, buff_size=2**24) for t,cls,k in specs]
 
     def ready(self):
         now=time.monotonic()
@@ -293,6 +298,8 @@ class Trial:
         rospy.set_param('/so3_control_bridge/max_thrust', self.args.control_max_thrust)
         rospy.set_param('/comparison/rhem_gt_conservative', self.args.rhem_gt_conservative)
         rospy.set_param('/comparison/sensor_calibration', self.args.sensor_calibration)
+        rospy.set_param('/comparison/airsim_camera_profile', str(
+            self.args.airsim_camera_profile or ROOT/'stacks/sim-x86/config/airsim_cameras.yaml'))
         if self.args.rhem_gt_conservative:
             for key, value in dict(max_vel_xy=.6, max_vel_z=.4, max_a_xy=1., max_a_z=.7,
                                    max_yaw_rate=.75, max_a_wz=1.5).items():
@@ -348,6 +355,13 @@ class Trial:
         subprocess.run(['rosparam','dump',str(self.folder/'parameters.yaml'),'/'],check=True,timeout=15)
         if self.args.planner=='rhem':
             shutil.copytree(ROOT/'.build/sim-x86/rhem',self.folder/'rhem_runtime_config')
+            cache = ROOT/'ws/rhem/build/rovio/CMakeCache.txt'
+            build = {'rovio_cmake': [line for line in cache.read_text().splitlines()
+                                    if line.startswith('ROVIO_')], 'binary_sha256': {}}
+            for name in ('rovio_node', 'rovio_bsp_node'):
+                binary = ROOT/'ws/rhem/devel/.private/rovio/lib/rovio'/name
+                build['binary_sha256'][name] = hashlib.sha256(binary.read_bytes()).hexdigest()
+            write_json(self.folder/'rhem_runtime_config/build.json', build)
         self.result['sources']=rospy.get_param('/comparison/sources')
         self.result['gt_sha256']=hashlib.sha256(self.metrics.gt_path.read_bytes()).hexdigest()
         self.result['evaluation_voxel_size']=self.metrics.voxel
@@ -394,7 +408,7 @@ class Trial:
                     if metric:
                         writer.writerow(dict(ros_time=ros,elapsed_s=self.result.get('elapsed_s',0),**metric));output.flush()
                         self.result['final_metrics']=metric
-                        if metric['map_age_s']>10:reason=reason or 'map_stale'
+                        if metric['map_age_s']>self.args.map_stale_timeout:reason=reason or 'map_stale'
                         elif self.takeover and metric['volume_rate_vio']>=self.args.coverage_threshold:reason=reason or 'coverage'
                     elif now-self.start_wall>30:reason=reason or 'map_missing'
                     next_metric=now+5
@@ -459,7 +473,8 @@ def load_previous(args):
     for key, default in dict(rhem_belief_mode='rovio', control_max_thrust=15.60,
                              rhem_gt_conservative=False, rhem_diagnostics=False, sensor_calibration='historical',
                              rhem_filter_profile='historical', rhem_progress_profile='historical',
-                             rhem_map_rays='clipped').items():
+                             rhem_map_rays='clipped', airsim_camera_profile=None,
+                             map_stale_timeout=10.).items():
         if manifest.get(key, default) != getattr(args, key, default):
             raise ValueError('Resume diagnostic configuration differs: '+key)
     results=json.loads((args.resume_from/'summary.json').read_text())
@@ -480,7 +495,7 @@ def main():
     parser.add_argument('--rhem-belief-mode',choices=['rovio','disabled'],default='rovio',
                         help='disabled: GT-only NBVP diagnostic, not a RHEM evaluation')
     parser.add_argument('--rhem-diagnostics',action='store_true',help='Record raw and aligned belief snapshots')
-    parser.add_argument('--rhem-filter-profile',choices=['historical','upstream','gated'],
+    parser.add_argument('--rhem-filter-profile',choices=['historical','upstream','gated','gated-fine','gated-bounded-bias'],
                         help='Default gated with airsim sensors, historical otherwise; gated adds a stricter image innovation gate; corrected capture times required')
     parser.add_argument('--rhem-progress-profile',choices=['historical','persistent','exploratory'],default='historical',
                         help='persistent retains distance discount (0.5); exploratory retains a weaker discount (0.15)')
@@ -492,13 +507,18 @@ def main():
                         help='GT-only diagnostic: slower motion, 0.8–1.8m planning slab, 0.5m vertical footprint')
     parser.add_argument('--sensor-calibration', choices=['historical','airsim'], default='historical',
                         help='airsim: measured separate RGB/depth extrinsics; GT-only diagnostic')
+    parser.add_argument('--airsim-camera-profile', help='Explicit common camera YAML, container path; must match running AirSim settings')
     parser.add_argument('--time-limit',type=float,default=300)
     parser.add_argument('--coverage-threshold',type=float,default=.8)
     parser.add_argument('--startup-timeout',type=float,default=90)
+    parser.add_argument('--map-stale-timeout',type=float,default=10.,
+                        help='Maximum time without a new map snapshot; explicit longer budget for expensive diagnostic planning')
     parser.add_argument('--resume-from',type=Path,help='Preserve completed trials from this batch and continue numbering in a new output')
     parser.add_argument('--output',type=Path,required=True,help='New directory, container path /work/flight_logs/...')
     args=parser.parse_args();args.control_source=args.control_source or args.planning_source
     args.rhem_filter_profile=args.rhem_filter_profile or ('gated' if args.sensor_calibration=='airsim' else 'historical')
+    if args.airsim_camera_profile and (args.sensor_calibration != 'airsim' or not Path(args.airsim_camera_profile).is_file()):
+        parser.error('An explicit camera profile requires airsim calibration and an existing YAML file')
     if args.rhem_map_rays=='full' and (args.planner!='rhem' or args.sensor_calibration!='airsim'):
         parser.error('Full map rays require RHEM and the common AirSim sensor pipeline')
     if not math.isfinite(args.control_max_thrust) or args.control_max_thrust <= 9.81:
@@ -511,6 +531,8 @@ def main():
         parser.error('Separate camera calibration is currently validated only with GT sources')
     if args.iterations<1 or min(args.time_limit,args.startup_timeout)<=0 or not 0<args.coverage_threshold<=1:
         parser.error('Invalid iteration count, timeout or coverage threshold')
+    if not math.isfinite(args.map_stale_timeout) or args.map_stale_timeout<=0:
+        parser.error('map-stale-timeout must be finite and positive')
     lock_path=ROOT/'.build/sim-x86/experiments.lock'
     lock_path.parent.mkdir(parents=True,exist_ok=True)
     batch_lock=lock_path.open('a')
@@ -538,12 +560,13 @@ def main():
                       'run_airsim_sensors.sh')),
                    Path(__file__).with_name('rhem_filter_config.py'),
                    ROOT/'stacks/sim-x86/config/rhem_rovio_covariance.info',
-                   ROOT/'stacks/sim-x86/config/airsim_cameras.yaml',
                    ROOT/'stacks/sim-x86/config/launch/airsim_sensor_pipeline.launch',
                    ROOT/'stacks/sim-x86/config/comparison-20260706.yml',
                    ROOT/'ws/risk-aware-comparison/src/risk_aware_planning/local_controller/scripts/so3_control_bridge.py',
                    *(ROOT/'stacks/sim-x86/config').glob('comparison-20260706-*.yaml')]:
         shutil.copy2(source,provenance/source.name)
+    shutil.copy2(args.airsim_camera_profile or ROOT/'stacks/sim-x86/config/airsim_cameras.yaml',
+                 provenance/'airsim_cameras.yaml')
     manifest['source_sha256']={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in provenance.iterdir()}
     write_json(args.output/'manifest.json',manifest)
     previous=[]
