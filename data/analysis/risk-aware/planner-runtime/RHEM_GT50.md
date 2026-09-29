@@ -26,11 +26,28 @@ This is a sampling variant, not an unchanged historical RHEM baseline; its
 manifest/configuration and analysis cohort must remain identifiable. The
 default `historical` profile retains previous sampling for reproduction.
 
-The first three updated trials require motion/coverage/control review before
-the remainder of the 50-attempt request proceeds. Historical time-indexed
-reference bands describe a different motion distribution, so this validation
-uses explicit post-trial comparison while retaining localization, component,
-map, collision, memory and storage termination guards.
+Trials 025–027 completed the bounded validation. Mean actual GT speed increased
+from 0.1043 m/s (017–024, eight trials) to 0.1427 m/s (three trials), a descriptive
+36.9% increase. Individual new speeds were 0.1523, 0.1378 and 0.1381 m/s;
+tracking RMSE was 0.0766, 0.0751 and 0.0794 m. Shared motion limits, generated
+camera calibration and ROVIO filter configuration match the previous condition.
+Planned yaw per metre decreased from 3.30 rad/m in audited trial 021 to
+0.96, 1.27 and 1.10 rad/m in the three pilots. No clock-rate or large trajectory
+delivery delay accounts for the earlier low speed.
+
+All three pilots still terminated on ROVIO divergence. Coverage was 59.53%,
+67.44% and 26.53%; the last trial failed early at 247.16 s. This does not establish
+better coverage efficiency or mission success, and no failure is excluded.
+See `motion-fix-20260929/validation-summary.json`, `validation-trials.csv`,
+`timing-after*.json`, and the existing `check_motion.py` plots for the evidence.
+
+After this review, `campaign_plan_heading_continuous.json` resumes 028–050 as
+the explicitly identified heading-continuity cohort. The descriptive review
+envelope retains the original historical bounds and includes the pilot bounds;
+it is not an iid statistical confidence interval or a pooled performance
+estimate. Repeated unexpected excursions still stop launches for review.
+Localization, component, map, collision, memory and storage guards remain.
+`data/manifests/rhem-gt50-20260929-cohorts.json` identifies cohort boundaries.
 
 The user requested 50 total attempts including the 13 earlier diagnostic
 flights, with review before continuing if new outcomes deviate unexpectedly.
@@ -39,8 +56,8 @@ They are descriptive references, not an iid statistical baseline.
 
 Artifacts and durable progress are in
 `data/results/rhem-gt-50-20260929/`; `status.json` is the continuing campaign
-status, `campaign_plan.json` fixes the remaining conditions, and
-`review_policy_after14.json` contains the reference samples and review limits.
+status; `campaign-process-current.json` identifies the active immutable plan
+and that plan selects the reference samples and review limits.
 New original records are in `flight_logs/rhem-gt-50-20260929-attemptNNN/`.
 
 ## Conditions and first review
