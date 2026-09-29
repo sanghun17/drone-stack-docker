@@ -57,13 +57,23 @@ def coverage_review(trial, policy):
     return checks, reason
 
 
-def belief_review(sensors, policy, stop_ros=None):
+def active_estimators(manifest):
+    """Only estimators actually used for belief/planning/control can fail a trial."""
+    names=[]
+    if manifest.get('planner')=='rhem' and manifest.get('rhem_belief_mode','rovio')=='rovio':
+        names.append('rovio')
+    if 'fast-livo' in (manifest.get('planning_source'),manifest.get('control_source')):
+        names.append('fast_livo')
+    return names
+
+
+def belief_review(sensors, policy, stop_ros=None, estimator='rovio'):
     # Reuse the historical scorer, including its initial yaw/translation alignment.
     # Ground truth is consumed only in this independent process.
     import numpy as np
     from score_rovio_replay import score
     states = {}
-    for name in ('gt', 'rovio'):
+    for name in ('gt', estimator):
         records = rows(sensors / (name + '.csv'))
         if stop_ros is not None:
             records = [r for r in records if float(r['header_ns']) / 1e9 <= stop_ros]
@@ -73,14 +83,17 @@ def belief_review(sensors, policy, stop_ros=None):
                                  *[float(r[k]) for k in ('x', 'y', 'z', 'qx', 'qy', 'qz', 'qw')]]
                                 for r in records])
     metrics, series = score(states)
-    if 'rovio' not in series:
-        return metrics, 'raw_rovio_unscorable'
-    t, error, *_ = series['rovio']
-    healthy = np.flatnonzero(error <= policy['raw_rovio_error_review_m'])
+    # A non-finite first estimate may leave no valid series to score.
+    if metrics.get(estimator,{}).get('invalid_samples',0):
+        return metrics, 'raw_'+estimator+'_nonfinite'
+    if estimator not in series:
+        return metrics, 'raw_'+estimator+'_unscorable'
+    t, error, *_ = series[estimator]
+    threshold=policy.get('localization_error_m',policy['raw_rovio_error_review_m'])
+    hold=policy.get('localization_error_duration_s',policy['raw_rovio_error_duration_s'])
+    healthy = np.flatnonzero(error <= threshold)
     first_bad = healthy[-1] + 1 if len(healthy) else 0
     duration = float(t[-1] - t[first_bad]) if first_bad < len(t) else 0.
     metrics['sustained_error_s'] = duration
-    reason = ('raw_rovio_divergence' if duration >= policy['raw_rovio_error_duration_s'] else None)
-    if metrics['rovio'].get('invalid_samples', 0):
-        reason = 'raw_rovio_nonfinite'
+    reason = ('raw_'+estimator+'_divergence' if duration >= hold else None)
     return metrics, reason

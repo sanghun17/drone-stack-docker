@@ -36,8 +36,10 @@ divergence, but this observation does not establish the sole cause. No changed
 flight setting or gross sensor-rate regression was found. The user explicitly
 chose to continue evaluating this setting, including failures, because no
 further high-confidence ROVIO repair was identified after the previous three-hour
-investigation. Attempts 015–050 form the separate frozen cohort. Known finite
-ROVIO divergence is reported rather than introducing another flight stop rule.
+investigation. The initial implementation incorrectly changed finite ROVIO
+divergence from a stop to a warning for attempts 015/016. Including failed trials
+should instead mean ending the failed trial, saving it, and continuing the
+campaign. See the restored termination policy below.
 Unexpected reference-band deviations still stop further launches for review.
 
 ## Recording and analysis validation
@@ -164,7 +166,7 @@ uses the existing copy/readback/hash/remove procedure for each remaining plan,
 validates completion and location receipts, and writes a queue completion
 marker only after every archive succeeds. Any failure prevents that marker.
 
-`campaign_plan_after_bulk_archive.json` waits for that completion marker before
+`campaign_plan_restored_localization_stop.json` waits for that completion marker before
 attempt 017 and contains no between-trial archive candidates. Old CSV metrics
 remain local; all new campaign originals remain local. Attempts 015/016 stay in
 the continuing status and the total remains 16 before the next launch. Storage
@@ -172,3 +174,45 @@ forecasts use three observations from the new stopping-policy cohort, excluding
 the old prolonged-hover bags. Disk-reserve checks still apply; available space
 is not a guarantee that all future outcomes will fit. Durable transfer status:
 `nas-bulk-before-collection/status.json`; durable collection status: `status.json`.
+
+## Restore estimator-divergence termination before attempt 017
+
+The user correctly noted that estimator divergence already had a termination
+condition. Attempt014 used an independent raw ROVIO position error of over 5 m
+for 10 s. Changing `raw_rovio_action` to `report` after014 was an incorrect
+interpretation of “include failures in the 50 attempts,” not authorization to
+continue collecting after divergence. Historical evidence is retained unchanged.
+
+The campaign supervisor now uses `localization_action: terminate_trial`: the
+same 5 m / 10 s criterion requests a normal failed-trial stop through the recorder's
+existing `/planning/task_fail_reason` channel. A non-finite pose is also a
+failure. The independent scorer uses initial yaw and translation alignment only;
+GT never enters the estimator or planner. The 5 s supervisor poll and sensor-log
+flush introduce detection latency beyond the 10 s criterion. Missing stop
+acknowledgment within 10 s or failure to publish still blocks the campaign for
+review rather than allowing indefinite collection.
+
+Only estimators used by the manifest's sources can terminate a trial: real
+ROVIO for RHEM belief; FAST-LIVO whenever planning or control uses it. Thus the
+current GT/GT campaign monitors ROVIO, and a RHEM VIO campaign monitors both.
+The independent sensor logger also records `/comparison/fast_livo/odom`.
+This corrects the absence of a common in-flight FAST-LIVO error guard in this
+RHEM wrapper; its existing FAST-LIVO convergence gate only checked startup.
+LA's own feature-based `LOCALIZATION` guard was never a shared RHEM guard.
+
+Failures are recorded as `planner_failure:LOCALIZATION_ROVIO_DIVERGENCE`,
+`...FAST_LIVO_DIVERGENCE` or the corresponding `NONFINITE` reasons. The existing
+CSV exporter retains the `L` endpoint category and the full estimator-specific
+reason. Clean teardown/export allows the next trial; these failures do not
+become a user interruption or a whole-campaign review stop. Unexpected coverage,
+configuration, recording and infrastructure problems retain the review stop.
+The 30 s repeated-planning-failure guard remains a separate fallback for an
+unusable planner that has not triggered the estimator error criterion.
+
+Recorded-prefix checks of the original bags' independent CSV evidence detect
+015 divergence by 575 s (15.548 s sustained) and016 by 440 s (16.120 s sustained).
+Earlier 560/425 s prefixes correctly do not trigger. These are offline checks,
+not replacements for the original 1800/756 s endpoints. Regressions verify source
+selection, initial alignment, both estimator labels, non-finite initial states,
+normal termination publication, next-trial continuation and legacy endpoint
+classification. No new simulation collection starts before NAS completion.

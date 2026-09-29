@@ -19,9 +19,9 @@ def receive(m,entry):
   v=m.pose.pose.position;q=m.pose.pose.orientation;row += [v.x,v.y,v.z,q.x,q.y,q.z,q.w]
  with lock:writer.writerow(row);counts[name]+=1
 try:
- for name,topic,cls in [('imu','/airsim_node/hmcl/imu/imu',Imu),('image','/camera/left/image_raw',Image),('gt','/gt_odom',Odometry),('rovio','/rhem/rovio/odometry',Odometry)]:
+ for name,topic,cls in [('imu','/airsim_node/hmcl/imu/imu',Imu),('image','/camera/left/image_raw',Image),('gt','/gt_odom',Odometry),('rovio','/rhem/rovio/odometry',Odometry),('fast_livo','/comparison/fast_livo/odom',Odometry)]:
   f=(a.output/(name+'.csv')).open('w');files.append(f);w=csv.writer(f)
-  w.writerow(['wall_monotonic','clock_ros','header_ns','seq']+(['wx','wy','wz','ax','ay','az'] if name=='imu' else ['x','y','z','qx','qy','qz','qw'] if name in ['gt','rovio'] else []))
+  w.writerow(['wall_monotonic','clock_ros','header_ns','seq']+(['wx','wy','wz','ax','ay','az'] if name=='imu' else ['x','y','z','qx','qy','qz','qw'] if cls is Odometry else []))
   counts[name]=0;subs.append(rospy.Subscriber(topic,cls,receive,(name,w),queue_size=10000,buff_size=2**24,tcp_nodelay=True))
  start=time.monotonic()
  while not rospy.is_shutdown() and time.monotonic()-start<a.duration:

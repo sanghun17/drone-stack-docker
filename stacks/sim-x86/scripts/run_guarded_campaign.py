@@ -120,6 +120,7 @@ for p in Path('/proc').glob('[0-9]*'):
             completed.append(dict(global_attempt=index,batch=str(batch),termination=result['termination'],
                 mission_success=result.get('mission_success',False),valid_evaluation=result.get('valid_evaluation',False),
                 final_metrics=result.get('final_metrics'),review=str(review),warnings=value.get('warnings',[]),
+                localization_failures=value.get('localization_failures',[]),
                 bag_bytes=result.get('bag',{}).get('bytes'),bag_compression=compression))
             if value['state']!='passed' or not pipeline.get('complete'):
                 publish('review_required',reasons=value['review_reasons'],pipeline=pipeline);return 1

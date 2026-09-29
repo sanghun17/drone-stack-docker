@@ -36,6 +36,14 @@ HEADER = ['MapName', 'RosTime', 'WallTime', 'GTOdomX', 'GTOdomY', 'GTOdomZ',
 UNITS = ['Unit', 'seconds', 'seconds'] + ['meters'] * 6 + ['ratio_0_1', 'ratio_0_1', 'm3', 'ratio_0_1']
 
 
+def planner_endpoint_type(reason):
+    """Preserve the historical L endpoint while retaining estimator-specific reasons."""
+    failure=reason.split(':',1)[1]
+    if failure=='LOCALIZATION' or failure.startswith('LOCALIZATION_'):
+        return 'L'
+    return {'NOVIEWPOINT':'N','COLLISION':'C','SAFE_ZONE_VIOLATION':'V'}.get(failure,'U')
+
+
 def recorded_camera_transform(bag, frame, base='base_link'):
     """Resolve the actual static optical mount recorded by the common bridge."""
     edges={}
@@ -146,8 +154,7 @@ def export(trial, output, gt_path, cadence=5.):
         end_type = 'C'
         reason = 'bag collision event: ' + collision_reason
     elif reason.startswith('planner_failure:'):
-        end_type = {'LOCALIZATION': 'L', 'NOVIEWPOINT': 'N', 'COLLISION': 'C',
-                    'SAFE_ZONE_VIOLATION': 'V'}.get(reason.split(':', 1)[1], 'U')
+        end_type = planner_endpoint_type(reason)
     with (output / 'endpoint.csv').open('x') as f:
         writer = csv.writer(f)
         writer.writerow(['time', 'type', 'reason']); writer.writerow(['seconds', 'C|L|N|T|S|V|U', ''])

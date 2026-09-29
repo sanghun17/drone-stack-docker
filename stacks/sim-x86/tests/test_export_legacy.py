@@ -5,7 +5,7 @@ from types import SimpleNamespace as Obj
 import unittest
 import numpy as np
 sys.path.insert(0,str(Path(__file__).resolve().parents[3]/'data/analysis/risk-aware/experiment-evaluation'))
-from export_legacy import recorded_camera_transform
+from export_legacy import recorded_camera_transform, planner_endpoint_type
 
 
 def edge(parent,child,xyz,q):
@@ -15,6 +15,11 @@ def edge(parent,child,xyz,q):
 
 
 class CameraTests(unittest.TestCase):
+    def test_estimator_failure_retains_localization_endpoint_category(self):
+        for suffix in ['LOCALIZATION','LOCALIZATION_ROVIO_DIVERGENCE','LOCALIZATION_FAST_LIVO_NONFINITE']:
+            self.assertEqual(planner_endpoint_type('planner_failure:'+suffix),'L')
+        self.assertEqual(planner_endpoint_type('planner_failure:BELIEF_INVALID'),'U')
+
     def test_depth_ray_uses_recorded_depth_mount(self):
         transforms=[edge('base_link','camera_left_link',[.25,-.15,.25],[0,0,0,1]),
                     edge('base_link','camera_depth_link',[.25,0,.25],[0,0,0,1]),

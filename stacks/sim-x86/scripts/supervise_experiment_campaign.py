@@ -12,7 +12,7 @@ import subprocess
 import time
 import shutil
 
-from experiment_review import coverage_review, belief_review
+from experiment_review import coverage_review, belief_review, active_estimators
 
 ROOT=Path(__file__).resolve().parents[3]
 
@@ -30,29 +30,63 @@ def write_status(path, value):
     temporary.write_text(json.dumps(value,indent=2)+'\n');temporary.replace(path)
 
 
+def request_localization_stop(reason):
+    """Use the recorder's normal failure channel so teardown and next trial work."""
+    if reason not in {f'raw_{name}_{kind}' for name in ('rovio','fast_livo')
+                      for kind in ('divergence','nonfinite')}:
+        raise ValueError('Not an estimator failure: '+reason)
+    message='LOCALIZATION_'+reason[len('raw_'):].upper()
+    command=('source /opt/ros/noetic/setup.bash; source /work/config/sim.env; '
+             'source /work/config/ros_env.sh; '
+             'exec rostopic pub -1 /planning/task_fail_reason std_msgs/String "$1"')
+    subprocess.run(['docker','exec','drone-stack-sim-x86','bash','-c',command,
+                    'localization_guard',message],check=True,timeout=15,
+                   stdout=subprocess.DEVNULL,stderr=subprocess.PIPE)
+    return message
+
+
 def guard_trial(args):
     """Review one trial; never launch the next one or modify estimator inputs."""
     policy=json.loads(args.review_policy.read_text())
     trial=args.batch/'iter_001'
     requested=False
+    localization_requested=False
+    localization_requested_at=None
     while True:
         value=dict(updated_at=datetime.datetime.now().astimezone().isoformat(),
-                   state='monitoring', batch=str(args.batch), review_reasons=[], warnings=[])
+                   state='monitoring', batch=str(args.batch), review_reasons=[], warnings=[],
+                   localization_failures=[],localization={})
+        value['localization_policy']={key:policy[key] for key in
+            ('localization_action','localization_error_m','localization_error_duration_s',
+             'raw_rovio_error_review_m','raw_rovio_error_duration_s') if key in policy}
+        stop_ros=None
         if args.status.exists():
-            value['review_reasons']=json.loads(args.status.read_text()).get('review_reasons',[])
+            previous=json.loads(args.status.read_text())
+            value['review_reasons']=previous.get('review_reasons',[])
+            value['localization_failures']=previous.get('localization_failures',[])
+            if 'termination_request' in previous:
+                value['termination_request']=previous['termination_request']
         try:
             value['coverage_checks'], reason=coverage_review(trial,policy)
             if reason:value['review_reasons'].append(reason)
             events=trial/'events.jsonl'
-            stop_ros=None
             if events.exists():
                 completed=[json.loads(s) for s in events.read_text().splitlines() if s.strip()]
                 stop_ros=next((e['ros_time'] for e in completed if e['phase']=='E.stop'),None)
-            value['belief'], reason=belief_review(args.sensors,policy,stop_ros)
-            if reason:
-                if reason=='raw_rovio_divergence' and policy.get('raw_rovio_action')=='report':
-                    value['warnings'].append(reason)
-                else:value['review_reasons'].append(reason)
+            manifest=args.batch/'manifest.json'
+            names=active_estimators(json.loads(manifest.read_text())) if manifest.exists() else []
+            value['active_estimators']=names
+            for name in names:
+                metrics, reason=belief_review(args.sensors,policy,stop_ros,estimator=name)
+                value['localization'][name]=metrics
+                if name=='rovio':value['belief']=metrics
+                if reason:
+                    if (policy.get('localization_action')=='terminate_trial'
+                            and reason.endswith(('_divergence','_nonfinite'))):
+                        value['localization_failures'].append(reason)
+                    elif reason=='raw_rovio_divergence' and policy.get('raw_rovio_action')=='report':
+                        value['warnings'].append(reason)
+                    else:value['review_reasons'].append(reason)
         except Exception as exc:
             # Failure to monitor must stop an unattended campaign, not pass it.
             value['review_reasons'].append('review_error: '+str(exc))
@@ -83,6 +117,18 @@ print(json.dumps(found))
         except Exception as exc:
             runners=[]
             value['review_reasons'].append('runner_inspection_error: '+str(exc))
+        value['localization_failures']=sorted(set(value['localization_failures']))
+        # Never publish a stale failure after another stop reason already won.
+        if value['localization_failures'] and stop_ros is None and runners and not localization_requested:
+            try:
+                value['termination_request']=request_localization_stop(value['localization_failures'][0])
+                localization_requested=True
+                localization_requested_at=time.monotonic()
+            except Exception as exc:
+                value['review_reasons'].append('localization_stop_error: '+str(exc))
+        if (localization_requested_at is not None and stop_ros is None
+                and time.monotonic()-localization_requested_at>10):
+            value['review_reasons'].append('localization_stop_not_acknowledged')
         result=trial/'result.json'
         if result.exists():
             outcome=json.loads(result.read_text())
@@ -97,6 +143,8 @@ print(json.dumps(found))
                 for p in runners:
                     subprocess.run(['docker','exec','drone-stack-sim-x86','kill','-INT',str(p['pid'])],check=True,timeout=10)
                 requested=True
+        elif localization_requested and stop_ros is None:
+            value['state']='stopping_failed_trial'
         value['review_reasons']=sorted(set(value['review_reasons']))
         write_status(args.status,value)
         if result.exists():return 1 if value['review_reasons'] else 0

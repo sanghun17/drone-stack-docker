@@ -6,10 +6,17 @@ import tempfile
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
-from experiment_review import coverage_review, belief_review
+from experiment_review import coverage_review, belief_review, active_estimators
 
 
 class ReviewTests(unittest.TestCase):
+    def test_only_used_estimators_terminate_the_trial(self):
+        gt=dict(planner='rhem',rhem_belief_mode='rovio',planning_source='gt',control_source='gt')
+        self.assertEqual(active_estimators(gt),['rovio'])
+        self.assertEqual(active_estimators(dict(gt,control_source='fast-livo')),['rovio','fast_livo'])
+        self.assertEqual(active_estimators(dict(gt,planner='pure')),[])
+        self.assertEqual(active_estimators(dict(gt,planner='pure',planning_source='fast-livo')),['fast_livo'])
+
     def test_takeover_time_two_checkpoints_and_no_extrapolation(self):
         policy={'consecutive_outside_checkpoints':2, 'checkpoints':{
             str(t):{'n':13, 'metrics':{'volume_m3':{'review_lower':100,'review_upper':200}}}
@@ -47,6 +54,20 @@ class ReviewTests(unittest.TestCase):
             metrics,reason=belief_review(sensors,policy,stop_ros=1019)
             self.assertIsNone(reason)
             self.assertLess(metrics['rovio']['position_max_error_m'],1e-10)
+            (sensors/'fast_livo.csv').write_bytes((sensors/'rovio.csv').read_bytes())
+            metrics,reason=belief_review(sensors,policy,estimator='fast_livo')
+            self.assertEqual(reason,'raw_fast_livo_divergence')
+            self.assertEqual(metrics['sustained_error_s'],19)
+
+    def test_nonfinite_first_estimate_is_failure_not_an_empty_healthy_series(self):
+        policy={'raw_rovio_error_review_m':5,'raw_rovio_error_duration_s':10}
+        with tempfile.TemporaryDirectory() as tmp:
+            folder=Path(tmp)
+            for name,x in [('gt','0'),('rovio','nan')]:
+                (folder/(name+'.csv')).write_text('header_ns,x,y,z,qx,qy,qz,qw\n'
+                    +''.join(f'{t*10**9},{x},0,0,0,0,0,1\n' for t in range(1000,1003)))
+            _,reason=belief_review(folder,policy)
+            self.assertEqual(reason,'raw_rovio_nonfinite')
 
 
 if __name__=='__main__':unittest.main()
