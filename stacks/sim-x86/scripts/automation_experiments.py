@@ -297,6 +297,7 @@ class Trial:
         rospy.set_param('/comparison/rhem_belief_mode', self.args.rhem_belief_mode)
         rospy.set_param('/comparison/rhem_filter_profile', self.args.rhem_filter_profile)
         rospy.set_param('/comparison/rhem_progress_profile', self.args.rhem_progress_profile)
+        rospy.set_param('/comparison/rhem_heading_profile', self.args.rhem_heading_profile)
         rospy.set_param('/comparison/rhem_map_rays', self.args.rhem_map_rays)
         if self.args.planner == 'rhem' and self.args.rhem_filter_profile != 'historical':
             simulator = rospy.get_param('/comparison/host_simulator', {})
@@ -483,6 +484,7 @@ def load_previous(args):
     for key, default in dict(rhem_belief_mode='rovio', control_max_thrust=15.60,
                              rhem_gt_conservative=False, rhem_diagnostics=False, sensor_calibration='historical',
                              rhem_filter_profile='historical', rhem_progress_profile='historical',
+                             rhem_heading_profile='historical',
                              rhem_map_rays='clipped', airsim_camera_profile=None,
                              map_stale_timeout=10.).items():
         if manifest.get(key, default) != getattr(args, key, default):
@@ -509,6 +511,8 @@ def main():
                         help='Default gated with airsim sensors, historical otherwise; gated adds a stricter image innovation gate; corrected capture times required')
     parser.add_argument('--rhem-progress-profile',choices=['historical','persistent','exploratory'],default='historical',
                         help='persistent retains distance discount (0.5); exploratory retains a weaker discount (0.15)')
+    parser.add_argument('--rhem-heading-profile',choices=['historical','continuous'],default='historical',
+                        help='continuous: prefer the smallest landmark-visible yaw change during belief replanning; recorded algorithm variant')
     parser.add_argument('--rhem-map-rays',choices=['clipped','full'],default='clipped',
                         help='full preserves distant returns for free-space clearing within the same 5 m mapper range')
     parser.add_argument('--control-max-thrust',type=float,default=15.60,

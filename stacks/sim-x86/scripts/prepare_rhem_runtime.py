@@ -109,6 +109,10 @@ def main():
             params['nbvp/gain/degressive_coeff'] = 0.15
     elif progress_profile != 'historical':
         raise ValueError(f'Unknown RHEM progress profile: {progress_profile}')
+    heading_profile = rospy.get_param('/comparison/rhem_heading_profile', 'historical')
+    if heading_profile not in ('historical', 'continuous'):
+        raise ValueError(f'Unknown RHEM heading profile: {heading_profile}')
+    params['bsp/heading_continuity'] = heading_profile == 'continuous'
     if rospy.get_param('/comparison/rhem_gt_conservative', False):
         if any(rospy.get_param('/comparison/sources/'+k) != 'gt'
                for k in ('planning_source', 'control_source')):

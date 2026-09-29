@@ -1,5 +1,37 @@
 # RHEM GT campaign, 2026-09-29
 
+## Heading-motion review after attempt 024
+
+The user requested correction of the approximately 0.11 m/s average execution
+speed. The original campaign completed through 024 before further launches
+were held for a separate, bounded validation. Original outcomes are retained.
+See `data/results/rhem-gt-50-20260929/motion-fix-20260929/` for evidence.
+
+On recorded attempt 021, 171 executed polyline edges required about 394.38 s;
+340.73 s of that duration was governed by yaw speed/acceleration limits. The
+planned path accumulated 140.07 radians of yaw changes. Maximum trajectory
+delivery delay was 0.066 s and measured command-tracking RMSE was 0.0646 m.
+Uniform intermediate yaw sampling, rather than a large timing delay, is the
+dominant source of slow translational progress in this example. The existing
+quintic converter additionally stops at polyline corners to preserve collision
+geometry; it is not changed in the first heading-continuity experiment.
+
+`--rhem-heading-profile continuous` explicitly selects the module's
+`bsp/heading_continuity` option. It retains the previous yaw if three landmarks
+remain visible, otherwise searches outward in 5-degree increments for the
+smallest admissible yaw change. Visibility is evaluated at the candidate pose
+with a squared-distance range check. ROVIO belief propagation, collision
+checks, viewpoint endpoint yaw and shared motion limits remain active.
+This is a sampling variant, not an unchanged historical RHEM baseline; its
+manifest/configuration and analysis cohort must remain identifiable. The
+default `historical` profile retains previous sampling for reproduction.
+
+The first three updated trials require motion/coverage/control review before
+the remainder of the 50-attempt request proceeds. Historical time-indexed
+reference bands describe a different motion distribution, so this validation
+uses explicit post-trial comparison while retaining localization, component,
+map, collision, memory and storage termination guards.
+
 The user requested 50 total attempts including the 13 earlier diagnostic
 flights, with review before continuing if new outcomes deviate unexpectedly.
 The earlier 13 used different settings and were censored at different times.

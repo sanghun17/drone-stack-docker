@@ -524,7 +524,7 @@
     "planner/rhem": {
       "files": {
         "CMakeLists.txt": "affe8af541eafb2e48dacf20c2f5609033024c99cdf81e147455f8db575b57cf",
-        "README.md": "754870e97227b7b3decb5c4a24da038e8b375d2bd9de936466fc3d2b9817c6ff",
+        "README.md": "c071f60846077cbdcfb7867ccb27b2221edf9b1933ed509cd6db294a27d24a0d",
         "build_ws.sh": "27fb87f256b06ec5d495822b52a42f57f82f2e0292250a1adfd50996cc50fabd",
         "clone.sh": "07aeaf4e779167678123c34a0db889ad236a5eb1dbfd7fdc69ccfcd8d4c0bb05",
         "launch/rhem.launch": "a37c520491b9f9f7204a9843c865d2f42c8257aa50f4416d595ce6433f3cd444",
@@ -535,6 +535,7 @@
         "patches/exploration_memory.patch": "540cbf64bc8342a8fb8ed71912b120ab0bb49f9db14a89bc4a4164cb6bf80567",
         "patches/gflags_catkin.patch": "3b6f942fb41be1305cfcd81ac076b715910b5a028930cc80e9b89db90c389214",
         "patches/glog_catkin.patch": "e85a20aa71796e0df99ab009e22e77579b93d4419867ff743c04aa344452e7bc",
+        "patches/heading_continuity.patch": "374ba6ff3f6102af3378918677d5167356cfeb24d1cae194b936c0263afbfaac",
         "patches/minkindr.patch": "2946b978dd14f418c4f5d3b8088990a0a8f9b3783d461948564c448c2128f3d7",
         "patches/minkindr_ros.patch": "a2f9f1860cf4b4f5a07274524c584d9f6508a96809e9847c85bea81ac45bdfe0",
         "patches/rhem.patch": "9da19ca95696c57d688a1234cf722f7422386c592c874c645412b68908afd4b9",
@@ -543,8 +544,9 @@
         "patches/volumetric_mapping.patch": "d21c14848f448ddb291fa31a54ecf983549728b6e3956b324e00bd41c3b791f1",
         "run.sh": "54f47510ef53ba4d5c6bf39d8fb547d7b17b6b1bae2b6bacdaa9d06c3167db14",
         "scripts/belief_bridge.py": "cd0772dcc9441a74214a1bc597e872fb80ab7ecf37fc59002a2d5d6477fd89a0",
-        "sources.yml": "663f653cd128833717a49946d667dfcb461f5df300fc70eef5736ed4111fc18a",
+        "sources.yml": "a50b8f23ad38d9c7e1a7778eafdd5b856d670a70a369efd447f2c935fb154f87",
         "tests/check_branch_memory.cpp": "caf10ae081e5399f1114f0d7355c3b0480f43989dbeae68f8b09762320c2013b",
+        "tests/check_heading_selection.cpp": "f406a387f506e7af5c979ea5a5e01bc28cd1cf5093b519c4cd9df4fabcc71cb2",
         "tests/check_propagation_service.py": "cb823b492c0a5e8036b9968769474993d963fcb0fd7513343d5f28f4154857c2",
         "tests/check_short_belief.cpp": "ab9a3c89a33a38fe11e0090a0fc3ca32984d0f2bffcdbb21ab7cea4418fdae52",
         "tests/test_belief_bridge.py": "2a0455a2b36f570287046bac454d6d8dccc747347e832de152e31cb3e9cafe63"
@@ -581,7 +583,7 @@
         "workspace": "/work/ws/rhem"
       },
       "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
-      "revision": "59cf04b3f54dc3870ab795c5435cbddafdac5092",
+      "revision": "4fbb218a3672e2dfc036949c5d0f255a8cca7139",
       "subdir": "deployment/stack-modules/planner/rhem"
     },
     "planner/risk-aware": {

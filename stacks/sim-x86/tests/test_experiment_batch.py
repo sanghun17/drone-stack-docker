@@ -152,6 +152,9 @@ class BatchTests(unittest.TestCase):
             args.rhem_progress_profile='persistent'
             with self.assertRaises(ValueError):load_previous(args)
             args.rhem_progress_profile='historical'
+            args.rhem_heading_profile='continuous'
+            with self.assertRaises(ValueError):load_previous(args)
+            args.rhem_heading_profile='historical'
             args.rhem_map_rays='full'
             with self.assertRaises(ValueError):load_previous(args)
             args.rhem_map_rays='clipped'
