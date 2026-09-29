@@ -2,9 +2,47 @@
 """Materialize pinned component repositories and apply versioned compatibility patches."""
 import argparse
 from pathlib import Path
+import shutil
 import subprocess
+import tempfile
 
 import yaml
+
+
+def applied_patch_prefix(target, patches):
+    """Check stacked patches in a disposable copy, newest to oldest.
+
+    A later patch may change an earlier patch's context. Checking that earlier
+    patch against the final tree in isolation incorrectly treats a correctly
+    deployed checkout as unpatched. Never unwind patches in the real checkout.
+    """
+    files = set()
+    for patch in patches:
+        stats = subprocess.check_output(['git', 'apply', '--numstat', '-z', str(patch)])
+        for record in stats.split(b'\0'):
+            if not record:
+                continue
+            name = Path(record.split(b'\t', 2)[2].decode())
+            if name.is_absolute() or '..' in name.parts:
+                raise ValueError('Patch path escapes checkout: ' + str(name))
+            files.add(name)
+    for count in range(len(patches), 0, -1):
+        with tempfile.TemporaryDirectory(prefix='source-patch-check-') as directory:
+            scratch = Path(directory)
+            subprocess.run(['git', 'init', '-q', str(scratch)], check=True)
+            for name in files:
+                source = target / name
+                if source.exists() or source.is_symlink():
+                    destination = scratch / name
+                    destination.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(source, destination, follow_symlinks=False)
+            for patch in reversed(patches[:count]):
+                command = ['git', '-C', str(scratch), 'apply', '--reverse', str(patch)]
+                if subprocess.run(command, capture_output=True).returncode:
+                    break
+            else:
+                return count
+    return 0
 
 
 def main():
@@ -28,11 +66,10 @@ def main():
         actual = subprocess.check_output(git + ['rev-parse', 'HEAD'], text=True).strip()
         if actual != revision:
             raise SystemExit(f'Preserving {target}: HEAD is {actual}, expected {revision}')
-        for patch in entry.get('patches', []):
-            path = str(manifest.parent / patch)
-            applied = subprocess.run(git + ['apply', '--reverse', '--check', path], capture_output=True)
-            if applied.returncode == 0:
-                continue
+        patches = [manifest.parent / patch for patch in entry.get('patches', [])]
+        prefix = applied_patch_prefix(target, patches)
+        for patch in patches[prefix:]:
+            path = str(patch)
             subprocess.run(git + ['apply', '--check', path], check=True)
             subprocess.run(git + ['apply', path], check=True)
         print(f'{entry["path"] or "."}: {revision}')
