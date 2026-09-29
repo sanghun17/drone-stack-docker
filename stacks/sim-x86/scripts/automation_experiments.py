@@ -70,10 +70,19 @@ def service(name, value, required=True):
 
 class Recorder(InMemoryRecorder):
     """Historical recorder with atomic freeze and checked, wall-time bag flush."""
-    def __init__(self, config):
+    def __init__(self, config, compression='none'):
         self.buffer_lock = threading.Lock()
         self.latched_calibration = {}
+        self.compression = compression
         super().__init__(str(config))
+
+    def _write_bag(self, bag_path, data):
+        # Compression runs only after the frozen flight interval. Message bytes,
+        # stamps, connection headers and topic selection remain unchanged.
+        with rosbag.Bag(bag_path, 'w', compression=self.compression) as bag:
+            for topic, payload, stamp, header in data:
+                raw=(header['type'],payload,header['md5sum'],None,None)
+                bag.write(topic,raw,stamp,raw=True,connection_header=header)
 
     def _callback(self, msg, topic):
         with self.buffer_lock:
@@ -123,7 +132,8 @@ class Recorder(InMemoryRecorder):
         if topics != expected:raise RuntimeError('Bag topic counts do not match frozen buffer')
         if count != len(data):
             raise RuntimeError(f'Incomplete bag: {count}/{len(data)} messages')
-        return {'messages': count, 'topics': topics, 'bytes': path.stat().st_size}
+        return {'messages': count, 'topics': topics, 'bytes': path.stat().st_size,
+                'compression': self.compression}
 
 
 class Convergence:
@@ -335,7 +345,7 @@ class Trial:
         topics=yaml.safe_load((LEGACY.parent/'config/rosbag_topics.yaml').read_text())
         topics['enabled']=True; topics['topics']=sorted(set(topics['topics']+EXTRA_TOPICS))
         (self.folder/'recording.yaml').write_text(yaml.safe_dump(topics))
-        self.recorder=Recorder(self.folder/'recording.yaml')
+        self.recorder=Recorder(self.folder/'recording.yaml', self.args.bag_compression)
         if self.args.planner == 'rhem' and self.args.rhem_diagnostics:
             # Keep the IMU/image interval that initializes ROVIO. Starting only
             # at D.enable made offline replay initialize from a different sample.
@@ -513,6 +523,8 @@ def main():
     parser.add_argument('--startup-timeout',type=float,default=90)
     parser.add_argument('--map-stale-timeout',type=float,default=10.,
                         help='Maximum time without a new map snapshot; explicit longer budget for expensive diagnostic planning')
+    parser.add_argument('--bag-compression',choices=['none','lz4','bz2'],default='none',
+                        help='Lossless bag compression after flight; all raw sensor payloads retained')
     parser.add_argument('--resume-from',type=Path,help='Preserve completed trials from this batch and continue numbering in a new output')
     parser.add_argument('--output',type=Path,required=True,help='New directory, container path /work/flight_logs/...')
     args=parser.parse_args();args.control_source=args.control_source or args.planning_source

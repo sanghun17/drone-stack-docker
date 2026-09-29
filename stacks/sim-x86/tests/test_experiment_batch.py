@@ -5,13 +5,37 @@ from pathlib import Path
 import sys
 import tempfile
 import threading
+import io
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 from automation_experiments import Recorder, run_trials, load_previous
+import rosbag
+import rospy
+from std_msgs.msg import String
 
 class BatchTests(unittest.TestCase):
+    def test_lossless_compression_preserves_payload_stamps_and_connections(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            message=String(data='sensor evidence '*1000)
+            stream=io.BytesIO();message.serialize(stream)
+            header={'type':message._type,'md5sum':message._md5sum,
+                    'message_definition':message._full_text,'callerid':'/original_sensor','latching':'0'}
+            data=[('/sensor',stream.getvalue(),rospy.Time(100,i),header) for i in range(20)]
+            recorder=Recorder.__new__(Recorder)
+            sizes=[]
+            for compression in ('none','lz4','bz2'):
+                path=Path(tmp)/(compression+'.bag');recorder.compression=compression
+                recorder._write_bag(str(path),data);sizes.append(path.stat().st_size)
+                with rosbag.Bag(str(path)) as bag:
+                    actual=list(bag.read_messages(raw=True,return_connection_header=True))
+                    self.assertEqual(len(actual),len(data))
+                    for row,expected in zip(actual,data):
+                        self.assertEqual(row[0],expected[0]);self.assertEqual(row[1][1],expected[1])
+                        self.assertEqual(row[2],expected[2]);self.assertEqual(row[3]['callerid'],b'/original_sensor')
+            self.assertLess(sizes[1],sizes[0]);self.assertLess(sizes[2],sizes[0])
+
     def test_latched_calibration_survives_recording_gate(self):
         recorder=Recorder.__new__(Recorder)
         recorder.buffer_lock=threading.Lock()

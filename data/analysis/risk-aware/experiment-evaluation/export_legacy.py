@@ -15,6 +15,7 @@ import sys
 import numpy as np
 import rosbag
 import yaml
+from scipy.spatial.transform import Rotation
 
 ROOT = Path(__file__).resolve().parents[4]
 sys.path.insert(0, str(ROOT / 'stacks/sim-x86/scripts'))
@@ -35,6 +36,29 @@ HEADER = ['MapName', 'RosTime', 'WallTime', 'GTOdomX', 'GTOdomY', 'GTOdomZ',
 UNITS = ['Unit', 'seconds', 'seconds'] + ['meters'] * 6 + ['ratio_0_1', 'ratio_0_1', 'm3', 'ratio_0_1']
 
 
+def recorded_camera_transform(bag, frame, base='base_link'):
+    """Resolve the actual static optical mount recorded by the common bridge."""
+    edges={}
+    for _,msg,_ in bag.read_messages(topics=['/tf_static']):
+        for edge in msg.transforms:
+            q=edge.transform.rotation;t=edge.transform.translation
+            value=(edge.header.frame_id,ExperimentPlotter._quat_to_R([q.x,q.y,q.z,q.w]),
+                   np.array([t.x,t.y,t.z]))
+            old=edges.get(edge.child_frame_id)
+            if old is not None and (old[0]!=value[0] or not np.allclose(old[1],value[1])
+                                    or not np.allclose(old[2],value[2])):
+                raise ValueError('Conflicting static transform: '+edge.child_frame_id)
+            edges[edge.child_frame_id]=value
+    rotation=np.eye(3);translation=np.zeros(3);visited=set()
+    while frame!=base:
+        if frame in visited or frame not in edges:
+            raise ValueError('Missing/cyclic recorded camera transform: '+frame)
+        visited.add(frame)
+        parent,r,t=edges[frame]
+        rotation=r@rotation;translation=r@translation+t;frame=parent
+    return rotation,translation
+
+
 def export(trial, output, gt_path, cadence=5.):
     result = json.loads((trial / 'result.json').read_text())
     if hashlib.sha256(gt_path.read_bytes()).hexdigest() != result['gt_sha256']:
@@ -53,6 +77,9 @@ def export(trial, output, gt_path, cadence=5.):
     rot = ExperimentPlotter._quat_to_R
     cam_rotation = rot(ExperimentPlotter._CAM_IN_BASE_QUAT)
     cam_translation = ExperimentPlotter._CAM_IN_BASE_TRANS
+    camera_frame='camera_left_optical_frame'
+    calibration=params.get('comparison',{}).get('sensor_calibration','historical')
+    camera_policy='historical fixed ExperimentPlotter mount'
     gt_rotation = gt_translation = None
     gt_pos = vio_pos = ['', '', '']
     gt_dense, vio_dense, collisions = [], [], []
@@ -61,6 +88,10 @@ def export(trial, output, gt_path, cadence=5.):
     last_gt_stamp = last_vio_stamp = None
     rows = cloud_count = 0
     with rosbag.Bag(str(trial / 'flight.bag')) as bag, (output / 'experiment_metrics.csv').open('x') as f:
+        if calibration=='airsim':
+            camera_frame='camera_depth_optical_frame'
+            cam_rotation,cam_translation=recorded_camera_transform(bag,camera_frame)
+            camera_policy='common AirSim depth optical mount from recorded /tf_static'
         counts = {k: v.message_count for k, v in bag.get_type_and_topic_info().topics.items()}
         required = ['/gt_odom', '/robot/odom', '/voxel_grid/output'] + list(maps)
         missing = [t for t in required if not counts.get(t)]
@@ -89,7 +120,7 @@ def export(trial, output, gt_path, cadence=5.):
             elif topic in ('/collision', '/unreal_ros_client/collision'):
                 collisions.append((now, str(msg.data)))
             elif topic == '/voxel_grid/output' and gt_rotation is not None:
-                if msg.header.frame_id != 'camera_left_optical_frame':
+                if msg.header.frame_id != camera_frame:
                     raise ValueError('Unexpected sensor-cloud frame: ' + msg.header.frame_id)
                 points = pointcloud2_to_xyz(msg).astype(np.float64)
                 world = (points @ cam_rotation.T + cam_translation) @ gt_rotation.T + gt_translation
@@ -138,7 +169,9 @@ def export(trial, output, gt_path, cadence=5.):
                     gt_sha256=result['gt_sha256'], cadence_s=cadence,
                     surface_gt_policy='historical cloud accumulation with latest GT pose; no odometry interpolation',
                     camera_in_base_translation=cam_translation.tolist(),
-                    camera_in_base_quaternion=ExperimentPlotter._CAM_IN_BASE_QUAT.tolist(),
+                    camera_in_base_quaternion=Rotation.from_matrix(cam_rotation).as_quat().tolist(),
+                    camera_in_base_rotation=cam_rotation.tolist(),
+                    camera_frame=camera_frame,camera_calibration_policy=camera_policy,
                     script_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
     (output / 'analysis_metadata.json').write_text(json.dumps(metadata, indent=2) + '\n')
     print(f'{trial.name}: {rows} metric rows, {cloud_count} clouds, endpoint {end_type} at {end_time-t0:.3f}s', flush=True)

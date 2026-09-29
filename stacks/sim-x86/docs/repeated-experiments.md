@@ -195,3 +195,44 @@ single-threaded planner callback exceed this interval while control continues
 holding its target. Any larger diagnostic budget must be explicit, is saved in
 the manifest and cannot change during resume. Sensor/clock freshness, collision
 checks and the exploration coverage threshold remain separate conditions.
+
+## Reviewed campaigns and storage
+
+`run_guarded_campaign.py PLAN.json` runs the existing evaluated entrypoint one
+trial at a time. The plan freezes runtime file hashes and trial arguments,
+records every attempt, and stops before the next launch if its independent
+review or the legacy CSV export fails. Its `status.json` distinguishes running,
+archiving, review-required and complete states; completion counts attempts,
+not successful missions. Never combine heterogeneous tuning attempts into a
+claim of independent repetitions of one configuration.
+
+`supervise_experiment_campaign.py --batch BATCH --status STATUS
+--review-policy POLICY --sensors SENSOR_LOGS` enables the single-trial review
+mode instead of automatic batch resume. It compares actual pre-checkpoint
+observed volume, observed GT rate and travelled GT distance with explicit
+reference bands. It never extrapolates terminated runs. Independent raw ROVIO
+scoring reuses `score_rovio_replay.py`, aligns initial yaw/translation only, and
+clips diagnostics at `E.stop`. GT is never supplied to the filter by this monitor.
+An explicitly reviewed, known ROVIO divergence may be report-only in the policy;
+its result remains in the data. Sensor freshness and simulation termination
+conditions still apply. Reference bands from heterogeneous, censored trials are
+descriptive screening limits, not confidence intervals or a significance test.
+
+`--bag-compression none|lz4|bz2` changes only the post-flight bag writer. All
+topics, serialized sensor payloads, message times and connection information
+are retained. A real-bag comparison verifies these as a multiset because ROS
+may reorder different topics that share the exact same recorded timestamp.
+
+Explicit unused-payload plans can be moved with
+`scripts/lib/verified_archive.py PLAN.json`. Every NAS copy is read back and
+SHA-256 verified, along with a portable metadata archive, before sources are
+removed. Local metrics/configurations remain; each moved bag gets a `.nas.json`
+location/hash receipt. Resume revalidates copies and refuses changed sources
+or unknown partial contents. The original prior-paper NAS inventories describe
+their original datasets; new RHEM diagnostics have their own namespace and
+verification receipts.
+
+For calibrated AirSim trials, the existing legacy exporter resolves the depth
+optical mount from recorded `/tf_static`. Historical trials retain their old
+fixed-camera convention. Missing or conflicting recorded transforms fail the
+export rather than silently substituting the RGB mount.

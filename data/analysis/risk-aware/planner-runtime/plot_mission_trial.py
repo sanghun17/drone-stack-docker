@@ -23,8 +23,10 @@ states = dict(np.load(a.rovio / 'states.npz'))
 scores, series = score(states)
 with (a.trial / 'metrics.csv').open() as f:
     rows = list(csv.DictReader(f))
-time = np.array([float(r['elapsed_s']) for r in rows])
+time = np.array([float(r['ros_time']) - result['takeover_ros_time'] for r in rows])
 coverage = np.array([float(r['volume_rate_vio']) * 100 for r in rows])
+measured = (time >= 0) & (time <= audit['duration_s'])
+time, coverage = time[measured], coverage[measured]
 gt = np.load(a.audit / 'timeseries.npz')['gt']
 gt = gt[gt[:, 0] >= 0]
 fig, axes = plt.subplots(1, 3, figsize=(14, 4.5), layout='constrained')
