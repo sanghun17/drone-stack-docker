@@ -222,6 +222,9 @@ descriptive screening limits, not confidence intervals or a significance test.
 topics, serialized sensor payloads, message times and connection information
 are retained. A real-bag comparison verifies these as a multiset because ROS
 may reorder different topics that share the exact same recorded timestamp.
+An optional campaign `compression_forecast` selects BZ2 for future trials when
+measured bag sizes predict insufficient local capacity with LZ4; it never
+recompresses historical evidence or changes a running flight's conditions.
 
 Explicit unused-payload plans can be moved with
 `scripts/lib/verified_archive.py PLAN.json`. Every NAS copy is read back and

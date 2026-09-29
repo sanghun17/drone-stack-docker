@@ -51,7 +51,16 @@ Attempt 014 remains marked invalid/interrupted; export success does not change
 the mission outcome. Existing `plot_mission_trial.py` produced its diagnostic
 figure using actual takeover-relative sample times, excluding preflight values.
 
-Future bags use lossless LZ4 after the flight ends. In a five-second real sample,
+Future bags default to lossless LZ4 after the flight ends. After three new
+completed trials, a storage forecast compares their measured sizes, remaining
+attempts, unused archive candidates and the 80 GiB startup reserve. If projected
+LZ4 storage exceeds that budget, subsequent bags use lossless BZ2 instead; this
+slows post-flight flushing without changing recorded samples or flight conditions.
+The selected compression is saved in each manifest and campaign status. This is
+a capacity estimate with a 15% margin, not a disk-usage guarantee; the live
+recorder reserve and review stop remain in force.
+
+In a five-second real sample,
 6,763 messages occupied 126,480,712 bytes uncompressed, 56,206,024 bytes with
 LZ4, and 36,075,397 bytes with BZ2. Serialized payloads, stamps and connection
 metadata matched exactly as a multiset in each case. LZ4 write/read validation
@@ -64,13 +73,23 @@ Existing PURE/LA/ablation bags and trajectories remain in their established
 locations. Superseded RHEM VIO recordings are organized under
 `diagnostics/RHEM/20260922-20260923-vio/`, with 112 original bags totalling
 38,109,003,924 bytes, portable metadata, plan and verification receipts.
+This migration completed on 2026-09-29 at 15:55 KST: all 112 NAS copies verified,
+all 112 local location receipts exist, and the old local payloads were removed.
+Local free space rose to about 102 GiB.
 Completed GT tuning bags may be moved to `diagnostics/RHEM/20260928-gt-tuning/`
 as space is needed. Their metrics/configs stay local for the current comparison;
-new campaign recordings stay local. Check the archive `COMPLETE.json` receipts
+new campaign recordings stay local. Superseded earlier simulation development
+bags are additional reserve candidates under `diagnostics/RHEM/pipeline-development/`.
+Check the archive `COMPLETE.json` receipts
 for actual completion; a plan alone does not prove a move finished.
 
 No old source is removed until remote bytes and metadata verify. Sources are
 hashed again before removal, and local `.bag.nas.json` receipts retain the
 restoration path and identity. GVFS reads use bounded 64 KiB chunks and reopen
 on transient errors. An interrupted duplicate partial from the initial transfer
-is retained until it can be verified and cleaned separately.
+was also checksum-verified and removed; its canonical NAS copy remains.
+
+The continuing launcher initially rejected a relative plan path before a new
+flight started. Path normalization was corrected and regression-tested. Attempt
+015 subsequently reached sensor initialization and control takeover; the durable
+process continues toward attempt 050 subject to the review policy.

@@ -22,8 +22,26 @@ def launch(command,log):
     return subprocess.Popen(command,cwd=ROOT,stdout=log.open('x'),stderr=subprocess.STDOUT,start_new_session=True)
 
 
+def compression_choice(plan,completed,free_bytes,archive_bytes):
+    """Only post-flight storage changes; flight/estimator arguments stay frozen."""
+    forecast=plan.get('compression_forecast')
+    if not forecast or len(completed)<forecast['minimum_samples']:
+        return 'lz4',None
+    ratio=forecast['bz2_to_lz4_ratio']
+    equivalents=[r['bag_bytes']/(ratio if r.get('bag_compression')=='bz2' else 1.)
+                 for r in completed if r.get('bag_bytes')]
+    if not equivalents:return 'lz4',None
+    remaining=plan['target_total']-plan['completed_before']-len(completed)
+    projected=sum(equivalents)/len(equivalents)*remaining*forecast['size_margin']
+    available=free_bytes+archive_bytes-plan['minimum_start_free_gib']*2**30
+    choice='bz2' if projected>available else 'lz4'
+    return choice,dict(projected_lz4_bytes=projected,available_after_reserve_bytes=available,
+                       samples=len(equivalents),selected=choice)
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('plan',type=Path);a=p.parse_args()
+    a.plan=a.plan.resolve()
     plan=json.loads(a.plan.read_text());out=a.plan.parent;status=out/'status.json'
     def interrupted(signum,frame):raise KeyboardInterrupt('Campaign interrupted')
     signal.signal(signal.SIGTERM,interrupted)
@@ -68,7 +86,11 @@ for p in Path('/proc').glob('[0-9]*'):
             name=f"{plan['name']}-attempt{index:03d}"
             batch=ROOT/'flight_logs'/name;sensors=out/f'attempt{index:03d}-sensors'
             sensor_container='/work/'+str(sensors.relative_to(ROOT))
-            command=['bash','stacks/sim-x86/scripts/run_evaluated_experiments.sh',*plan['trial_arguments'],
+            archive_bytes=sum(json.loads((ROOT/p).read_text())['total_bytes'] for p in plan['archive_plans'][archive_index:])
+            compression,forecast=compression_choice(plan,completed,shutil.disk_usage(ROOT).free,archive_bytes)
+            arguments=list(plan['trial_arguments'])
+            if '--bag-compression' in arguments:arguments[arguments.index('--bag-compression')+1]=compression
+            command=['bash','stacks/sim-x86/scripts/run_evaluated_experiments.sh',*arguments,
                      '--output','/work/flight_logs/'+name]
             sensor_command='source /opt/ros/noetic/setup.bash; source /work/config/sim.env; source /work/config/ros_env.sh; exec python3 /work/data/analysis/risk-aware/planner-runtime/monitor_sensor_health.py --duration 4000 --output '+sensor_container
             monitor=launch(['docker','exec','-u','1000:1000','drone-stack-sim-x86','bash','-c',sensor_command],out/f'attempt{index:03d}-sensors.log')
@@ -76,7 +98,8 @@ for p in Path('/proc').glob('[0-9]*'):
             review=out/f'attempt{index:03d}-review.json'
             guard=launch(['python3','stacks/sim-x86/scripts/supervise_experiment_campaign.py','--batch',str(batch),
                 '--status',str(review),'--review-policy',str(ROOT/plan['review_policy']),'--sensors',str(sensors)],out/f'attempt{index:03d}-guard.log')
-            publish('running',current_attempt=index,batch=str(batch),launcher_pid=current.pid,guard_pid=guard.pid)
+            publish('running',current_attempt=index,batch=str(batch),launcher_pid=current.pid,guard_pid=guard.pid,
+                    bag_compression=compression,storage_forecast=forecast)
             while current.poll() is None:
                 if guard.poll() is not None and not (batch/'iter_001/result.json').exists():
                     os.kill(current.pid,signal.SIGINT)
@@ -91,7 +114,8 @@ for p in Path('/proc').glob('[0-9]*'):
             pipeline=json.loads((batch/'pipeline_status.json').read_text())
             completed.append(dict(global_attempt=index,batch=str(batch),termination=result['termination'],
                 mission_success=result.get('mission_success',False),valid_evaluation=result.get('valid_evaluation',False),
-                final_metrics=result.get('final_metrics'),review=str(review),warnings=value.get('warnings',[])))
+                final_metrics=result.get('final_metrics'),review=str(review),warnings=value.get('warnings',[]),
+                bag_bytes=result.get('bag',{}).get('bytes'),bag_compression=compression))
             if value['state']!='passed' or not pipeline.get('complete'):
                 publish('review_required',reasons=value['review_reasons'],pipeline=pipeline);return 1
             current=guard=None

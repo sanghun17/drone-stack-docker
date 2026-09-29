@@ -11,6 +11,14 @@ import run_guarded_campaign as campaign
 
 
 class CampaignTests(unittest.TestCase):
+    def test_storage_forecast_only_selects_lossless_postflight_format(self):
+        plan=dict(completed_before=14,target_total=50,minimum_start_free_gib=80,
+                  compression_forecast=dict(minimum_samples=3,bz2_to_lz4_ratio=.64,size_margin=1.15))
+        completed=[dict(bag_bytes=8*2**30,bag_compression='lz4')]*3
+        self.assertEqual(campaign.compression_choice(plan,completed,100*2**30,100*2**30)[0],'bz2')
+        self.assertEqual(campaign.compression_choice(plan,completed,400*2**30,0)[0],'lz4')
+        self.assertEqual(campaign.compression_choice(plan,completed[:2],100*2**30,0)[0],'lz4')
+
     def test_review_blocks_next_trial_but_retains_failed_attempt(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);plan=root/'plan.json'
@@ -28,7 +36,8 @@ class CampaignTests(unittest.TestCase):
                 return Obj(pid=1,poll=lambda:0,wait=lambda **kw:0,returncode=0)
             with patch.object(campaign,'ROOT',root),patch.object(campaign,'launch',side_effect=launch),\
                  patch.object(campaign.shutil,'disk_usage',return_value=Obj(free=100*2**30)),\
-                 patch.object(campaign.subprocess,'run'),patch.object(sys,'argv',['campaign',str(plan)]):
+                 patch.object(campaign.subprocess,'run'),patch.object(campaign.os,'getcwd',return_value=str(root)),\
+                 patch.object(sys,'argv',['campaign','plan.json']):
                 self.assertEqual(campaign.main(),1)
             state=json.loads((root/'status.json').read_text())
             self.assertEqual(state['completed_total'],15)
