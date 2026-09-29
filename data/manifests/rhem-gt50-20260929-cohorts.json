@@ -6,22 +6,34 @@
   "rule": "Report cohorts separately. Do not label the whole campaign as 50 identical historical RHEM trials. Preserve all failures and original endpoints.",
   "cohorts": [
     {
-      "attempts": [1, 13],
+      "attempts": [
+        1,
+        13
+      ],
       "label": "Historical GT tuning diagnostics, heterogeneous settings",
       "inventory": "data/results/rhem-mission-20260928/exploration13_existing_format/trials.csv"
     },
     {
-      "attempts": [14, 14],
+      "attempts": [
+        14,
+        14
+      ],
       "label": "Historical heading sampling; guard-interrupted diagnostic",
       "valid_evaluation": false
     },
     {
-      "attempts": [15, 16],
+      "attempts": [
+        15,
+        16
+      ],
       "label": "Historical heading sampling; obsolete localization report-only policy",
       "note": "Raw bags were deleted at user request after prolonged idle recording. Derived measurements and original failure/interruption outcomes remain."
     },
     {
-      "attempts": [17, 24],
+      "attempts": [
+        17,
+        24
+      ],
       "label": "RHEM historical heading sampling with divergence termination",
       "heading_profile": "historical"
     },
@@ -31,9 +43,22 @@
       "label": "RHEM with heading-continuity sampling and divergence termination",
       "heading_profile": "continuous",
       "module_revision": "4fbb218a3672e2dfc036949c5d0f255a8cca7139",
-      "validation_attempts": [25, 26, 27],
+      "validation_attempts": [
+        25,
+        26,
+        27
+      ],
       "validation": "data/results/rhem-gt-50-20260929/motion-fix-20260929/validation-summary.json",
-      "note": "Explicit algorithm sampling variant. Three-trial motion-speed improvement does not establish better exploration efficiency or mission success."
+      "note": "Explicit algorithm sampling variant. Three-trial motion-speed improvement does not establish better exploration efficiency or mission success.",
+      "interrupted_diagnostics": [
+        28
+      ],
+      "review_policy_changes": [
+        {
+          "first_attempt": 29,
+          "review": "data/manifests/rhem-gt50-20260930-review.json"
+        }
+      ]
     }
   ]
 }

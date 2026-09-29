@@ -1,0 +1,120 @@
+{
+  "reviewed_at": "2026-09-30T02:27:17.905425+09:00",
+  "campaign": "rhem-gt-50-20260929",
+  "attempt": 28,
+  "original_outcome": {
+    "termination": "interrupted",
+    "valid_evaluation": false,
+    "mission_success": false
+  },
+  "decision": "Resume029 after verified benign late upper-envelope excursion; original interrupted outcome retained",
+  "cause": "Late checkpoint bands were not adjusted for the reviewed continuous-heading cohort because025-027 all ended before450s. Survivor attrition additionally made the old600s volume upper bound smaller than450s.",
+  "evidence": {
+    "frozen_sha256_mismatches": [],
+    "provenance_differences_from027": [],
+    "runtime_camera_rovio_planner_build_identical_to027": true,
+    "volume_rate_vio": 0.7610675039246467,
+    "actual_distance_m_10hz": 82.51017456110205,
+    "control_duration_s": 607.8146629333496,
+    "mean_speed_mps": 0.1357489043829628,
+    "tracking_rmse_m": 0.06860810701842886,
+    "collision_events": [],
+    "rovio_final_error_m": 3.610165010140333,
+    "rovio_max_error_m": 5.070969208159239,
+    "rovio_stop_threshold_sustained": false,
+    "last60_737s_dense_gt_distance_m": 8.39168046065488
+  },
+  "policy_change": {
+    "first_affected_attempt": 29,
+    "early_and_lower_bands": "unchanged",
+    "late_upper_rule": "1.5 * prefix maximum of previous upper limits; coverage capped at1",
+    "factor_rationale": "Fixed operational margin following37% pilot mean speed increase, not a statistical interval or claim that coverage scales linearly with speed",
+    "limits": {
+      "450": {
+        "volume_m3": {
+          "old_upper": 482.5828125,
+          "new_upper": 723.87421875,
+          "lower_unchanged": 159.2765625
+        },
+        "volume_rate_vio": {
+          "old_upper": 0.6948979591836735,
+          "new_upper": 1.0,
+          "lower_unchanged": 0.18673469387755104
+        },
+        "gt_distance_m": {
+          "old_upper": 46.11392542407827,
+          "new_upper": 77.55307530336677,
+          "lower_unchanged": 30.821303684775692
+        }
+      },
+      "600": {
+        "volume_m3": {
+          "old_upper": 426.375,
+          "new_upper": 723.87421875,
+          "lower_unchanged": 179.0625
+        },
+        "volume_rate_vio": {
+          "old_upper": 0.7206436420722135,
+          "new_upper": 1.0,
+          "lower_unchanged": 0.2586342229199372
+        },
+        "gt_distance_m": {
+          "old_upper": 60.30820033989053,
+          "new_upper": 90.4623005098358,
+          "lower_unchanged": 44.06045325512768
+        }
+      },
+      "750": {
+        "volume_m3": {
+          "old_upper": 516.8203125,
+          "new_upper": 775.23046875,
+          "lower_unchanged": 174.9140625
+        },
+        "volume_rate_vio": {
+          "old_upper": 0.8032182103610676,
+          "new_upper": 1.0,
+          "lower_unchanged": 0.25957613814756675
+        },
+        "gt_distance_m": {
+          "old_upper": 76.61398533860176,
+          "new_upper": 114.92097800790265,
+          "lower_unchanged": 57.17986456605331
+        }
+      }
+    }
+  },
+  "policy": "data/results/rhem-gt-50-20260929/review_policy_heading_reviewed028.json",
+  "policy_sha256": "74a867df88226a87077ed4488f1ec6b87797a58b498af6f66b4cf5ede21567ea",
+  "replay_checks": {
+    "25": {
+      "reason": null,
+      "outside_checkpoints": []
+    },
+    "26": {
+      "reason": null,
+      "outside_checkpoints": []
+    },
+    "27": {
+      "reason": null,
+      "outside_checkpoints": []
+    },
+    "28": {
+      "reason": null,
+      "outside_checkpoints": []
+    }
+  },
+  "guards_retained": [
+    "frozen runtime hashes",
+    "early reference bands",
+    "all lower reference bands",
+    "finite localization and sustained5m/10s divergence",
+    "collision",
+    "map/component failures",
+    "recorder memory and disk reserve"
+  ],
+  "evidence_paths": [
+    "data/results/rhem-gt-50-20260929/attempt028-review.json",
+    "data/results/rhem-gt-50-20260929/motion-fix-20260929/motion028/motion.json"
+  ],
+  "limitations": "One longer flight is not a statistical validation of exploration efficiency. ROVIO still drifted3.61m at interruption. No actual sample, original status snapshot, endpoint or failure label is rewritten."
+}

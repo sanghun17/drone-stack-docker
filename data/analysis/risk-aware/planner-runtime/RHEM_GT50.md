@@ -1,5 +1,42 @@
 # RHEM GT campaign, 2026-09-29
 
+## Late-reference review after attempt 028
+
+Attempt 028 was interrupted by the descriptive reference guard at 606.74 s,
+with 76.11% observed GT coverage. The campaign finished saving/exporting at
+21:08 KST on September 29 and remained stopped until review on September 30.
+It is an invalid, interrupted diagnostic, not a completed normal evaluation.
+Its original result, review, endpoint and samples remain unchanged.
+
+All frozen hashes and the full provenance snapshot matched the reviewed
+continuous-heading condition. Generated camera, ROVIO, planner and build files
+matched 027. The existing bag motion audit measured 82.51 m over 607.81 s,
+0.1357 m/s, with 0.0686 m tracking RMSE, no recorded collision and continuing
+motion through the last minute. ROVIO final error was 3.61 m; its brief 5.07 m
+maximum did not satisfy the 5 m for 10 s stop condition. This is continuing
+exploration with estimator drift, not proof that localization is solved.
+
+The guard retained old upper limits at 450/600/750 s because all three pilots
+ended before those checkpoints. Distance exceeded the old upper limit at
+450 s; distance, volume and coverage exceeded it at 600 s. Historical survivor
+attrition also made the 600 s volume upper limit smaller than the 450 s limit.
+This was not a configuration mismatch or a motion/coverage regression.
+
+Starting with 029, the reviewed operational screening envelope retains every
+early limit (through 300 s) and every lower limit. Later cumulative upper limits
+are 1.5 times the prefix maximum of the previous upper limits, with coverage
+capped at 1. The fixed allowance reflects the measured 37% pilot speed increase
+with margin; it is not a confidence interval or an assumption that coverage
+scales linearly with speed. Limits do not adapt automatically to new results.
+Frozen-source checks and localization, collision, map, component and storage
+stops remain active. Replay of 025–028 passes; a lower-distance regression still
+requests review. Further unexplained deviations still hold the campaign.
+
+The versioned decision and exact changed bounds are in
+`data/manifests/rhem-gt50-20260930-review.json`. The original stopped status is
+`data/results/rhem-gt-50-20260929/status_after028_before_review.json`.
+`campaign_plan_heading_reviewed028.json` resumes 029–050 after this review.
+
 ## Heading-motion review after attempt 024
 
 The user requested correction of the approximately 0.11 m/s average execution
