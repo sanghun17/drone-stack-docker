@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 import tarfile
 import time
 from urllib.parse import quote
@@ -76,11 +77,61 @@ def transfer(src,dst):
     return h.hexdigest()
 
 
+def archive_queue(path):
+    """Finish an explicit set of archives before collection may resume."""
+    queue=json.loads(path.read_text());audit=path.parent
+    completed=[]
+    def publish(state,**extra):
+        value=dict(state=state,updated_at=time.time(),completed_plans=completed,
+                   total_plans=len(queue['plans']),**extra)
+        temporary=audit/'status.tmp'
+        temporary.write_text(json.dumps(value,indent=2)+'\n')
+        temporary.replace(audit/'status.json')
+    try:
+        for name in queue['plans']:
+            plan_path=Path(name);plan=json.loads(plan_path.read_text())
+            completion=plan_path.parent/'COMPLETE.json'
+            if not completion.exists():
+                publish('archiving',current_plan=name)
+                with (plan_path.parent/'worker-bulk.log').open('x') as log:
+                    subprocess.run([sys.executable,str(Path(__file__).resolve()),str(plan_path)],
+                                   stdout=log,stderr=subprocess.STDOUT,check=True)
+            receipt=json.loads(completion.read_text())
+            destination=Path(plan['destination'])
+            if (receipt['state']!='complete' or receipt['files']!=plan['total_files']
+                    or receipt['bytes']!=plan['total_bytes']
+                    or receipt['destination']!=str(destination)
+                    or json.loads((destination/'plan.json').read_text())!=plan
+                    or json.loads((destination/'COMPLETE.json').read_text())!=receipt):
+                raise RuntimeError('Archive completion does not match plan: '+name)
+            for entry in plan['entries']:
+                source=Path(entry['source'])
+                local=json.loads(source.with_suffix(source.suffix+'.nas.json').read_text())
+                if (source.exists() or local['entry']!=entry
+                        or Path(entry['destination']).stat().st_size!=entry['size']):
+                    raise RuntimeError('Archive location receipt mismatch: '+entry['source'])
+            completed.append(name)
+            publish('between_archives')
+        result=dict(state='complete',plans=completed,
+                    bytes=sum(json.loads(Path(p).read_text())['total_bytes'] for p in completed),
+                    completed_at=time.time())
+        write_json(audit/'COMPLETE.json',result)
+        publish('complete')
+    except BaseException as error:
+        publish('review_required',error=str(error))
+        raise
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('plan',type=Path)
     parser.add_argument('--resume',action='store_true',help='Reverify an existing archive of exactly this plan')
-    a=parser.parse_args();plan=json.loads(a.plan.read_text());audit=a.plan.parent
+    parser.add_argument('--queue',action='store_true',help='Complete every listed archive before writing the queue completion receipt')
+    a=parser.parse_args()
+    if a.queue:
+        if a.resume:parser.error('--queue uses per-archive completion receipts; do not combine with --resume')
+        archive_queue(a.plan.resolve());return
+    plan=json.loads(a.plan.read_text());audit=a.plan.parent
     destination=Path(plan['destination']);root=Path(plan['local_root'])
     destination.mkdir(parents=True,exist_ok=a.resume)
     receipts=destination/'verification';receipts.mkdir(exist_ok=a.resume)

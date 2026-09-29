@@ -24,6 +24,28 @@ def waypoint(pose):
     return [p.x, p.y, p.z, euler_from_quaternion([q.x, q.y, q.z, q.w])[2]]
 
 
+class PlanningFailureWindow:
+    """Allow recovery, but do not retry an unusable planner indefinitely."""
+    def __init__(self, timeout_s=30.0):
+        if not np.isfinite(timeout_s) or timeout_s <= 0:
+            raise ValueError('Planning failure timeout must be finite and positive')
+        self.timeout_s = timeout_s
+        self.clear()
+
+    def clear(self):
+        self.started = None
+        self.last = None
+        self.attempts = 0
+
+    def reject(self, now):
+        if self.started is None or now < self.last:
+            self.started = now
+            self.attempts = 0
+        self.last = now
+        self.attempts += 1
+        return self.attempts >= 3 and now - self.started >= self.timeout_s
+
+
 class Adapter:
     def __init__(self):
         if rospy.get_param('/system/platform') != 'sim':
@@ -50,6 +72,11 @@ class Adapter:
         self.accepted = rospy.Publisher('~belief_trajectories', UInt32, queue_size=1)
         self.improved = rospy.Publisher('~belief_improved', Bool, queue_size=1)
         self.status = rospy.Publisher('~status', String, queue_size=1)
+        self.task_failure = rospy.Publisher('/planning/task_fail_reason', String, queue_size=1)
+        timeout = float(rospy.get_param('~planning_failure_timeout_s', 30.0))
+        self.planning_failures = PlanningFailureWindow(timeout)
+        # Include the stopping policy in the recorder's parameter snapshot.
+        rospy.set_param('~planning_failure_timeout_s', timeout)
         self.last_status = 0.0
         self.subscriber = rospy.Subscriber(rospy.get_param('/system/odom_topic'), Odometry,
                                           self.receive, queue_size=1)
@@ -65,6 +92,7 @@ class Adapter:
             if req.data and not self.enabled:
                 self.goal = None
                 self.finish = 0.0
+                self.planning_failures.clear()
             self.enabled = req.data
         return SetBoolResponse(True, 'RHEM planning enabled' if req.data else 'RHEM planning disabled')
 
@@ -80,6 +108,19 @@ class Adapter:
         if not np.isfinite(point).all():
             raise ValueError('Non-finite common odometry')
         return point, np.linalg.norm([vel.x, vel.y, vel.z])
+
+    def reject_plan(self, reason, detail):
+        """Report an operational failure; no GT error or coverage threshold is used."""
+        with self.lock:
+            if not self.enabled:
+                return
+            if not self.planning_failures.reject(rospy.Time.now().to_sec()):
+                return
+            self.enabled = False
+            self.task_failure.publish(String(data=reason))
+            rospy.logerr('RHEM planning failed after %.1f s and %d retries: %s (%s)',
+                         self.planning_failures.last - self.planning_failures.started,
+                         self.planning_failures.attempts, reason, detail)
 
     def run(self):
         rospy.wait_for_service('/rhem/bsp_planner')
@@ -100,14 +141,21 @@ class Adapter:
                     continue
                 if speed > 0.3:
                     continue
-                response = self.planner(Header(stamp=rospy.Time.now(), frame_id=self.frame))
+                try:
+                    response = self.planner(Header(stamp=rospy.Time.now(), frame_id=self.frame))
+                except rospy.ServiceException as error:
+                    self.reject_plan('PLANNER_SERVICE', str(error))
+                    raise
                 if not self.enabled:
                     continue
                 if self.require_belief and not response.belief_space:
+                    self.reject_plan('BELIEF_INVALID', 'Path has no valid belief evaluation')
                     raise ValueError('Path has no valid belief evaluation; keeping hover')
                 path = np.array([waypoint(p) for p in response.path])
                 if len(path) < 2:
+                    self.reject_plan('NOVIEWPOINT', 'RHEM has not produced a path')
                     raise ValueError('RHEM has not produced a path')
+                self.planning_failures.clear()
                 point, speed = self.current()
                 if np.linalg.norm(path[0, :3] - point[:3]) > 0.3 or speed > 0.3:
                     raise ValueError('Vehicle moved during RHEM planning; waiting to replan')

@@ -11,6 +11,21 @@ import run_guarded_campaign as campaign
 
 
 class CampaignTests(unittest.TestCase):
+    def test_reviewed_resume_retains_previous_outcomes_without_rerunning_them(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);plan=root/'plan.json'
+            previous=[dict(global_attempt=15,termination='time_limit'),
+                      dict(global_attempt=16,termination='interrupted')]
+            plan.write_text(json.dumps(dict(name='test',completed_before=14,target_total=16,
+                recorded_trials=previous)))
+            with patch.object(campaign,'ROOT',root),patch.object(campaign,'launch') as launch,\
+                 patch.object(sys,'argv',['campaign',str(plan)]):
+                self.assertEqual(campaign.main(),0)
+            launch.assert_not_called()
+            state=json.loads((root/'status.json').read_text())
+            self.assertEqual(state['completed_total'],16)
+            self.assertEqual(state['trials'],previous)
+
     def test_storage_forecast_only_selects_lossless_postflight_format(self):
         plan=dict(completed_before=14,target_total=50,minimum_start_free_gib=80,
                   compression_forecast=dict(minimum_samples=3,bz2_to_lz4_ratio=.64,size_margin=1.15))
@@ -18,6 +33,9 @@ class CampaignTests(unittest.TestCase):
         self.assertEqual(campaign.compression_choice(plan,completed,100*2**30,100*2**30)[0],'bz2')
         self.assertEqual(campaign.compression_choice(plan,completed,400*2**30,0)[0],'lz4')
         self.assertEqual(campaign.compression_choice(plan,completed[:2],100*2**30,0)[0],'lz4')
+        plan['compression_forecast']['first_attempt']=17
+        previous=[dict(global_attempt=i,bag_bytes=30*2**30) for i in (14,15,16)]
+        self.assertEqual(campaign.compression_choice(plan,previous,100*2**30,0),('lz4',None))
 
     def test_review_blocks_next_trial_but_retains_failed_attempt(self):
         with tempfile.TemporaryDirectory() as tmp:

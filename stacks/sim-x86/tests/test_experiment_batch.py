@@ -10,12 +10,32 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
-from automation_experiments import Recorder, run_trials, load_previous
+from automation_experiments import Recorder, Trial, run_trials, load_previous
 import rosbag
 import rospy
 from std_msgs.msg import String
 
 class BatchTests(unittest.TestCase):
+    def test_planner_failure_ends_monitor_without_waiting_for_time_limit(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            trial=Trial.__new__(Trial)
+            trial.folder=Path(tmp);trial.lock=threading.Lock();trial.last={}
+            trial.receive(String(data='BELIEF_INVALID'),'task_fail')
+            trial.takeover=(0.,100.);trial.start_wall=0.
+            trial.args=SimpleNamespace(planner='rhem',rhem_belief_mode='rovio',
+                time_limit=1800,startup_timeout=90,map_stale_timeout=10,coverage_threshold=.8)
+            trial.result={};trial.landmarks=25;trial.uncertainty=1.
+            trial.healthy=lambda:None;trial.ready=lambda:True
+            trial.metrics=SimpleNamespace(sample=lambda:dict(surface_rate_vio=.1,
+                volume_rate_vio=.2,volume_m3=50,gt_total=3185,known_voxels=637,map_age_s=.1))
+            events=[];trial.event=lambda phase,**kw:events.append((phase,kw))
+            with patch('automation_experiments.rospy.Time.now',return_value=rospy.Time(160)),\
+                 patch('automation_experiments.time.monotonic',return_value=60):
+                trial.monitor()
+            self.assertEqual(trial.result['termination'],'planner_failure:BELIEF_INVALID')
+            self.assertEqual(trial.result['elapsed_s'],60)
+            self.assertEqual(events[-1],('E.stop',dict(reason='planner_failure:BELIEF_INVALID')))
+
     def test_lossless_compression_preserves_payload_stamps_and_connections(self):
         with tempfile.TemporaryDirectory() as tmp:
             message=String(data='sensor evidence '*1000)

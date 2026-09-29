@@ -90,6 +90,85 @@ on transient errors. An interrupted duplicate partial from the initial transfer
 was also checksum-verified and removed; its canonical NAS copy remains.
 
 The continuing launcher initially rejected a relative plan path before a new
-flight started. Path normalization was corrected and regression-tested. Attempt
-015 subsequently reached sensor initialization and control takeover; the durable
-process continues toward attempt 050 subject to the review policy.
+flight started. Path normalization was corrected and regression-tested.
+
+## Motion audit and stopping-policy correction after attempt 016
+
+The 1,800 s reported for attempt 015 was takeover-to-termination elapsed time,
+not time spent moving or gaining observations. Coverage reached its final
+66.0283% at 601.415 s; its last accepted trajectory ended at about 597.4 s.
+It then hovered for roughly 20 minutes until the time limit. At one-second GT
+sampling, translation faster than 0.05 m/s occupied 352.902 s; this threshold
+excludes yaw-only observation and deliberate planning pauses, so it is not a
+definition of useful exploration. Total recorded GT distance was 51.781 m.
+
+Attempt 016 reached its final 53.8148% at 443.654 s. Its last accepted trajectory
+ended at about 461.7 s, after which it remained stationary until the guard
+interrupted at 756.017 s. Recorded GT distance was 42.258 m. Only distance was
+outside the 600/750 s reference bands; volume and coverage stayed inside. The
+band comparison had only four/three surviving historical references. Runtime
+provenance files were byte-identical between 015 and 016. The review concluded
+this was consistent with the previously observed ROVIO failure rather than a
+changed flight configuration; the failure remains retained and invalid.
+The original status and review decision are preserved in
+`status_after016_before_review.json` and `attempt016-review-decision.json`.
+
+The adapter first rejected a path without valid belief at 598.445 s (015) and
+462.749 s (016), then retried indefinitely, including subsequent planner service
+errors. The evaluator already subscribed to `/planning/task_fail_reason`, but
+the adapter never published a failure. Cached landmark count and uncertainty
+could remain populated after ROVIO became unusable, so the initial belief-ready
+check did not terminate either run. The complete 015 pipeline took 45m16s:
+30m mission elapsed time, about 5m recording/cleanup and 10m CSV export.
+The 016 pipeline took 18m13s, including 12m36s mission elapsed time.
+
+Starting with attempt 017, at least three failed planner replies spanning
+30 seconds publish an explicit failure and disable further planning. Invalid
+belief yields `BELIEF_INVALID`, service exceptions yield `PLANNER_SERVICE`, and
+empty usable-belief paths yield `NOVIEWPOINT`. A valid planner reply clears the
+retry window. The timeout uses simulation time, resets with control enable, and
+is recorded in the parameter snapshot. Successful active trajectories and
+ordinary planning/observation pauses are not stopped for lack of coverage gain.
+No GT-error threshold or substituted belief is used. The 1,800 s maximum and all
+estimator, sensor, map and motion settings remain unchanged.
+
+This is a stopping-policy change: 017–050 form a separate evaluation cohort;
+015 remains a time-limit outcome and 016 remains interrupted. No historical
+endpoint, success flag or raw sample is rewritten. Adapter retry/publication,
+transient recovery, clock-reset handling and evaluator termination were tested
+without starting another simulation collection during the NAS transfer.
+
+The failure labels describe observable interface failures, not their ultimate
+cause. Both logs report `invalid propagated uncertainty metric` before the
+bridge starts rejecting non-finite ROVIO covariance (015: 692.141 s; 016:
+572.329 s). The corresponding service failures propagate through the planner;
+there is no evidence of a missing service/remapping at these events. Identical
+settings across runs exclude a between-run change, not a shared misconfiguration.
+Independent raw ROVIO scoring exceeds 100 m at 584.443 s (015) / 435.674 s (016),
+before the first adapter belief rejection at 598.445 / 462.749 s. At those
+rejections, raw position errors are approximately 556 / 879 m. Scoring uses
+initial yaw/translation alignment only; it is not fed back to either filter.
+Remaining sensor/configuration defects, model mismatch and numerical or visual
+tracking limitations have not been causally separated. These results measure
+this integrated RHEM/ROVIO pipeline, not an established intrinsic RHEM limit.
+
+## Transfer all old data before resuming collection
+
+The user requested that NAS transfer finish before collection rather than occur
+between trials. The launcher was stopped during preflight archival, before
+attempt 017 started. `nas-bulk-before-collection/queue.json` lists all 32
+previously reviewed archive plans: 185,206,620,949 bytes total, of which the
+5,020,322,365-byte feature50 archive was already complete. Existing per-batch
+NAS destinations remain unchanged. `scripts/lib/verified_archive.py --queue`
+uses the existing copy/readback/hash/remove procedure for each remaining plan,
+validates completion and location receipts, and writes a queue completion
+marker only after every archive succeeds. Any failure prevents that marker.
+
+`campaign_plan_after_bulk_archive.json` waits for that completion marker before
+attempt 017 and contains no between-trial archive candidates. Old CSV metrics
+remain local; all new campaign originals remain local. Attempts 015/016 stay in
+the continuing status and the total remains 16 before the next launch. Storage
+forecasts use three observations from the new stopping-policy cohort, excluding
+the old prolonged-hover bags. Disk-reserve checks still apply; available space
+is not a guarantee that all future outcomes will fit. Durable transfer status:
+`nas-bulk-before-collection/status.json`; durable collection status: `status.json`.

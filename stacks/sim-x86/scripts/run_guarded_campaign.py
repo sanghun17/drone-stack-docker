@@ -25,11 +25,13 @@ def launch(command,log):
 def compression_choice(plan,completed,free_bytes,archive_bytes):
     """Only post-flight storage changes; flight/estimator arguments stay frozen."""
     forecast=plan.get('compression_forecast')
-    if not forecast or len(completed)<forecast['minimum_samples']:
+    observed=[r for r in completed if r.get('global_attempt',0)>=
+              (forecast or {}).get('first_attempt',0)]
+    if not forecast or len(observed)<forecast['minimum_samples']:
         return 'lz4',None
     ratio=forecast['bz2_to_lz4_ratio']
     equivalents=[r['bag_bytes']/(ratio if r.get('bag_compression')=='bz2' else 1.)
-                 for r in completed if r.get('bag_bytes')]
+                 for r in observed if r.get('bag_bytes')]
     if not equivalents:return 'lz4',None
     remaining=plan['target_total']-plan['completed_before']-len(completed)
     projected=sum(equivalents)/len(equivalents)*remaining*forecast['size_margin']
@@ -45,7 +47,10 @@ def main():
     plan=json.loads(a.plan.read_text());out=a.plan.parent;status=out/'status.json'
     def interrupted(signum,frame):raise KeyboardInterrupt('Campaign interrupted')
     signal.signal(signal.SIGTERM,interrupted)
-    archive_index=0;completed=[]
+    archive_index=0;completed=list(plan.get('recorded_trials',[]))
+    if [r['global_attempt'] for r in completed] != list(range(
+            plan['completed_before']+1,plan['completed_before']+len(completed)+1)):
+        raise ValueError('Recorded trials must be a contiguous prefix of the campaign')
     current=None;monitor=None;guard=None
     def stop_monitor(folder):
         code="""import os,signal
@@ -69,7 +74,7 @@ for p in Path('/proc').glob('[0-9]*'):
                 raise RuntimeError('Prerequisite NAS archive stopped before verification/removal completed')
             publish('waiting_for_verified_archive',archive=prerequisite['completion'])
             time.sleep(5)
-        for index in range(plan['completed_before']+1,plan['target_total']+1):
+        for index in range(plan['completed_before']+len(completed)+1,plan['target_total']+1):
             for name,checksum in plan['frozen_sha256'].items():
                 if hashlib.sha256((ROOT/name).read_bytes()).hexdigest()!=checksum:
                     raise RuntimeError('Frozen runtime configuration/source changed: '+name)
