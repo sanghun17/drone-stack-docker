@@ -18,7 +18,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as pe
 from matplotlib.colors import BoundaryNorm
-from matplotlib.ticker import PercentFormatter
+from matplotlib.ticker import MaxNLocator, PercentFormatter
 
 METHODS=[('ours','PURE','#C83278'),('ours_mean','LA','#0B78A8'),
          ('ablation','Ablation1','#222222'),('la','Ablation2','#F07818'),('rhem','RHEM','#6C55A3')]
@@ -77,13 +77,24 @@ def draw(groups,out,stem,metric,methods=METHODS,time_end=130):
             contours=ax.contour(times,thresholds,z,levels=levels,colors='white',linewidths=.8)
             halo=[pe.withStroke(linewidth=1.8,foreground='#222222',alpha=.6)]
             for collection in contours.collections:collection.set_path_effects(halo)
-            labels=ax.clabel(contours,fmt={v:('100%' if v==top else f'{v:.0%}') for v in levels},fontsize=8,inline_spacing=3)
+            label_options={}
+            if time_end>300:
+                positions=[]
+                for level,fraction in zip(levels,np.linspace(.78,.35,len(levels))):
+                    column=int(np.argmin(abs(times-(10+fraction*(time_end-10)))))
+                    reached=np.flatnonzero(z[:,column]>=level)
+                    positions.append((times[column],thresholds[reached[-1]] if len(reached) else thresholds[0]))
+                label_options['manual']=positions
+            labels=ax.clabel(contours,fmt={v:('100%' if v==top else f'{v:.0%}') for v in levels},fontsize=8,inline_spacing=3,**label_options)
             for text in labels:text.set_path_effects(halo)
         if key=='rhem' and volume and z.max()<.2:
             ax.text(.5,.92,f'At most {z.max():.0%} attain 100 m³',transform=ax.transAxes,ha='center',va='top',color='white',fontsize=9)
         ax.set_title(f'{label}  (n={len(runs)})',color=color,fontweight='bold',pad=8)
         ax.set_xlim(10,time_end);ax.set_ylim(thresholds[0],thresholds[-1])
-        ax.set_xticks([20,60,100,130] if time_end==130 else [20,100,200,300])
+        if time_end>300:
+            ax.xaxis.set_major_locator(MaxNLocator(nbins=5,integer=True))
+        else:
+            ax.set_xticks([20,60,100,130] if time_end==130 else [20,100,200,300])
         if volume:ax.set_yticks([100,200,300,400,500])
         else:
             ax.set_yticks(np.linspace(0,1,6));ax.yaxis.set_major_formatter(PercentFormatter(1))

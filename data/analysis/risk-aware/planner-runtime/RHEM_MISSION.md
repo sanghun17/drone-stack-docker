@@ -328,3 +328,21 @@ not evidence of improved estimator accuracy.
 The subsequent one-hour FAST-LIVO timestamp comparison is documented in
 [FAST_LIVO_TIMING.md](FAST_LIVO_TIMING.md). Its hard deadline is **17:36:55 UTC**;
 it does not extend the RHEM mission window.
+
+## Existing-format plots of the 13 exploration attempts
+
+`data/results/rhem-mission-20260928/exploration13_existing_format/` contains
+time-versus-observed-volume and observed-rate figures for all 13 exploration
+attempts, excluding the separate `pipeline90` sensor check. They reuse
+`experiment-evaluation/plot_paper_simulation.py` (`load_compact` and `draw`),
+with the existing empirical-attainment definition and fixed denominator 13.
+Only long-duration tick spacing and contour-label placement were extended.
+
+The full view spans 10–810 s; `rhem13_observed_volume_paper130` retains the
+original 10–130 s figure window. PNG, PDF and SVG are saved with compact input
+CSVs, the 13-trial inventory, source hashes and `provenance.json`. The inputs
+contain 1,255 measured samples after actual control takeover and before each
+termination, without an invented zero sample. Already attained thresholds
+remain attained after termination, as in the existing renderer; no flight
+trajectory is extended. These are different diagnostic configurations, not
+13 repetitions of one validated planner configuration.
