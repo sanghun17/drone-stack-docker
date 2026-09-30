@@ -70,14 +70,16 @@ def draw(groups,out,stem,metric,methods=METHODS,time_end=130):
     for ax,(key,label,color) in zip(axes[0],methods):
         runs=groups[key];z=surface(runs,thresholds,times);surfaces[key]=z
         mesh=ax.pcolormesh(times,thresholds,z,cmap='viridis',norm=norm,shading='nearest',rasterized=True)
-        # The top boundary separates 100% from one missing trial for each N.
-        top=1-.5/len(runs)
-        levels=sorted({v for v in [.2,.4,.6,.8,top] if z.min()<v<z.max()})
+        # Put each boundary halfway between the required integer trial count
+        # and one fewer. Contouring exactly at 4/5 can put an "80%" label on
+        # the 100% boundary instead of surrounding the region attaining >=80%.
+        label_format={(np.ceil(fraction*len(runs)-1e-9)-.5)/len(runs):f'{fraction:.0%}'
+                      for fraction in [.2,.4,.6,.8,1.]}
+        levels=sorted(v for v in label_format if z.min()<v<z.max())
         if levels:
             contours=ax.contour(times,thresholds,z,levels=levels,colors='white',linewidths=.8)
             halo=[pe.withStroke(linewidth=1.8,foreground='#222222',alpha=.6)]
             for collection in contours.collections:collection.set_path_effects(halo)
-            label_format={v:('100%' if v==top else f'{v:.0%}') for v in levels}
             if time_end>300:
                 labels=[]
                 anchors=[]

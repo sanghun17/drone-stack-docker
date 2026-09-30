@@ -1,0 +1,174 @@
+{
+  "campaign": "data/results/rhem-gt-20-20260930-continuous",
+  "state": "complete",
+  "completed_at": "2026-09-30T17:25:49.645366+09:00",
+  "completed_total": 10,
+  "final_target_total": 10,
+  "outcomes": {
+    "coverage": 5,
+    "planner_failure:LOCALIZATION_ROVIO_DIVERGENCE": 4,
+    "collision": 1
+  },
+  "last_trial_warning": [
+    "raw_rovio_divergence"
+  ],
+  "figure_directory": "data/results/rhem-gt-10-20260930",
+  "primary_volume_figure": "data/results/rhem-gt-10-20260930/rhem10_observed_volume.png",
+  "primary_coverage_figure": "data/results/rhem-gt-10-20260930/rhem10_observed_rate.png",
+  "renderer": "data/analysis/risk-aware/experiment-evaluation/plot_paper_simulation.py",
+  "renderer_sha256": "e6d0cf0545a50029cef31c9008119c821cbe86d0bbe3db2d63dcbeb88a244e3f",
+  "sample_count": 481,
+  "cohorts": [
+    {
+      "attempts": [
+        1,
+        5
+      ],
+      "n": 5,
+      "finite_rovio_drift": "terminate at >5m for >=10s"
+    },
+    {
+      "attempts": [
+        6,
+        10
+      ],
+      "n": 5,
+      "finite_rovio_drift": "record only"
+    }
+  ],
+  "interpretation": "All-trial panel pools two externally imposed stopping policies. Cohort panels expose this change; samples are not ten repetitions with one stopping rule. GT planning/control and real ROVIO belief unchanged.",
+  "verification": [
+    "Exactly 10 recorded and exported trials; all per-trial reviews passed; no attempt011; campaign manager exited.",
+    "All 24 frozen runtime hashes match the final campaign plan.",
+    "Pooled surface equals the equally weighted two five-trial cohort surfaces.",
+    "All attainment surfaces are finite, in [0,1], nondecreasing in time and nonincreasing in threshold.",
+    "No synthetic t=0 rows or post-termination observations in plot inputs.",
+    "Integer-count contour membership verified for N=1,2,3,5,10,13,20,100 at all five attainment targets.",
+    "Primary volume and coverage figures visually inspected for label overlap and clipping."
+  ],
+  "source_sha256": {
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt001/iter_001/metrics.csv": "c2d1457956e07a36b6c400cc2784b4d1780a5150586bfbea1297e53fbe1f0893",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt001/iter_001/result.json": "6fc54832394b537a3fecc8031e7e0c089601e6d184caa90e5690fe713cabbb6c",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt001/iter_001/events.jsonl": "3d57a50c29d2ecad6b5f9174d55b23abbd0d83bd29deefff638579a440794272",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt002/iter_001/metrics.csv": "026d9cc97eff89387b8eeb1ee96d78449ea8cb678cdc13bae5e1592ac5a63683",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt002/iter_001/result.json": "2cae7710f6df7187568fd12202886104dbd81f0ab263bdf633938cefe2609f65",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt002/iter_001/events.jsonl": "23a5b6d36686034a48ae468b7893d3c7710c52655097cfe8a59f2d1b7b7889c0",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt003/iter_001/metrics.csv": "daee7a5a491951e11466f4091c8e033bb1e5372e0d32e398abb5e5948c319569",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt003/iter_001/result.json": "92064be81672ad04dca9baebaeaf56b2521f6dcd7586b0d6d2b7d9f02a5c46a4",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt003/iter_001/events.jsonl": "cac98faea71997bf0d36e8e39c19ea14390f53e9c654bd5dd33a40ee4cfa9643",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt004/iter_001/metrics.csv": "28ea8d5c84fe5197311d90a26aa58f52cb9ca510b48335811fb0a0d5262fdca1",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt004/iter_001/result.json": "e84a43d134148e5e18dc5c1b0ddabe92eac24765ce1bea80c8a26e88e21f0c86",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt004/iter_001/events.jsonl": "ed908f500be9d644fdc075b37e832addcb0004a9ec7b3b5eca2cd5f9331ab49c",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt005/iter_001/metrics.csv": "22ede60779bf39430830705ff5b3e4597f8df6d8a98c7811991f24b9e23a9cf2",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt005/iter_001/result.json": "a812f01a5a940f71c4a667dfdfdbe22df273d515526c271d3380527e0a71602a",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt005/iter_001/events.jsonl": "f22b3e4f92684e2f42cd0df62a5896ab7e5acec0d653a81bf9cd4d4e31ca060f",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt006/iter_001/metrics.csv": "dd08f7b9542cccda0f55c1e4b65b9d146e0361aa8ef64ff3fc64fd952bd056a3",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt006/iter_001/result.json": "cc55e3264c67f1b940e98227d12cbb4d76fa87b4848d6c0141dd752a88d8e8b7",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt006/iter_001/events.jsonl": "24bdaae320edbdaa9e0ff01bddd9d4fbcdc4d9a43874629d9cfaa47ccbbe8721",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt007/iter_001/metrics.csv": "8dd2671218ed2509edbb5d1f282a982d7d30297c32558a76643d868de3b66d42",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt007/iter_001/result.json": "e77d4605ac2bd6a278dfbab3257b80839fe58c137459c885ab4c7438a1dfcaca",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt007/iter_001/events.jsonl": "c8c846410b57c7f282044c8202a5b06b3b6179d2eb2bf7241dbfbd57d912d936",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt008/iter_001/metrics.csv": "14ff50ed7645663a497dc7ac08366411944478d3bbd56135548884874591b0eb",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt008/iter_001/result.json": "f137c62643bdffa8020179f65774a821fbaf53bf2bd92ffc59f23431aab531df",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt008/iter_001/events.jsonl": "e3da9fbdec65ab84b4216c005d31a517c88eade95a16f237f689cfdcf491f882",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt009/iter_001/metrics.csv": "47d36bb6a8de2a27a7356fc94df6e3167c6515ab9b342b5243a022dfb464ee63",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt009/iter_001/result.json": "5888ccf5c47047b62b6f6b39fef2d578512cf7816f174685433c84df3ac425b9",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt009/iter_001/events.jsonl": "cc89235e63d794ec51eff8a9dc29a36763beafbf64df4500d83f2b76cc662e28",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt010/iter_001/metrics.csv": "90cd4ff0cf2562fd352cc7c986e017097e191fb4406ffe3e8cc2552783e0db8d",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt010/iter_001/result.json": "242141c2eed023363d7de24107bcbd7f9f913ee93db52194ac9f01bb1c4a9851",
+    "flight_logs/rhem-gt-20-20260930-continuous-attempt010/iter_001/events.jsonl": "4ecb6b21793ca1f5ea506bc75804a3e0204734c72b84addac2009b8929ea6bce"
+  },
+  "artifact_sha256": {
+    "README.md": "a1a93ec63ac62f99ad35606ba8ec4cddc80643a29d828511e9d6d468f8b7dfb2",
+    "provenance.json": "a5f584a68bea8c299d213b255d33ecbe3ee0cd6cb072278153467e7aaabe3021",
+    "rhem10_observed_rate.pdf": "bed9524b8473c90c7325878613d695fea1e0ac9c1f2020611bfea8c96516832b",
+    "rhem10_observed_rate.png": "edd3dafb4d7060f34774133a70951474772c48d24047e2c00c892dba22217ec9",
+    "rhem10_observed_rate.svg": "b985e8550568ec885580c3edf5650d73c3106ca21aa997dd1014f4490d83fae8",
+    "rhem10_observed_rate_input.csv": "d51bde15234e83fa66a314d2b29970a53bd42c40326b594827e7c251ca577d8c",
+    "rhem10_observed_rate_panel.pdf": "a1b9935c62fae3b0d7bc1b32c9e4c20aa37611bc214dbe1c25d41e0f54168102",
+    "rhem10_observed_rate_panel.png": "8d62cc6844c6e430d7e17b00a729a42ed434ce4df7fb83c40ce2bff88002847c",
+    "rhem10_observed_rate_panel.svg": "419d0bc740778995e3b58cdec055d981ddf684a4d9afa05ebc793fbc6633db2d",
+    "rhem10_observed_rate_panel_surfaces.npz": "a58bd13a879e9c35947c19b4c7c0bb3847ba908a5fad2c00cb1e75ddcbe60eb4",
+    "rhem10_observed_rate_paper130.pdf": "7a33cf6da438130140126817b63fb1b4bac906cf10c1fc244d4f0725bfa96e0b",
+    "rhem10_observed_rate_paper130.png": "6e127ee95937b71d9d3e8a49f6d28c3d0d49fcfbf0cc7280b207428c7fda9c21",
+    "rhem10_observed_rate_paper130.svg": "86ffd0005945dc691b34775b5a208ecfaf72cfb472eff8cda6e9796042054eac",
+    "rhem10_observed_rate_paper130_surfaces.npz": "409137234c1ef9e1b2cc4e4c2d56e4d2dd93cffee7ab91481cda6b019dfa75f5",
+    "rhem10_observed_rate_surfaces.npz": "404d9c6813bf09e5f8e525fb69ec860a171a8a5845d38d9f4d9a9b547dc1ec09",
+    "rhem10_observed_volume.pdf": "047692c4e4726d3248fdb1a5dac4769772f766b871e9c73040cbc92c3cbc434c",
+    "rhem10_observed_volume.png": "029348ff2f10901135b78e0b96788e2e096943776e0c9961d59a952f1fe6d036",
+    "rhem10_observed_volume.svg": "20bf7d1fb85bf6e7805b9788604ad9f731523dbbc1938b73b73ddc9c4c3d4e23",
+    "rhem10_observed_volume_input.csv": "1d84cae2120b6283e7afdae5c2a01f12ad60959e6eb0eaed4326f3f25f5c1e94",
+    "rhem10_observed_volume_panel.pdf": "ceb66371907bc8ff31fce111ac26bbe21bc45dbf096f98286be788c0fec82ed6",
+    "rhem10_observed_volume_panel.png": "b4f3ab4b7dbbbf460ce9de1253ca20969dc7b2ba3cdf3fbca98d0ff45c019828",
+    "rhem10_observed_volume_panel.svg": "c668bfeb00dd5710ed0adfef9cf4eb2b4db1051cb1e3f41730a7c75a72afdb7a",
+    "rhem10_observed_volume_panel_surfaces.npz": "47449ddc0d0e85e102306eb999ec475b133f69a29141c7808de1e4a0e907e828",
+    "rhem10_observed_volume_paper130.pdf": "35c89fca709e8886c3c6bb34472c15ec908ba2f1c7442568ff305f7e523f4d76",
+    "rhem10_observed_volume_paper130.png": "d9104c0fe835b6fc92bd2ba94b812165b5b74342d553b6c91b1a39ce5e5bcd87",
+    "rhem10_observed_volume_paper130.svg": "39c8f5e122ec6b1ad31f5ff57753178605fec6b0c262836ed223337427c40d06",
+    "rhem10_observed_volume_paper130_surfaces.npz": "397bab967e1d18cfa416d955210d579ef721afa051bce948fb33ed4e57d6ff37",
+    "rhem10_observed_volume_surfaces.npz": "3c6effefc6d24ec78b42f285da385969a80fc93db6bce6ff3b325b252cb40822",
+    "trials.csv": "8f251c8390ca0a7f51464f107c0cb73a8ecd958443eb280a26193ef4f459e652"
+  },
+  "trial_summary": [
+    {
+      "attempt": "1",
+      "termination": "coverage",
+      "elapsed_s": 327.4814920425415,
+      "coverage": 0.8021978021978022
+    },
+    {
+      "attempt": "2",
+      "termination": "planner_failure:LOCALIZATION_ROVIO_DIVERGENCE",
+      "elapsed_s": 263.3908131122589,
+      "coverage": 0.6383045525902669
+    },
+    {
+      "attempt": "3",
+      "termination": "planner_failure:LOCALIZATION_ROVIO_DIVERGENCE",
+      "elapsed_s": 152.0737771987915,
+      "coverage": 0.579905808477237
+    },
+    {
+      "attempt": "4",
+      "termination": "planner_failure:LOCALIZATION_ROVIO_DIVERGENCE",
+      "elapsed_s": 140.85956501960754,
+      "coverage": 0.6222919937205651
+    },
+    {
+      "attempt": "5",
+      "termination": "planner_failure:LOCALIZATION_ROVIO_DIVERGENCE",
+      "elapsed_s": 290.3066146373749,
+      "coverage": 0.7861852433281005
+    },
+    {
+      "attempt": "6",
+      "termination": "coverage",
+      "elapsed_s": 307.3100368976593,
+      "coverage": 0.8502354788069074
+    },
+    {
+      "attempt": "7",
+      "termination": "collision",
+      "elapsed_s": 106.65964007377625,
+      "coverage": 0.20251177394034536
+    },
+    {
+      "attempt": "8",
+      "termination": "coverage",
+      "elapsed_s": 226.6634340286255,
+      "coverage": 0.8
+    },
+    {
+      "attempt": "9",
+      "termination": "coverage",
+      "elapsed_s": 317.5712070465088,
+      "coverage": 0.8113029827315542
+    },
+    {
+      "attempt": "10",
+      "termination": "coverage",
+      "elapsed_s": 277.3160619735718,
+      "coverage": 0.8279434850863422
+    }
+  ]
+}

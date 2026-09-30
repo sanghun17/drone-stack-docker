@@ -90,5 +90,11 @@
     "completed_at_change": 6,
     "final_target_total": 10,
     "existing_folder_name_retained": true
+  },
+  "completion": {
+    "state": "complete",
+    "completed_total": 10,
+    "completed_at": "2026-09-30T17:25:49.645366+09:00",
+    "results_manifest": "data/manifests/rhem-gt10-20260930-results.json"
   }
 }
