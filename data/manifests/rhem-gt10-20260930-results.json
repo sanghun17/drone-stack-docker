@@ -170,5 +170,10 @@
       "elapsed_s": 277.3160619735718,
       "coverage": 0.8279434850863422
     }
-  ]
+  ],
+  "relocation_receipts": [
+    "data/manifests/simulation-results-cleanup-20260930.json",
+    "data/results/rhem-vio-50-20260930/export_locations.json"
+  ],
+  "relocation_note": "Original payloads and measured values are unchanged; use location receipts to resolve earlier data/results paths. Redundant per-trial preview images were removed during user-authorized cleanup."
 }

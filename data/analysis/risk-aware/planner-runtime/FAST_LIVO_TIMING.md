@@ -25,7 +25,7 @@ does not compare frame deduplication, frame rate or all previous publisher
 changes. It also does not reproduce the entire historical flight controller.
 
 Two 300-second clips are prepared under
-`data/results/fast-livo-timing-20260928/`:
+`data/archive/simulation-validation-20260930/fast-livo-timing-20260928/`:
 
 | Input directory suffix | RGB resolution | RGB / cloud / IMU messages | Readback delay median / p95 |
 | --- | --- | --- | --- |
@@ -116,7 +116,7 @@ stable full-clip FAST-LIVO localization.** The second phase began at
 its **17:36:55 UTC** deadline. The scheduled deadline guard was cancelled after
 completion, and all owned simulation/replay/filter processes were stopped.
 The final artifact inventory and exact stop time are saved in
-`data/results/fast-livo-timing-20260928/validation_summary.json` and
+`data/archive/simulation-validation-20260930/fast-livo-timing-20260928/validation_summary.json` and
 `fastlivo_phase.json` respectively.
 
 An earlier harness attempt stopped on JSON serialization of the GT reference
@@ -129,7 +129,7 @@ comparison input. These setup failures are not filter performance results.
 
 On 2026-09-30 the user requested deletion of historical RHEM payloads. These
 FAST-LIVO comparisons were moved intact to
-`data/results/fast-livo-timing-20260928/`; input and output bytes are unchanged.
+`data/archive/simulation-validation-20260930/fast-livo-timing-20260928/`; input and output bytes are unchanged.
 The input manifests keep their historical source trial paths. The replay driver
 reads only `parameters.yaml` and the recorded common camera profile from those
 trials for these two clips (online CameraInfo calibration was disabled). Restore
@@ -151,8 +151,8 @@ unused port for each run:
 
 ```bash
 python3 /work/data/analysis/risk-aware/planner-runtime/replay_fastlivo_timing.py \
-  /work/data/results/fast-livo-timing-20260928/fastlivo-timing-inputs-rgb640 \
-  --output /work/data/results/fast-livo-timing-20260928/fastlivo-rgb640-repeat \
+  /work/data/archive/simulation-validation-20260930/fast-livo-timing-20260928/fastlivo-timing-inputs-rgb640 \
+  --output /work/data/archive/simulation-validation-20260930/fast-livo-timing-20260928/fastlivo-rgb640-repeat \
   --port 11424 --rate .5 --camera-calibration shared-profile
 ```
 
@@ -168,3 +168,7 @@ the historical live FAST-LIVO RGB/depth extrinsics. These trials therefore do
 not certify the live FAST-LIVO planning/control pipeline. No FAST-LIVO estimator
 code or tuning was changed in this comparison. Single pairs on two trajectories
 also do not establish a statistical improvement across missions.
+
+The 2026-09-30 result cleanup relocated these completed diagnostics with SHA-256
+verification. See `data/manifests/simulation-results-cleanup-20260930.json`
+for previous/current paths; recorded inputs and output bytes are unchanged.

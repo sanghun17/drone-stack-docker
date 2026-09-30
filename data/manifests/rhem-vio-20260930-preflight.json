@@ -176,5 +176,10 @@
     "data/results/rhem-vio-preflight-20260930/live_wiring.json": "18a4f31f843f0b2febdae50e50c435c4c4683e303acba05e27d99daac270baf5",
     "data/results/rhem-vio-preflight-20260930/tf_authorities.json": "b84c024db767f4c54ba84a975bfdf391cf33bd1a189eb135bdccb39ec2deae47",
     "data/results/rhem-vio-preflight-20260930/preflight_review.json": "96cd8236749935a11507eb25f53788780f99cb133addf91e288b03d990912dfe"
-  }
+  },
+  "relocation_receipts": [
+    "data/manifests/simulation-results-cleanup-20260930.json",
+    "data/results/rhem-vio-50-20260930/export_locations.json"
+  ],
+  "relocation_note": "Original payloads and measured values are unchanged; use location receipts to resolve earlier data/results paths. Redundant per-trial preview images were removed during user-authorized cleanup."
 }

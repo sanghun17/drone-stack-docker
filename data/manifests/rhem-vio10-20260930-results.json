@@ -541,5 +541,10 @@
     ]
   },
   "mission_time_limit_s": 600,
-  "display_revision": "Full plots shortened from 600 to 200 seconds to include the longest actual flight (183.969 s). All retained attainment values and 130 s paper arrays are exactly unchanged. Tick positions stay inside the requested display window."
+  "display_revision": "Full plots shortened from 600 to 200 seconds to include the longest actual flight (183.969 s). All retained attainment values and 130 s paper arrays are exactly unchanged. Tick positions stay inside the requested display window.",
+  "relocation_receipts": [
+    "data/manifests/simulation-results-cleanup-20260930.json",
+    "data/results/rhem-vio-50-20260930/export_locations.json"
+  ],
+  "relocation_note": "Original payloads and measured values are unchanged; use location receipts to resolve earlier data/results paths. Redundant per-trial preview images were removed during user-authorized cleanup."
 }

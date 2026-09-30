@@ -85,6 +85,21 @@ Before each trial the runner removes unreachable `/rhem/` ROS registrations.
 This prevents stale XMLRPC ports from sending a duplicate-name shutdown to an
 unrelated new trial process. Reachable RHEM and unrelated nodes are preserved.
 
+For a reviewed campaign, group completed exports inside its own directory:
+
+```bash
+python3 data/analysis/risk-aware/experiment-evaluation/collect_campaign_exports.py \
+  data/results/CAMPAIGN --watch
+```
+
+This moves only exports with complete raw pipeline and export statuses to
+`CAMPAIGN/trials/attemptNNN`. It verifies file hashes before and after each
+move, retains metric/endpoint CSVs, and removes the redundant per-trial
+`coverage_and_endpoints` PNG/PDF previews. `export_locations.json` records
+original paths, current paths, retained hashes and removed previews. Raw
+`flight_logs` and the cohort's final figures are unchanged. The optional watcher
+stops when the campaign completes or requires review.
+
 
 ## Resuming the 100-trial run (2026-09-23)
 
