@@ -67,6 +67,7 @@ def draw(groups,out,stem,metric,methods=METHODS,time_end=130):
     fig,axes=plt.subplots(1,len(methods),figsize=(3*len(methods)+.65,3.65),squeeze=False,
                           sharex=True,sharey=True,layout='constrained')
     surfaces={};norm=BoundaryNorm(np.linspace(0,1,11),256,clip=True)
+    contour_labels=[]
     for ax,(key,label,color) in zip(axes[0],methods):
         runs=groups[key];z=surface(runs,thresholds,times);surfaces[key]=z
         mesh=ax.pcolormesh(times,thresholds,z,cmap='viridis',norm=norm,shading='nearest',rasterized=True)
@@ -102,7 +103,9 @@ def draw(groups,out,stem,metric,methods=METHODS,time_end=130):
                         fmt=label_format,fontsize=8,inline_spacing=3))
             else:
                 labels=ax.clabel(contours,fmt=label_format,fontsize=8,inline_spacing=3)
-            for text in labels:text.set_path_effects(halo)
+            for text in labels:
+                text.set_path_effects(halo)
+                contour_labels.append((ax,text))
         if key=='rhem' and volume and z.max()<.2:
             ax.text(.5,.92,f'At most {z.max():.0%} attain 100 m³',transform=ax.transAxes,ha='center',va='top',color='white',fontsize=9)
         ax.set_title(f'{label}  (n={len(runs)})',color=color,fontweight='bold',pad=8)
@@ -120,6 +123,20 @@ def draw(groups,out,stem,metric,methods=METHODS,time_end=130):
                       ticks=np.linspace(0,1,6))
     cbar.ax.yaxis.set_major_formatter(PercentFormatter(1))
     cbar.set_label('Trials attaining threshold [%]',fontsize=10)
+    # Short-lived cohorts can put a contour immediately on an axis boundary.
+    # Keep its entire label visible after constrained layout has placed axes.
+    fig.canvas.draw()
+    renderer=fig.canvas.get_renderer()
+    for ax,text in contour_labels:
+        box=text.get_window_extent(renderer);bounds=ax.get_window_extent()
+        dx=max(0,bounds.x0+3-box.x0)+min(0,bounds.x1-3-box.x1)
+        dy=max(0,bounds.y0+3-box.y0)+min(0,bounds.y1-3-box.y1)
+        if dx or dy:
+            old=text.get_position()
+            new=ax.transData.inverted().transform(ax.transData.transform(old)+[dx,dy])
+            text.set_position(new)
+            ax.annotate('',xy=old,xytext=new,
+                        arrowprops={'arrowstyle':'-','color':'white','lw':.7})
     for ext in ['png','pdf','svg']:fig.savefig(out/f'{stem}.{ext}',dpi=300)
     plt.close(fig)
     np.savez_compressed(out/f'{stem}_surfaces.npz',time_s=times,threshold=thresholds,**surfaces)
