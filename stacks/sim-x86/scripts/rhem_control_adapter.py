@@ -6,15 +6,15 @@ import json
 
 import numpy as np
 import rospy
-from bsp_planner.srv import bsp_srv
-from geometry_msgs.msg import Point
+from bsp_planner.srv import bsp_srv, validate_trajectory
+from geometry_msgs.msg import Point, Vector3
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Header, UInt32, Bool, String
 from std_srvs.srv import SetBool, SetBoolResponse
 from tf.transformations import euler_from_quaternion
 from traj_utils.msg import MixTraj
 
-from rhem_trajectory import parameterize
+from rhem_trajectory import parameterize, trajectory_envelopes
 
 
 def waypoint(pose):
@@ -82,6 +82,9 @@ class Adapter:
                                           self.receive, queue_size=1)
         self.toggle_service = rospy.Service('~toggle_running', SetBool, self.toggle)
         self.planner = rospy.ServiceProxy('/rhem/bsp_planner', bsp_srv)
+        self.validate = rospy.ServiceProxy('/rhem/validate_trajectory', validate_trajectory)
+        self.envelope_extent = float(rospy.get_param('/system/voxel_size')) * 0.5
+        rospy.set_param('~execution_profile', 'continuous-validated-v1')
 
     def receive(self, msg):
         with self.lock:
@@ -122,6 +125,21 @@ class Adapter:
                          self.planning_failures.last - self.planning_failures.started,
                          self.planning_failures.attempts, reason, detail)
 
+    def checked_trajectory(self, path):
+        """Use the largest verified through-tangent; never restore stop-at-every-vertex."""
+        last_reason = ''
+        for scale in (1., .5, .25, .125, .0625):
+            result = parameterize(path, self.limits, tangent_scale=scale)
+            centers, sizes = trajectory_envelopes(*result[:3], self.envelope_extent)
+            reply = self.validate(Header(stamp=rospy.Time.now(), frame_id=self.frame),
+                [Point(*p) for p in centers], [Vector3(*p) for p in sizes])
+            if reply.valid:
+                rospy.loginfo('RHEM continuous trajectory: tangent_scale=%.4f, %d checked envelopes',
+                              scale, reply.checked)
+                return result
+            last_reason = reply.reason
+        raise ValueError('No collision-free continuous trajectory: ' + last_reason)
+
     def run(self):
         rospy.wait_for_service('/rhem/bsp_planner')
         while not rospy.is_shutdown():
@@ -136,10 +154,10 @@ class Adapter:
                         goal=None if self.goal is None else self.goal.tolist(), finish=self.finish,
                         goal_error=None if self.goal is None else float(np.linalg.norm(point[:3]-self.goal)))))
                     self.last_status = time.monotonic()
-                if self.goal is not None and (rospy.Time.now().to_sec() < self.finish
-                        or np.linalg.norm(point[:3] - self.goal) > 0.3):
-                    continue
-                if speed > 0.3:
+                # Finish the published trajectory, then request the next plan.
+                # The shared traj_server holds its final pose while we compute;
+                # there is no extra speed/arrival gate before the request.
+                if self.goal is not None and rospy.Time.now().to_sec() < self.finish:
                     continue
                 try:
                     response = self.planner(Header(stamp=rospy.Time.now(), frame_id=self.frame))
@@ -155,19 +173,33 @@ class Adapter:
                 if len(path) < 2:
                     self.reject_plan('NOVIEWPOINT', 'RHEM has not produced a path')
                     raise ValueError('RHEM has not produced a path')
-                self.planning_failures.clear()
                 point, speed = self.current()
-                if np.linalg.norm(path[0, :3] - point[:3]) > 0.3 or speed > 0.3:
+                if np.linalg.norm(path[0, :3] - point[:3]) > 0.3:
+                    self.reject_plan('PATH_INVALID', 'Path start moved during planning')
                     raise ValueError('Vehicle moved during RHEM planning; waiting to replan')
                 if np.any(path[:, :3] < self.lower) or np.any(path[:, :3] > self.upper):
+                    self.reject_plan('PATH_INVALID', 'Path is outside exploration bounds')
                     raise ValueError('RHEM path is outside the common exploration bounds')
-                knots, controls, durations, yaw = parameterize(path, self.limits)
+                try:
+                    knots, controls, durations, yaw = self.checked_trajectory(path)
+                except (ValueError, rospy.ServiceException) as error:
+                    self.reject_plan('PATH_INVALID', str(error))
+                    raise
+                if not self.enabled:
+                    continue
+                # Validation can take time. Do not publish a path whose origin
+                # no longer agrees with the current pose.
+                point, speed = self.current()
+                if np.linalg.norm(path[0, :3] - point[:3]) > 0.3:
+                    self.reject_plan('PATH_INVALID', 'Path start moved during validation')
+                    raise ValueError('Vehicle moved during trajectory validation')
                 self.traj_id += 1
                 msg = MixTraj(bspline_degree=5, traj_id=self.traj_id,
                               start_time=rospy.Time.now(), real_traj_duration=float(sum(durations)),
                               knots=knots.tolist(), pos_pts=[Point(*p) for p in controls],
                               minco_order=5, coef_yaw=yaw.ravel().tolist(), duration_yaw=durations.tolist())
                 self.publisher.publish(msg)
+                self.planning_failures.clear()
                 self.accepted.publish(self.traj_id)
                 self.improved.publish(response.belief_improved)
                 self.goal = path[-1, :3]

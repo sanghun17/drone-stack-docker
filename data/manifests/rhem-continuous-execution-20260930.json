@@ -1,0 +1,97 @@
+{
+  "profile": "continuous-validated-v1",
+  "date": "2026-09-30",
+  "request": "Remove stack-specific arrival/speed gating and blanket zero interior waypoint velocities; preserve shared-controller final hold.",
+  "module_revision": "1b344a75c1a2529576c02225e7bc3d72ffd19e36",
+  "pilot": "rhem-continuous-gt-20260930-attempt001",
+  "planning_source": "gt",
+  "control_source": "gt",
+  "belief_source": "rovio",
+  "separate_from_completed_gt50": true,
+  "removed": [
+    "Wait for old-goal distance <=0.3m before requesting a plan",
+    "Wait for measured speed <=0.3m before requesting/accepting a plan",
+    "Force every interior position/yaw velocity to zero"
+  ],
+  "retained": [
+    "Existing shared SO3 and MixTraj trajectory server",
+    "Shared PURE/LA motion limits",
+    "Hold final pose when no next trajectory is available",
+    "Original ROVIO belief propagation",
+    "Path-start consistency and operational/localization termination"
+  ],
+  "validation": {
+    "unit_tests": 11,
+    "native_service_tests": "data/results/rhem-continuous-gt-20260930/validation-service-tests.json",
+    "build": "data/results/rhem-gt-50-20260929/shared-motion-20260930/continuous-build.log",
+    "guard_state": "passed",
+    "termination": "coverage",
+    "mission_success": true,
+    "valid_evaluation": true,
+    "elapsed_s": 282.18651008605957,
+    "coverage": 0.8194662480376766,
+    "tracking_rmse_m": 0.15585158611630362,
+    "tracking_max_m": 0.44433134212807535,
+    "collision_events": [],
+    "gt_speed": {
+      "mean_mps": 0.2658129993570074,
+      "peak_xy_mps": 1.193486946439018,
+      "peak_3d_mps": 1.286849462877569,
+      "p95_mps": 0.6032161071714646,
+      "fraction_below_0_05mps": 0.08016159897937487,
+      "fraction_below_0_1mps": 0.22808136650365016,
+      "outside_planned_s": 89.10000000000001,
+      "inside_planned_mean_mps": 0.3417115094202623
+    },
+    "interior_command_velocities": {
+      "count": 245,
+      "nonzero_count": 245,
+      "min_mps": 0.017333249432122503,
+      "median_mps": 0.289067287896488,
+      "max_mps": 0.581529688900306
+    },
+    "accepted_tangent_scales": {
+      "1.0000": 53
+    },
+    "rovio_final_error_m": 4.0371210380646065,
+    "rovio_peak_error_m": 4.542408780161099
+  },
+  "limitations": [
+    "One successful pilot does not establish speed/success-rate improvement.",
+    "Continuous execution differs from original waypoint-settling belief prediction; it is a motion variant.",
+    "Existing trajectory timing is retained and adjusted for whole-curve derivative limits; this is not a time-optimal retiming change."
+  ],
+  "evidence_directory": "data/results/rhem-continuous-gt-20260930",
+  "flight_source_sha256": {
+    "config/modules.lock.json": "482a1f3768bca0e15a2362f34d592ed31675ac92616bf85b7770cdbb94a4c06e",
+    "stacks/sim-x86/config/airsim_cameras.yaml": "e5b68a5215c8cdd8966d68819475a0f63fc67cd7aa6f75d56ef9af0d1e71d425",
+    "stacks/sim-x86/config/comparison-20260706-params.yaml": "d399f3839d2097fe64ed4f029b7fd119463275ec45e3839fd25d7484d9839b45",
+    "stacks/sim-x86/config/comparison-20260706-sensors.yaml": "75aa39d385d3f402b0a5382fec3bcb1d91b222d50d53faf0ba2a713a1ba68a1d",
+    "stacks/sim-x86/scripts/run_rhem.sh": "85f792530718c4e5a4d5cfc84b60cbd60a9b02363360a812aadd3d5a3c2889e5",
+    "stacks/sim-x86/scripts/prepare_rhem_runtime.py": "91c9d3ed2b594a71d0249f1821054f21f5a19ffa7e3bf81077a61a9a0c052373",
+    "stacks/sim-x86/scripts/rhem_filter_config.py": "3e36750b6a8af11d0f31df8a756e00b150cfb2ccdf75bf91538187668670975d",
+    "stacks/sim-x86/scripts/rhem_control_adapter.py": "b768937b58d6d83632f10d0e780a2a17682860a6779695f72580823d3c4894fc",
+    "stacks/sim-x86/scripts/rhem_trajectory.py": "505eb6d15dc343dcd4360bad1b4c3f185f56b8d221f644cff52fd83daf57e3f8",
+    "stacks/sim-x86/scripts/experiment_metrics.py": "8eb78c88b2b6b4c715776d7e033a062e353caa74a02038b17e86ee1720175e5e",
+    "data/assets/simulation/airsim/user_data/settings.json": "d7e57dd26c40a4281880326f3806b893f949f046b4ba6dbe8e6e47bdb9a801a9",
+    "ws/rhem/devel/.private/rovio/lib/rovio/rovio_node": "695d1eb79164b549639bc2825e88ce517fc2525e265a5ac562772d6053c36059",
+    "ws/rhem/devel/.private/rovio/lib/rovio/rovio_bsp_node": "23456b6c7c22d3957cd6c43ff79b18a9eca304bc97a6a00f2f2e3bc1568d68fd",
+    "stacks/sim-x86/scripts/supervise_experiment_campaign.py": "ddac2ffc07c91d1c43efdaa593d9148198b94f7301256fe2e1920d8e01f697df",
+    "stacks/sim-x86/scripts/experiment_review.py": "a29bc1332d520bb401146dc88eb4564c8dcdb1d45e2f9dea28f6a064944195d4",
+    "stacks/sim-x86/scripts/run_guarded_campaign.py": "d3e2932ef28ce8d69aa3f7d6a50863a3c8813238ba86793b8b87952b9dd0bf64",
+    "data/analysis/risk-aware/planner-runtime/monitor_sensor_health.py": "0c0f03b21424eda0406708753aba132d94615383d363901a53b5032f6dc33597",
+    "data/analysis/risk-aware/planner-runtime/score_rovio_replay.py": "cba8a78a1c1aeba63eea14b275cd3c64e77d8da6f674f20eeb1f523a5c20a03f",
+    "data/analysis/risk-aware/experiment-evaluation/export_legacy.py": "31e44c655b41619868f7cf04320149a8b1be614568139722d144e5618c789f83",
+    "stacks/sim-x86/scripts/automation_experiments.py": "aaed16ac7dcfec5b3dd8bf2645d699bb8951757c57fe541f1f063c8656a8df74",
+    "ws/rhem/devel/.private/bsp_planner/lib/libbsp_planner.so": "99d31417edc9a8e9cc7d5f612375796316686208810d89702317bcae63e29c75",
+    "modules/planner/rhem/patches/heading_continuity.patch": "374ba6ff3f6102af3378918677d5167356cfeb24d1cae194b936c0263afbfaac",
+    "modules/planner/rhem/patches/trajectory_validation.patch": "f20639d7f8f3cc0f3c73685f3c54fb3074a54f759b01f16538e5a231a58d988a",
+    "data/results/rhem-continuous-gt-20260930/review_policy.json": "470097b6bdac19e6d6089806ec99478b5c498860bdce3c1cfb5f522a3b361879"
+  },
+  "postflight_change": "After flight completion, added cancellation check after validation; regression test verifies no publication if disabled during validation. Flight geometry and motion generation are unchanged.",
+  "final_source_sha256": {
+    "stacks/sim-x86/scripts/rhem_control_adapter.py": "385ac756098d7a618444a16cff6e449909d7a70578785722a4ce5388d457c23f",
+    "stacks/sim-x86/scripts/rhem_trajectory.py": "505eb6d15dc343dcd4360bad1b4c3f185f56b8d221f644cff52fd83daf57e3f8",
+    "config/modules.lock.json": "482a1f3768bca0e15a2362f34d592ed31675ac92616bf85b7770cdbb94a4c06e"
+  }
+}
