@@ -12,6 +12,65 @@ import supervise_experiment_campaign as guard
 
 
 class LocalizationTerminationTests(unittest.TestCase):
+    def test_reference_review_preserves_flight_but_still_holds_next_launch(self):
+        reason='observed_volume_or_rate_outside_reference'
+        for action,free,expected in (
+                ('finish_trial_then_review',100,'awaiting_trial_end_for_review'),
+                ('finish_trial_then_review',10,'stopping_for_review'),
+                ('interrupt',100,'stopping_for_review')):
+            with self.subTest(action=action,free=free),tempfile.TemporaryDirectory() as tmp:
+                root=Path(tmp);batch=root/'flight_logs/trial';trial=batch/'iter_001';trial.mkdir(parents=True)
+                policy=root/'policy.json'
+                policy.write_text(json.dumps(dict(reference_action=action,disk_reserve_gib=20,
+                    allowed_terminal_states=['coverage','interrupted'])))
+                args=Obj(batch=batch,status=root/'status.json',review_policy=policy,sensors=root/'sensors')
+                def finish(_):
+                    self.assertEqual(json.loads(args.status.read_text())['state'],expected)
+                    (trial/'result.json').write_text(json.dumps(dict(
+                        termination='coverage' if expected=='awaiting_trial_end_for_review' else 'interrupted',
+                        cleanup_errors=[])))
+                with patch.object(guard,'ROOT',root),\
+                     patch.object(guard,'coverage_review',side_effect=[([],reason),([],None)]),\
+                     patch.object(guard.shutil,'disk_usage',return_value=Obj(free=free*2**30)),\
+                     patch.object(guard.subprocess,'check_output',return_value='[{"pid":1234,"rss":0}]'),\
+                     patch.object(guard.subprocess,'run') as run,\
+                     patch.object(guard.time,'sleep',side_effect=finish) as sleep:
+                    self.assertEqual(guard.guard_trial(args),1)
+                sleep.assert_called_once()
+                if expected=='awaiting_trial_end_for_review':run.assert_not_called()
+                else:
+                    run.assert_called_once()
+                    self.assertEqual(run.call_args[0][0][-3:],['kill','-INT','1234'])
+                status=json.loads(args.status.read_text())
+                self.assertEqual(status['state'],'review_required')
+                self.assertIn(reason,status['review_reasons'])  # Latched after transient alert.
+                self.assertEqual(status['outcome']['termination'],
+                    'coverage' if expected=='awaiting_trial_end_for_review' else 'interrupted')
+
+    def test_deferred_reference_review_never_delays_localization_failure(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);batch=root/'flight_logs/trial';trial=batch/'iter_001';trial.mkdir(parents=True)
+            (batch/'manifest.json').write_text(json.dumps(dict(planner='rhem',planning_source='gt',control_source='gt')))
+            policy=root/'policy.json'
+            terminal='planner_failure:LOCALIZATION_ROVIO_DIVERGENCE'
+            policy.write_text(json.dumps(dict(reference_action='finish_trial_then_review',
+                localization_action='terminate_trial',disk_reserve_gib=20,allowed_terminal_states=[terminal])))
+            args=Obj(batch=batch,status=root/'status.json',review_policy=policy,sensors=root/'sensors')
+            def request(reason):
+                (trial/'result.json').write_text(json.dumps(dict(termination=terminal,cleanup_errors=[])))
+                return 'LOCALIZATION_ROVIO_DIVERGENCE'
+            with patch.object(guard,'ROOT',root),\
+                 patch.object(guard,'coverage_review',return_value=([],'observed_volume_or_rate_outside_reference')),\
+                 patch.object(guard,'belief_review',return_value=({},'raw_rovio_divergence')),\
+                 patch.object(guard.shutil,'disk_usage',return_value=Obj(free=100*2**30)),\
+                 patch.object(guard.subprocess,'check_output',return_value='[{"pid":1234,"rss":0}]'),\
+                 patch.object(guard,'request_localization_stop',side_effect=request) as stop,\
+                 patch.object(guard.subprocess,'run') as run,\
+                 patch.object(guard.time,'sleep',side_effect=AssertionError('Localization failure delayed')):
+                self.assertEqual(guard.guard_trial(args),1)
+            stop.assert_called_once_with('raw_rovio_divergence');run.assert_not_called()
+            self.assertEqual(json.loads(args.status.read_text())['outcome']['termination'],terminal)
+
     def test_divergence_uses_normal_failure_channel_and_passes_review(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);batch=root/'flight_logs/trial';trial=batch/'iter_001';trial.mkdir(parents=True)

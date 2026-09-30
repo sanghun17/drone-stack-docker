@@ -1,5 +1,44 @@
 # RHEM GT campaign, 2026-09-29
 
+## Early-reference review after attempt 030
+
+Attempt 029 completed the mission at 84.18% observed GT coverage after 479.17 s.
+Its final raw ROVIO position error was 2.53 m, below the sustained divergence
+stop threshold. Attempt 030 was then interrupted at 125.27 s and 37.14%
+coverage: its volume/rate exceeded the old 60 s upper limits and its volume
+exceeded the old 120 s upper limit. The prior repair had left early upper
+limits unchanged. The campaign stopped at 02:43 KST on September 30.
+
+Before changing the monitor, all frozen hashes matched. Full provenance and
+generated camera/filter/planner/build snapshots matched 029; GT identity and
+voxel size also matched. The existing motion audit measured 22.89 m over
+125.78 s (0.1820 m/s), 0.0909 m tracking RMSE and no recorded collision.
+ROVIO final/max position error was 1.96 m. The early upper excursion is
+consistent with faster exploration under the reviewed variant; 030 stays an
+invalid interrupted diagnostic with its original endpoint and raw samples.
+
+Starting with 031, the same fixed 1.5 prefix-maximum upper allowance used in
+the 028 review applies at all checkpoints. It is computed from the original
+025–027 policy, not multiplied again over the revised late bounds. All lower
+limits remain unchanged. This operational allowance is not a confidence
+interval or a coverage-speed scaling law; one successful flight does not
+establish a success rate. Exact limits and evidence are versioned in
+`data/manifests/rhem-gt50-20260930-review030.json`.
+
+The policy now selects `reference_action: finish_trial_then_review`. A finite
+reference-band alert is latched and holds the next launch for review, while
+the current trial reaches its ordinary endpoint. Such an alert does not by
+itself interrupt a healthy flight. Nonfinite coverage/motion is a monitor
+failure and still stops immediately; disk/operational failures and ROVIO's
+normal divergence termination remain active. No unexplained alert is silently
+accepted, and bounds never widen automatically. Supervisor tests cover a
+latched transient alert, immediate disk failure, and localization termination
+even with a pending reference review. The manager still holds subsequent
+launches when the completed trial requires review.
+
+`campaign_plan_heading_reviewed030.json` resumes 031–050. Original stopped
+status is preserved in `status_after030_before_review.json`.
+
 ## Late-reference review after attempt 028
 
 Attempt 028 was interrupted by the descriptive reference guard at 606.74 s,

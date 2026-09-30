@@ -138,8 +138,15 @@ print(json.dumps(found))
                 value['review_reasons'].append('termination:'+outcome['termination'])
             value['state']='review_required' if value['review_reasons'] else 'passed'
         elif value['review_reasons']:
-            value['state']='stopping_for_review'
-            if runners and not requested:
+            # A descriptive outlier must hold the next launch, but need not
+            # censor an otherwise healthy flight. Operational errors still stop
+            # immediately; localization retains its normal failure channel.
+            immediate=[reason for reason in value['review_reasons'] if not (
+                reason=='observed_volume_or_rate_outside_reference'
+                and policy.get('reference_action')=='finish_trial_then_review')]
+            value['state']=('stopping_for_review' if immediate else
+                            'awaiting_trial_end_for_review')
+            if immediate and runners and not requested:
                 for p in runners:
                     subprocess.run(['docker','exec','drone-stack-sim-x86','kill','-INT',str(p['pid'])],check=True,timeout=10)
                 requested=True

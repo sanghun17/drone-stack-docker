@@ -51,12 +51,17 @@
       "validation": "data/results/rhem-gt-50-20260929/motion-fix-20260929/validation-summary.json",
       "note": "Explicit algorithm sampling variant. Three-trial motion-speed improvement does not establish better exploration efficiency or mission success.",
       "interrupted_diagnostics": [
-        28
+        28,
+        30
       ],
       "review_policy_changes": [
         {
           "first_attempt": 29,
           "review": "data/manifests/rhem-gt50-20260930-review.json"
+        },
+        {
+          "first_attempt": 31,
+          "review": "data/manifests/rhem-gt50-20260930-review030.json"
         }
       ]
     }

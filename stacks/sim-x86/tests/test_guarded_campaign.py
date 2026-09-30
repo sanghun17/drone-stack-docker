@@ -65,7 +65,7 @@ class CampaignTests(unittest.TestCase):
         previous=[dict(global_attempt=i,bag_bytes=30*2**30) for i in (14,15,16)]
         self.assertEqual(campaign.compression_choice(plan,previous,100*2**30,0),('lz4',None))
 
-    def test_review_blocks_next_trial_but_retains_failed_attempt(self):
+    def test_review_blocks_next_trial_even_after_successful_flight_and_export(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);plan=root/'plan.json'
             plan.write_text(json.dumps(dict(name='test',completed_before=14,target_total=50,
@@ -75,8 +75,9 @@ class CampaignTests(unittest.TestCase):
                 launches.append(command)
                 if 'stacks/sim-x86/scripts/run_evaluated_experiments.sh' in command:
                     trial=root/'flight_logs/test-attempt015/iter_001';trial.mkdir(parents=True)
-                    (trial/'result.json').write_text(json.dumps({'termination':'interrupted'}))
-                    (trial.parent/'pipeline_status.json').write_text(json.dumps({'complete':False}))
+                    (trial/'result.json').write_text(json.dumps(dict(
+                        termination='coverage',mission_success=True,valid_evaluation=True)))
+                    (trial.parent/'pipeline_status.json').write_text(json.dumps({'complete':True}))
                 if 'stacks/sim-x86/scripts/supervise_experiment_campaign.py' in command:
                     (root/'attempt015-review.json').write_text(json.dumps({'state':'review_required','review_reasons':['outlier']}))
                 return Obj(pid=1,poll=lambda:0,wait=lambda **kw:0,returncode=0)
@@ -88,6 +89,8 @@ class CampaignTests(unittest.TestCase):
             state=json.loads((root/'status.json').read_text())
             self.assertEqual(state['completed_total'],15)
             self.assertEqual(state['state'],'review_required')
+            self.assertTrue(state['trials'][0]['mission_success'])
+            self.assertTrue(state['trials'][0]['valid_evaluation'])
             self.assertFalse((root/'flight_logs/test-attempt016').exists())
             self.assertEqual(sum('stacks/sim-x86/scripts/run_evaluated_experiments.sh' in c for c in launches),1)
 

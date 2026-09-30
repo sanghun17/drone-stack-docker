@@ -1,0 +1,160 @@
+{
+  "reviewed_at": "2026-09-30T09:52:42.300041+09:00",
+  "campaign": "rhem-gt-50-20260929",
+  "attempt": 30,
+  "original_outcome": {
+    "termination": "interrupted",
+    "valid_evaluation": false,
+    "mission_success": false
+  },
+  "decision": "Preserve interrupted030; resume031 with fixed cohort upper allowance across all checkpoints and deferred statistical review",
+  "cause": "028 repair applied the reviewed upper allowance only after300s; normal early exploration still compared against unadjusted historical upper limits.030 crossed volume/rate at60s and volume at120s.",
+  "evidence": {
+    "frozen_sha256_mismatches_before_monitor_change": [],
+    "provenance_differences_from029": [],
+    "camera_rovio_planner_build_identical_to029": true,
+    "gt_hash_and_voxel_definition_identical_to029": true,
+    "distance_m_10hz": 22.89367594987661,
+    "duration_s": 125.78391599655151,
+    "mean_speed_mps": 0.18200797588862047,
+    "tracking_rmse_m": 0.09089942208476086,
+    "collision_events": [],
+    "rovio_final_and_max_error_m": 1.9631648220274691,
+    "volume_rate_vio": 0.37142857142857144
+  },
+  "successful029": {
+    "elapsed_s": 479.16804909706116,
+    "volume_rate_vio": 0.8417582417582418,
+    "termination": "coverage",
+    "mission_success": true
+  },
+  "policy_change": {
+    "first_attempt": 31,
+    "lower_bands": "unchanged",
+    "upper_rule": "Same1.5 * prefix maximum of original025-027 policy upper limits as028 review, now at all checkpoints; coverage capped at1",
+    "changed_limits": {
+      "30": {
+        "volume_m3": {
+          "old_upper": 166.265625,
+          "new_upper": 249.3984375,
+          "lower_unchanged": 82.0
+        },
+        "volume_rate_vio": {
+          "old_upper": 0.19254317111459968,
+          "new_upper": 0.2888147566718995,
+          "lower_unchanged": 0.01718995290423861
+        },
+        "gt_distance_m": {
+          "old_upper": 10.038828785277289,
+          "new_upper": 15.058243177915934,
+          "lower_unchanged": 0.0
+        }
+      },
+      "60": {
+        "volume_m3": {
+          "old_upper": 200.828125,
+          "new_upper": 301.2421875,
+          "lower_unchanged": 105.84375
+        },
+        "volume_rate_vio": {
+          "old_upper": 0.2138932496075353,
+          "new_upper": 0.32083987441130296,
+          "lower_unchanged": 0.051412872841444274
+        },
+        "gt_distance_m": {
+          "old_upper": 16.390667231341908,
+          "new_upper": 24.586000847012862,
+          "lower_unchanged": 1.486495033886428
+        }
+      },
+      "120": {
+        "volume_m3": {
+          "old_upper": 294.6875,
+          "new_upper": 442.03125,
+          "lower_unchanged": 116.734375
+        },
+        "volume_rate_vio": {
+          "old_upper": 0.39568288854003136,
+          "new_upper": 0.593524332810047,
+          "lower_unchanged": 0.06930926216640503
+        },
+        "gt_distance_m": {
+          "old_upper": 26.298934124630136,
+          "new_upper": 39.448401186945205,
+          "lower_unchanged": 5.154439879148231
+        }
+      },
+      "180": {
+        "volume_m3": {
+          "old_upper": 346.484375,
+          "new_upper": 519.7265625,
+          "lower_unchanged": 125.734375
+        },
+        "volume_rate_vio": {
+          "old_upper": 0.5445054945054946,
+          "new_upper": 0.8167582417582419,
+          "lower_unchanged": 0.10792778649921507
+        },
+        "gt_distance_m": {
+          "old_upper": 34.53844480890841,
+          "new_upper": 51.80766721336261,
+          "lower_unchanged": 8.857403855440813
+        }
+      },
+      "300": {
+        "volume_m3": {
+          "old_upper": 452.1578125,
+          "new_upper": 678.2367187499999,
+          "lower_unchanged": 151.3890625
+        },
+        "volume_rate_vio": {
+          "old_upper": 0.6980376766091052,
+          "new_upper": 1.0,
+          "lower_unchanged": 0.17888540031397177
+        },
+        "gt_distance_m": {
+          "old_upper": 51.70205020224451,
+          "new_upper": 77.55307530336677,
+          "lower_unchanged": 18.090697832440352
+        }
+      }
+    },
+    "reference_action": "finish_trial_then_review",
+    "operational_and_localization_stop": "unchanged",
+    "nonfinite_metrics": "immediate monitor failure; never defer"
+  },
+  "policy": "data/results/rhem-gt-50-20260929/review_policy_heading_reviewed030.json",
+  "policy_sha256": "1258e54dac14273e0ef5838b055fcbf9a6e23f56c2aa531165b7b093306e1120",
+  "replays": {
+    "25": {
+      "reason": null,
+      "outside_checkpoints": []
+    },
+    "26": {
+      "reason": null,
+      "outside_checkpoints": []
+    },
+    "27": {
+      "reason": null,
+      "outside_checkpoints": []
+    },
+    "28": {
+      "reason": null,
+      "outside_checkpoints": []
+    },
+    "29": {
+      "reason": null,
+      "outside_checkpoints": []
+    },
+    "30": {
+      "reason": null,
+      "outside_checkpoints": []
+    }
+  },
+  "review_is_still_required": "Unexplained excursions hold the next launch; there is no automatic widening or unconditional resume.",
+  "evidence_paths": [
+    "data/results/rhem-gt-50-20260929/attempt030-review.json",
+    "data/results/rhem-gt-50-20260929/motion-fix-20260929/motion030/motion.json"
+  ],
+  "limitations": "Operational screening allowance, not a statistical confidence bound. Faster motion does not prove proportional coverage improvement or localization stability. The29 success is one trial, not an estimated success rate."
+}

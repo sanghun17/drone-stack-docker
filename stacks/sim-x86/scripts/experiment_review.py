@@ -48,6 +48,8 @@ def coverage_review(trial, policy):
             if len(pts)<2:
                 raise ValueError('Missing GT motion for completed checkpoint')
             values['gt_distance_m']=sum(math.dist(a,b) for a,b in zip(pts,pts[1:]))
+        if any(not math.isfinite(v) for v in values.values()):
+            raise ValueError('Non-finite coverage or motion at checkpoint '+str(at))
         outside = [k for k, v in values.items() if not
                    reference['metrics'][k]['review_lower'] <= v <= reference['metrics'][k]['review_upper']]
         checks.append(dict(time_s=at, reference_n=reference['n'], values=values, outside=outside))
