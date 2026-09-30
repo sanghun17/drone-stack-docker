@@ -80,16 +80,20 @@ def draw(groups,out,stem,metric,methods=METHODS,time_end=130):
             label_format={v:('100%' if v==top else f'{v:.0%}') for v in levels}
             if time_end>300:
                 labels=[]
+                anchors=[]
                 for index,(level,fraction) in enumerate(zip(levels,np.linspace(.78,.35,len(levels)))):
                     segments=[segment for segment in contours.allsegs[index] if len(segment)]
                     if not segments:continue
                     points=np.concatenate(segments)
                     scaled=(points-[times[0],thresholds[0]])/[times[-1]-times[0],thresholds[-1]-thresholds[0]]
                     interior=(scaled[:,0]>.08)&(scaled[:,0]<.92)&(scaled[:,1]>.12)&(scaled[:,1]<.88)
+                    for anchor in anchors:
+                        interior&=(abs(scaled[:,0]-anchor[0])>.16)|(abs(scaled[:,1]-anchor[1])>.11)
                     if not interior.any():continue
                     target=[fraction,.85-.14*index]
                     nearest=np.argmin(np.sum((scaled[interior]-target)**2,axis=1))
                     position=points[interior][nearest]
+                    anchors.append(scaled[interior][nearest])
                     # Restrict each requested label to its own contour. Otherwise
                     # nearby plateaus can all select and label the same level.
                     labels.extend(ax.clabel(contours,levels=[level],manual=[position],
