@@ -57,12 +57,13 @@ def guard_trial(args):
                    state='monitoring', batch=str(args.batch), review_reasons=[], warnings=[],
                    localization_failures=[],localization={})
         value['localization_policy']={key:policy[key] for key in
-            ('localization_action','localization_error_m','localization_error_duration_s',
+            ('localization_action','localization_error_m','localization_error_duration_s','raw_rovio_action',
              'raw_rovio_error_review_m','raw_rovio_error_duration_s') if key in policy}
         stop_ros=None
         if args.status.exists():
             previous=json.loads(args.status.read_text())
             value['review_reasons']=previous.get('review_reasons',[])
+            value['warnings']=previous.get('warnings',[])
             value['localization_failures']=previous.get('localization_failures',[])
             if 'termination_request' in previous:
                 value['termination_request']=previous['termination_request']
@@ -81,11 +82,13 @@ def guard_trial(args):
                 value['localization'][name]=metrics
                 if name=='rovio':value['belief']=metrics
                 if reason:
-                    if (policy.get('localization_action')=='terminate_trial'
+                    # A finite ROVIO drift can be diagnostic-only in GT trials.
+                    # Keep non-finite estimates on the normal failure channel.
+                    if reason=='raw_rovio_divergence' and policy.get('raw_rovio_action')=='report':
+                        value['warnings'].append(reason)
+                    elif (policy.get('localization_action')=='terminate_trial'
                             and reason.endswith(('_divergence','_nonfinite'))):
                         value['localization_failures'].append(reason)
-                    elif reason=='raw_rovio_divergence' and policy.get('raw_rovio_action')=='report':
-                        value['warnings'].append(reason)
                     else:value['review_reasons'].append(reason)
         except Exception as exc:
             # Failure to monitor must stop an unattended campaign, not pass it.
@@ -117,6 +120,7 @@ print(json.dumps(found))
         except Exception as exc:
             runners=[]
             value['review_reasons'].append('runner_inspection_error: '+str(exc))
+        value['warnings']=sorted(set(value['warnings']))
         value['localization_failures']=sorted(set(value['localization_failures']))
         # Never publish a stale failure after another stop reason already won.
         if value['localization_failures'] and stop_ros is None and runners and not localization_requested:

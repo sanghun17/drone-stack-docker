@@ -1,0 +1,47 @@
+{
+  "date": "2026-09-30T16:50:32.507077+09:00",
+  "authorization": "User requested that the externally added 5m drift condition no longer end GT exploration; continue to planner/mission endpoints.",
+  "campaign": "rhem-gt-20-20260930-continuous",
+  "first_attempt": 6,
+  "target_total": 20,
+  "completed_before_change": 5,
+  "cohorts": [
+    {
+      "attempts": [
+        1,
+        5
+      ],
+      "finite_rovio_drift_action": "terminate_trial",
+      "threshold_m": 5,
+      "duration_s": 10
+    },
+    {
+      "attempts": [
+        6,
+        20
+      ],
+      "finite_rovio_drift_action": "report_only",
+      "threshold_m": 5,
+      "duration_s": 10
+    }
+  ],
+  "planning_source": "gt",
+  "control_source": "gt",
+  "belief_source": "rovio",
+  "nonfinite_estimate_action": "terminate_trial",
+  "native_planner_and_mission_stops_unchanged": true,
+  "coverage_threshold": 0.8,
+  "time_limit_s": 600,
+  "algorithm_estimator_and_controller_changes": false,
+  "supervisor_sha256": "9c943f60fff43fd67dc3a0bfdc26bc4c03b6ba0991ff0b2c44b663890d80f776",
+  "policy": "data/results/rhem-gt-20-20260930-continuous/review_policy-report-only.json",
+  "policy_sha256": "d15b4bbea4b1929c9a548a901b0d39766e23df90f4f3f567242dc514cdbbd199",
+  "boundary_evidence": "data/results/rhem-gt-20-20260930-continuous/policy-transitions",
+  "validation": {
+    "localization_termination_tests": 6,
+    "experiment_review_tests": 5,
+    "guarded_campaign_tests": 4,
+    "result": "passed"
+  },
+  "interpretation": "GT exploration may continue despite failed ROVIO localization; this does not demonstrate stable VIO localization. Keep the two stopping-policy cohorts separate."
+}

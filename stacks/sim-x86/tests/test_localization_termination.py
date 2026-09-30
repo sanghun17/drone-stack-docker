@@ -12,6 +12,58 @@ import supervise_experiment_campaign as guard
 
 
 class LocalizationTerminationTests(unittest.TestCase):
+    def test_reported_rovio_drift_allows_flight_until_collision_and_retains_warning(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);batch=root/'flight_logs/trial';trial=batch/'iter_001';trial.mkdir(parents=True)
+            (batch/'manifest.json').write_text(json.dumps(dict(planner='rhem',planning_source='gt',control_source='gt')))
+            policy=root/'policy.json'
+            policy.write_text(json.dumps(dict(localization_action='terminate_trial',raw_rovio_action='report',
+                disk_reserve_gib=20,allowed_terminal_states=['collision'])))
+            args=Obj(batch=batch,status=root/'status.json',review_policy=policy,sensors=root/'sensors')
+            def finish(_):
+                status=json.loads(args.status.read_text())
+                self.assertEqual(status['state'],'monitoring')
+                self.assertEqual(status['warnings'],['raw_rovio_divergence'])
+                self.assertEqual(status['localization_failures'],[])
+                (trial/'events.jsonl').write_text(json.dumps(dict(phase='E.stop',ros_time=200))+'\n')
+                (trial/'result.json').write_text(json.dumps(dict(termination='collision',cleanup_errors=[])))
+            with patch.object(guard,'ROOT',root),patch.object(guard,'coverage_review',return_value=([],None)),\
+                 patch.object(guard,'belief_review',side_effect=[({},'raw_rovio_divergence'),({},None)]),\
+                 patch.object(guard.shutil,'disk_usage',return_value=Obj(free=100*2**30)),\
+                 patch.object(guard.subprocess,'check_output',return_value='[{"pid":1234,"rss":0}]'),\
+                 patch.object(guard,'request_localization_stop') as stop,\
+                 patch.object(guard.subprocess,'run') as run,\
+                 patch.object(guard.time,'sleep',side_effect=finish):
+                self.assertEqual(guard.guard_trial(args),0)
+            stop.assert_not_called();run.assert_not_called()
+            status=json.loads(args.status.read_text())
+            self.assertEqual(status['warnings'],['raw_rovio_divergence'])
+            self.assertEqual(status['state'],'passed')
+            self.assertEqual(status['localization_policy']['raw_rovio_action'],'report')
+            self.assertEqual(status['outcome']['termination'],'collision')
+
+    def test_reported_drift_does_not_disable_nonfinite_termination(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);batch=root/'flight_logs/trial';trial=batch/'iter_001';trial.mkdir(parents=True)
+            (batch/'manifest.json').write_text(json.dumps(dict(planner='rhem',planning_source='gt',control_source='gt')))
+            policy=root/'policy.json';terminal='planner_failure:LOCALIZATION_ROVIO_NONFINITE'
+            policy.write_text(json.dumps(dict(localization_action='terminate_trial',raw_rovio_action='report',
+                disk_reserve_gib=20,allowed_terminal_states=[terminal])))
+            args=Obj(batch=batch,status=root/'status.json',review_policy=policy,sensors=root/'sensors')
+            def request(reason):
+                (trial/'result.json').write_text(json.dumps(dict(termination=terminal,cleanup_errors=[])))
+                return 'LOCALIZATION_ROVIO_NONFINITE'
+            with patch.object(guard,'ROOT',root),patch.object(guard,'coverage_review',return_value=([],None)),\
+                 patch.object(guard,'belief_review',return_value=({},'raw_rovio_nonfinite')),\
+                 patch.object(guard.shutil,'disk_usage',return_value=Obj(free=100*2**30)),\
+                 patch.object(guard.subprocess,'check_output',return_value='[{"pid":1234,"rss":0}]'),\
+                 patch.object(guard,'request_localization_stop',side_effect=request) as stop,\
+                 patch.object(guard.subprocess,'run') as run,\
+                 patch.object(guard.time,'sleep',side_effect=AssertionError('Nonfinite stop delayed')):
+                self.assertEqual(guard.guard_trial(args),0)
+            stop.assert_called_once_with('raw_rovio_nonfinite');run.assert_not_called()
+            self.assertEqual(json.loads(args.status.read_text())['localization_failures'],['raw_rovio_nonfinite'])
+
     def test_reference_review_preserves_flight_but_still_holds_next_launch(self):
         reason='observed_volume_or_rate_outside_reference'
         for action,free,expected in (

@@ -79,5 +79,9 @@
   "analysis_format": "Existing run_evaluated_experiments.sh recorder and legacy CSV exporter",
   "pilot_reference": "data/manifests/rhem-continuous-execution-20260930.json",
   "deletion_scope": "User authorized permanent deletion of all previous local and NAS RHEM raw data and result payloads on 2026-09-30. Preserve reproducibility code/configuration/verification records, non-RHEM shared data, and this new campaign. See rhem-payload-deletion-20260930.json.",
-  "storage": "New data local; no NAS transfer during collection; existing compression forecast and reserve active."
+  "storage": "New data local; no NAS transfer during collection; existing compression forecast and reserve active.",
+  "policy_transitions": [
+    "data/manifests/rhem-gt20-20260930-rovio-report-only.json"
+  ],
+  "frozen_sha256_scope": "Initial configuration for attempts001-005; subsequent supervisor/policy hashes are recorded in policy_transitions."
 }
