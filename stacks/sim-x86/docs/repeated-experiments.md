@@ -250,3 +250,19 @@ remain active. An empty `checkpoints` object explicitly disables GT-derived
 performance screening for VIO, whose performance is the quantity being tested.
 Preflight attempts are separate from the frozen ten-attempt evaluation cohort.
 See `data/manifests/rhem-vio-20260930-protocol.json` for the exact protocol.
+
+The completed ten-attempt cohort is recorded in
+`data/manifests/rhem-vio10-20260930-results.json`: nine collisions and one native
+RHEM planning failure, with no completed mission. All attempts have complete raw
+records, legacy exports and clean teardown. Existing paper plots are under
+`data/results/rhem-vio-10-20260930/figures/`. Their threshold attainment persists
+after termination, while plotted inputs stop at each actual endpoint.
+
+Current PURE and LA diagnostic controls are kept outside the RHEM cohort. The
+initial LA attempt did not satisfy its native estimated-speed startup gate and
+also exposed duplicate static parents for `odom`; both findings are preserved.
+A separate LA recheck uses the generic sensor launch's map reference argument
+to remove the duplicate parent. Its flight and legacy export completed, ending
+in collision. This composition fix occurred after the RHEM cohort and does not
+alter its data or original archived runtime sources. Single diagnostic controls
+do not establish a statistical or historical planner comparison.

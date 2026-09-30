@@ -101,6 +101,27 @@ VIO 예비 2회는 59.0초·148.7초에 충돌했다. 연결 검증은 FAST-LIVO
 실행 근거와 정확한 종료점은
 `data/manifests/rhem-vio-20260930-preflight.json`에 보관한다.
 
+### 플래너 교체와 공통 실행 구성
+
+센서 발행, 카메라 보정, FAST-LIVO, odometry 전달, SO3 제어, 공통 운동 제한,
+기록과 평가를 PURE·LA·RHEM이 재사용한다. 새 플래너도 공통 odometry와
+trajectory/position-command 규약에 맞춘 연결부를 제공하면 같은 실행 구성을
+사용할 수 있다. RHEM의 ROVIO belief와 경로 변환 등 알고리즘 고유 부분은
+플래너 연결부에서 소유한다.
+
+LA는 원래 `world -> odom` static TF를 발행한다. 공통 센서 launch의
+`map_reference_frame` 인자는 기본값 `odom`이며, LA 실행 구성만 `world`를
+전달해 `map -> world -> odom`을 만든다. PURE·RHEM은 `map -> odom`을
+사용한다. 이 선택은 스택의 실행 구성에 있고 공통 센서 발행기에는 플래너별
+분기를 추가하지 않는다. 실제 LA bag에서 static TF의 부모가 하나씩인 것과
+Depth mount를 사용한 기존 분석 export가 완료되는 것을 확인했다.
+
+현재 설정의 RHEM VIO 10회와 PURE·LA 단일 진단의 결과는
+`data/manifests/rhem-vio10-20260930-results.json`에 보관한다. 세 플래너에서
+보정, 추정기 설정, 입력 odometry, 제어기, 운동 제한과 평가 범위가 같은 것도
+실험별 parameters 파일로 대조했다. 이는 FAST-LIVO 안정성이나 모든 미래
+플래너의 무수정 연결을 보장하지 않으며, 각 연결부의 규약 검증은 필요하다.
+
 ## 검증 자료와 한계
 
 `data/results/sim-sensor-audit-20260928/`에 입력 통계와 GT/ROVIO audit를,

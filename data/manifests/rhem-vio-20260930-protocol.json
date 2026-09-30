@@ -1,10 +1,13 @@
 {
-  "status": "preflight_in_progress",
+  "status": "complete",
   "implementation_commit": "98449c1",
   "campaigns": {
     "gt_control": "data/results/rhem-vio-preflight-20260930-gt",
     "vio_preflight": "data/results/rhem-vio-preflight-20260930",
-    "vio_evaluation": "data/results/rhem-vio-10-20260930"
+    "vio_evaluation": "data/results/rhem-vio-10-20260930",
+    "pure_control": "data/results/pure-vio-control-20260930",
+    "la_original_failed_start": "data/results/la-vio-control-20260930",
+    "la_tf_fixed_control": "data/results/la-vio-control-20260930-tf-fixed"
   },
   "requested_evaluation_attempts": 10,
   "preflight_attempts": {
@@ -56,7 +59,8 @@
   },
   "historical_comparison": "Old PURE/LA data predates shared calibration fixes; historical label mapping also differs from original source method names. Do not claim identical historical conditions.",
   "validation": {
-    "unit_tests": 55,
+    "unit_tests": 56,
     "layout": "passed"
-  }
+  },
+  "results_manifest": "data/manifests/rhem-vio10-20260930-results.json"
 }

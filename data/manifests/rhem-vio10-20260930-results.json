@@ -1,0 +1,532 @@
+{
+  "status": "complete",
+  "campaign": "data/results/rhem-vio-10-20260930",
+  "attempts": 10,
+  "implementation_commit": "98449c1",
+  "post_cohort_tf_composition_commit": "16c8e9c",
+  "renderer_label_commit": "544ad29",
+  "summary": {
+    "attempts": 10,
+    "successes": 0,
+    "collisions": 9,
+    "planner_failures": 1,
+    "flight_seconds": {
+      "min": 8.563441753387451,
+      "median": 44.589004039764404,
+      "max": 183.9690659046173
+    },
+    "terminal_volume_rate_vio": {
+      "mean": 0.20467817896389326,
+      "median": 0.12762951334379907,
+      "max": 0.4970172684458399
+    },
+    "main_evaluation_excludes_preflight": true,
+    "frozen_runtime_files": 34,
+    "all_pipeline_exports_complete": true,
+    "no_attempt011": true
+  },
+  "renderer": "data/analysis/risk-aware/experiment-evaluation/plot_paper_simulation.py",
+  "renderer_sha256": "7f337e5046eafb0e5cd1ea7ab1001de001fbaeb1a54653be7d0264029b8582c7",
+  "primary_figure": "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume.png",
+  "paper_figure": "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume_paper130.pdf",
+  "interpretation": {
+    "cohort": "All ten prescribed attempts, including failures; preflight excluded.",
+    "time": "Measured samples from actual SO3 takeover through E.stop, with no synthetic zero.",
+    "attainment": "Fixed denominator ten; achieved thresholds persist after flight ends without generating new measurements.",
+    "localization": "FAST-LIVO errors of several metres coincide with collision trials; no single failure cause established. Attempt005 native sampling failed with FAST-LIVO/ROVIO endpoint errors 0.39/0.14m.",
+    "controls": "Single current PURE and LA diagnostic runs; original LA non-start retained separately; no statistical or identical-condition historical comparison."
+  },
+  "shared_architecture": "Sensor publisher, calibration, FAST-LIVO, odometry routing, SO3 control, motion limits, recording and evaluation are reused. Planner adapters own native belief and path conventions.",
+  "control_checks": {
+    "pure": {
+      "campaign": "data/results/pure-vio-control-20260930",
+      "termination": "collision",
+      "valid_evaluation": true,
+      "flight_seconds": 29.868165969848633,
+      "volume_rate_vio": 0.2251177394034537,
+      "volume_m3": 171.109375,
+      "gt_distance_m": 15.093928086873664,
+      "trajectories": 16,
+      "localization_at_stop": {
+        "fast_livo": {
+          "samples": 8019,
+          "total_samples": 8019,
+          "invalid_samples": 0,
+          "first_invalid_s": null,
+          "full_duration_s": 53.39590096473694,
+          "duration_s": 53.39590096473694,
+          "position_rmse_m": 0.79242698606635,
+          "position_final_error_m": 2.630490387938851,
+          "position_max_error_m": 2.6711020554514073,
+          "attitude_rmse_deg": 12.84664047720101,
+          "first_1m_error_s": 29.498287200927734,
+          "final_aligned_xyz": [
+            -0.21150503337276372,
+            2.854570993032116,
+            0.36882418625501745
+          ],
+          "final_gt_xyz": [
+            -1.6205732822418197,
+            5.075740337371824,
+            0.3891489207744597
+          ]
+        },
+        "sustained_error_s": 0.0
+      },
+      "localization_warning": null,
+      "pipeline": {
+        "runner_exit_code": 0,
+        "export_exit_code": 0,
+        "complete": true
+      }
+    },
+    "la": {
+      "campaign": "data/results/la-vio-control-20260930-tf-fixed",
+      "termination": "collision",
+      "valid_evaluation": true,
+      "flight_seconds": 13.192147016525269,
+      "volume_rate_vio": 0.17142857142857143,
+      "volume_m3": 138.171875,
+      "gt_distance_m": 15.018849108556015,
+      "trajectories": 11,
+      "localization_at_stop": {
+        "fast_livo": {
+          "samples": 3474,
+          "total_samples": 3474,
+          "invalid_samples": 0,
+          "first_invalid_s": null,
+          "full_duration_s": 22.54160213470459,
+          "duration_s": 22.54160213470459,
+          "position_rmse_m": 1.72113156956271,
+          "position_final_error_m": 6.206793899814027,
+          "position_max_error_m": 6.21986632118648,
+          "attitude_rmse_deg": 7.951373328607164,
+          "first_1m_error_s": 15.716066122055054,
+          "final_aligned_xyz": [
+            1.1063906260168672,
+            0.7278559053718121,
+            0.9645350456799944
+          ],
+          "final_gt_xyz": [
+            -0.30181032419204556,
+            6.7050223350524885,
+            1.8671656847000113
+          ]
+        },
+        "sustained_error_s": 0.9510757923126221
+      },
+      "localization_warning": null,
+      "pipeline": {
+        "runner_exit_code": 0,
+        "export_exit_code": 0,
+        "complete": true
+      }
+    },
+    "original_la_failed_start": {
+      "campaign": "data/results/la-vio-control-20260930",
+      "termination": "no_control_takeover",
+      "flight_started": false,
+      "valid_evaluation": false,
+      "export_error": "Conflicting static transform: odom",
+      "diagnosis": {
+        "gt": {
+          "samples": 4504,
+          "min_mps": 0.003011105352009564,
+          "median_mps": 0.0030188874807611753,
+          "max_mps": 0.003019782016984182,
+          "fraction_below_la_start_gate": 1.0
+        },
+        "primary": {
+          "samples": 13733,
+          "min_mps": 0.2696659103572343,
+          "median_mps": 0.38806087016918817,
+          "max_mps": 1.0292673707303281,
+          "fraction_below_la_start_gate": 0.02679676691181825
+        },
+        "static_parents": {
+          "odom": [
+            "map",
+            "world"
+          ],
+          "camera_left_link": [
+            "base_link"
+          ],
+          "camera_left_optical_frame": [
+            "camera_left_link"
+          ],
+          "camera_depth_link": [
+            "base_link"
+          ],
+          "camera_depth_optical_frame": [
+            "camera_depth_link"
+          ],
+          "imu": [
+            "aft_mapped"
+          ],
+          "camera_init": [
+            "odom"
+          ]
+        },
+        "termination": "no_control_takeover",
+        "flight_started": false
+      },
+      "interpretation": "LA native startup gate requires speed <0.3m/s on consecutive FSM ticks; estimated speed usually exceeded this despite GT hover. Separate duplicate static odom parents broke export. TF composition corrected; no estimator or native startup threshold tuning. Original evidence preserved. Recheck startup cannot be causally attributed to TF change alone."
+    },
+    "tf_recheck": {
+      "static_parents": {
+        "world": [
+          "map"
+        ],
+        "imu": [
+          "aft_mapped"
+        ],
+        "camera_init": [
+          "odom"
+        ],
+        "camera_left_link": [
+          "base_link"
+        ],
+        "camera_left_optical_frame": [
+          "camera_left_link"
+        ],
+        "camera_depth_link": [
+          "base_link"
+        ],
+        "camera_depth_optical_frame": [
+          "camera_depth_link"
+        ],
+        "odom": [
+          "world"
+        ]
+      },
+      "unique_static_parents": true,
+      "export_complete": true
+    },
+    "shared_parameters_verified": {
+      "common": {
+        "cam_info_timeout": 0.0,
+        "cam_info_topic": "/camera/left/camera_info",
+        "img_en": 1,
+        "img_topic": "/camera/left/image_raw",
+        "imu_topic": "/airsim_node/hmcl/imu/imu",
+        "lid_topic": "/voxel_grid/output",
+        "lidar_en": 1,
+        "online_intrinsics_en": true,
+        "ros_driver_bug_fix": false
+      },
+      "extrin_calib": {
+        "Pcl": [
+          -0.15,
+          0.0,
+          2.7755575615628914e-17
+        ],
+        "Rcl": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "extrinsic_R": [
+          0.0,
+          1.1102230246251565e-16,
+          1.0000000000000002,
+          -1.0,
+          -2.220446049250313e-16,
+          1.1102230246251565e-16,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        "extrinsic_T": [
+          0.25,
+          0.0,
+          0.25
+        ]
+      },
+      "laserMapping": {
+        "cam_cx": 160.0,
+        "cam_cy": 120.0,
+        "cam_d0": 0.0,
+        "cam_d1": 0.0,
+        "cam_d2": 0.0,
+        "cam_d3": 0.0,
+        "cam_fx": 193.0634765625,
+        "cam_fy": 193.0634765625,
+        "cam_height": 240,
+        "cam_model": "Pinhole",
+        "cam_width": 320,
+        "reinitialize_with_gt_odom": false,
+        "scale": 1.0
+      },
+      "so3_control_bridge": {
+        "cmd_topic": "/planning/pos_cmd",
+        "enable_bag": false,
+        "max_thrust": 16.535,
+        "service_name": "/control_bridge/toggle_running"
+      },
+      "target_bounding_volume": {
+        "x_max": 7,
+        "x_min": -23,
+        "y_max": 8,
+        "y_min": -3,
+        "z_max": 2,
+        "z_min": 0
+      },
+      "map_bounding_volume": {
+        "x_max": 8,
+        "x_min": -24,
+        "y_max": 9,
+        "y_min": -4,
+        "z_max": 5,
+        "z_min": -2
+      },
+      "uav": {
+        "gravity_align_en": false,
+        "imu_rate_odom": true
+      },
+      "sources": {
+        "control_odom_topic": "/robot/odom",
+        "control_source": "fast-livo",
+        "estimation_source": "fast-livo",
+        "planning_odom_topic": "/robot/odom",
+        "planning_source": "fast-livo",
+        "rhem_belief_source": "rovio"
+      },
+      "calibration": {
+        "initial_alignment": "native first GT pose only; no in-flight reinitialization",
+        "overlay": {
+          "common": {
+            "cam_info_timeout": 0.0,
+            "cam_info_topic": "/camera/left/camera_info",
+            "online_intrinsics_en": true
+          },
+          "extrin_calib": {
+            "Pcl": [
+              -0.15,
+              0.0,
+              2.7755575615628914e-17
+            ],
+            "Rcl": [
+              1.0,
+              0.0,
+              0.0,
+              0.0,
+              1.0,
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "extrinsic_R": [
+              0.0,
+              1.1102230246251565e-16,
+              1.0000000000000002,
+              -1.0,
+              -2.220446049250313e-16,
+              1.1102230246251565e-16,
+              0.0,
+              -1.0,
+              0.0
+            ],
+            "extrinsic_T": [
+              0.25,
+              0.0,
+              0.25
+            ]
+          },
+          "laserMapping": {
+            "reinitialize_with_gt_odom": false
+          }
+        },
+        "profile": "/work/stacks/sim-x86/config/airsim_cameras.yaml"
+      },
+      "motion_limits": {
+        "max_a_wz": 5.0,
+        "max_a_xy": 5.0,
+        "max_a_z": 2.0,
+        "max_vel_xy": 2.0,
+        "max_vel_z": 1.0,
+        "max_yaw_rate": 2.0
+      }
+    },
+    "interpretation": "One PURE and one launched LA diagnostic under current common settings; initial LA non-start is retained separately. These checks are not a statistical planner comparison or reproduction of historical paper conditions. RHEM belief/adapter and native planner policies differ by algorithm."
+  },
+  "runtime_verification": {
+    "runtime_files": 34,
+    "current_matches": [
+      "config/modules.lock.json",
+      "stacks/sim-x86/config/airsim_cameras.yaml",
+      "stacks/sim-x86/config/comparison-20260706-params.yaml",
+      "stacks/sim-x86/config/comparison-20260706-sensors.yaml",
+      "stacks/sim-x86/scripts/run_rhem.sh",
+      "stacks/sim-x86/scripts/prepare_rhem_runtime.py",
+      "stacks/sim-x86/scripts/rhem_filter_config.py",
+      "stacks/sim-x86/scripts/rhem_control_adapter.py",
+      "stacks/sim-x86/scripts/rhem_trajectory.py",
+      "stacks/sim-x86/scripts/experiment_metrics.py",
+      "data/assets/simulation/airsim/user_data/settings.json",
+      "ws/rhem/devel/.private/rovio/lib/rovio/rovio_node",
+      "ws/rhem/devel/.private/rovio/lib/rovio/rovio_bsp_node",
+      "stacks/sim-x86/scripts/supervise_experiment_campaign.py",
+      "stacks/sim-x86/scripts/experiment_review.py",
+      "stacks/sim-x86/scripts/run_guarded_campaign.py",
+      "data/analysis/risk-aware/planner-runtime/monitor_sensor_health.py",
+      "data/analysis/risk-aware/planner-runtime/score_rovio_replay.py",
+      "data/analysis/risk-aware/experiment-evaluation/export_legacy.py",
+      "stacks/sim-x86/scripts/automation_experiments.py",
+      "ws/rhem/devel/.private/bsp_planner/lib/libbsp_planner.so",
+      "modules/planner/rhem/patches/heading_continuity.patch",
+      "modules/planner/rhem/patches/trajectory_validation.patch",
+      "stacks/sim-x86/scripts/configure_sources.py",
+      "stacks/sim-x86/scripts/run_airsim_sensors.sh",
+      "stacks/sim-x86/scripts/prepare_fast_livo_runtime.py",
+      "stacks/sim-x86/config/launch/fast_livo_airsim.launch",
+      "ws/fast-livo-sim/devel/.private/fast_livo/lib/fast_livo/fastlivo_mapping",
+      "ws/fast-livo-sim/src/FAST-LIVO2/config/simulator_openvins.yaml",
+      "ws/fast-livo-sim/src/FAST-LIVO2/config/camera_simulator_openvins.yaml",
+      "ws/risk-aware-comparison/src/risk_aware_planning/local_controller/scripts/so3_control_bridge.py",
+      "data/results/rhem-vio-10-20260930/review_policy.json"
+    ],
+    "post_cohort_changed_files": {
+      "stacks/sim-x86/scripts/run_comparison.sh": {
+        "expected_sha256": "244fd9e62836c45c9213462aad0bf6651eea45ee1f14c5e6a2b4a9f391c25d46",
+        "verified_trial_snapshots": [
+          "flight_logs/rhem-vio-10-20260930-attempt001/provenance/run_comparison.sh",
+          "flight_logs/rhem-vio-10-20260930-attempt002/provenance/run_comparison.sh",
+          "flight_logs/rhem-vio-10-20260930-attempt003/provenance/run_comparison.sh",
+          "flight_logs/rhem-vio-10-20260930-attempt004/provenance/run_comparison.sh",
+          "flight_logs/rhem-vio-10-20260930-attempt005/provenance/run_comparison.sh",
+          "flight_logs/rhem-vio-10-20260930-attempt006/provenance/run_comparison.sh",
+          "flight_logs/rhem-vio-10-20260930-attempt007/provenance/run_comparison.sh",
+          "flight_logs/rhem-vio-10-20260930-attempt008/provenance/run_comparison.sh",
+          "flight_logs/rhem-vio-10-20260930-attempt009/provenance/run_comparison.sh",
+          "flight_logs/rhem-vio-10-20260930-attempt010/provenance/run_comparison.sh"
+        ]
+      },
+      "stacks/sim-x86/config/launch/airsim_sensor_pipeline.launch": {
+        "expected_sha256": "704f06aa0286fe15629a0a17248320daf82389d97ce42e66ea07e310888738c6",
+        "verified_trial_snapshots": [
+          "flight_logs/rhem-vio-10-20260930-attempt001/provenance/airsim_sensor_pipeline.launch",
+          "flight_logs/rhem-vio-10-20260930-attempt002/provenance/airsim_sensor_pipeline.launch",
+          "flight_logs/rhem-vio-10-20260930-attempt003/provenance/airsim_sensor_pipeline.launch",
+          "flight_logs/rhem-vio-10-20260930-attempt004/provenance/airsim_sensor_pipeline.launch",
+          "flight_logs/rhem-vio-10-20260930-attempt005/provenance/airsim_sensor_pipeline.launch",
+          "flight_logs/rhem-vio-10-20260930-attempt006/provenance/airsim_sensor_pipeline.launch",
+          "flight_logs/rhem-vio-10-20260930-attempt007/provenance/airsim_sensor_pipeline.launch",
+          "flight_logs/rhem-vio-10-20260930-attempt008/provenance/airsim_sensor_pipeline.launch",
+          "flight_logs/rhem-vio-10-20260930-attempt009/provenance/airsim_sensor_pipeline.launch",
+          "flight_logs/rhem-vio-10-20260930-attempt010/provenance/airsim_sensor_pipeline.launch"
+        ]
+      }
+    },
+    "post_cohort_commit": "16c8e9c",
+    "reason": "LA-specific map reference composition; original RHEM cohort configuration retained in all ten trial provenance snapshots."
+  },
+  "verification": [
+    "56 sim-x86 unit tests passed.",
+    "All ten valid evaluations, complete legacy exports and clean teardown.",
+    "No attempt011.",
+    "34 frozen runtime hashes verified against current files or original archived snapshots.",
+    "RHEM/PURE/LA shared calibration, estimator settings, sources, controller, bounds and motion limits match.",
+    "Recorded corrected LA static TF has unique parents and legacy export completes.",
+    "All six attainment figures contain ten attempts and valid monotone bounded surfaces.",
+    "Contour-label adjustment leaves attainment arrays exactly unchanged."
+  ],
+  "artifact_sha256": {
+    "data/results/rhem-vio-10-20260930/status.json": "07845d53ddf5689df8813d83eb3d6afbca69ee7b608377403c46f7ade6b2c9eb",
+    "data/results/rhem-vio-10-20260930/campaign_plan.json": "43707951ca6b8a7f5ba9736858f148c900eb15dfb134895a1d5e37127b82f843",
+    "data/results/rhem-vio-10-20260930/review_policy.json": "74bd23b822a5ae216dda4ef7d69a55253f69663c4797dcb97dc301447ae0c079",
+    "data/results/rhem-vio-10-20260930/baseline_checks.json": "f85068ad89a829d127daff108983a00a04ce5a7f5d13a6f8bf9ad3df0123637e",
+    "data/results/rhem-vio-10-20260930/frozen_runtime_verification.json": "5c7a59b52ca08df8e7fd58d34b7140421bf13dc21e7a37b8db744d505d67ca63",
+    "data/results/rhem-vio-10-20260930/attempt005-failure-review.json": "28381e8016406cd707241c2f58f5cd362f21c4ff47559a8dce33802475252913",
+    "data/results/rhem-vio-10-20260930/figures/README.md": "4cd97801c31d39ee01044b3f0b08818e7bdd992f69437dec446a5672367af43f",
+    "data/results/rhem-vio-10-20260930/figures/localization_at_endpoints.json": "036a2789119bec8e357d2471a570a0707d67993423d438a6b4734ec8d654fbb5",
+    "data/results/rhem-vio-10-20260930/figures/provenance.json": "58de9c3d000b4e3e18c420b473bfd74dff184dec4d5cefb47722805afdf1a79a",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate.pdf": "10c8ce3ee07682850f722f2505260b46b60cd04417d0759704e45aa7d534b32b",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate.png": "3a5945fab1b065b29583fe2bc41373cca75c68bed3948340f50ed758ec248a91",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate.svg": "45b3bb209808942fdbe52396bfb499fd486ae411c6189e57fe8bd6cee333417d",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate_input.csv": "96f222aecd75c17753e13031f97bbefcf46f0bbad498382111378f34800b8c58",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate_paper130.pdf": "97a1957beda5c5135c3fa95756dbfe4048f167e46b7cb2a7a7c67289f2aa7bfb",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate_paper130.png": "c64b13cbcc71b9cf3b435f8d4b2cbf89a8e300361f8648d9ab92754622651872",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate_paper130.svg": "b82c6a496f24ed9686896d6769862500e2f06ebdb9b1acc7ce650abe5ab6ed2f",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate_paper130_surfaces.npz": "49876aa010c0ec983efb1c26d30daddb704fba5ff70161acf7c49c0a8ef9a4e5",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate_surfaces.npz": "472179aa31d2f1951942bf34c4a212f3330dde759d7f953f59262a49b2108532",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate.pdf": "ca8e0da30a8da198750be9272daa3400b25132ca9e425caa0ed923880218ff35",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate.png": "e01fa857d8bad364574bf12bf99063adc6502a7f98df06bae20bd814b8417d45",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate.svg": "d9d0256cccbc45737c7937c05b78fe734abb03b0ade1526dd4b664d8932b3506",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate_input.csv": "fcb4d09e102fec6d90e15ef69da9ff0a8534dece4a22bdb9790ead25b2213a15",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate_paper130.pdf": "d001688f5036f64db93cba8bf127390ae8f93564bcc5d3a1a3d4894d1ebb1725",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate_paper130.png": "4fad056096603760a985ef08328db5acb7ae6a042241972799687c8a13a846fc",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate_paper130.svg": "f496d4124f4d88165e1a7c7b3c2385b283045581deeeb96eef41504a7bd720ca",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate_paper130_surfaces.npz": "f3fc829c033a8cdde53f0ce47746f896ccdf99c0cacdb1182a53e6fcb8ee33dd",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate_surfaces.npz": "6d415d06c2474bdff224e2d3ce33d1ac9c282c4dd565001fa326bade373bd4d0",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume.pdf": "d021e5e6f99343cc6dbcf6f2f4c655accaee776f3c8a3a9dafd55847025a33af",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume.png": "61d8098face9cf880dc8800412852acd2cea3d83cf05eef49ca75a6a1fafd311",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume.svg": "bf2ac63698da3ff1b682384e3c52f8d813ed25ee442340180d2d60cc52eed6bd",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume_input.csv": "44e64cdce0eb135796214f30f2085d9c9727c2b292d39e015f1811c36aa4cf4b",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume_paper130.pdf": "6f1a64a098f0fb1bec28271911608c90caf9c8c4eba4a85e3512528258479f12",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume_paper130.png": "3bdbc3979727165f87487c63337a81f67ef94955d4947c5d06743f9768fe3708",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume_paper130.svg": "71bffed3e8e2d372d45c9cac1a20500d2b06d2dc4d16aee660c249dae3f275e2",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume_paper130_surfaces.npz": "d9c7816fbf0542f32ffb125cb8eb65594b55ec38d4b4ebcda9c9506a261694ea",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume_surfaces.npz": "090927a92d443582dde0d181e4fdb3c32b83d59175f36d81d778145a5a6fad54",
+    "data/results/rhem-vio-10-20260930/figures/summary.json": "6bead5fc970514bcd442384150449af3a38044ef5ab76d2bcf910e616b6a84fd",
+    "data/results/rhem-vio-10-20260930/figures/trials.csv": "41c9b06cd9a279c3797c097e98e52181e4b0969c968eef831746249b174d0929"
+  },
+  "source_sha256": {
+    "flight_logs/rhem-vio-10-20260930-attempt001/iter_001/metrics.csv": "f554cd8a3bbe6e94405d5f2478c5aa74ce6fa189815ae80407f24832d7f4cbbe",
+    "flight_logs/rhem-vio-10-20260930-attempt001/iter_001/result.json": "6bbd6f9c250dd59ec00eaceed6429d7bb36777a307a6d8dc9a2f61c925534cfb",
+    "flight_logs/rhem-vio-10-20260930-attempt001/iter_001/events.jsonl": "49cbab9b3b2166c12df9839f59292be3305e2c31efea61039c30fb602dd114f7",
+    "data/results/rhem-vio-10-20260930-attempt001/iter_001/experiment_metrics.csv": "dc5001689669f31ae4a70fc8fa8aca52cf11dbb313dae4a8c4405078327b5fb1",
+    "data/results/rhem-vio-10-20260930-attempt001/iter_001/analysis_metadata.json": "f864cb3c56458b0e29f2db2e87e317e1dd9b599d3bd2d0430d7d2680684b02f2",
+    "flight_logs/rhem-vio-10-20260930-attempt002/iter_001/metrics.csv": "6a722bfbc288b3f74585923f6d222da15e7e959445bb4fe7ec3a9e2949a64659",
+    "flight_logs/rhem-vio-10-20260930-attempt002/iter_001/result.json": "9144136e22dc0df278c42d78b862fa3c8b9de41fad003319e83eb717eb91af88",
+    "flight_logs/rhem-vio-10-20260930-attempt002/iter_001/events.jsonl": "ceb1e360db8b4b91cd80325249382d7bebf67a2aabdbd605fef031389ed2a249",
+    "data/results/rhem-vio-10-20260930-attempt002/iter_001/experiment_metrics.csv": "bceef49c4d18fb5ea57dae92de028a158ab1159d3dab62eeee5d6bcd70d8e5f4",
+    "data/results/rhem-vio-10-20260930-attempt002/iter_001/analysis_metadata.json": "62ca2e2ecebff678dca71bec70399d9c57f4c74247b41e29553c97718fc3b37d",
+    "flight_logs/rhem-vio-10-20260930-attempt003/iter_001/metrics.csv": "fd828deb5ee35fc2006d8a53798bc520ae5e64bd9998fe38fe3eed8c19d24287",
+    "flight_logs/rhem-vio-10-20260930-attempt003/iter_001/result.json": "39a965eb93d5ecf383219389fdf10d0b55624ad786bc0bda23b57f3092b33fcc",
+    "flight_logs/rhem-vio-10-20260930-attempt003/iter_001/events.jsonl": "e614fea91735552cf34d635839c931fcb542902bbc336d82df61d64d67536d53",
+    "data/results/rhem-vio-10-20260930-attempt003/iter_001/experiment_metrics.csv": "d9247e2746191a4c9a4850a433b8ede8e11f9e65710241f695b761183a0137d4",
+    "data/results/rhem-vio-10-20260930-attempt003/iter_001/analysis_metadata.json": "9ca4679585cba7cb083d811bc44516903d9438e5c13baf70315ab40e09e68070",
+    "flight_logs/rhem-vio-10-20260930-attempt004/iter_001/metrics.csv": "d00ecb87f8fa53a91fcf11944458151884f4dcec0bd85dea9cdc41456e8f6f76",
+    "flight_logs/rhem-vio-10-20260930-attempt004/iter_001/result.json": "93f9acc17f7faed5ecb94cdcbb721faa911a7a95e74af29fd6eec7bb06a00462",
+    "flight_logs/rhem-vio-10-20260930-attempt004/iter_001/events.jsonl": "ae6978f12912cbcab072b5749a26d8502956b2db9b4692c0a139b97e936a1a1d",
+    "data/results/rhem-vio-10-20260930-attempt004/iter_001/experiment_metrics.csv": "be1df9ad2a6587e8067a894aa1981e9f887a83d8ed8963145b1925842b0f29d5",
+    "data/results/rhem-vio-10-20260930-attempt004/iter_001/analysis_metadata.json": "94b583edfc547525458639ac0eb666ee18942785fc2c2ea8d9b4fd7117e7e94c",
+    "flight_logs/rhem-vio-10-20260930-attempt005/iter_001/metrics.csv": "84f7b7a1586ebef722ce530d23c52ec3f6016b6adc74aa1b552c1aa63b178115",
+    "flight_logs/rhem-vio-10-20260930-attempt005/iter_001/result.json": "26f656e95d4ed6073d3ebbf1cd5ec391221af2c19b34cb2bcf1fe86ac71828c7",
+    "flight_logs/rhem-vio-10-20260930-attempt005/iter_001/events.jsonl": "faf6f660ff80318b16c2d0aa19d2cc4aaf3fbd0193ae35b23d820c314914c6a2",
+    "data/results/rhem-vio-10-20260930-attempt005/iter_001/experiment_metrics.csv": "d9480d609b2c66c1afb1ac6c7ce1f3da977e37a0b9587c5555ecb78b748bb057",
+    "data/results/rhem-vio-10-20260930-attempt005/iter_001/analysis_metadata.json": "3681fc2fcda12ab60bc452afb78650e402b38150aab2287d65f1a0ad64e63ddf",
+    "flight_logs/rhem-vio-10-20260930-attempt006/iter_001/metrics.csv": "2b302108226d73a8910c49a0dc7d5c0842bff906e38991fd04ae2d750093a53f",
+    "flight_logs/rhem-vio-10-20260930-attempt006/iter_001/result.json": "426c3ee2db582bf870debe1c35c4e941a0a3dc0d5094e1f1351844d1a16cc362",
+    "flight_logs/rhem-vio-10-20260930-attempt006/iter_001/events.jsonl": "42606e648c6c442a0a1731a51cee1b3a760a0d8d6f9ef661e8213cea7b134923",
+    "data/results/rhem-vio-10-20260930-attempt006/iter_001/experiment_metrics.csv": "71c3d105627c7d1334451ecba0a8221b4e5fcfbb9f62e525e8033c6c8c9db887",
+    "data/results/rhem-vio-10-20260930-attempt006/iter_001/analysis_metadata.json": "a2ed5b7032ba4c079a5b8578b8d54d4d682b503471a647fcda10ba247353b6dd",
+    "flight_logs/rhem-vio-10-20260930-attempt007/iter_001/metrics.csv": "d3bd75424a1379cc1df78339fb03b77f8e124b5c708dbe295d8eba33f2300f1f",
+    "flight_logs/rhem-vio-10-20260930-attempt007/iter_001/result.json": "121cd426167110b4d453b69654f974b58c70d9986b2d82298025fe45e59c57d0",
+    "flight_logs/rhem-vio-10-20260930-attempt007/iter_001/events.jsonl": "6047d186cf981fe9acce50293c09e05dda689328db49610ee678d95c1c41f322",
+    "data/results/rhem-vio-10-20260930-attempt007/iter_001/experiment_metrics.csv": "1eb5a8adb6c0506e50d49130320303158bfe35add7df2bc999a1c6b082325900",
+    "data/results/rhem-vio-10-20260930-attempt007/iter_001/analysis_metadata.json": "138e5f0fce94f5f2365849922e6df2a148bfe73f6b6efd5e03c3ea9955f001d2",
+    "flight_logs/rhem-vio-10-20260930-attempt008/iter_001/metrics.csv": "7cd2f4e3c423bb9c2f06a6a9a7f28efc8c4db93a9206aec36f2c90f8e35e13f3",
+    "flight_logs/rhem-vio-10-20260930-attempt008/iter_001/result.json": "a725c5dbbbfa31be09f0a232002142273c54d0b5bf40aca732e2924b9d2f33fe",
+    "flight_logs/rhem-vio-10-20260930-attempt008/iter_001/events.jsonl": "f4f0ea4256fad4924e79e023b47c08f17e142e8fcfa8e0263ab980b353021a1d",
+    "data/results/rhem-vio-10-20260930-attempt008/iter_001/experiment_metrics.csv": "9623102963d7c214d05e2057b4e6d0d6f2fbb82fca6cdea317afb95b2615cb53",
+    "data/results/rhem-vio-10-20260930-attempt008/iter_001/analysis_metadata.json": "151972615f36df6b8327cd215360c477de9601d34f0b29368c4fca12c4e26403",
+    "flight_logs/rhem-vio-10-20260930-attempt009/iter_001/metrics.csv": "adc79d44b79e9ba839938bd1fd5e7f2eb7100c15303c6fb527bb8426e928df2a",
+    "flight_logs/rhem-vio-10-20260930-attempt009/iter_001/result.json": "783264d953644d2fda8234618153076a8bd8509f2b0594a27bd991233aa59bde",
+    "flight_logs/rhem-vio-10-20260930-attempt009/iter_001/events.jsonl": "e754f5f40ec68cb04a94f0a7f65f235f1d8ed9e1d1905179262c4b80e38f5e6d",
+    "data/results/rhem-vio-10-20260930-attempt009/iter_001/experiment_metrics.csv": "39f62e278309b8db258bbd86a0695ad63e0c1733ca0d83a9a73d91ef81466aa6",
+    "data/results/rhem-vio-10-20260930-attempt009/iter_001/analysis_metadata.json": "1a31ebfe9ad9d0952f89b1b092b8648283109afe13e6aa3e50b71c31876c5882",
+    "flight_logs/rhem-vio-10-20260930-attempt010/iter_001/metrics.csv": "ba000ddb88ffff4e42de6e51aef3b04a2c83fd1215d96467416fce99385e501f",
+    "flight_logs/rhem-vio-10-20260930-attempt010/iter_001/result.json": "173a1d2f0aea8f8b1bb2b143ba80ee932fa447adb8a84983e49dc71e17b3a264",
+    "flight_logs/rhem-vio-10-20260930-attempt010/iter_001/events.jsonl": "524769733b76162b4fbc28e4ac785c541e2129aa230c786ab23ef95dcc11c1d3",
+    "data/results/rhem-vio-10-20260930-attempt010/iter_001/experiment_metrics.csv": "bf5f962547a2e70b18797dd0331ecde32bb097be8ed78ffd72a8911ac2789772",
+    "data/results/rhem-vio-10-20260930-attempt010/iter_001/analysis_metadata.json": "d1c1d0718be18d8380057b7537475f912c6edf7351ee7019c74fab57b4247c33"
+  }
+}
