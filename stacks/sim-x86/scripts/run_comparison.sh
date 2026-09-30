@@ -85,11 +85,16 @@ case "$COMPONENT" in
     trap 'kill -INT "$SOURCES_PID" 2>/dev/null || true' EXIT
     if [ "$(rosparam get /comparison/sensor_calibration 2>/dev/null || echo historical)" = airsim ]; then
       RANGE_RAYS=false
+      MAP_REFERENCE=odom
+      if [ "$(rosparam get /planning_algorithm 2>/dev/null || echo ours)" = la ]; then
+        MAP_REFERENCE=world
+      fi
       if [ "$(rosparam get /comparison/rhem_map_rays 2>/dev/null || echo clipped)" = full ]; then
         RANGE_RAYS=true
       fi
       bash "$ROOT/stacks/sim-x86/scripts/run_airsim_sensors.sh" \
-        localization:="$(rosparam get /system/localization)" publish_range_rays:="$RANGE_RAYS" "$@"
+        localization:="$(rosparam get /system/localization)" publish_range_rays:="$RANGE_RAYS" \
+        map_reference_frame:="$MAP_REFERENCE" "$@"
     else
       # Explicit historical replay keeps its original publisher and geometry.
       roslaunch active_3d_planning_app_reconstruction airsim_sensor_punlisher.launch \

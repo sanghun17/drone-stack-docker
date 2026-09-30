@@ -3,9 +3,13 @@
        This stack composes the existing odometry relay and ROS depth processing. -->
   <arg name="localization"/>
   <arg name="publish_range_rays" default="false"/>
+  <arg name="map_reference_frame" default="odom"/>
   <param name="use_sim_time" value="true"/>
   <node name="clock_relay" pkg="topic_tools" type="relay" args="/airsim_node/clock /clock --wait-for-start"/>
-  <node pkg="tf2_ros" type="static_transform_publisher" name="map_to_odom" args="0 0 0 0 0 0 1 map odom"/>
+  <!-- LA owns world -> odom. Its composition uses map -> world here so odom
+       has one parent; PURE/RHEM keep the direct map -> odom transform. -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="map_to_reference"
+        args="0 0 0 0 0 0 1 map $(arg map_reference_frame)"/>
   <node pkg="tf2_ros" type="static_transform_publisher" name="imu_to_base" args="0 0 0 0 0 0 1 imu base_link"
         unless="$(eval arg('localization') == 'vio')"/>
   <node pkg="active_3d_planning_app_reconstruction" type="airsim_gt_odom_publisher.py"
