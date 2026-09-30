@@ -1,0 +1,62 @@
+{
+  "status": "preflight_in_progress",
+  "implementation_commit": "98449c1",
+  "campaigns": {
+    "gt_control": "data/results/rhem-vio-preflight-20260930-gt",
+    "vio_preflight": "data/results/rhem-vio-preflight-20260930",
+    "vio_evaluation": "data/results/rhem-vio-10-20260930"
+  },
+  "requested_evaluation_attempts": 10,
+  "preflight_attempts": {
+    "gt": 1,
+    "vio": 2
+  },
+  "sensor_calibration": "Shared AirSim geometry module and live RGB CameraInfo; depth to RGB translation -0.15 m on RGB optical x.",
+  "planning_control": "FAST-LIVO via /robot/odom; ordinary estimator TF; GT only for initial native world alignment and independent evaluation",
+  "belief": "Real ROVIO gated profile; no GT fusion",
+  "motion_limits": {
+    "xy_mps": 2,
+    "z_mps": 1,
+    "xy_acc_mps2": 5,
+    "z_acc_mps2": 2,
+    "yaw_rate_rps": 2
+  },
+  "bounds": {
+    "x": [
+      -23,
+      7
+    ],
+    "y": [
+      -3,
+      8
+    ],
+    "z": [
+      0,
+      2
+    ]
+  },
+  "termination": {
+    "time_limit_s": 600,
+    "coverage_threshold": 0.8,
+    "finite_localization_error": "report only for FAST-LIVO and ROVIO",
+    "native_failures": "Retain planner task failures and collision",
+    "invalid_inputs": "Terminate nonfinite estimates, stale data/map, stopped clock; review infrastructure failures before proceeding"
+  },
+  "analysis": {
+    "renderer": "data/analysis/risk-aware/experiment-evaluation/plot_paper_simulation.py",
+    "exporter": "data/analysis/risk-aware/experiment-evaluation/export_legacy.py",
+    "time_origin": "actual SO3 takeover",
+    "exclude": "pre-takeover/post-termination samples; no synthetic zero",
+    "metrics": [
+      "VolumeM3",
+      "VolumeRateVio",
+      "SurfaceRateGT"
+    ],
+    "cohort": "All ten attempted trials; early failures retained; preflight kept separately"
+  },
+  "historical_comparison": "Old PURE/LA data predates shared calibration fixes; historical label mapping also differs from original source method names. Do not claim identical historical conditions.",
+  "validation": {
+    "unit_tests": 55,
+    "layout": "passed"
+  }
+}
