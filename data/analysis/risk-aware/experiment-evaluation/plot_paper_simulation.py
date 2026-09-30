@@ -72,20 +72,30 @@ def draw(groups,out,stem,metric,methods=METHODS,time_end=130):
         mesh=ax.pcolormesh(times,thresholds,z,cmap='viridis',norm=norm,shading='nearest',rasterized=True)
         # The top boundary separates 100% from one missing trial for each N.
         top=1-.5/len(runs)
-        levels=[v for v in [.2,.4,.6,.8,top] if z.min()<v<z.max()]
+        levels=sorted({v for v in [.2,.4,.6,.8,top] if z.min()<v<z.max()})
         if levels:
             contours=ax.contour(times,thresholds,z,levels=levels,colors='white',linewidths=.8)
             halo=[pe.withStroke(linewidth=1.8,foreground='#222222',alpha=.6)]
             for collection in contours.collections:collection.set_path_effects(halo)
-            label_options={}
+            label_format={v:('100%' if v==top else f'{v:.0%}') for v in levels}
             if time_end>300:
-                positions=[]
-                for level,fraction in zip(levels,np.linspace(.78,.35,len(levels))):
-                    column=int(np.argmin(abs(times-(10+fraction*(time_end-10)))))
-                    reached=np.flatnonzero(z[:,column]>=level)
-                    positions.append((times[column],thresholds[reached[-1]] if len(reached) else thresholds[0]))
-                label_options['manual']=positions
-            labels=ax.clabel(contours,fmt={v:('100%' if v==top else f'{v:.0%}') for v in levels},fontsize=8,inline_spacing=3,**label_options)
+                labels=[]
+                for index,(level,fraction) in enumerate(zip(levels,np.linspace(.78,.35,len(levels)))):
+                    segments=[segment for segment in contours.allsegs[index] if len(segment)]
+                    if not segments:continue
+                    points=np.concatenate(segments)
+                    scaled=(points-[times[0],thresholds[0]])/[times[-1]-times[0],thresholds[-1]-thresholds[0]]
+                    interior=(scaled[:,0]>.08)&(scaled[:,0]<.92)&(scaled[:,1]>.12)&(scaled[:,1]<.88)
+                    if not interior.any():continue
+                    target=[fraction,.85-.14*index]
+                    nearest=np.argmin(np.sum((scaled[interior]-target)**2,axis=1))
+                    position=points[interior][nearest]
+                    # Restrict each requested label to its own contour. Otherwise
+                    # nearby plateaus can all select and label the same level.
+                    labels.extend(ax.clabel(contours,levels=[level],manual=[position],
+                        fmt=label_format,fontsize=8,inline_spacing=3))
+            else:
+                labels=ax.clabel(contours,fmt=label_format,fontsize=8,inline_spacing=3)
             for text in labels:text.set_path_effects(halo)
         if key=='rhem' and volume and z.max()<.2:
             ax.text(.5,.92,f'At most {z.max():.0%} attain 100 m³',transform=ax.transAxes,ha='center',va='top',color='white',fontsize=9)
