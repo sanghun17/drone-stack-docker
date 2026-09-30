@@ -32,6 +32,26 @@ this deliberate setting change. Pilot outcomes and tracking must be reviewed
 before resuming the remaining requested trials. Runtime snapshots verify the
 six common values and RHEM's derived `system/v_max`/`system/dyaw_max`.
 
+032 completed at 261.59 s with 80.57% coverage and no recorded collision. The
+existing 10 Hz motion audit measured 65.46 m over the 262.18 s control window,
+0.2497 m/s, and 0.1562 m tracking RMSE. Peak tracking error was 0.6230 m, so the
+higher-speed tracking is less accurate than the preceding low-speed condition;
+one successful flight does not establish its collision rate. Final raw ROVIO
+error was 3.72 m without a sustained divergence stop. The same controller source
+hash, camera, filter and binaries were verified. Only RHEM `system/v_max` and
+`system/dyaw_max` changed in generated planner YAML; spatial bounds are equal.
+
+The accepted paths had a nominal duration sum of 185.16 s, versus 415.10 s in
+029, and maximum trajectory delivery delay 0.063 s. These are different random
+paths and the sum includes the unfinished final edge; this is not a paired
+estimate or exact wall-time decomposition. Stop-at-corner timing remains.
+
+After review, `campaign_plan_shared_motion.json` continues 033–050 in this
+separately identified cohort. Replay of 032 also passes the existing review030
+operational envelope, whose numerical limits are retained without widening.
+See `data/manifests/rhem-gt50-20260930-shared-motion.json` and
+`data/results/rhem-gt-50-20260929/shared-motion-20260930/` for measurements.
+
 ## Early-reference review after attempt 030
 
 Attempt 029 completed the mission at 84.18% observed GT coverage after 479.17 s.

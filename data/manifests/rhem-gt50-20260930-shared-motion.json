@@ -1,0 +1,46 @@
+{
+  "reviewed_at": "2026-09-30T10:14:29.869574+09:00",
+  "attempt": 32,
+  "scope": "First complete validation with shared PURE/LA motion limits and existing SO3; not a success-rate estimate",
+  "termination": "coverage",
+  "mission_success": true,
+  "elapsed_s": 261.5852949619293,
+  "volume_rate_vio": 0.8056514913657771,
+  "control_duration_s": 262.1823790073395,
+  "actual_distance_10hz_m": 65.45618404772527,
+  "mean_speed_mps": 0.24965897515901672,
+  "tracking_rmse_m": 0.1562110486833229,
+  "tracking_max_m": 0.6230404849318408,
+  "collision_events": [],
+  "raw_rovio_final_error_m": 3.7207006505885274,
+  "planned_duration_sum_s": 185.15798021106852,
+  "trajectory_start_delivery_delay_max_s": 0.06300902366638184,
+  "common_motion_limits": {
+    "max_vel_xy": 2.0,
+    "max_vel_z": 1.0,
+    "max_a_xy": 5.0,
+    "max_a_z": 2.0,
+    "max_yaw_rate": 2.0,
+    "max_a_wz": 5.0
+  },
+  "execution_chain": [
+    "RHEM bsp_srv: geometry_msgs/Pose[]",
+    "rhem_control_adapter.py: timed MixTraj from common limits",
+    "shared local_plan_manager/traj_server: PositionCommand",
+    "shared local_controller/so3_control_bridge.py: AirSim attitude/thrust"
+  ],
+  "unchanged_controller_sha256": "9db241b23a6350e1983a64aa39da55fcaaad286fd7459fca186538c264abdc3d",
+  "preflight_receipt": "data/results/rhem-gt-50-20260929/shared-motion-20260930/preflight032.json",
+  "review_decision": "Continue033-050 as separate shared-motion cohort after normal export completes. Preserve failures. Prior reviewed operational envelope also contains032; retain its numerical bounds without further widening. Reference-only alerts hold next launch after normal endpoint; localization/operational failures still stop.",
+  "limitations": [
+    "Tracking error increased at higher speed: RMS15.6cm and peak62.3cm; a successful pilot does not establish collision rate.",
+    "RHEM exact-polyline timing still stops at geometric/yaw vertices. Same SO3 controller does not imply the same path or trajectory-generation algorithm.",
+    "Diagnostic0.8\u20131.8m spatial bounds and centered0.5m vertical footprint remain; only motion constraints were unified.",
+    "Raw ROVIO drift remains, though no sustained divergence threshold was reached in032."
+  ],
+  "evidence_paths": [
+    "data/results/rhem-gt-50-20260929/shared-motion-20260930/motion032/motion.json",
+    "data/results/rhem-gt-50-20260929/shared-motion-20260930/timing032.json",
+    "data/results/rhem-gt-50-20260929/attempt032-review.json"
+  ]
+}

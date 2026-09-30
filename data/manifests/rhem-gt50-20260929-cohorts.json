@@ -74,8 +74,12 @@
       "module_revision": "4fbb218a3672e2dfc036949c5d0f255a8cca7139",
       "motion_limits_source": "stacks/sim-x86/config/comparison-20260706-params.yaml:planning/shared",
       "rhem_bounds_profile": "gt-diagnostic",
-      "validation_status": "Attempt032 pilot required before further collection",
-      "note": "New condition. Do not pool with earlier conservative-motion results; unchanged shared traj_server and SO3 controller."
+      "validation_status": "032 completed with shared limits and unchanged SO3; reviewed tracking/error and normal mission endpoint",
+      "note": "New condition. Do not pool with earlier conservative-motion results; unchanged shared traj_server and SO3 controller.",
+      "validation_attempts": [
+        32
+      ],
+      "validation": "data/manifests/rhem-gt50-20260930-shared-motion.json"
     }
   ]
 }
