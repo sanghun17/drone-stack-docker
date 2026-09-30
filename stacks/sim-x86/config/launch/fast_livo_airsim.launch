@@ -1,0 +1,13 @@
+<launch>
+  <arg name="calibration"/>
+  <arg name="diagnostic_tf" default="false"/>
+  <group>
+    <!-- GT diagnostics must not compete with the control TF tree. VIO owns
+         its ordinary TF tree; both modes consume identical camera geometry. -->
+    <remap from="/tf" to="$(eval '/diagnostics/fast_livo/tf' if arg('diagnostic_tf') else '/tf')"/>
+    <remap from="/tf_static" to="$(eval '/diagnostics/fast_livo/tf_static' if arg('diagnostic_tf') else '/tf_static')"/>
+    <include file="$(find fast_livo)/launch/mapping_simulator_openvins.launch"/>
+  </group>
+  <!-- Load after native defaults, before roslaunch starts any nodes. -->
+  <rosparam command="load" file="$(arg calibration)"/>
+</launch>

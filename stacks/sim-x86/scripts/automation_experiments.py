@@ -524,7 +524,7 @@ def main():
     parser.add_argument('--rhem-bounds-profile',choices=['shared','gt-diagnostic'],default='shared',
                         help='gt-diagnostic: only 0.8–1.8m planning slab and 0.5m vertical footprint; motion limits stay in /planning/shared')
     parser.add_argument('--sensor-calibration', choices=['historical','airsim'], default='historical',
-                        help='airsim: measured separate RGB/depth extrinsics; GT-only diagnostic')
+                        help='airsim: common measured RGB/depth geometry and native CameraInfo intrinsics for GT or VIO')
     parser.add_argument('--airsim-camera-profile', help='Explicit common camera YAML, container path; must match running AirSim settings')
     parser.add_argument('--time-limit',type=float,default=300)
     parser.add_argument('--coverage-threshold',type=float,default=.8)
@@ -549,8 +549,6 @@ def main():
         parser.error('Conservative diagnostic requires RHEM with GT planning and control')
     if args.rhem_bounds_profile != 'shared' and (args.planner != 'rhem' or args.planning_source != 'gt' or args.control_source != 'gt'):
         parser.error('GT diagnostic bounds require RHEM with GT planning and control')
-    if args.sensor_calibration == 'airsim' and (args.planning_source != 'gt' or args.control_source != 'gt'):
-        parser.error('Separate camera calibration is currently validated only with GT sources')
     if args.iterations<1 or min(args.time_limit,args.startup_timeout)<=0 or not 0<args.coverage_threshold<=1:
         parser.error('Invalid iteration count, timeout or coverage threshold')
     if not math.isfinite(args.map_stale_timeout) or args.map_stale_timeout<=0:
@@ -579,10 +577,11 @@ def main():
                    ROOT/'config/modules.lock.json',
                    *(Path(__file__).with_name(name) for name in ('run_rhem.sh','prepare_rhem_runtime.py',
                       'rhem_control_adapter.py','rhem_trajectory.py','rhem_belief_probe.py','configure_sources.py',
-                      'run_airsim_sensors.sh')),
+                      'run_airsim_sensors.sh','prepare_fast_livo_runtime.py')),
                    Path(__file__).with_name('rhem_filter_config.py'),
                    ROOT/'stacks/sim-x86/config/rhem_rovio_covariance.info',
                    ROOT/'stacks/sim-x86/config/launch/airsim_sensor_pipeline.launch',
+                   ROOT/'stacks/sim-x86/config/launch/fast_livo_airsim.launch',
                    ROOT/'stacks/sim-x86/config/comparison-20260706.yml',
                    ROOT/'ws/risk-aware-comparison/src/risk_aware_planning/local_controller/scripts/so3_control_bridge.py',
                    *(ROOT/'stacks/sim-x86/config').glob('comparison-20260706-*.yaml')]:

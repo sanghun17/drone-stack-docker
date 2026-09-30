@@ -12,6 +12,34 @@ import supervise_experiment_campaign as guard
 
 
 class LocalizationTerminationTests(unittest.TestCase):
+    def test_common_finite_drift_policy_preserves_nonfinite_stops(self):
+        for estimator in ('rovio','fast_livo'):
+            for kind in ('divergence','nonfinite'):
+                with self.subTest(estimator=estimator,kind=kind), tempfile.TemporaryDirectory() as tmp:
+                    root=Path(tmp);batch=root/'flight_logs/trial';trial=batch/'iter_001';trial.mkdir(parents=True)
+                    (batch/'manifest.json').write_text('{}')
+                    reason=f'raw_{estimator}_{kind}'
+                    terminal='collision' if kind=='divergence' else 'planner_failure:LOCALIZATION_'+estimator.upper()+'_NONFINITE'
+                    policy=root/'policy.json'
+                    policy.write_text(json.dumps(dict(localization_action='terminate_trial',
+                        finite_localization_action='report',disk_reserve_gib=20,allowed_terminal_states=[terminal])))
+                    args=Obj(batch=batch,status=root/'status.json',review_policy=policy,sensors=root/'sensors')
+                    def finish(*_):
+                        (trial/'result.json').write_text(json.dumps(dict(termination=terminal,cleanup_errors=[])))
+                    with patch.object(guard,'ROOT',root),patch.object(guard,'coverage_review',return_value=([],None)),\
+                         patch.object(guard,'active_estimators',return_value=[estimator]),\
+                         patch.object(guard,'belief_review',return_value=({},reason)),\
+                         patch.object(guard.shutil,'disk_usage',return_value=Obj(free=100*2**30)),\
+                         patch.object(guard.subprocess,'check_output',return_value='[{"pid":1234,"rss":0}]'),\
+                         patch.object(guard,'request_localization_stop',side_effect=finish) as stop,\
+                         patch.object(guard.subprocess,'run') as run,patch.object(guard.time,'sleep',side_effect=finish):
+                        self.assertEqual(guard.guard_trial(args),0)
+                    if kind=='nonfinite':stop.assert_called_once_with(reason)
+                    else:
+                        stop.assert_not_called()
+                        self.assertEqual(json.loads(args.status.read_text())['warnings'],[reason])
+                    run.assert_not_called()
+
     def test_reported_rovio_drift_allows_flight_until_collision_and_retains_warning(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);batch=root/'flight_logs/trial';trial=batch/'iter_001';trial.mkdir(parents=True)

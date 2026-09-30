@@ -8,7 +8,7 @@ if [ ! -f /.dockerenv ]; then
   source "$ROOT/scripts/lib/ensure_container.sh"
   docker start "$__C" >/dev/null
   case "${1:-}" in
-    fast) MATCH='roslaunch.*(mapping_simulator_openvins.launch|fast_livo_gt_diagnostic.launch)' ;;
+    fast) MATCH='roslaunch.*(mapping_simulator_openvins.launch|fast_livo_gt_diagnostic.launch|fast_livo_airsim.launch)' ;;
     sensor) MATCH='(roslaunch.*airsim_sensor_(punlisher|pipeline).launch|bash .*/run_airsim_sensors.sh)' ;;
     voxblox) MATCH='roslaunch active_3d_planning_app_reconstruction uncertainty_voxblox.launch' ;;
     pure-global) MATCH='roslaunch active_3d_planning_app_reconstruction exploration_planner.launch' ;;
@@ -67,10 +67,14 @@ case "$COMPONENT" in
     ;;
   fast)
     source "$ROOT/ws/fast-livo-sim/devel/setup.bash" --extend
+    if [ "$(rosparam get /comparison/sensor_calibration 2>/dev/null || echo historical)" = airsim ]; then
+      python3 "$ROOT/stacks/sim-x86/scripts/prepare_fast_livo_runtime.py"
+      DIAGNOSTIC_TF=false
+      if [ "$(rosparam get /system/localization)" = gt ]; then DIAGNOSTIC_TF=true; fi
+      exec roslaunch "$ROOT/stacks/sim-x86/config/launch/fast_livo_airsim.launch" \
+        calibration:="$ROOT/.build/sim-x86/fast_livo_calibration.yaml" diagnostic_tf:="$DIAGNOSTIC_TF" "$@"
+    fi
     if [ "$(rosparam get /system/localization)" = gt ]; then
-      if [ "$(rosparam get /comparison/sensor_calibration 2>/dev/null || echo historical)" = airsim ]; then
-        set -- online_intrinsics:=true "$@"
-      fi
       exec roslaunch "$ROOT/stacks/sim-x86/config/launch/fast_livo_gt_diagnostic.launch" "$@"
     fi
     exec roslaunch fast_livo mapping_simulator_openvins.launch "$@"

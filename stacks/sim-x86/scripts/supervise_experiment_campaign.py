@@ -57,7 +57,7 @@ def guard_trial(args):
                    state='monitoring', batch=str(args.batch), review_reasons=[], warnings=[],
                    localization_failures=[],localization={})
         value['localization_policy']={key:policy[key] for key in
-            ('localization_action','localization_error_m','localization_error_duration_s','raw_rovio_action',
+            ('localization_action','finite_localization_action','localization_error_m','localization_error_duration_s','raw_rovio_action',
              'raw_rovio_error_review_m','raw_rovio_error_duration_s') if key in policy}
         stop_ros=None
         if args.status.exists():
@@ -82,9 +82,12 @@ def guard_trial(args):
                 value['localization'][name]=metrics
                 if name=='rovio':value['belief']=metrics
                 if reason:
-                    # A finite ROVIO drift can be diagnostic-only in GT trials.
-                    # Keep non-finite estimates on the normal failure channel.
-                    if reason=='raw_rovio_divergence' and policy.get('raw_rovio_action')=='report':
+                    # Finite error may be diagnostic-only for all estimators.
+                    # Preserve the historical ROVIO-only policy and always keep
+                    # non-finite estimates on the normal failure channel.
+                    if (reason.endswith('_divergence') and (
+                            policy.get('finite_localization_action')=='report' or
+                            (name=='rovio' and policy.get('raw_rovio_action')=='report'))):
                         value['warnings'].append(reason)
                     elif (policy.get('localization_action')=='terminate_trial'
                             and reason.endswith(('_divergence','_nonfinite'))):
