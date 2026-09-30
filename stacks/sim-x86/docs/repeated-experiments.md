@@ -239,3 +239,14 @@ For calibrated AirSim trials, the existing legacy exporter resolves the depth
 optical mount from recorded `/tf_static`. Historical trials retain their old
 fixed-camera convention. Missing or conflicting recorded transforms fail the
 export rather than silently substituting the RGB mount.
+
+The 2026-09-30 VIO protocol uses `finite_localization_action: report` together
+with `localization_action: terminate_trial`: finite FAST-LIVO and ROVIO drift
+is logged without censoring the flight, while non-finite estimates still end
+the trial through the normal failure channel. The older `raw_rovio_action`
+override remains supported for replaying earlier GT policies. Native planner
+failures, collision, stale inputs/maps and configured coverage/time limits
+remain active. An empty `checkpoints` object explicitly disables GT-derived
+performance screening for VIO, whose performance is the quantity being tested.
+Preflight attempts are separate from the frozen ten-attempt evaluation cohort.
+See `data/manifests/rhem-vio-20260930-protocol.json` for the exact protocol.

@@ -1,0 +1,180 @@
+{
+  "decision": "proceed_with_frozen_vio_evaluation",
+  "basis": [
+    "GT control achieved 80.85% in 272.59 seconds using common bounds.",
+    "Both VIO pilots passed initialization and exported complete sensor/metric records; collision at 59.00 and 148.74 seconds.",
+    "614 matching odometry messages verify exact FAST-LIVO pose relay and body velocity rotation to machine precision.",
+    "No duplicate TF authority in sampled runtime tree; ROVIO has separate frames.",
+    "Finite estimator drift never requested termination."
+  ],
+  "pilot_status": {
+    "state": "complete",
+    "updated_at": "2026-09-30T20:21:57.867478+09:00",
+    "completed_total": 2,
+    "target_total": 2,
+    "trials": [
+      {
+        "global_attempt": 1,
+        "batch": "/home/ml/risk-stack-docker/flight_logs/rhem-vio-preflight-20260930-attempt001",
+        "termination": "collision",
+        "mission_success": false,
+        "valid_evaluation": true,
+        "final_metrics": {
+          "surface_rate_vio": 0.10737833594976452,
+          "volume_rate_vio": 0.19623233908948196,
+          "volume_m3": 223.84375,
+          "gt_total": 3185,
+          "known_voxels": 625,
+          "map_age_s": 1.674511746969074
+        },
+        "review": "/home/ml/risk-stack-docker/data/results/rhem-vio-preflight-20260930/attempt001-review.json",
+        "warnings": [],
+        "localization_failures": [],
+        "bag_bytes": 778974569,
+        "bag_compression": "lz4"
+      },
+      {
+        "global_attempt": 2,
+        "batch": "/home/ml/risk-stack-docker/flight_logs/rhem-vio-preflight-20260930-attempt002",
+        "termination": "collision",
+        "mission_success": false,
+        "valid_evaluation": true,
+        "final_metrics": {
+          "surface_rate_vio": 0.1218210361067504,
+          "volume_rate_vio": 0.565149136577708,
+          "volume_m3": 340.4375,
+          "gt_total": 3185,
+          "known_voxels": 1800,
+          "map_age_s": 1.327425459981896
+        },
+        "review": "/home/ml/risk-stack-docker/data/results/rhem-vio-preflight-20260930/attempt002-review.json",
+        "warnings": [],
+        "localization_failures": [],
+        "bag_bytes": 2006519127,
+        "bag_compression": "lz4"
+      }
+    ]
+  },
+  "historical_parity": "Current corrected common sensor pipeline; not byte-identical historical PURE/LA data.",
+  "outcomes": [
+    {
+      "batch": "rhem-vio-preflight-20260930-gt-attempt001",
+      "termination": "coverage",
+      "duration_s": 272.5917308330536,
+      "gt_distance_m": 73.71589013529739,
+      "trajectories": 47,
+      "final_live_metrics": {
+        "surface_rate_vio": 0.6483516483516484,
+        "volume_rate_vio": 0.8084772370486656,
+        "volume_m3": 552.453125,
+        "gt_total": 3185,
+        "known_voxels": 2575,
+        "map_age_s": 1.1556041960138828
+      },
+      "last_exported_metrics": {
+        "VolumeM3": 539.65625,
+        "VolumeRateVio": 0.7572998430141288,
+        "SurfaceRateGT": 0.9626373626373627
+      },
+      "endpoint_gt": {
+        "time": 278.1410641670227,
+        "xyz": [
+          -18.462440490722653,
+          2.0351860523223833,
+          1.0812817811965938
+        ]
+      },
+      "endpoint_vio": {
+        "time": 278.1410641670227,
+        "xyz": [
+          -18.462440490722653,
+          2.0351860523223833,
+          1.0812817811965938
+        ]
+      },
+      "result_sha256": "86d2b3f725edb70842266127f79e0cb6b0801370d7eb3bcc11c4e9c72b511346",
+      "analysis_metadata_sha256": "c84c8ce7dd9c8878a32a5c06ed14f173993dd7cac02b019373bc5640cd0d3a54"
+    },
+    {
+      "batch": "rhem-vio-preflight-20260930-attempt001",
+      "termination": "collision",
+      "duration_s": 59.00044298171997,
+      "gt_distance_m": 31.764817239898424,
+      "trajectories": 8,
+      "final_live_metrics": {
+        "surface_rate_vio": 0.10737833594976452,
+        "volume_rate_vio": 0.19623233908948196,
+        "volume_m3": 223.84375,
+        "gt_total": 3185,
+        "known_voxels": 625,
+        "map_age_s": 1.674511746969074
+      },
+      "last_exported_metrics": {
+        "VolumeM3": 223.5,
+        "VolumeRateVio": 0.19434850863422293,
+        "SurfaceRateGT": 0.22762951334379905
+      },
+      "endpoint_gt": {
+        "time": 64.51856088638306,
+        "xyz": [
+          -3.2508938312530504,
+          1.1525597572326651,
+          4.55267810821533
+        ]
+      },
+      "endpoint_vio": {
+        "time": 64.49155807495117,
+        "xyz": [
+          -1.0679883685535099,
+          1.3182356034728295,
+          0.9008072925398993
+        ]
+      },
+      "result_sha256": "07f10410454f8a6f37e11844d00dcbbc4fe159ac0f775d8df522401bd0e9ba1f",
+      "analysis_metadata_sha256": "9c281ad3edc1d44f88019324179e91f196794bbd14e522f16058acbb57358176"
+    },
+    {
+      "batch": "rhem-vio-preflight-20260930-attempt002",
+      "termination": "collision",
+      "duration_s": 148.74450302124023,
+      "gt_distance_m": 52.3112048909413,
+      "trajectories": 17,
+      "final_live_metrics": {
+        "surface_rate_vio": 0.1218210361067504,
+        "volume_rate_vio": 0.565149136577708,
+        "volume_m3": 340.4375,
+        "gt_total": 3185,
+        "known_voxels": 1800,
+        "map_age_s": 1.327425459981896
+      },
+      "last_exported_metrics": {
+        "VolumeM3": 340.4375,
+        "VolumeRateVio": 0.565149136577708,
+        "SurfaceRateGT": 0.7453689167974882
+      },
+      "endpoint_gt": {
+        "time": 154.141587972641,
+        "xyz": [
+          -7.8662443161010716,
+          3.573460102081296,
+          2.5347638130187975
+        ]
+      },
+      "endpoint_vio": {
+        "time": 154.13258814811707,
+        "xyz": [
+          -6.183813522447428,
+          1.67578518143729,
+          0.6687444500712538
+        ]
+      },
+      "result_sha256": "52aecdd759e2e18afe2b29d2addaf491a6accef5f9f38b4d8ff8990cb8c0ec39",
+      "analysis_metadata_sha256": "e65555d2a14b3ad9cc538a418912b43aa43e3855cc5ee64c39d693b4bcfc081d"
+    }
+  ],
+  "evidence_sha256": {
+    "data/results/rhem-vio-preflight-20260930/live_wiring.json": "18a4f31f843f0b2febdae50e50c435c4c4683e303acba05e27d99daac270baf5",
+    "data/results/rhem-vio-preflight-20260930/tf_authorities.json": "b84c024db767f4c54ba84a975bfdf391cf33bd1a189eb135bdccb39ec2deae47",
+    "data/results/rhem-vio-preflight-20260930/preflight_review.json": "96cd8236749935a11507eb25f53788780f99cb133addf91e288b03d990912dfe"
+  }
+}

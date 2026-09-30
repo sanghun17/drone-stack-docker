@@ -79,6 +79,28 @@ bash stacks/sim-x86/scripts/run_experiments.sh \
 원래 settings 파일로 재시작해야 한다. 새 설정은 현재 GT 경로에서 검증했으며,
 FAST-LIVO의 VIO 성능이나 원래 논문 비교 조건과 동등하다고 주장하지 않는다.
 
+### 2026-09-30 VIO 연결 검증
+
+`--sensor-calibration airsim`은 이제 GT와 VIO 모두 지원한다.
+`prepare_fast_livo_runtime.py`가 공통 발행기의 `camera_geometry`를 재사용해
+현재 카메라 프로필에서 FAST-LIVO 외부 보정을 만든다. RGB 내부 보정은
+기존 FAST-LIVO CameraInfo 로더로 전달한다. 필터의 잡음·특징점 파라미터는
+변경하지 않는다. 현재 프로필의 Depth→RGB 이동은 optical x축 -0.15m다.
+GT에서는 FAST-LIVO TF를 진단 네임스페이스로 분리하고, VIO에서는 원래
+추정기 TF를 사용한다. ArUco 발행기나 별도 센서 구현을 추가하지 않는다.
+
+VIO의 planning/control은 모두 `/robot/odom`의 FAST-LIVO 상태를 사용하며,
+RHEM belief는 실제 ROVIO를 유지한다. FAST-LIVO의 원래 첫 GT pose 기반
+전역 좌표 정렬은 보존하지만 비행 중 GT 재초기화는 하지 않는다.
+614개 동시각 메시지에서 pose 전달 오차 0, world→body 속도 변환 오차
+최대 1.25e-16m/s를 확인했다. 표본 TF 트리에서도 중복 authority가 없었다.
+
+공통 높이 0–2m의 GT 대조는 272.6초에 관측률 80.8%로 완료했고,
+VIO 예비 2회는 59.0초·148.7초에 충돌했다. 연결 검증은 FAST-LIVO의
+안정화나 과거 PURE/LA 실험과 완전히 같은 조건이라는 증명이 아니다.
+실행 근거와 정확한 종료점은
+`data/manifests/rhem-vio-20260930-preflight.json`에 보관한다.
+
 ## 검증 자료와 한계
 
 `data/results/sim-sensor-audit-20260928/`에 입력 통계와 GT/ROVIO audit를,
