@@ -1,5 +1,37 @@
 # RHEM GT campaign, 2026-09-29
 
+## Shared motion limits requested after attempt 031
+
+The user requested the same motion limits as PURE/LA and reuse of the existing
+SO(3) controller. The manager was held while 031 completed, then stopped before
+032. Attempt 031 ended at 307.14 s and 74.63% coverage on ROVIO divergence;
+recording/export completed normally and the original result is retained.
+
+All three planners already use `comparison_control.launch`, the same
+`local_plan_manager/traj_server` and `local_controller/so3_control_bridge.py`.
+RHEM supplies a list of poses, whereas that execution chain consumes a timed
+`MixTraj` and emits position/velocity/acceleration/yaw commands. The RHEM adapter
+provides the missing timing, not a separate controller. Its exact-polyline
+quintics stop at retained corners to avoid cutting unchecked space. Replacing
+SO(3) cannot remove those stops. PURE's JAX adapter also converts trajectories;
+LA's optimizer relies on its own distance map, boundary derivatives and costs,
+so it is not a drop-in pose-list converter preserving RHEM belief evaluation.
+
+For the new cohort, `--rhem-gt-conservative` is removed. That explicit legacy
+option remains only to reproduce earlier diagnostic runs. New
+`--rhem-bounds-profile gt-diagnostic` retains the same 0.8–1.8 m spatial bounds
+and 0.5 m vertical footprint without overriding `/planning/shared`. Thus the
+motion-only validation uses the common YAML's XY/Z velocities 2/1 m/s,
+accelerations 5/2 m/s², yaw rate 2 rad/s and yaw acceleration 5 rad/s². SO(3),
+camera/ROVIO settings and the heading variant are retained. Geometry remains a
+diagnostic condition and must still be identified in paper comparisons.
+
+Attempt 032 first validates these shared limits before extending collection.
+The previous low-speed reference envelope is not a statistical baseline for
+this deliberate setting change. Pilot outcomes and tracking must be reviewed
+before resuming the remaining requested trials. Runtime snapshots verify the
+six common values and RHEM's derived `system/v_max`/`system/dyaw_max`.
+
 ## Early-reference review after attempt 030
 
 Attempt 029 completed the mission at 84.18% observed GT coverage after 479.17 s.

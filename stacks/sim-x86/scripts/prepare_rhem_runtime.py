@@ -13,6 +13,18 @@ from rhem_filter_config import apply_covariance_profile, apply_image_gate, info_
 ROOT = Path(__file__).resolve().parents[3]
 
 
+def apply_flight_bounds(params, profile, planning_source, control_source):
+    """Select diagnostic geometry independently of common motion constraints."""
+    if profile == 'shared':
+        return
+    if profile != 'gt-diagnostic':
+        raise ValueError('Unknown RHEM bounds profile: '+profile)
+    if (planning_source, control_source) != ('gt', 'gt'):
+        raise ValueError('Diagnostic bounds require GT sources')
+    params.update({'bbx/minZ': .8, 'bbx/maxZ': 1.8,
+                   'system/bbx/z': .5, 'system/bbx/z_offset': 0.})
+
+
 def main():
     rospy.init_node('prepare_rhem_runtime', anonymous=True)
     if rospy.get_param('/system/platform') != 'sim':
@@ -113,12 +125,12 @@ def main():
     if heading_profile not in ('historical', 'continuous'):
         raise ValueError(f'Unknown RHEM heading profile: {heading_profile}')
     params['bsp/heading_continuity'] = heading_profile == 'continuous'
+    bounds_profile = rospy.get_param('/comparison/rhem_bounds_profile', 'shared')
     if rospy.get_param('/comparison/rhem_gt_conservative', False):
-        if any(rospy.get_param('/comparison/sources/'+k) != 'gt'
-               for k in ('planning_source', 'control_source')):
-            raise ValueError('Conservative diagnostic requires GT sources')
-        params.update({'bbx/minZ': .8, 'bbx/maxZ': 1.8,
-                       'system/bbx/z': .5, 'system/bbx/z_offset': 0.})
+        bounds_profile = 'gt-diagnostic'  # Explicit legacy reproduction.
+    apply_flight_bounds(params, bounds_profile,
+                        rospy.get_param('/comparison/sources/planning_source'),
+                        rospy.get_param('/comparison/sources/control_source'))
     (output / 'planner.yaml').write_text(yaml.safe_dump(params))
     print(f'RHEM runtime config: {output}; camera {info.width}x{info.height}, body={body}')
 

@@ -39,7 +39,6 @@
     },
     {
       "first_attempt": 25,
-      "planned_last_attempt": 50,
       "label": "RHEM with heading-continuity sampling and divergence termination",
       "heading_profile": "continuous",
       "module_revision": "4fbb218a3672e2dfc036949c5d0f255a8cca7139",
@@ -63,7 +62,20 @@
           "first_attempt": 31,
           "review": "data/manifests/rhem-gt50-20260930-review030.json"
         }
-      ]
+      ],
+      "last_attempt": 31,
+      "motion_limits": "Legacy conservative diagnostic: XY speed0.6m/s, XY acceleration1m/s2"
+    },
+    {
+      "first_attempt": 32,
+      "planned_last_attempt": 50,
+      "label": "RHEM heading-continuity sampling with shared PURE/LA motion limits; diagnostic spatial bounds",
+      "heading_profile": "continuous",
+      "module_revision": "4fbb218a3672e2dfc036949c5d0f255a8cca7139",
+      "motion_limits_source": "stacks/sim-x86/config/comparison-20260706-params.yaml:planning/shared",
+      "rhem_bounds_profile": "gt-diagnostic",
+      "validation_status": "Attempt032 pilot required before further collection",
+      "note": "New condition. Do not pool with earlier conservative-motion results; unchanged shared traj_server and SO3 controller."
     }
   ]
 }

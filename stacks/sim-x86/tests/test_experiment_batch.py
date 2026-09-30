@@ -11,11 +11,25 @@ import unittest
 from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 from automation_experiments import Recorder, Trial, run_trials, load_previous
+from prepare_rhem_runtime import apply_flight_bounds
 import rosbag
 import rospy
 from std_msgs.msg import String
 
 class BatchTests(unittest.TestCase):
+    def test_diagnostic_bounds_do_not_reduce_shared_motion_limits(self):
+        common={'system/v_max':2.,'system/dyaw_max':2.,'bbx/minZ':0.,'bbx/maxZ':2.}
+        unchanged=dict(common)
+        apply_flight_bounds(unchanged,'shared','fast-livo','fast-livo')
+        self.assertEqual(unchanged,common)
+        diagnostic=dict(common)
+        apply_flight_bounds(diagnostic,'gt-diagnostic','gt','gt')
+        self.assertEqual(diagnostic['system/v_max'],2.)
+        self.assertEqual(diagnostic['system/dyaw_max'],2.)
+        self.assertEqual((diagnostic['bbx/minZ'],diagnostic['bbx/maxZ']),(.8,1.8))
+        for profile,planning,control in [('gt-diagnostic','gt','fast-livo'),('unknown','gt','gt')]:
+            with self.assertRaises(ValueError):apply_flight_bounds(dict(common),profile,planning,control)
+
     def test_planner_failure_ends_monitor_without_waiting_for_time_limit(self):
         with tempfile.TemporaryDirectory() as tmp:
             trial=Trial.__new__(Trial)
@@ -155,6 +169,9 @@ class BatchTests(unittest.TestCase):
             args.rhem_heading_profile='continuous'
             with self.assertRaises(ValueError):load_previous(args)
             args.rhem_heading_profile='historical'
+            args.rhem_bounds_profile='gt-diagnostic'
+            with self.assertRaises(ValueError):load_previous(args)
+            args.rhem_bounds_profile='shared'
             args.rhem_map_rays='full'
             with self.assertRaises(ValueError):load_previous(args)
             args.rhem_map_rays='clipped'

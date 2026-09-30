@@ -308,6 +308,7 @@ class Trial:
         rospy.set_param('/comparison/rhem_diagnostics', self.args.rhem_diagnostics)
         rospy.set_param('/so3_control_bridge/max_thrust', self.args.control_max_thrust)
         rospy.set_param('/comparison/rhem_gt_conservative', self.args.rhem_gt_conservative)
+        rospy.set_param('/comparison/rhem_bounds_profile', self.args.rhem_bounds_profile)
         rospy.set_param('/comparison/sensor_calibration', self.args.sensor_calibration)
         rospy.set_param('/comparison/airsim_camera_profile', str(
             self.args.airsim_camera_profile or ROOT/'stacks/sim-x86/config/airsim_cameras.yaml'))
@@ -482,7 +483,8 @@ def load_previous(args):
     for key in ('planner','planning_source','control_source','time_limit','coverage_threshold','startup_timeout'):
         if manifest[key]!=getattr(args,key):raise ValueError('Resume configuration differs: '+key)
     for key, default in dict(rhem_belief_mode='rovio', control_max_thrust=15.60,
-                             rhem_gt_conservative=False, rhem_diagnostics=False, sensor_calibration='historical',
+                             rhem_gt_conservative=False, rhem_bounds_profile='shared',
+                             rhem_diagnostics=False, sensor_calibration='historical',
                              rhem_filter_profile='historical', rhem_progress_profile='historical',
                              rhem_heading_profile='historical',
                              rhem_map_rays='clipped', airsim_camera_profile=None,
@@ -518,7 +520,9 @@ def main():
     parser.add_argument('--control-max-thrust',type=float,default=15.60,
                         help='AirSim SO(3) thrust scale; 16.535 is the measured calibration, 15.60 preserves historical runs')
     parser.add_argument('--rhem-gt-conservative',action='store_true',
-                        help='GT-only diagnostic: slower motion, 0.8–1.8m planning slab, 0.5m vertical footprint')
+                        help='Legacy reproduction only: reduced motion limits plus GT bounds; use --rhem-bounds-profile gt-diagnostic to keep bounds with shared PURE/LA motion limits')
+    parser.add_argument('--rhem-bounds-profile',choices=['shared','gt-diagnostic'],default='shared',
+                        help='gt-diagnostic: only 0.8–1.8m planning slab and 0.5m vertical footprint; motion limits stay in /planning/shared')
     parser.add_argument('--sensor-calibration', choices=['historical','airsim'], default='historical',
                         help='airsim: measured separate RGB/depth extrinsics; GT-only diagnostic')
     parser.add_argument('--airsim-camera-profile', help='Explicit common camera YAML, container path; must match running AirSim settings')
@@ -543,6 +547,8 @@ def main():
         parser.error('Belief isolation requires RHEM with GT planning and control')
     if args.rhem_gt_conservative and (args.planner != 'rhem' or args.planning_source != 'gt' or args.control_source != 'gt'):
         parser.error('Conservative diagnostic requires RHEM with GT planning and control')
+    if args.rhem_bounds_profile != 'shared' and (args.planner != 'rhem' or args.planning_source != 'gt' or args.control_source != 'gt'):
+        parser.error('GT diagnostic bounds require RHEM with GT planning and control')
     if args.sensor_calibration == 'airsim' and (args.planning_source != 'gt' or args.control_source != 'gt'):
         parser.error('Separate camera calibration is currently validated only with GT sources')
     if args.iterations<1 or min(args.time_limit,args.startup_timeout)<=0 or not 0<args.coverage_threshold<=1:
