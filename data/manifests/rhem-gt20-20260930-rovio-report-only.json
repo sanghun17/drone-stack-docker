@@ -3,7 +3,7 @@
   "authorization": "User requested that the externally added 5m drift condition no longer end GT exploration; continue to planner/mission endpoints.",
   "campaign": "rhem-gt-20-20260930-continuous",
   "first_attempt": 6,
-  "target_total": 20,
+  "target_total": 10,
   "completed_before_change": 5,
   "cohorts": [
     {
@@ -18,7 +18,7 @@
     {
       "attempts": [
         6,
-        20
+        10
       ],
       "finite_rovio_drift_action": "report_only",
       "threshold_m": 5,
@@ -35,7 +35,7 @@
   "algorithm_estimator_and_controller_changes": false,
   "supervisor_sha256": "9c943f60fff43fd67dc3a0bfdc26bc4c03b6ba0991ff0b2c44b663890d80f776",
   "policy": "data/results/rhem-gt-20-20260930-continuous/review_policy-report-only.json",
-  "policy_sha256": "d15b4bbea4b1929c9a548a901b0d39766e23df90f4f3f567242dc514cdbbd199",
+  "policy_sha256": "9616a01d54e4d48f166ee37dc1efa9468e366905d6ee34e514c0e749a1a2c102",
   "boundary_evidence": "data/results/rhem-gt-20-20260930-continuous/policy-transitions",
   "validation": {
     "localization_termination_tests": 6,
@@ -43,5 +43,7 @@
     "guarded_campaign_tests": 4,
     "result": "passed"
   },
-  "interpretation": "GT exploration may continue despite failed ROVIO localization; this does not demonstrate stable VIO localization. Keep the two stopping-policy cohorts separate."
+  "interpretation": "GT exploration may continue despite failed ROVIO localization; this does not demonstrate stable VIO localization. Keep the two stopping-policy cohorts separate.",
+  "original_target_total": 20,
+  "target_change": "User reduced total to 10 after attempt006; finite drift behavior unchanged."
 }
