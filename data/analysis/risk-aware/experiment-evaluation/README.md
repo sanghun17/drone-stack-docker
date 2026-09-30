@@ -100,6 +100,34 @@ original paths, current paths, retained hashes and removed previews. Raw
 `flight_logs` and the cohort's final figures are unchanged. The optional watcher
 stops when the campaign completes or requires review.
 
+## RHEM VIO fifty-attempt cohort (2026-09-30)
+
+`data/results/rhem-vio-50-20260930/` retains the original ten attempts and adds
+forty with the same FAST-LIVO planning/control and real ROVIO belief settings.
+All fifty native outcomes remain in the denominator, including belief startup
+failures and the original validity flags. There were 45 collisions, three
+`belief_not_ready` outcomes and two native planner failures; no mission reached
+the 80% target. Terminal `VolumeRateVio` averaged 23.66% and reached 61.44%.
+
+`figures/rhem_vio50_observed_volume.{png,pdf,svg}` uses the existing
+`plot_paper_simulation.py` functions `load_compact` and `draw`, with a 200 s
+window containing the longest flight (183.97 s). The `_paper130` versions use
+the paper's existing window. Rate and GT surface diagnostic variants, compact
+inputs, `trials.csv` and `cohort.json` are stored alongside them. To reproduce,
+load each compact CSV with `load_compact`, append empty arrays for the cohort
+members missing measured samples, and call `draw` with the recorded metric and
+window. Attempt022 never achieved SO3 takeover: it contributes an empty series
+to the fixed denominator rather than an invented t=0 coverage sample.
+
+One simulator clock stall occurred before attempt044 could start. Its raw
+batch and evidence remain under the campaign's `infrastructure/attempt044/`
+record; the raw batch itself remains in `flight_logs/`. Evaluation044 was
+repeated after restarting the same simulator/plugin/settings and reapplying
+the common rendering profile. This infrastructure preparation failure is
+separate from the fifty native algorithm outcomes. The final metadata is
+`data/manifests/rhem-vio50-20260930-results.json`; all fifty configuration,
+export-hash and teardown checks are in `continuation_validation.json`.
+
 
 ## Resuming the 100-trial run (2026-09-23)
 

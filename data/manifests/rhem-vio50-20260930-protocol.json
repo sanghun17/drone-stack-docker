@@ -1,5 +1,5 @@
 {
-  "status": "running",
+  "status": "complete",
   "campaign": "data/results/rhem-vio-50-20260930",
   "previous_completed_attempts": 10,
   "requested_additional_attempts": 40,
@@ -95,7 +95,7 @@
     "free_bytes": 271576444928,
     "minimum_start_free_gib": 40
   },
-  "note": "User-authorized continuation: retain initial ten VIO attempts, run global attempts011\u2013050 with identical flight arguments, real FAST-LIVO control/planning and real ROVIO belief. Post-cohort LA TF composition uses odom for RHEM as before; estimator, planner, controller, sensors, bounds and stop policy unchanged. All terminal outcomes retained.",
+  "note": "User-authorized continuation: retain initial ten VIO attempts, run global attempts011–050 with identical flight arguments, real FAST-LIVO control/planning and real ROVIO belief. Post-cohort LA TF composition uses odom for RHEM as before; estimator, planner, controller, sensors, bounds and stop policy unchanged. All terminal outcomes retained.",
   "exports": "data/results/rhem-vio-50-20260930/trials/attemptNNN/iter_001",
   "cleanup_receipt": "data/manifests/simulation-results-cleanup-20260930.json",
   "attempt011_verification": {
@@ -103,5 +103,14 @@
     "planner_yaml_identical": true,
     "camera_yaml_identical": true,
     "rovio_info_difference": "Only per-reset measured camera mount pose differs at sub-millimetre / small-angle scale; calibration procedure and filter tuning unchanged."
-  }
+  },
+  "infrastructure_recovery": {
+    "excluded_raw_batch": "flight_logs/rhem-vio-50-20260930-attempt044",
+    "evidence": "data/results/rhem-vio-50-20260930/infrastructure/attempt044",
+    "restart": "Same simulator/plugin/settings/launch flags; fixed rendering commands reapplied through common profile. Physics timestamps and both320x240 camera streams verified.",
+    "reason": "Simulator physics/image clock stopped before planner service or flight startup. Repeat evaluation44 in fresh batch; preserve all native planner failures."
+  },
+  "completed_at": "2026-10-01T00:22:26.484115+09:00",
+  "results": "data/manifests/rhem-vio50-20260930-results.json",
+  "completed_evaluation_attempts": 50
 }

@@ -2238,7 +2238,20 @@
       "reason": "Redundant single-trial preview; CSVs, raw flight evidence and final cohort figures retained."
     }
   ],
-  "updated_at": "2026-09-30T22:29:01.590824+09:00",
+  "updated_at": "2026-10-01T00:31:38.549934+09:00",
   "grouped_vio_exports": "data/results/rhem-vio-50-20260930/export_locations.json",
-  "interpretation": "Historical data relocated with identical bytes; location receipt resolves original paths. Only explicitly named redundant per-trial preview images deleted."
+  "interpretation": "Historical data relocated with identical bytes; location receipt resolves original paths. Only explicitly named redundant per-trial preview images deleted.",
+  "final_grouping": {
+    "vio_attempts": 50,
+    "gt_attempts": 10,
+    "result_top_level_directories_before": 43,
+    "result_top_level_directories_after": 11,
+    "vio_export_location_receipt": "data/results/rhem-vio-50-20260930/export_locations.json",
+    "vio_export_location_receipt_sha256": "e741f89f29995b2142b383e96c2850e1a11bbbdfc100e8fae1679bfbbf631e73",
+    "removed_vio_preview_files": 100,
+    "removed_gt_preview_files": 20,
+    "removed_total_preview_files": 120,
+    "removed_total_preview_bytes": 8313779,
+    "note": "Local relocation reduces visible result clutter, not raw storage usage. No raw flight evidence or measured metric/endpoint CSV was deleted."
+  }
 }
