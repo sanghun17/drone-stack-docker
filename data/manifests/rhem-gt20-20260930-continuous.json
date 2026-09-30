@@ -78,6 +78,6 @@
   "live_status": "data/results/rhem-gt-20-20260930-continuous/status.json",
   "analysis_format": "Existing run_evaluated_experiments.sh recorder and legacy CSV exporter",
   "pilot_reference": "data/manifests/rhem-continuous-execution-20260930.json",
-  "deletion_scope": "Pending clarification of local vs NAS; new campaign/reference inputs excluded from any historical payload removal.",
+  "deletion_scope": "User authorized permanent deletion of all previous local and NAS RHEM raw data and result payloads on 2026-09-30. Preserve reproducibility code/configuration/verification records, non-RHEM shared data, and this new campaign. See rhem-payload-deletion-20260930.json.",
   "storage": "New data local; no NAS transfer during collection; existing compression forecast and reserve active."
 }
