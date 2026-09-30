@@ -26,7 +26,7 @@
     "no_attempt011": true
   },
   "renderer": "data/analysis/risk-aware/experiment-evaluation/plot_paper_simulation.py",
-  "renderer_sha256": "7f337e5046eafb0e5cd1ea7ab1001de001fbaeb1a54653be7d0264029b8582c7",
+  "renderer_sha256": "282838b93b2bfa60e0b49e51fe74216d6f0b818ff6465fe6b601ce0cd0da33c6",
   "primary_figure": "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume.png",
   "paper_figure": "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume_paper130.pdf",
   "interpretation": {
@@ -435,7 +435,8 @@
     "RHEM/PURE/LA shared calibration, estimator settings, sources, controller, bounds and motion limits match.",
     "Recorded corrected LA static TF has unique parents and legacy export completes.",
     "All six attainment figures contain ten attempts and valid monotone bounded surfaces.",
-    "Contour-label adjustment leaves attainment arrays exactly unchanged."
+    "Contour-label adjustment leaves attainment arrays exactly unchanged.",
+    "200 s display verified against unchanged original attainment values; 130 s paper arrays exactly unchanged."
   ],
   "artifact_sha256": {
     "data/results/rhem-vio-10-20260930/status.json": "07845d53ddf5689df8813d83eb3d6afbca69ee7b608377403c46f7ade6b2c9eb",
@@ -444,36 +445,36 @@
     "data/results/rhem-vio-10-20260930/baseline_checks.json": "f85068ad89a829d127daff108983a00a04ce5a7f5d13a6f8bf9ad3df0123637e",
     "data/results/rhem-vio-10-20260930/frozen_runtime_verification.json": "5c7a59b52ca08df8e7fd58d34b7140421bf13dc21e7a37b8db744d505d67ca63",
     "data/results/rhem-vio-10-20260930/attempt005-failure-review.json": "28381e8016406cd707241c2f58f5cd362f21c4ff47559a8dce33802475252913",
-    "data/results/rhem-vio-10-20260930/figures/README.md": "4cd97801c31d39ee01044b3f0b08818e7bdd992f69437dec446a5672367af43f",
+    "data/results/rhem-vio-10-20260930/figures/README.md": "c0b72b8d133b8a7145f8f0e46c760523dfc3da4097da96efdbf9f4014b88bf1a",
     "data/results/rhem-vio-10-20260930/figures/localization_at_endpoints.json": "036a2789119bec8e357d2471a570a0707d67993423d438a6b4734ec8d654fbb5",
-    "data/results/rhem-vio-10-20260930/figures/provenance.json": "58de9c3d000b4e3e18c420b473bfd74dff184dec4d5cefb47722805afdf1a79a",
-    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate.pdf": "10c8ce3ee07682850f722f2505260b46b60cd04417d0759704e45aa7d534b32b",
-    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate.png": "3a5945fab1b065b29583fe2bc41373cca75c68bed3948340f50ed758ec248a91",
-    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate.svg": "45b3bb209808942fdbe52396bfb499fd486ae411c6189e57fe8bd6cee333417d",
+    "data/results/rhem-vio-10-20260930/figures/provenance.json": "de8a6aaaeb1c7878d08c87388b0bde89e24033033fd4bd65df73d96abce3b1b7",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate.pdf": "9faa20b5c8b9685ebbfe6d8c5e951ccaf3c3be81de98372a7c2d92e8ffba97c1",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate.png": "5e89da603b1f257d28a691317ec77fd0c5fdb056fc3c6b1282f8cba988a70a58",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate.svg": "dc91e8f7dbd9b5bcbb9cfd6addaaadeeca4cc3b71ef00d7c54a9a1972ea51fcd",
     "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate_input.csv": "96f222aecd75c17753e13031f97bbefcf46f0bbad498382111378f34800b8c58",
-    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate_paper130.pdf": "97a1957beda5c5135c3fa95756dbfe4048f167e46b7cb2a7a7c67289f2aa7bfb",
-    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate_paper130.png": "c64b13cbcc71b9cf3b435f8d4b2cbf89a8e300361f8648d9ab92754622651872",
-    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate_paper130.svg": "b82c6a496f24ed9686896d6769862500e2f06ebdb9b1acc7ce650abe5ab6ed2f",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate_paper130.pdf": "2881a07830efcb27906c9158234a9113bfb86d751a4b25adb90a6ae0bee5390f",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate_paper130.png": "dfdcee4ba3592aa6a399f7427b20bd446438e56d896a2bb10d5dbb3609322c8a",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate_paper130.svg": "5b7075f311c2edb183ec4b2ae192c90cb3a63c714f99ea2598637eb3fbc68636",
     "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate_paper130_surfaces.npz": "49876aa010c0ec983efb1c26d30daddb704fba5ff70161acf7c49c0a8ef9a4e5",
-    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate_surfaces.npz": "472179aa31d2f1951942bf34c4a212f3330dde759d7f953f59262a49b2108532",
-    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate.pdf": "ca8e0da30a8da198750be9272daa3400b25132ca9e425caa0ed923880218ff35",
-    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate.png": "e01fa857d8bad364574bf12bf99063adc6502a7f98df06bae20bd814b8417d45",
-    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate.svg": "d9d0256cccbc45737c7937c05b78fe734abb03b0ade1526dd4b664d8932b3506",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_gt_surface_rate_surfaces.npz": "76acdcb94a8517fc37f37b936e9f8efd4b946e794f4997ffa18b9e09aa7300ed",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate.pdf": "5774b096b27f868be652c84665c1dc6c206beb62fb1854584ec8dcc8a80288c3",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate.png": "4e22cae3926dc12e37cfb87c31fddf862d5a2719b1cd4ef265b0a9ff4d379843",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate.svg": "3dfe8968a34379b872d6fc02861f7aef947d70a8ae963275e0d3ea38df033cc3",
     "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate_input.csv": "fcb4d09e102fec6d90e15ef69da9ff0a8534dece4a22bdb9790ead25b2213a15",
-    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate_paper130.pdf": "d001688f5036f64db93cba8bf127390ae8f93564bcc5d3a1a3d4894d1ebb1725",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate_paper130.pdf": "495f245c1ee52ecf47f5f3d1c0b76b97d06dd9764ab80b7667315f227a32c7c1",
     "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate_paper130.png": "4fad056096603760a985ef08328db5acb7ae6a042241972799687c8a13a846fc",
-    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate_paper130.svg": "f496d4124f4d88165e1a7c7b3c2385b283045581deeeb96eef41504a7bd720ca",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate_paper130.svg": "cf582ea2ae1d4b68ecd3695f7f7dbb7b225296e1893da0887bb2bd84203883ea",
     "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate_paper130_surfaces.npz": "f3fc829c033a8cdde53f0ce47746f896ccdf99c0cacdb1182a53e6fcb8ee33dd",
-    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate_surfaces.npz": "6d415d06c2474bdff224e2d3ce33d1ac9c282c4dd565001fa326bade373bd4d0",
-    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume.pdf": "d021e5e6f99343cc6dbcf6f2f4c655accaee776f3c8a3a9dafd55847025a33af",
-    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume.png": "61d8098face9cf880dc8800412852acd2cea3d83cf05eef49ca75a6a1fafd311",
-    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume.svg": "bf2ac63698da3ff1b682384e3c52f8d813ed25ee442340180d2d60cc52eed6bd",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_rate_surfaces.npz": "8bc794111dc7237ed395176c07e97186b8982fe80776e876404b70bafcd5db31",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume.pdf": "5a777e97d3dfabe449bf60586dca8621c1f1eda9b87773816d01b95828e66897",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume.png": "266c8a13ca6eba013b35762d73db61c7b3a4aa6674f0d01d21bebb7ecea300ac",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume.svg": "26a0fd88bba329248b754059aacb70896616b87ba1d4bc7712ac2b7bfbd1477f",
     "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume_input.csv": "44e64cdce0eb135796214f30f2085d9c9727c2b292d39e015f1811c36aa4cf4b",
-    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume_paper130.pdf": "6f1a64a098f0fb1bec28271911608c90caf9c8c4eba4a85e3512528258479f12",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume_paper130.pdf": "caaf579fe846153ff8bb91fc2b6055a0aacea537caba771d63f5c8259e4110ae",
     "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume_paper130.png": "3bdbc3979727165f87487c63337a81f67ef94955d4947c5d06743f9768fe3708",
-    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume_paper130.svg": "71bffed3e8e2d372d45c9cac1a20500d2b06d2dc4d16aee660c249dae3f275e2",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume_paper130.svg": "332e1e8a5c4c019955affbb924e77dafec588ff11df4171e07477f5ac38266d9",
     "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume_paper130_surfaces.npz": "d9c7816fbf0542f32ffb125cb8eb65594b55ec38d4b4ebcda9c9506a261694ea",
-    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume_surfaces.npz": "090927a92d443582dde0d181e4fdb3c32b83d59175f36d81d778145a5a6fad54",
+    "data/results/rhem-vio-10-20260930/figures/rhem_vio10_observed_volume_surfaces.npz": "7b6e66f68de11ac15cbf310368f030ad73fb62a7fed548a3cc56f407af2b0893",
     "data/results/rhem-vio-10-20260930/figures/summary.json": "6bead5fc970514bcd442384150449af3a38044ef5ab76d2bcf910e616b6a84fd",
     "data/results/rhem-vio-10-20260930/figures/trials.csv": "41c9b06cd9a279c3797c097e98e52181e4b0969c968eef831746249b174d0929"
   },
@@ -528,5 +529,17 @@
     "flight_logs/rhem-vio-10-20260930-attempt010/iter_001/events.jsonl": "524769733b76162b4fbc28e4ac785c541e2129aa230c786ab23ef95dcc11c1d3",
     "data/results/rhem-vio-10-20260930-attempt010/iter_001/experiment_metrics.csv": "bf5f962547a2e70b18797dd0331ecde32bb097be8ed78ffd72a8911ac2789772",
     "data/results/rhem-vio-10-20260930-attempt010/iter_001/analysis_metadata.json": "d1c1d0718be18d8380057b7537475f912c6edf7351ee7019c74fab57b4247c33"
-  }
+  },
+  "display_windows_s": {
+    "full": [
+      10,
+      200
+    ],
+    "paper": [
+      10,
+      130
+    ]
+  },
+  "mission_time_limit_s": 600,
+  "display_revision": "Full plots shortened from 600 to 200 seconds to include the longest actual flight (183.969 s). All retained attainment values and 130 s paper arrays are exactly unchanged. Tick positions stay inside the requested display window."
 }

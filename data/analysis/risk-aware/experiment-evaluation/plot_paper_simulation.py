@@ -113,7 +113,8 @@ def draw(groups,out,stem,metric,methods=METHODS,time_end=130):
         if time_end>300:
             ax.xaxis.set_major_locator(MaxNLocator(nbins=5,integer=True))
         else:
-            ax.set_xticks([20,60,100,130] if time_end==130 else [20,100,200,300])
+            ticks=[20,60,100,130] if time_end==130 else [20,100,200,300]
+            ax.set_xticks([tick for tick in ticks if tick<=time_end])
         if volume:ax.set_yticks([100,200,300,400,500])
         else:
             ax.set_yticks(np.linspace(0,1,6));ax.yaxis.set_major_formatter(PercentFormatter(1))
