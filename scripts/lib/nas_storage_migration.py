@@ -18,6 +18,7 @@ def digest(path, report=None):
     offset, retries = 0, 0
     checksum = hashlib.sha256()
     while offset < expected:
+        resumed_at = offset
         try:
             with path.open('rb', buffering=0) as stream:
                 if offset:
@@ -31,7 +32,10 @@ def digest(path, report=None):
                     if report:
                         report(part_bytes=offset)
         except OSError:
-            retries += 1
+            # A long read may make substantial progress between disconnects.
+            # Limit consecutive failures at one offset, rather than counting
+            # unrelated recoverable disconnects across a multi-GiB archive.
+            retries = 0 if offset > resumed_at else retries + 1
             if retries > 8:
                 raise
             time.sleep(1)
@@ -47,6 +51,7 @@ def matching_prefix(local, partial, report=None):
         return False
     offset, retries = 0, 0
     while offset < expected:
+        resumed_at = offset
         try:
             with local.open('rb', buffering=0) as source, partial.open('rb', buffering=0) as remote:
                 if offset:
@@ -62,7 +67,7 @@ def matching_prefix(local, partial, report=None):
                     if report:
                         report(part_bytes=offset)
         except OSError:
-            retries += 1
+            retries = 0 if offset > resumed_at else retries + 1
             if retries > 8:
                 raise
             if report:

@@ -215,6 +215,41 @@ class MigrationTest(unittest.TestCase):
             migration.remote_bytes(path, payload)
         self.assertEqual(path.read_bytes(), b'{"unrecognized":true}\n')
 
+    def test_multiple_read_disconnects_can_resume_while_bytes_keep_advancing(self):
+        source = self.source / 'a.tar'
+        partial = self.share / 'a.tar.partial'
+        payload = bytes(range(256)) * 4096
+        source.write_bytes(payload)
+        partial.write_bytes(payload)
+        real_open = Path.open
+
+        class OneBlockRead:
+            def __init__(self, stream):
+                self.stream, self.read_once = stream, False
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                self.stream.close()
+
+            def seek(self, offset):
+                self.stream.seek(offset)
+
+            def read(self, amount):
+                if self.read_once:
+                    raise OSError('SMB disconnected after making progress')
+                self.read_once = True
+                return self.stream.read(amount)
+
+        def periodic_disconnect(path, *args, **kwargs):
+            stream = real_open(path, *args, **kwargs)
+            return OneBlockRead(stream) if path == partial else stream
+
+        with patch.object(Path, 'open', periodic_disconnect), patch.object(migration.time, 'sleep'):
+            self.assertTrue(migration.matching_prefix(source, partial))
+            self.assertEqual(migration.digest(partial), migration.digest(source))
+
 
 if __name__ == '__main__':
     unittest.main()
