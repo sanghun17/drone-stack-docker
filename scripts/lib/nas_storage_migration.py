@@ -137,17 +137,45 @@ def save(path, value):
     temporary.replace(path)
 
 
+def remote_bytes(path, payload):
+    """Publish immutable metadata, retrying only a recognized partial prefix."""
+    checksum = hashlib.sha256(payload).hexdigest()
+    for attempt in range(5):
+        try:
+            if path.exists():
+                size = path.stat().st_size
+                if size == len(payload) and digest(path) == checksum:
+                    return
+                if size >= len(payload):
+                    raise RuntimeError('Existing NAS metadata differs: ' + str(path))
+                offset = 0
+                with path.open('rb', buffering=0) as existing:
+                    while offset < size:
+                        block = existing.read(min(65536, size - offset))
+                        if not block:
+                            raise OSError('Premature EOF in NAS metadata')
+                        if block != payload[offset:offset + len(block)]:
+                            raise RuntimeError('Existing NAS metadata differs: ' + str(path))
+                        offset += len(block)
+                if path.stat().st_size != size:
+                    raise RuntimeError('NAS metadata changed during recognition')
+                path.unlink()
+            with path.open('xb') as stream:
+                for offset in range(0, len(payload), 65536):
+                    block = payload[offset:offset + 65536]
+                    if stream.write(block) != len(block):
+                        raise OSError('Short NAS metadata write')
+            if path.stat().st_size != len(payload) or digest(path) != checksum:
+                raise RuntimeError('NAS metadata readback differs: ' + str(path))
+            return
+        except OSError:
+            if attempt == 4:
+                raise
+            time.sleep(attempt + 1)
+
+
 def remote_json(path, value):
-    payload = (json.dumps(value, ensure_ascii=True, indent=2) + '\n').encode()
-    if path.exists():
-        if path.stat().st_size != len(payload) or digest(path) != hashlib.sha256(payload).hexdigest():
-            raise RuntimeError('Existing NAS metadata differs: ' + str(path))
-        return
-    with path.open('xb') as stream:
-        for offset in range(0, len(payload), 65536):
-            stream.write(payload[offset:offset + 65536])
-    if path.stat().st_size != len(payload) or digest(path) != hashlib.sha256(payload).hexdigest():
-        raise RuntimeError('NAS metadata readback differs: ' + str(path))
+    remote_bytes(path, (json.dumps(value, ensure_ascii=True, indent=2) + '\n').encode())
 
 
 def beneath(path, root):

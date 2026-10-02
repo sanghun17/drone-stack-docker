@@ -178,6 +178,43 @@ class MigrationTest(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'checksum manifest changed'):
             self.run_migration()
 
+    def test_metadata_retry_recognizes_truncated_write_and_rejects_other_data(self):
+        path = self.destination / 'receipt.json'
+        self.destination.mkdir()
+        payload = b'{"files":"' + b'x' * 150000 + b'"}\n'
+        real_open, interrupted = Path.open, False
+
+        class InterruptedWrite:
+            def __init__(self, stream):
+                self.stream = stream
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                self.stream.close()
+
+            def write(self, block):
+                nonlocal interrupted
+                if not interrupted and self.stream.tell() >= 65536:
+                    interrupted = True
+                    raise OSError('transient SMB write error')
+                return self.stream.write(block)
+
+        def open_with_failure(target, *args, **kwargs):
+            stream = real_open(target, *args, **kwargs)
+            return InterruptedWrite(stream) if target == path and args == ('xb',) else stream
+
+        with patch.object(Path, 'open', open_with_failure), patch.object(migration.time, 'sleep'):
+            migration.remote_bytes(path, payload)
+        self.assertTrue(interrupted)
+        self.assertEqual(path.read_bytes(), payload)
+        migration.remote_bytes(path, payload)
+        path.write_bytes(b'{"unrecognized":true}\n')
+        with self.assertRaisesRegex(RuntimeError, 'metadata differs'):
+            migration.remote_bytes(path, payload)
+        self.assertEqual(path.read_bytes(), b'{"unrecognized":true}\n')
+
 
 if __name__ == '__main__':
     unittest.main()
