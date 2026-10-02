@@ -114,6 +114,42 @@ class MigrationTest(unittest.TestCase):
         self.assertTrue(migration.matching_prefix(source, partial))
         partial.write_bytes(b'12346')
         self.assertFalse(migration.matching_prefix(source, partial))
+
+    def test_prefix_read_retry_resumes_both_streams_at_the_same_offset(self):
+        source = self.source / 'a.tar'
+        payload = bytes(range(256)) * 1024
+        source.write_bytes(payload)
+        partial = self.share / 'a.tar.partial'
+        partial.write_bytes(payload[:180000])
+        real_open, failed = Path.open, False
+
+        class InterruptedRead:
+            def __init__(self, stream):
+                self.stream = stream
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                self.stream.close()
+
+            def seek(self, offset):
+                self.stream.seek(offset)
+
+            def read(self, amount):
+                nonlocal failed
+                if not failed and self.stream.tell() >= 65536:
+                    failed = True
+                    raise OSError('transient SMB read error')
+                return self.stream.read(amount)
+
+        def open_with_failure(path, *args, **kwargs):
+            stream = real_open(path, *args, **kwargs)
+            return InterruptedRead(stream) if path == partial else stream
+
+        with patch.object(Path, 'open', open_with_failure), patch.object(migration.time, 'sleep'):
+            self.assertTrue(migration.matching_prefix(source, partial))
+        self.assertTrue(failed)
         partial.write_bytes(b'1234567890')
         self.assertFalse(migration.matching_prefix(source, partial))
 

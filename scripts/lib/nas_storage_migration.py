@@ -42,19 +42,34 @@ def digest(path, report=None):
 
 def matching_prefix(local, partial, report=None):
     """Recognize an interrupted upload without discarding unknown NAS bytes."""
-    remaining = partial.stat().st_size
-    expected = remaining
-    if remaining > local.stat().st_size:
+    expected = partial.stat().st_size
+    if expected > local.stat().st_size:
         return False
-    with local.open('rb', buffering=0) as source, partial.open('rb', buffering=0) as remote:
-        while remaining:
-            amount = min(65536, remaining)
-            a, b = source.read(amount), remote.read(amount)
-            if len(a) != amount or a != b:
-                return False
-            remaining -= amount
+    offset, retries = 0, 0
+    while offset < expected:
+        try:
+            with local.open('rb', buffering=0) as source, partial.open('rb', buffering=0) as remote:
+                if offset:
+                    source.seek(offset)
+                    remote.seek(offset)
+                while offset < expected:
+                    block = remote.read(min(65536, expected - offset))
+                    if not block:
+                        raise OSError('Premature EOF in interrupted upload')
+                    if source.read(len(block)) != block:
+                        return False
+                    offset += len(block)
+                    if report:
+                        report(part_bytes=offset)
+        except OSError:
+            retries += 1
+            if retries > 8:
+                raise
             if report:
-                report(part_bytes=expected - remaining)
+                report(True, prefix_read_retry=retries, part_bytes=offset)
+            time.sleep(1)
+    if partial.stat().st_size != expected:
+        raise RuntimeError('NAS partial changed during recognition')
     return True
 
 
