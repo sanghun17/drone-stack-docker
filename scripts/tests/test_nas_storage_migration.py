@@ -250,6 +250,35 @@ class MigrationTest(unittest.TestCase):
             self.assertTrue(migration.matching_prefix(source, partial))
             self.assertEqual(migration.digest(partial), migration.digest(source))
 
+    def test_upload_retry_appends_only_after_recognizing_identical_prefix(self):
+        source = self.source / 'a.tar'
+        payload = bytes(range(256)) * 4096
+        source.write_bytes(payload)
+        destination = self.share / 'a.tar'
+        options = []
+
+        class InterruptedUpload:
+            def __init__(self, command, stdin, **kwargs):
+                options.append(command[2])
+                target = Path(command[3])
+                with target.open('ab' if command[2] == '--append' else 'xb') as output:
+                    output.write(stdin.read(100000) if len(options) == 1 else stdin.read())
+                self.returncode = 1 if len(options) == 1 else 0
+
+            def poll(self):
+                return self.returncode
+
+            def wait(self):
+                return self.returncode
+
+        with patch.object(migration, 'nas_uri', side_effect=str), \
+                patch.object(migration.subprocess, 'Popen', InterruptedUpload), \
+                patch.object(migration.time, 'sleep'):
+            checksum = migration.transfer_archive(source, destination, lambda *a, **kw: None)
+        self.assertEqual(options, ['--create', '--append'])
+        self.assertEqual(destination.read_bytes(), payload)
+        self.assertEqual(checksum, migration.digest(source))
+
 
 if __name__ == '__main__':
     unittest.main()

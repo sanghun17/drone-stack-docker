@@ -78,25 +78,32 @@ def matching_prefix(local, partial, report=None):
     return True
 
 
+def nas_uri(path):
+    share = Path('/run/user/1000/gvfs/smb-share:server=10.74.22.95,share=research')
+    return 'smb://10.74.22.95/research/' + quote(path.relative_to(share).as_posix(), safe='/')
+
+
 def transfer_archive(source, destination, report):
     checksum = digest(source)
     partial = destination.with_name(destination.name + '.partial')
-    share = Path('/run/user/1000/gvfs/smb-share:server=10.74.22.95,share=research')
-    uri = 'smb://10.74.22.95/research/' + quote(partial.relative_to(share).as_posix(), safe='/')
+    uri = nas_uri(partial)
     for attempt in range(1, 6):
-        if partial.exists():
+        interrupted = partial.exists()
+        resume_offset = 0
+        if interrupted:
             report(True, phase='checking_interrupted_upload')
             if partial.stat().st_size == source.stat().st_size and digest(partial) == checksum:
                 partial.rename(destination)
                 return checksum
             if not matching_prefix(source, partial, report):
                 raise RuntimeError('Unknown or corrupt NAS partial; source retained: ' + str(partial))
-            partial.unlink()
-        report(True, phase='uploading', upload_attempt=attempt, part_bytes=0,
-               archive_bytes=source.stat().st_size)
+            resume_offset = partial.stat().st_size
+        report(True, phase='uploading', upload_attempt=attempt, part_bytes=resume_offset,
+               archive_bytes=source.stat().st_size, resume_offset=resume_offset)
         # Feeding GIO from a staged file avoids Python pipe producer failures.
         with source.open('rb') as stream, tempfile.TemporaryFile() as errors:
-            process = subprocess.Popen(['gio', 'save', '--create', uri], stdin=stream,
+            stream.seek(resume_offset)
+            process = subprocess.Popen(['gio', 'save', '--append' if interrupted else '--create', uri], stdin=stream,
                                        stdout=subprocess.DEVNULL, stderr=errors)
             progress, changed_at = -1, time.monotonic()
             try:
