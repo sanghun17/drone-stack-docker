@@ -405,6 +405,34 @@ def run_locked(audit):
     destination, share = Path(plan['destination']), Path(plan['share'])
     if not share.is_dir() or not beneath(destination, share) or destination == share:
         raise RuntimeError('Authenticated NAS share is unavailable or destination is unsafe')
+    if (audit / 'COMPLETE.json').exists():
+        completed = json.loads((audit / 'COMPLETE.json').read_text())
+        expected = dict(state='complete', parts=len(plan['parts']),
+                        source_bytes=plan['source_bytes'], destination=str(destination))
+        if any(completed.get(key) != value for key, value in expected.items()):
+            raise RuntimeError('Local completion receipt does not match this plan')
+        for name, value in [('plan.json', plan), ('COMPLETE.json', completed)]:
+            if not (destination / name).exists():
+                raise RuntimeError('Completed NAS metadata is missing: ' + name)
+            remote_json(destination / name, value)
+        sums = []
+        for part in plan['parts']:
+            name = part['name']
+            receipt = json.loads((audit / (name + '.verified.json')).read_text())
+            removed = json.loads((audit / (name + '.removed.json')).read_text())
+            if (removed['sha256'] != receipt['sha256'] or receipt['name'] != name or
+                    (destination / name).stat().st_size != receipt['archive_bytes']):
+                raise RuntimeError('Completed archive receipt or size changed: ' + name)
+            if not (destination / (name + '.json')).exists():
+                raise RuntimeError('Completed NAS verification receipt is missing: ' + name)
+            remote_json(destination / (name + '.json'), receipt)
+            sums.append(receipt['sha256'] + '  ' + name + '\n')
+        if (destination / 'SHA256SUMS').read_bytes() != ''.join(sums).encode():
+            raise RuntimeError('Completed checksum manifest changed')
+        save(audit / 'status.json', dict(phase='complete', completed_parts=len(plan['parts']),
+                                       total_parts=len(plan['parts']), source_bytes=plan['source_bytes'],
+                                       updated_at=time.time(), completed_at=completed['completed_at']))
+        return
     protected = [Path(p) for p in plan['protected']]
     for part in plan['parts']:
         for entry in part['entries']:

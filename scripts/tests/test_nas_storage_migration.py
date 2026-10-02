@@ -167,6 +167,17 @@ class MigrationTest(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'identity changed'):
             migration.unchanged(plan['parts'][0]['entries'][0])
 
+    def test_completed_group_can_resume_without_replacing_completion(self):
+        (self.source / 'a.bag').write_bytes(b'payload')
+        migration.prepare(self.config, self.audit)
+        self.run_migration()
+        completion = (self.destination / 'COMPLETE.json').read_bytes()
+        self.run_migration()
+        self.assertEqual((self.destination / 'COMPLETE.json').read_bytes(), completion)
+        (self.destination / 'SHA256SUMS').write_text('changed')
+        with self.assertRaisesRegex(RuntimeError, 'checksum manifest changed'):
+            self.run_migration()
+
 
 if __name__ == '__main__':
     unittest.main()
