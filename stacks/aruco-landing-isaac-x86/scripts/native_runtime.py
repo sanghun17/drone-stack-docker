@@ -5,6 +5,10 @@ import math
 def robot_config(dt):
     from isaaclab_assets.robots.arl_robot_1 import ARL_ROBOT_1_CFG
     cfg=ARL_ROBOT_1_CFG.replace(prim_path='{ENV_REGEX_NS}/Robot')
+    # Landing cameras observe the pad. Hide drone visual geometry without
+    # changing its native physics, collision shapes, motor dynamics or control.
+    # This also avoids stale dynamic-mesh transforms in the pinned RTX streamer.
+    cfg.spawn.visible=False
     actuator=cfg.actuators['thrusters']
     actuator.dt=dt
     for key in ('thrust_const_range','tau_inc_range','tau_dec_range'):

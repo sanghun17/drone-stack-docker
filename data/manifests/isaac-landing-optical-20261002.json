@@ -1,0 +1,356 @@
+{
+  "date": "2026-10-02",
+  "stack": "aruco-landing-isaac-x86",
+  "status": "Optical rendering, isolation and CPU/GPU pilots validated; remaining environment sweep requires driver recovery",
+  "driver": {
+    "version": "570.211.01",
+    "kernel": "5.15.0-139-generic",
+    "dkms_installed": true,
+    "reboot_completed": true
+  },
+  "selected_gpu": "GPU-5f5e6979-51fc-3166-7a87-4e264c81e4dc",
+  "native_image": "nvcr.io/nvidia/isaac-lab:3.0.0-rc1@sha256:1e795d3f10b50e97f93141a8eb1fa4d2c90a192c226a1bceecc5338ca87652f3",
+  "aruco_revision": "0cc8a10ceae7df7f24506e4e8e1f2094eaee8e01",
+  "application_sources_sha256": {
+    "evaluate.py": "cd0ac71580330b2ecfe8785abcab1010138e025a3b7b0226fd469329a5964169",
+    "native_runtime.py": "8ea26b263c92b6dcd89678d9726348e220c9af4db320cc55e72baffdc8c10b4c",
+    "native_smoke.py": "4050594a38c0455064a7be10b2bc9530a2a62092b0075a7d97c342e1152e160d",
+    "pad_scene.py": "6a9bc4606d4a278269ff597cf8c6a5df203d9ebb7e8fb084c8175c00326c447e",
+    "preflight.py": "f3e8f55d53eba57083566f83b9fb2a88ca7cca471041c8cc7a8476e874d6f240",
+    "trial_store.py": "5c106f7823b5c93cce0117a8db187988308bf5b66b65449a17b14d125e0e8ba6"
+  },
+  "optical_smoke": {
+    "smoke_detected": 4,
+    "expected": 4,
+    "statistics": {
+      "physics_s": 0.0,
+      "render_s": 1.0873568370000157,
+      "device_and_transfer_s": 0.011968127000159257,
+      "detect_s": 1.8432698069998423,
+      "pnp_s": 0.05061137400014104,
+      "control_s": 0.0,
+      "transferred_bytes": 6220800,
+      "markers": 726,
+      "camera_batches": 3,
+      "physics_steps": 0
+    },
+    "pose_quality": {
+      "valid_poses": 12,
+      "translation_sum_squared_m2": 0.00017770243547693464,
+      "translation_max_m": 0.006271625529529515,
+      "rotation_max_deg": 0.23177410638616863
+    },
+    "hardware": {
+      "gpu_uuid": "GPU-5f5e6979-51fc-3166-7a87-4e264c81e4dc",
+      "gpu_name": "NVIDIA GeForce RTX 2080 Ti",
+      "driver": "570.211.01",
+      "memory_mib": 11264,
+      "rtx_driver_floor_passed": true,
+      "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+      "renderer_log_minimum": "550.90.07",
+      "renderer_log_recommended": "580.95.05",
+      "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+    }
+  },
+  "isolation": {
+    "enabled": {
+      "smoke_detected": 4,
+      "expected": 4,
+      "statistics": {
+        "physics_s": 0.0,
+        "render_s": 1.1694459919999645,
+        "device_and_transfer_s": 0.012686672000199906,
+        "detect_s": 1.8093183219999673,
+        "pnp_s": 0.05012383399991904,
+        "control_s": 0.0,
+        "transferred_bytes": 6220800,
+        "markers": 726,
+        "camera_batches": 3,
+        "physics_steps": 0
+      },
+      "pose_quality": {
+        "valid_poses": 12,
+        "translation_sum_squared_m2": 0.0001648382026453551,
+        "translation_max_m": 0.0062712431202016534,
+        "rotation_max_deg": 0.23176192910465374
+      },
+      "hardware": {
+        "gpu_uuid": "GPU-5f5e6979-51fc-3166-7a87-4e264c81e4dc",
+        "gpu_name": "NVIDIA GeForce RTX 2080 Ti",
+        "driver": "570.211.01",
+        "memory_mib": 11264,
+        "rtx_driver_floor_passed": true,
+        "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+        "renderer_log_minimum": "550.90.07",
+        "renderer_log_recommended": "580.95.05",
+        "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+      },
+      "foreign_occluder": true,
+      "scene_partitioning": true
+    },
+    "negative_control": {
+      "smoke_detected": 3,
+      "expected": 4,
+      "statistics": {
+        "physics_s": 0.0,
+        "render_s": 0.4203743159998794,
+        "device_and_transfer_s": 0.01408068299997467,
+        "detect_s": 2.1159755149999455,
+        "pnp_s": 0.03770131099986429,
+        "control_s": 0.0,
+        "transferred_bytes": 6220800,
+        "markers": 543,
+        "camera_batches": 3,
+        "physics_steps": 0
+      },
+      "pose_quality": {
+        "valid_poses": 9,
+        "translation_sum_squared_m2": 0.00016423843967044007,
+        "translation_max_m": 0.006271625529529515,
+        "rotation_max_deg": 0.23177410638616863
+      },
+      "hardware": {
+        "gpu_uuid": "GPU-5f5e6979-51fc-3166-7a87-4e264c81e4dc",
+        "gpu_name": "NVIDIA GeForce RTX 2080 Ti",
+        "driver": "570.211.01",
+        "memory_mib": 11264,
+        "rtx_driver_floor_passed": true,
+        "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+        "renderer_log_minimum": "550.90.07",
+        "renderer_log_recommended": "580.95.05",
+        "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+      },
+      "foreign_occluder": true,
+      "scene_partitioning": false,
+      "passed": false
+    },
+    "negative_control_process_exit_code": 1
+  },
+  "gpu_static_comparison": {
+    "scope": "actual static Isaac renders; detector timing excludes rendering/upload/CPU PnP",
+    "images": 4,
+    "corner_cpu_agreement_rmse_px": 0.8888300949282769,
+    "cpu_detect_s": 0.883739932000708,
+    "gpu_detect_s": 0.02404183900011958,
+    "strict_agreement_passed": false,
+    "static_pose_gate_passed": true
+  },
+  "gpu_static_ground_truth_max_error_m": 0.0033945153054097954,
+  "pilots": {
+    "pilot-padonly-cpu-n1": {
+      "output": "data/results/isaac/pilot-padonly-cpu-n1",
+      "summary": {
+        "num_envs": 1,
+        "completed_trials": 4,
+        "wall_s": 165.73095883200006,
+        "startup_wall_s": 18.64525538600003,
+        "evaluation_wall_s": 184.37623546999998,
+        "new_trials": 4,
+        "trial_per_wall_hour": 86.88780962522003,
+        "aggregate_simulation_s": 13.883333333333333,
+        "aggregate_simulation_per_wall_s": 0.08377030719653737,
+        "gpu_peak_allocated_bytes": 20996608,
+        "hardware": {
+          "gpu_uuid": "GPU-5f5e6979-51fc-3166-7a87-4e264c81e4dc",
+          "gpu_name": "NVIDIA GeForce RTX 2080 Ti",
+          "driver": "570.211.01",
+          "memory_mib": 11264,
+          "rtx_driver_floor_passed": true,
+          "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+          "renderer_log_minimum": "550.90.07",
+          "renderer_log_recommended": "580.95.05",
+          "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+        },
+        "timing": {
+          "physics_s": 14.232518772006642,
+          "render_s": 28.5739007819991,
+          "device_and_transfer_s": 0.6070245619962407,
+          "detect_s": 112.19509700700064,
+          "pnp_s": 3.2796157080043713,
+          "control_s": 0.15566727399880165,
+          "transferred_bytes": 440121600,
+          "markers": 41455,
+          "camera_batches": 849,
+          "physics_steps": 1666
+        },
+        "pose_quality": {
+          "valid_poses": 849,
+          "translation_sum_squared_m2": 0.0077260105054059525,
+          "translation_max_m": 0.009658049281753317,
+          "rotation_max_deg": 0.3609505809035775
+        }
+      },
+      "pose_quality": {
+        "valid_poses": 849,
+        "translation_sum_squared_m2": 0.0077260105054059525,
+        "translation_max_m": 0.009658049281753317,
+        "rotation_max_deg": 0.3609505809035775,
+        "translation_rmse_m": 0.003016642199447716
+      },
+      "successes": 4,
+      "trials": 4,
+      "maximum_lateral_error_m": 0.022105716168880463,
+      "manifest_fingerprint": "b4d5ac8a0549aa51afba559cc4c42911f6f3ba5da58867d42a1203365dc236dc",
+      "performance_usable": true,
+      "performance_note": "4-trial pilot, excludes application startup"
+    },
+    "pilot-padonly-cpu-n4": {
+      "output": "data/results/isaac/pilot-padonly-cpu-n4",
+      "summary": {
+        "num_envs": 4,
+        "completed_trials": 4,
+        "wall_s": 129.92811047200007,
+        "startup_wall_s": 18.010484749999932,
+        "evaluation_wall_s": 147.9386077260001,
+        "new_trials": 4,
+        "trial_per_wall_hour": 110.83051964419391,
+        "aggregate_simulation_s": 13.866666666666667,
+        "aggregate_simulation_per_wall_s": 0.10672568558329784,
+        "gpu_peak_allocated_bytes": 58876416,
+        "hardware": {
+          "gpu_uuid": "GPU-5f5e6979-51fc-3166-7a87-4e264c81e4dc",
+          "gpu_name": "NVIDIA GeForce RTX 2080 Ti",
+          "driver": "570.211.01",
+          "memory_mib": 11264,
+          "rtx_driver_floor_passed": true,
+          "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+          "renderer_log_minimum": "550.90.07",
+          "renderer_log_recommended": "580.95.05",
+          "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+        },
+        "timing": {
+          "physics_s": 4.248665326001401,
+          "render_s": 16.324740912998777,
+          "device_and_transfer_s": 0.24095862199897056,
+          "detect_s": 104.03265336700133,
+          "pnp_s": 2.9649393769989274,
+          "control_s": 0.0677939959982723,
+          "transferred_bytes": 460339200,
+          "markers": 41621,
+          "camera_batches": 222,
+          "physics_steps": 436
+        },
+        "pose_quality": {
+          "valid_poses": 887,
+          "translation_sum_squared_m2": 0.008346695439688466,
+          "translation_max_m": 0.010180799552361652,
+          "rotation_max_deg": 0.32330073844994417
+        }
+      },
+      "pose_quality": {
+        "valid_poses": 887,
+        "translation_sum_squared_m2": 0.008346695439688466,
+        "translation_max_m": 0.010180799552361652,
+        "rotation_max_deg": 0.32330073844994417,
+        "translation_rmse_m": 0.0030675770048355414
+      },
+      "successes": 4,
+      "trials": 4,
+      "maximum_lateral_error_m": 0.02207893691956997,
+      "manifest_fingerprint": "c54f9a69259ad57c5f488b682d0863b87427ad750c0b362ebbf12e3dc5cecbf4",
+      "performance_usable": true,
+      "performance_note": "4-trial pilot, excludes application startup"
+    },
+    "pilot-padonly-gpu-n1": {
+      "output": "data/results/isaac/pilot-padonly-gpu-n1",
+      "summary": {
+        "num_envs": 1,
+        "completed_trials": 16,
+        "wall_s": 221.49759829799996,
+        "startup_wall_s": 17.598820423000006,
+        "evaluation_wall_s": 239.09643768799992,
+        "new_trials": 16,
+        "trial_per_wall_hour": 260.04796640054633,
+        "aggregate_simulation_s": 50.75,
+        "aggregate_simulation_per_wall_s": 0.22912212317409247,
+        "gpu_peak_allocated_bytes": 10115584,
+        "hardware": {
+          "gpu_uuid": "GPU-5f5e6979-51fc-3166-7a87-4e264c81e4dc",
+          "gpu_name": "NVIDIA GeForce RTX 2080 Ti",
+          "driver": "570.211.01",
+          "memory_mib": 11264,
+          "rtx_driver_floor_passed": true,
+          "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+          "renderer_log_minimum": "550.90.07",
+          "renderer_log_recommended": "580.95.05",
+          "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+        },
+        "timing": {
+          "physics_s": 49.12109838400488,
+          "render_s": 92.52918130299122,
+          "device_and_transfer_s": 39.49549159999492,
+          "detect_s": 0.0028156580106042384,
+          "pnp_s": 16.240635854995844,
+          "control_s": 0.525708978997045,
+          "transferred_bytes": 5266132,
+          "markers": 145936,
+          "camera_batches": 3109,
+          "physics_steps": 6090
+        },
+        "pose_quality": {
+          "valid_poses": 3109,
+          "translation_sum_squared_m2": 0.019459601496265595,
+          "translation_max_m": 0.009696263562503324,
+          "rotation_max_deg": 0.23553149794533693
+        }
+      },
+      "pose_quality": {
+        "valid_poses": 3109,
+        "translation_sum_squared_m2": 0.019459601496265595,
+        "translation_max_m": 0.009696263562503324,
+        "rotation_max_deg": 0.23553149794533693,
+        "translation_rmse_m": 0.0025018231690009615
+      },
+      "successes": 16,
+      "trials": 16,
+      "maximum_lateral_error_m": 0.048266030848026276,
+      "manifest_fingerprint": "e210ccb0d9d48c7463b789fe2b7ab5be6f37e9f877e3e76f4b3bda3bd5bb198a",
+      "performance_usable": false,
+      "performance_note": "GPU1 bus loss happened during the trial loop; renderer shutdown hung afterward. Remeasure performance on a healthy driver state."
+    }
+  },
+  "fixes": [
+    "Saved optical smoke images and machine-readable pass/fail results",
+    "Preserved failure exit code through native SimulationApp.close",
+    "Native spawn visibility hides drone graphics while retaining physics",
+    "Explicit Fabric forward synchronization before optical capture",
+    "Separated application startup from trial-loop timing",
+    "Forwarded the optional GPU detector library into the existing Docker service"
+  ],
+  "driver_incident": {
+    "time_utc": "2026-10-02T11:40:51Z",
+    "gpu_index_before_incident": 1,
+    "gpu_uuid": "GPU-8149eb0b-023a-17dd-b942-c622f0b8c4ca",
+    "pci": "0000:1a:00.0",
+    "xid": 79,
+    "description": "GPU has fallen off the bus",
+    "root_cause": "not determined",
+    "recovery_message": "Xid154 Node Reboot Required on all GPUs",
+    "shutdown_process_pid": 59246,
+    "shutdown_thread_state": "D / drm_release",
+    "effect": "Selected GPU0 completed 16 trials, but renderer shutdown did not finish. Host NVML UUID lookup failed; GPU0-only container NVML still worked.",
+    "automated_sweep_stopped": true
+  },
+  "memory_note": "Observed CPU-run usage: N1 3926 MiB, N4 4557 MiB (individual samples, not measured peaks). Container GPU monitoring started after GPU trials ended and measured stalled cleanup only; exclude it from peak-memory comparisons.",
+  "default_detector": "cpu",
+  "gpu_detector": "experimental; strict corner/ID agreement gate still fails",
+  "termination": "vision camera-height threshold, not physical ground contact",
+  "validation": [
+    "CPU N1 and N4: 4/4 successes each",
+    "GPU N1: 16/16 successes",
+    "Isolation enabled: 4/4 pads detected; disabled: 3/4, expected failed smoke with exit1",
+    "Trial-store unit test, Python/bash syntax, repository worktree layout"
+  ],
+  "remaining": [
+    "Recover the driver state by rebooting; GPU1 bus-loss cause remains undetermined",
+    "Run GPU N4/N8/N16 with the same 16 trial IDs and measure full GPU memory usage",
+    "Remeasure GPU N1 throughput without a driver incident",
+    "Expand actual-image GPU pose validation beyond this small controlled pilot before changing the CPU default"
+  ],
+  "evidence_paths": [
+    ".build/isaac-landing/driver570-gpu1-xid.log",
+    ".build/isaac-landing/driver570-shutdown-stall.log",
+    "data/results/isaac/",
+    "data/results/isaac-landing-validation/gpu-real-static.json"
+  ]
+}

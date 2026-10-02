@@ -17,6 +17,7 @@ ARUCO = ROOT / 'ws/aruco-landing/src/aruco_landing'
 
 
 def main():
+    process_started_wall = time.perf_counter()
     from isaaclab.app import AppLauncher
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', type=Path, default=HERE.parent/'config/evaluation.yaml')
@@ -27,10 +28,16 @@ def main():
     parser.add_argument('--resume', action='store_true')
     parser.add_argument('--detector', choices=['cpu','gpu-experimental'])
     parser.add_argument('--smoke', action='store_true', help='render and detect; fail unless every camera finds the pad')
+    parser.add_argument('--isolation-smoke', action='store_true',
+                        help='smoke with an env-1 visual occluder directly in front of env-0 camera')
     parser.add_argument('--physics', default='isaacsim_physx', choices=['isaacsim_physx'])
     AppLauncher.add_app_launcher_args(parser)
     parser.set_defaults(headless=True)
     args = parser.parse_args()
+    args.process_started_wall = process_started_wall
+    if args.isolation_smoke:
+        if args.num_envs < 2: parser.error('isolation-smoke requires at least two environments')
+        args.smoke = True
     if args.num_envs < 1 or args.trials < 1 or args.trial_start < 0:
         parser.error('num-envs/trials must be positive and trial-start nonnegative')
     cfg = yaml.safe_load(args.config.read_text())
@@ -70,10 +77,18 @@ def main():
         print('All requested trials already completed.'); return
     args.enable_cameras = True
     launcher = AppLauncher(args)
+    exit_code = 0
     try:
         run(args, cfg, manifest, pending, store)
+    except BaseException as error:
+        import traceback
+        traceback.print_exc()
+        exit_code = 130 if isinstance(error,KeyboardInterrupt) else 1
     finally:
-        launcher.app.close()
+        # SimulationApp uses os._exit() on shutdown. Preserve failures instead
+        # of allowing its default exit code 0 to hide a failed smoke/run.
+        launcher.app.close(exit_code=exit_code)
+    if exit_code: raise SystemExit(exit_code)
 
 
 def run(args, cfg, manifest, pending, store):
@@ -108,7 +123,7 @@ def run(args, cfg, manifest, pending, store):
             width=camera_cfg['width'], height=camera_cfg['height'], data_types=['rgb'],
             spawn=sim_utils.PinholeCameraCfg(focal_length=24.,
                 horizontal_aperture=24.*camera_cfg['width']/camera_cfg['fx'], clipping_range=(.01,8.)),
-            renderer_cfg=IsaacRtxRendererCfg(enable_scene_partitioning=True,
+            renderer_cfg=IsaacRtxRendererCfg(enable_scene_partitioning=cfg.get('scene_partitioning',True),
                 global_settings=IsaacRtxRendererGlobalSettingsCfg(
                     enable_shadows=False, enable_reflections=False, enable_global_illumination=False,
                     enable_ambient_occlusion=False, antialiasing_mode='Off')))
@@ -117,6 +132,17 @@ def run(args, cfg, manifest, pending, store):
                                      replicate_physics=True, filter_collisions=True))
     from isaaclab.sim import get_current_stage
     add_pad(get_current_stage(), args.num_envs, manifest)
+    if args.isolation_smoke:
+        # A visible foreign object within env-0's clipping range would cover
+        # its pad completely without RTX partition culling. No physics is run.
+        first = initial_condition(cfg['seed'],pending[0],cfg['initial_bounds'])
+        origins = scene.env_origins
+        if not isinstance(origins,torch.Tensor): origins = origins.torch
+        point = origins[0]-origins[1]+torch.tensor(
+            [first['x'],first['y'],first['z']-.4],device=sim.device)
+        occluder = sim_utils.CuboidCfg(size=(.8,.8,.05),
+            visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.,0.,0.)))
+        occluder.func('/World/envs/env_1/IsolationOccluder',occluder,translation=tuple(point.cpu().tolist()))
     sim.reset()
     robot, camera = scene['robot'], scene['camera']
     K = np.array([[camera_cfg['fx'],0.,camera_cfg['cx']],
@@ -139,6 +165,10 @@ def run(args, cfg, manifest, pending, store):
     new_rows = []
 
     def capture():
+        # Camera-only headless runs have no visualizer to call forward(). Sync
+        # PhysX articulation transforms into Fabric before RTX reads geometry,
+        # including the first image after a trial reset. This does not step time.
+        sim.forward()
         pose = robot.data.root_link_pose_w.torch
         camera.set_world_poses(pose[:,:3]+math_utils.quat_apply(pose[:,3:7],offset),
             math_utils.quat_mul(pose[:,3:7],optical_quat), convention='ros')
@@ -184,7 +214,20 @@ def run(args, cfg, manifest, pending, store):
         for _ in range(3): observations = capture()
         if args.smoke:
             found = sum(pose is not None for pose in observations[:len(cohort)])
-            print(json.dumps(dict(smoke_detected=found, expected=len(cohort), statistics=totals,pose_quality=quality)),flush=True)
+            import cv2
+            images = camera.data.output['rgb']
+            if not isinstance(images, torch.Tensor): images = images.torch
+            images = images[...,:3].cpu().numpy()
+            for env, image in enumerate(images):
+                cv2.imwrite(str(store.directory / ('camera-%03d.png' % env)), cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
+            result = dict(smoke_detected=found, expected=len(cohort), statistics=totals,
+                          pose_quality=quality, hardware=check_hardware(),
+                          foreign_occluder=args.isolation_smoke,
+                          scene_partitioning=cfg.get('scene_partitioning',True),
+                          passed=found==len(cohort) and quality['translation_max_m']<=.03
+                                 and quality['rotation_max_deg']<=5.)
+            store._atomic(store.directory/'smoke.json', result)
+            print(json.dumps(result),flush=True)
             if found != len(cohort): raise RuntimeError('pad detection smoke failed')
             if quality['translation_max_m']>.03 or quality['rotation_max_deg']>5.:
                 raise RuntimeError('optical pose smoke exceeds .03 m / 5 degree limits')
@@ -262,6 +305,8 @@ def run(args, cfg, manifest, pending, store):
     wall = time.perf_counter()-start
     durations = sum(row['simulation_duration_s'] for row in new_rows)
     summary = dict(num_envs=args.num_envs,completed_trials=len(store.completed), wall_s=wall,
+        startup_wall_s=start-args.process_started_wall,
+        evaluation_wall_s=time.perf_counter()-args.process_started_wall,
         new_trials=len(new_rows), trial_per_wall_hour=len(new_rows)/wall*3600, aggregate_simulation_s=durations,
         aggregate_simulation_per_wall_s=durations/wall, gpu_peak_allocated_bytes=torch.cuda.max_memory_allocated(),
         hardware=check_hardware(), timing=totals,pose_quality=quality)
