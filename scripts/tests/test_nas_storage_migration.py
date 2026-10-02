@@ -33,12 +33,12 @@ class MigrationTest(unittest.TestCase):
                            destination=str(self.destination), protected=[],
                            roots=[dict(path=str(self.source), remove='all')], part_bytes=4)
 
-    def copy(self, src, dst):
+    def copy(self, src, dst, report=None):
         shutil.copyfile(src, dst)
         return migration.digest(dst)
 
     def run_migration(self, copy=None):
-        with patch.object(migration, 'transfer', side_effect=copy or self.copy), contextlib.redirect_stdout(io.StringIO()):
+        with patch.object(migration, 'transfer_archive', side_effect=copy or self.copy), contextlib.redirect_stdout(io.StringIO()):
             migration.run(self.audit)
 
     def test_round_trip_preserves_links_and_independent_hardlinked_parts(self):
@@ -68,10 +68,10 @@ class MigrationTest(unittest.TestCase):
         source.write_bytes(b'original')
         migration.prepare(self.config, self.audit)
         with self.assertRaisesRegex(OSError, 'NAS failed'):
-            self.run_migration(lambda src, dst: (_ for _ in ()).throw(OSError('NAS failed')))
+            self.run_migration(lambda src, dst, report: (_ for _ in ()).throw(OSError('NAS failed')))
         self.assertEqual(source.read_bytes(), b'original')
 
-        def changed(src, dst):
+        def changed(src, dst, report):
             checksum = self.copy(src, dst)
             source.write_bytes(b'CHANGED!')
             return checksum
@@ -105,6 +105,17 @@ class MigrationTest(unittest.TestCase):
         self.assertFalse(source.exists())
         self.assertTrue(metadata.exists())
         self.assertTrue((self.audit / 'COMPLETE.json').exists())
+
+    def test_only_identical_prefix_is_recognized_as_interrupted_upload(self):
+        source = self.source / 'a.tar'
+        source.write_bytes(b'123456789')
+        partial = self.share / 'a.tar.partial'
+        partial.write_bytes(b'12345')
+        self.assertTrue(migration.matching_prefix(source, partial))
+        partial.write_bytes(b'12346')
+        self.assertFalse(migration.matching_prefix(source, partial))
+        partial.write_bytes(b'1234567890')
+        self.assertFalse(migration.matching_prefix(source, partial))
 
     def test_protected_selection_and_replaced_parent_are_rejected(self):
         source = self.source / 'a.bag'

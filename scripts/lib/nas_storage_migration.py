@@ -7,10 +7,109 @@ import json
 import os
 from pathlib import Path
 import stat
+import subprocess
 import tarfile
+import tempfile
 import time
+from urllib.parse import quote
 
-from verified_archive import digest, transfer
+def digest(path, report=None):
+    expected = path.stat().st_size
+    offset, retries = 0, 0
+    checksum = hashlib.sha256()
+    while offset < expected:
+        try:
+            with path.open('rb', buffering=0) as stream:
+                if offset:
+                    stream.seek(offset)
+                while offset < expected:
+                    block = stream.read(min(65536, expected - offset))
+                    if not block:
+                        raise OSError('Premature EOF: ' + str(path))
+                    checksum.update(block)
+                    offset += len(block)
+                    if report:
+                        report(part_bytes=offset)
+        except OSError:
+            retries += 1
+            if retries > 8:
+                raise
+            time.sleep(1)
+    if path.stat().st_size != expected:
+        raise RuntimeError('File size changed while hashing: ' + str(path))
+    return checksum.hexdigest()
+
+
+def matching_prefix(local, partial, report=None):
+    """Recognize an interrupted upload without discarding unknown NAS bytes."""
+    remaining = partial.stat().st_size
+    expected = remaining
+    if remaining > local.stat().st_size:
+        return False
+    with local.open('rb', buffering=0) as source, partial.open('rb', buffering=0) as remote:
+        while remaining:
+            amount = min(65536, remaining)
+            a, b = source.read(amount), remote.read(amount)
+            if len(a) != amount or a != b:
+                return False
+            remaining -= amount
+            if report:
+                report(part_bytes=expected - remaining)
+    return True
+
+
+def transfer_archive(source, destination, report):
+    checksum = digest(source)
+    partial = destination.with_name(destination.name + '.partial')
+    share = Path('/run/user/1000/gvfs/smb-share:server=10.74.22.95,share=research')
+    uri = 'smb://10.74.22.95/research/' + quote(partial.relative_to(share).as_posix(), safe='/')
+    for attempt in range(1, 6):
+        if partial.exists():
+            report(True, phase='checking_interrupted_upload')
+            if partial.stat().st_size == source.stat().st_size and digest(partial) == checksum:
+                partial.rename(destination)
+                return checksum
+            if not matching_prefix(source, partial, report):
+                raise RuntimeError('Unknown or corrupt NAS partial; source retained: ' + str(partial))
+            partial.unlink()
+        report(True, phase='uploading', upload_attempt=attempt, part_bytes=0,
+               archive_bytes=source.stat().st_size)
+        # Feeding GIO from a staged file avoids Python pipe producer failures.
+        with source.open('rb') as stream, tempfile.TemporaryFile() as errors:
+            process = subprocess.Popen(['gio', 'save', '--create', uri], stdin=stream,
+                                       stdout=subprocess.DEVNULL, stderr=errors)
+            progress, changed_at = -1, time.monotonic()
+            try:
+                while process.poll() is None:
+                    try:
+                        size = partial.stat().st_size
+                        report(part_bytes=size)
+                        if size != progress:
+                            progress, changed_at = size, time.monotonic()
+                    except OSError:
+                        pass
+                    if time.monotonic() - changed_at > 300:
+                        process.kill()
+                        raise OSError('NAS upload made no progress for five minutes')
+                    time.sleep(2)
+                errors.seek(0)
+                detail = errors.read().decode(errors='replace')
+            finally:
+                if process.poll() is None:
+                    process.kill()
+                process.wait()
+        if process.returncode:
+            report(True, upload_error=detail)
+            if attempt == 5:
+                raise OSError('NAS upload failed after five attempts: ' + detail)
+            time.sleep(min(2**attempt, 30))
+            continue
+        report(True, phase='verifying_nas_archive', part_bytes=0)
+        if partial.stat().st_size != source.stat().st_size or digest(partial, report) != checksum:
+            raise RuntimeError('NAS archive readback mismatch; source retained')
+        partial.rename(destination)
+        return checksum
+    raise RuntimeError('NAS upload did not complete')
 
 
 def save(path, value):
@@ -280,7 +379,7 @@ def run_locked(audit):
                             raise RuntimeError('Existing destination differs from staged archive')
                     else:
                         report(True, phase='copying_and_verifying')
-                        checksum = transfer(spool, final)
+                        checksum = transfer_archive(spool, final, report)
                         if checksum != receipt['sha256']:
                             raise RuntimeError('Uploaded archive differs from staging receipt')
                     receipt['verified_at'] = time.time()
