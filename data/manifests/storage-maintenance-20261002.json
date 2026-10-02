@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "status": "in_progress",
+  "started_at": "2026-10-02T17:11:48.724043+09:00",
+  "authorization": "User authorized deleting cleanup candidates and moving the remaining candidates to 2026_RAL NAS; retain ArUco experiment results and webcam recordings locally.",
+  "nas_windows_root": "X:\\Environment Uncertainty-aware Planning\\2026_RAL",
+  "nas_uri": "smb://10.74.22.95/research/Environment%20Uncertainty-aware%20Planning/2026_RAL",
+  "local_audit": "/home/ml/drone-data/shared/archive/storage-maintenance-20261002",
+  "preserved_local": [
+    "/home/ml/aruco-stack-docker/data/results",
+    "/home/ml/drone-data/shared/results/webcam-recordings",
+    "/home/ml/drone-data/training/archive/worktrees"
+  ],
+  "active_sources_retained": [
+    "/home/ml/risk-stack-docker/flight_logs/shared-simulation-20260930/roscore.log",
+    "/home/ml/.ros/log/26ace784-b68a-11f1-a218-6d2e551b4f4d",
+    "/home/ml/.local/share/xorg/Xorg.0.log"
+  ],
+  "dataset_resume_audit": "/home/ml/drone-data/shared/archive/nas-dataset-transfer-20260921",
+  "new_archives": [
+    {
+      "name": "simulation-logs",
+      "audit": "/home/ml/drone-data/shared/archive/storage-maintenance-20261002/archives/simulation-logs",
+      "destination": "/run/user/1000/gvfs/smb-share:server=10.74.22.95,share=research/Environment Uncertainty-aware Planning/2026_RAL/local_archive/ml-storage-20261002/simulation-logs",
+      "parts": 12,
+      "source_bytes": 88257486732,
+      "retained": [
+        {
+          "path": "/home/ml/risk-stack-docker/flight_logs/shared-simulation-20260930/roscore.log",
+          "reason": "open file"
+        }
+      ]
+    },
+    {
+      "name": "risk-research-archive",
+      "audit": "/home/ml/drone-data/shared/archive/storage-maintenance-20261002/archives/risk-research-archive",
+      "destination": "/run/user/1000/gvfs/smb-share:server=10.74.22.95,share=research/Environment Uncertainty-aware Planning/2026_RAL/local_archive/ml-storage-20261002/risk-research-archive",
+      "parts": 8,
+      "source_bytes": 60306333084,
+      "retained": []
+    },
+    {
+      "name": "downloaded-bags",
+      "audit": "/home/ml/drone-data/shared/archive/storage-maintenance-20261002/archives/downloaded-bags",
+      "destination": "/run/user/1000/gvfs/smb-share:server=10.74.22.95,share=research/Environment Uncertainty-aware Planning/2026_RAL/local_archive/ml-storage-20261002/downloaded-bags",
+      "parts": 10,
+      "source_bytes": 71564797532,
+      "retained": []
+    },
+    {
+      "name": "training-results",
+      "audit": "/home/ml/drone-data/shared/archive/storage-maintenance-20261002/archives/training-results",
+      "destination": "/run/user/1000/gvfs/smb-share:server=10.74.22.95,share=research/Environment Uncertainty-aware Planning/2026_RAL/local_archive/ml-storage-20261002/training-results",
+      "parts": 3,
+      "source_bytes": 23461535650,
+      "retained": []
+    },
+    {
+      "name": "training-history",
+      "audit": "/home/ml/drone-data/shared/archive/storage-maintenance-20261002/archives/training-history",
+      "destination": "/run/user/1000/gvfs/smb-share:server=10.74.22.95,share=research/Environment Uncertainty-aware Planning/2026_RAL/local_archive/ml-storage-20261002/training-history",
+      "parts": 4,
+      "source_bytes": 27288176870,
+      "retained": []
+    },
+    {
+      "name": "jetpack-recovery",
+      "audit": "/home/ml/drone-data/shared/archive/storage-maintenance-20261002/archives/jetpack-recovery",
+      "destination": "/run/user/1000/gvfs/smb-share:server=10.74.22.95,share=research/Environment Uncertainty-aware Planning/2026_RAL/local_archive/ml-storage-20261002/jetpack-recovery",
+      "parts": 5,
+      "source_bytes": 35004672058,
+      "retained": []
+    }
+  ],
+  "verification": "Every TAR is read back from NAS and checked by SHA-256 before removing its unchanged local files. Individual source file SHA-256 checks run again before removal.",
+  "worker_script": "scripts/lib/nas_storage_migration.py"
+}
