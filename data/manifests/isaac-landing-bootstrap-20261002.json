@@ -1,0 +1,187 @@
+{
+  "date": "2026-10-02",
+  "project": "aruco",
+  "stack": "aruco-landing-isaac-x86",
+  "status": "implemented; optical evaluation blocked by current host RTX driver",
+  "sources": {
+    "simulation/isaac-lab": {
+      "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
+      "revision": "4fb69d3ccafbb6f882579834d7ceeeb5155f7fa1",
+      "subdir": "deployment/stack-modules/simulation/isaac-lab"
+    },
+    "planner/aruco-batch": {
+      "repository": "https://github.com/sanghun17/aruco_landing.git",
+      "revision": "0cc8a10ceae7df7f24506e4e8e1f2094eaee8e01",
+      "subdir": "deployment/stack-modules/planner/aruco-batch"
+    }
+  },
+  "native_image": "nvcr.io/nvidia/isaac-lab:3.0.0-rc1@sha256:1e795d3f10b50e97f93141a8eb1fa4d2c90a192c226a1bceecc5338ca87652f3",
+  "host": {
+    "gpu_uuid": "GPU-5f5e6979-51fc-3166-7a87-4e264c81e4dc",
+    "gpu_name": "NVIDIA GeForce RTX 2080 Ti",
+    "driver": "535.261.03",
+    "memory_mib": 11264,
+    "rtx_driver_floor_passed": false,
+    "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+    "renderer_log_minimum": "550.90.07",
+    "renderer_log_recommended": "580.95.05",
+    "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+  },
+  "driver_upgrade": {
+    "authorized": true,
+    "installed": false,
+    "reason": "sudo requires local password; no unattended sudo access",
+    "reviewed_package": "nvidia-driver-570=570.211.01-0ubuntu1",
+    "apt_plan": {
+      "new_packages": 22,
+      "removed_driver_535_packages": 20,
+      "general_os_upgrade": false
+    },
+    "installer": "modules/simulation/isaac-lab/upgrade_host_driver.sh",
+    "reboot_required": true
+  },
+  "native_validation": {
+    "4": {
+      "num_envs": 4,
+      "cycles": [
+        {
+          "cycle": 0,
+          "wall_s": 2.095368891954422,
+          "max_hover_drift_m": 0.0
+        },
+        {
+          "cycle": 1,
+          "wall_s": 0.5979187230113894,
+          "max_hover_drift_m": 0.0
+        },
+        {
+          "cycle": 2,
+          "wall_s": 0.6112510010134429,
+          "max_hover_drift_m": 0.0
+        }
+      ],
+      "scope": "native physics/control/reset only; no images",
+      "passed": true
+    },
+    "16": {
+      "num_envs": 16,
+      "cycles": [
+        {
+          "cycle": 0,
+          "wall_s": 2.162236872012727,
+          "max_hover_drift_m": 0.0
+        },
+        {
+          "cycle": 1,
+          "wall_s": 0.5967489740578458,
+          "max_hover_drift_m": 0.0
+        },
+        {
+          "cycle": 2,
+          "wall_s": 0.5465051350183785,
+          "max_hover_drift_m": 0.0
+        }
+      ],
+      "scope": "native physics/control/reset only; no images",
+      "passed": true
+    }
+  },
+  "native_velocity_validation": {
+    "num_envs": 16,
+    "cycles": [
+      {
+        "cycle": 0,
+        "wall_s": 2.0897580760065466,
+        "max_hover_drift_m": 0.0
+      },
+      {
+        "cycle": 1,
+        "wall_s": 0.6100694000488147,
+        "max_hover_drift_m": 0.0
+      },
+      {
+        "cycle": 2,
+        "wall_s": 0.5666507800342515,
+        "max_hover_drift_m": 0.0
+      }
+    ],
+    "max_velocity_error_m_s": 0.004181969445198774,
+    "scope": "native physics/control/reset only; no images",
+    "passed": true
+  },
+  "gpu_detection": {
+    "single_marker_accuracy_gate_passed": true,
+    "full_pad": {
+      "scope": "synthetic images only; excludes Isaac rendering",
+      "images": 24,
+      "backend": "experimental fixed-threshold CUDA CCL/quad/TLS/4x4 decode",
+      "cases": [
+        {
+          "batch_size": 1,
+          "gpu_wall_s": 0.27003870997577906,
+          "cpu_wall_s": 1.7169402480358258,
+          "gpu_images_per_s": 88.87614669079358,
+          "cpu_images_per_s": 13.978354824785502,
+          "grayscale_reference_bytes": 12441600,
+          "gpu_transferred_bytes": 48480,
+          "reference_matches": 1335,
+          "extra_vs_reference": 9,
+          "missed_vs_reference": 0,
+          "corner_rmse_px": 0.7626374054347644,
+          "pnp_dropouts": 0,
+          "pose_translation_max_delta_m": 0.005191823226530504
+        },
+        {
+          "batch_size": 4,
+          "gpu_wall_s": 0.18377890100236982,
+          "cpu_wall_s": 1.729403842939064,
+          "gpu_images_per_s": 130.59170486437137,
+          "cpu_images_per_s": 13.87761458839643,
+          "grayscale_reference_bytes": 12441600,
+          "gpu_transferred_bytes": 48480,
+          "reference_matches": 1335,
+          "extra_vs_reference": 9,
+          "missed_vs_reference": 0,
+          "corner_rmse_px": 0.7626374054347644,
+          "pnp_dropouts": 0,
+          "pose_translation_max_delta_m": 0.005191823226531103
+        },
+        {
+          "batch_size": 16,
+          "gpu_wall_s": 0.0719636189751327,
+          "cpu_wall_s": 1.7318093089852482,
+          "gpu_images_per_s": 333.5018491537132,
+          "cpu_images_per_s": 13.858338718633389,
+          "grayscale_reference_bytes": 12441600,
+          "gpu_transferred_bytes": 48480,
+          "reference_matches": 1335,
+          "extra_vs_reference": 9,
+          "missed_vs_reference": 0,
+          "corner_rmse_px": 0.7626374054347644,
+          "pnp_dropouts": 0,
+          "pose_translation_max_delta_m": 0.005191823226530731
+        }
+      ],
+      "accuracy_gate_passed": false
+    },
+    "reference_note": "Extra detections are differences against a CPU reference after its 12 px PnP filter; they are not proven false marker IDs.",
+    "timing_note": "Synthetic detector-only timing includes CUDA workspace allocations. Excludes Isaac rendering and CPU PnP; CPU images already reside on host.",
+    "default_backend": "cpu",
+    "gpu_pnp": "deferred pending actual PnP stage measurements"
+  },
+  "tests": {
+    "pure_aruco_tests": 56,
+    "orchestration_tests": 46,
+    "trial_store_tests": 1
+  },
+  "remaining": [
+    "Install compatible host driver locally and reboot.",
+    "Validate actual camera render, intrinsics/extrinsics, pose against ground truth and environment image isolation.",
+    "Run matched-seed landing pilots and environment-count throughput/memory sweep.",
+    "Validate experimental GPU detection on actual rendered images before changing the CPU default."
+  ],
+  "evidence_paths": [
+    ".build/isaac-landing/kit-probe.log",
+    "data/results/isaac-landing-validation/"
+  ]
+}

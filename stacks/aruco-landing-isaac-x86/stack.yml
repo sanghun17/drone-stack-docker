@@ -1,0 +1,15 @@
+project: aruco
+arch: [amd64]
+gpu_arch: nogpu
+gpu: false  # optional ROS dev container; GPU belongs to the isolated service
+modules:
+  - simulation/isaac-lab
+  - planner/aruco-batch
+containers:
+  isaac:
+    # GPU 0 passed CUDA arithmetic. This is not a full hardware health verdict.
+    # Override this value on another host before generating the stack.
+    gpu_uuid: GPU-5f5e6979-51fc-3166-7a87-4e264c81e4dc
+    gpu_uuid_env: ISAAC_GPU_UUID
+    environment:
+      ISAAC_SCRIPT: /work/stacks/aruco-landing-isaac-x86/scripts/evaluate.py

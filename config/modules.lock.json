@@ -472,6 +472,32 @@
       "revision": "d3a0fa90d099c797af5c0309262e9fc90f304a7d",
       "subdir": "deployment/stack-modules/perception/aruco-landing"
     },
+    "planner/aruco-batch": {
+      "files": {
+        "README.md": "8c0487b917faa4a29a48c511354ae55ff7e115bf2559fe39856adca4bb38b1f7",
+        "clone.sh": "70b54f46107eb1ebf1bb95370a796bad2f56235cb705c9681a092bacf8fdf154",
+        "module.yml": "03c78ee51aea8e4b04881c009e36660e2da6652a44e291a95cec358b5d08e37a",
+        "run.sh": "3d731c4cdc9058203fbca663b6d34f0a545768f247180e0f4acd82e85d4f384d"
+      },
+      "manifest": {
+        "description": "ROS-free ArUco landing policy and pose estimation for Isaac batch evaluation.",
+        "group": "planner",
+        "name": "aruco-batch",
+        "needs": [
+          "simulation/isaac-lab"
+        ],
+        "provides": [
+          "batch-landing-policy"
+        ],
+        "run": [
+          "run.sh"
+        ],
+        "runtime_service": "isaac"
+      },
+      "repository": "https://github.com/sanghun17/aruco_landing.git",
+      "revision": "0cc8a10ceae7df7f24506e4e8e1f2094eaee8e01",
+      "subdir": "deployment/stack-modules/planner/aruco-batch"
+    },
     "planner/aruco-landing": {
       "files": {
         "module.yml": "9596662d3c555924467985a07f3f153901580cc5c9ade5ceef57a1eb91462c8f",
@@ -800,6 +826,48 @@
       "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
       "revision": "362b85edb562baf5a9dfbeda7b1df3569581ac3a",
       "subdir": "deployment/stack-modules/simulation/airsim"
+    },
+    "simulation/isaac-lab": {
+      "files": {
+        "Dockerfile": "70b3cb6f9f7f07adcc032303d19f12cb42debd6cce9a1d8b3b73f00e233aa157",
+        "README.md": "21166a2f70562d9dc270c99eed8d43d57f58328da854477cc130a6811bf445ce",
+        "module.yml": "b6362f341d65ea356d9c92e13118ce1da3974b62561b23e92928b2a4c79adf53",
+        "run.sh": "d3a4d4f64792fac782d6d82c59e94dd7ffca1b1143de0c34b5e4c08f8f11023a",
+        "upgrade_host_driver.sh": "781287c3833d091b4cc26c0a4ed3d5c31e2baf2a157f5f65999e353bf97f0cd2"
+      },
+      "manifest": {
+        "container": {
+          "arch": [
+            "amd64"
+          ],
+          "dockerfile": "Dockerfile",
+          "environment": {
+            "ACCEPT_EULA": "Y",
+            "PRIVACY_CONSENT": "N",
+            "PYTHONDONTWRITEBYTECODE": "1"
+          },
+          "gpu": true,
+          "image": "nvcr.io/nvidia/isaac-lab:3.0.0-rc1@sha256:1e795d3f10b50e97f93141a8eb1fa4d2c90a192c226a1bceecc5338ca87652f3",
+          "mounts": [
+            "isaac-cache:/root/.cache"
+          ],
+          "service": "isaac",
+          "shm_size": "4gb"
+        },
+        "description": "Isolated native Isaac Lab runtime; scene and experiments are stack-owned.",
+        "group": "simulation",
+        "name": "isaac-lab",
+        "provides": [
+          "isaac-native-physics",
+          "batched-camera"
+        ],
+        "run": [
+          "run.sh"
+        ]
+      },
+      "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
+      "revision": "4fb69d3ccafbb6f882579834d7ceeeb5155f7fa1",
+      "subdir": "deployment/stack-modules/simulation/isaac-lab"
     },
     "utility/gui-vnc": {
       "files": {

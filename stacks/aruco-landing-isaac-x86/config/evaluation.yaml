@@ -1,0 +1,50 @@
+# Initial benchmark configuration, not final publication parameters.
+physics_dt_s: 0.008333333333333333
+control_decimation: 2  # control + image rate = 60 Hz of simulation time
+env_spacing_m: 20.0
+seed: 1701
+max_duration_s: 20.0
+sensor_latency_s: 0.0  # explicit simulation delay, independent of processing wall time
+success_radius_m: 0.10
+detector_backend: cpu
+pad_manifest: config/paper_pad_layout_physical_20260920_runtime.yaml
+camera:
+  width: 720
+  height: 720
+  fx: 708.077114
+  fy: 708.077114
+  cx: 360.0
+  cy: 360.0
+  body_position_m: [0.0, 0.0, -0.10]
+  # ROS optical camera: +X = -body Y, +Y = -body X, +Z = -body Z.
+  body_quaternion_xyzw: [0.7071067811865476, -0.7071067811865476, 0.0, 0.0]
+initial_bounds:
+  x: [-0.35, 0.35]
+  y: [-0.35, 0.35]
+  z: [1.3, 2.0]
+  yaw_deg: [-25.0, 25.0]
+# Same native dynamics/gains for every environment. Bounds are frozen at the
+# midpoint of the official ARL Robot 1 demo; no native source is modified.
+native_controller:
+  trim_initial_motors: true
+  K_vel: [3.0, 3.0, 1.75]
+  K_rot: [1.725, 1.725, 0.325]
+  K_angvel: [0.45, 0.45, 0.0825]
+policy:
+  horizontal_reference: camera
+  height_reference: camera
+  kp_xy: 0.8
+  kd_xy: 0.15
+  speed_limit_m_s: 2.0
+  descent_speed_m_s: 0.50
+  h_min_m: 0.20
+  derivative_filter_tau_s: 0.10
+  derivative_speed_limit_m_s: 2.0
+  acquisition_timeout_s: 2.0
+  loss_timeout_s: 0.50
+  latency_compensation_enabled: true
+  max_pose_prediction_s: 0.20
+  touchdown_stop_lead_s: 0.08
+  yaw_kp: 1.0
+  yaw_rate_limit_rad_s: 0.35
+  yaw_deadband_deg: 1.0

@@ -67,18 +67,25 @@ sync_modules(){ python3 "$ROOT/scripts/module_sources.py" sync "$stack" --arch "
 gen(){ sync_modules --no-artifacts; python3 "$ROOT/scripts/gen_dockerfile_compose.py" "$stack" --arch "$ARCH"; }
 DF(){ echo "$ROOT/.build/$stack/Dockerfile"; }
 CF(){ echo "$ROOT/.build/$stack/compose.yml"; }
+build_isolated(){
+  local services
+  services="$(python3 -c 'import json,sys; print(" ".join(sorted(set(json.load(open(sys.argv[1])).values()))))' "$ROOT/.build/$stack/containers.json")"
+  [ -z "$services" ] || docker compose -f "$(CF)" build $services
+}
 
 case "$cmd" in
   sync)  need_stack; sync_modules ;;
   gen)   need_stack; gen ;;
   build) need_stack; need_buildx; sync_modules; gen
          echo ">> docker build (native $ARCH) -> drone-stack:$stack"
-         docker build $DOCKER_BUILD_OPTS -f "$(DF)" -t "drone-stack:$stack" "$ROOT" ;;
+         docker build $DOCKER_BUILD_OPTS -f "$(DF)" -t "drone-stack:$stack" "$ROOT"
+         build_isolated ;;
   up)    need_stack; need_buildx; sync_modules; gen
          docker build $DOCKER_BUILD_OPTS -f "$(DF)" -t "drone-stack:$stack" "$ROOT"
+         build_isolated
          docker compose -f "$(CF)" up -d
          echo ">> container drone-stack-$stack up. start nodes: ./setup.sh run $stack <module>" ;;
-  run)   need_stack; sync_modules --no-artifacts; mod="${3:?need <module> e.g. sensor/realsense-d435i}"
+  run)   need_stack; gen >/dev/null; mod="${3:?need <module> e.g. sensor/realsense-d435i}"
          module_key="$mod"
          [ ! -f "$ROOT/modules/$mod" ] || module_key="${mod%/*}"
          python3 "$ROOT/scripts/stack_context.py" resolve --stack "$stack" --module "$module_key" >/dev/null
@@ -92,8 +99,13 @@ case "$cmd" in
          # Keep the container's compose-pinned ROS_MASTER_* values. Exporting the
          # host-wide stack.env port here made every named multi-master stack fall
          # back onto 11311, despite its stacks/*/stack.yml ros_master_port setting.
-         docker exec -it ${envargs[@]+"${envargs[@]}"} "drone-stack-$stack" bash -lc \
-           "source /opt/ros/noetic/setup.bash; bash /work/modules/$mod" ;;
+         target="$(python3 "$ROOT/scripts/lib/container_dispatch.py" "$stack" "$module_key")"
+         prelude="source /opt/ros/noetic/setup.bash; "
+         [ "$target" = "drone-stack-$stack" ] || prelude=""
+         ttyargs=(-i)
+         if [ -t 0 ] && [ -t 1 ]; then ttyargs+=(-t); fi
+         docker exec "${ttyargs[@]}" ${envargs[@]+"${envargs[@]}"} "$target" bash -lc \
+           "${prelude}exec bash /work/modules/$mod \"\$@\"" -- "${@:4}" ;;
   sh)    need_stack; docker exec -it "drone-stack-$stack" bash ;;
   down)  need_stack; docker compose -f "$(CF)" down ;;
   clone) need_stack; gen >/dev/null
