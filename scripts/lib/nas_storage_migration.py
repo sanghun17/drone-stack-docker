@@ -328,6 +328,72 @@ def remove_verified(part, receipt, report):
             report(removed_file=entry['source'])
 
 
+def privileged_operation(audit, part, operation, report):
+    """Grant root access only to planned payload roots and this audit directory."""
+    plan = json.loads((audit / 'plan.json').read_text())
+    roots = [Path(s['path']) for s in plan['roots']]
+    protected = [Path(p) for p in plan['protected']]
+    opened = opened_paths()
+    for entry in part['entries']:
+        path = Path(entry['source'])
+        if not any(beneath(path, root) for root in roots) or any(beneath(path, p) for p in protected):
+            raise RuntimeError('Privileged operation escaped its planned selection')
+        if entry['remove'] and str(path) in opened:
+            raise RuntimeError('Planned source is open: ' + str(path))
+    command = ['docker', 'run', '--rm', '--network', 'none', '--read-only',
+               '--cap-drop', 'ALL', '--cap-add', 'DAC_OVERRIDE', '--cap-add', 'CHOWN',
+               '--mount', 'type=bind,src=' + str(audit) + ',dst=/audit',
+               '--mount', 'type=bind,src=' + str(Path(__file__).resolve()) + ',dst=/migration.py,readonly']
+    for root in roots:
+        command += ['--mount', 'type=bind,src=' + str(root) + ',dst=' + str(root) +
+                    (',readonly' if operation == 'stage' else '')]
+    command += ['--entrypoint', '/usr/bin/python3', 'drone-stack:sim-x86',
+                '/migration.py', '/audit', '--root-' + operation, part['name']]
+    report(True, phase=operation + '_with_payload_permissions')
+    subprocess.run(command, check=True)
+    if operation == 'stage':
+        result = json.loads((audit / (part['name'] + '.root-stage.json')).read_text())
+        if result['name'] != part['name']:
+            raise RuntimeError('Privileged staging result differs')
+        return result['files']
+
+
+def root_operation(audit, name, operation):
+    if os.geteuid() != 0 or audit != Path('/audit'):
+        raise RuntimeError('Root operation is restricted to the bounded container audit mount')
+    plan = json.loads((audit / 'plan.json').read_text())
+    part = next(p for p in plan['parts'] if p['name'] == name)
+    roots = [Path(s['path']) for s in plan['roots']]
+    protected = [Path(p) for p in plan['protected']]
+    for entry in part['entries']:
+        path = Path(entry['source'])
+        if not any(beneath(path, r) for r in roots) or any(beneath(path, p) for p in protected):
+            raise RuntimeError('Root operation includes an unselected source')
+    owner = audit.stat()
+    last = 0
+
+    def report(force=False, **values):
+        nonlocal last
+        if force or time.time() - last > 10:
+            save(audit / 'root-operation-status.json', dict(operation=operation, name=name,
+                                                          updated_at=time.time(), **values))
+            os.chown(audit / 'root-operation-status.json', owner.st_uid, owner.st_gid)
+            last = time.time()
+
+    if operation == 'stage':
+        spool = audit / (name + '.staging')
+        hashes = stage(part, spool, report)
+        os.chown(spool, owner.st_uid, owner.st_gid)
+        result = audit / (name + '.root-stage.json')
+        save(result, dict(name=name, files=hashes))
+        os.chown(result, owner.st_uid, owner.st_gid)
+    else:
+        receipt = json.loads((audit / (name + '.verified.json')).read_text())
+        if receipt['name'] != name or not receipt.get('verified_at'):
+            raise RuntimeError('NAS verification receipt is missing')
+        remove_verified(part, receipt, report)
+
+
 def run(audit):
     with (audit / 'worker.lock').open('w') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -385,7 +451,11 @@ def run_locked(audit):
                             raise RuntimeError('Local staged archive checksum differs')
                     else:
                         report(True, phase='staging')
-                        hashes = stage(part, spool, report)
+                        if any(e['kind'] == 'file' and not os.access(e['source'], os.R_OK)
+                               for e in part['entries']):
+                            hashes = privileged_operation(audit, part, 'stage', report)
+                        else:
+                            hashes = stage(part, spool, report)
                         receipt = dict(name=name, archive_bytes=spool.stat().st_size,
                                        sha256=digest(spool), files=hashes)
                         save(pending, receipt)
@@ -401,7 +471,14 @@ def run_locked(audit):
                     remote_json(destination / (name + '.json'), receipt)
                     save(verified, receipt)
                 report(True, phase='removing_verified_sources')
-                remove_verified(part, receipt, report)
+                remaining = [e for e in part['entries'] if e['remove'] and
+                             (Path(e['source']).exists() or Path(e['source']).is_symlink())]
+                if any(not os.access(Path(e['source']).parent, os.W_OK) or
+                       (e['kind'] == 'file' and not os.access(e['source'], os.R_OK))
+                       for e in remaining):
+                    privileged_operation(audit, part, 'remove', report)
+                else:
+                    remove_verified(part, receipt, report)
                 save(done, dict(name=name, sha256=receipt['sha256'], removed_at=time.time()))
                 if spool.exists():
                     spool.unlink()
@@ -459,10 +536,18 @@ def main():
     parser.add_argument('audit', type=Path)
     parser.add_argument('--prepare', type=Path, help='Freeze an explicit selection; perform no transfer')
     parser.add_argument('--queue', type=Path, help='Complete each already prepared group in order')
+    root_args = parser.add_mutually_exclusive_group()
+    root_args.add_argument('--root-stage', help=argparse.SUPPRESS)
+    root_args.add_argument('--root-remove', help=argparse.SUPPRESS)
     args = parser.parse_args()
     if args.prepare and args.queue:
         parser.error('--prepare and --queue are mutually exclusive')
-    if args.prepare:
+    if args.root_stage or args.root_remove:
+        if args.prepare or args.queue:
+            parser.error('Root operations cannot prepare or run queues')
+        root_operation(args.audit, args.root_stage or args.root_remove,
+                       'stage' if args.root_stage else 'remove')
+    elif args.prepare:
         plan = prepare(json.loads(args.prepare.read_text()), args.audit)
         print(json.dumps(dict(parts=len(plan['parts']), source_bytes=plan['source_bytes'],
                               retained=plan['retained'])))
