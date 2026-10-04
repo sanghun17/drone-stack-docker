@@ -101,10 +101,39 @@ The first optical smoke after container recreation spent about three minutes
 initializing rendering; subsequent pilot startup took about 18--20 seconds.
 The interrupted pilot that overlapped that smoke is excluded from results.
 
-For the first larger **experimental GPU** pilot, keep 720 x 720 and start with
-16 environments: this had the best measured throughput among the four counts.
-Rendering consumed about 64% of its trial-loop time and CPU PnP about 16%, so
-moving PnP to GPU would address a smaller part of the current runtime.
+The subsequent frame-logged count sweep recommends **30 environments** on this
+single healthy 2080 Ti with 720 x 720 and the **experimental GPU** detector.
+N16/N24 replayed the same 96 trials at 745/799 trials/hour. N25/N30 replayed the
+same 150 trials at 809/843 trials/hour; N28 screened 84 trials at 835/hour.
+All 576 qualifying executions succeeded under the current vision-height rule,
+replaying 150 unique initial conditions. N30's 28,541 active frames had 100%
+marker/pose availability and 1.324 mm camera position RMSE. Peak whole-GPU NVML
+sample was 9002 MiB of 11264, with stable working memory across five cohorts.
+The N30 foreign-environment occluder optical test also passed, and no new kernel
+GPU errors appeared.
+
+The near-peak region is N28--N30; the 1% difference is within cohort variation.
+N31/N32 rendered uniform gray images and detected no pad. Their acquisition
+aborts are excluded from throughput selection. The underlying rendering cause
+is unresolved, and this is not a general Isaac environment-count limit. The
+observed failure coincides with a larger tiled-image layout. Native dynamics,
+controller, dt and perception remain unchanged. See the
+[count-sweep report](../../data/analysis/aruco/isaac_parallelism_20261004.md) and
+`data/manifests/isaac-landing-parallelism-20261004.json` for trial sets, diagnostics
+and complete measurements.
+
+At N30, rendering consumes 67.7% of loop time and CPU PnP 17.8%. Under the same
+initial bounds, 1000 evaluations take about 71 minutes and 10000 about 11.86 hours,
+plus startup/shutdown and a final partial cohort. Run a new logged campaign with
+a fresh output directory:
+
+```bash
+ARUCO_CUDA_LIBRARY=/work/.build/isaac-landing/libaruco_cuda.so \
+  bash stacks/aruco-landing-isaac-x86/scripts/evaluate.sh \
+  --detector gpu-experimental --num-envs 30 --trials 1000 --trial-start 0 \
+  --output /work/data/results/isaac/campaign-gpu-n30
+```
+
 A 360 x 360 variant with unchanged field of view reached 1721 trials/hour and
 16/16 landing successes, but its maximum optical position error was 7.84 cm,
 exceeding the existing 3 cm accuracy limit. That candidate is rejected; default
@@ -155,9 +184,10 @@ bash stacks/aruco-landing-isaac-x86/scripts/evaluate.sh \
   --num-envs 1 --trials 10 --output /work/data/results/isaac/pilot-1
 ```
 
-Then compare `--num-envs 1, 4, 8, 16` in separate output directories with identical
-seed/config/trial IDs. Select the count by trials per wall hour, failures and GPU
-memory, not simulation Hz alone. Do not assume multi-GPU rendering or all visible
+On another GPU/configuration, compare counts in separate output directories with
+identical seed/config/trial IDs, choosing trial counts that fill both candidates'
+cohorts. Select by trials per wall hour, active-frame accuracy/availability, failures
+and whole-GPU memory. Do not assume multi-GPU rendering or all visible
 cards are healthy. `--trial-start` permits disjoint trial IDs in separate workers
 and output directories; concurrent writers must not share an output directory.
 

@@ -1,0 +1,823 @@
+{
+  "date": "2026-10-04",
+  "stack": "aruco-landing-isaac-x86",
+  "status": "Measured environment-count sweep completed; recommend N30 on the current single-GPU experimental profile",
+  "recommended_num_envs": 30,
+  "near_peak_num_envs": [
+    28,
+    30
+  ],
+  "selection": "Highest observed successful trial-loop throughput with active-frame optical accuracy and >1 GiB sampled VRAM headroom; not proof of a unique mathematical optimum",
+  "hardware": {
+    "gpu_uuid": "GPU-5f5e6979-51fc-3166-7a87-4e264c81e4dc",
+    "gpu_name": "NVIDIA GeForce RTX 2080 Ti",
+    "driver": "570.211.01",
+    "memory_mib": 11264,
+    "rtx_driver_floor_passed": true,
+    "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+    "renderer_log_minimum": "550.90.07",
+    "renderer_log_recommended": "580.95.05",
+    "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+  },
+  "selected_pci": "0000:19:00.0",
+  "failed_gpu_isolation": {
+    "pci": "0000:1a:00.0",
+    "uuid": "GPU-8149eb0b-023a-17dd-b942-c622f0b8c4ca",
+    "uuid_verified": false,
+    "driver": null,
+    "driver_override": "none",
+    "boot_isolation_active": true,
+    "functions": [
+      {
+        "pci": "0000:1a:00.0",
+        "vendor": "0x10de",
+        "device": "0x1e04"
+      },
+      {
+        "pci": "0000:1a:00.1",
+        "vendor": "0x10de",
+        "device": "0x10f7"
+      },
+      {
+        "pci": "0000:1a:00.2",
+        "vendor": "0x10de",
+        "device": "0x1ad6"
+      },
+      {
+        "pci": "0000:1a:00.3",
+        "vendor": "0x10de",
+        "device": "0x1ad7"
+      }
+    ],
+    "boot_script": "/etc/initramfs-tools/scripts/init-top/00-drone-isolate-gpu-0000-1a-00-0",
+    "boot_order_verified": true
+  },
+  "host_kernel_gpu_errors": [],
+  "evaluation_metadata": {
+    "fingerprint": "66d3735e197f69253707d0c949ac5afe6e2851e7059270a6e5fcaa7126d24c29",
+    "config": {
+      "physics_dt_s": 0.008333333333333333,
+      "control_decimation": 2,
+      "env_spacing_m": 20.0,
+      "seed": 1701,
+      "max_duration_s": 20.0,
+      "sensor_latency_s": 0.0,
+      "success_radius_m": 0.1,
+      "detector_backend": "gpu-experimental",
+      "pad_manifest": "config/paper_pad_layout_physical_20260920_runtime.yaml",
+      "camera": {
+        "width": 720,
+        "height": 720,
+        "fx": 708.077114,
+        "fy": 708.077114,
+        "cx": 360.0,
+        "cy": 360.0,
+        "body_position_m": [
+          0.0,
+          0.0,
+          -0.1
+        ],
+        "body_quaternion_xyzw": [
+          0.7071067811865476,
+          -0.7071067811865476,
+          0.0,
+          0.0
+        ]
+      },
+      "initial_bounds": {
+        "x": [
+          -0.35,
+          0.35
+        ],
+        "y": [
+          -0.35,
+          0.35
+        ],
+        "z": [
+          1.3,
+          2.0
+        ],
+        "yaw_deg": [
+          -25.0,
+          25.0
+        ]
+      },
+      "native_controller": {
+        "trim_initial_motors": true,
+        "K_vel": [
+          3.0,
+          3.0,
+          1.75
+        ],
+        "K_rot": [
+          1.725,
+          1.725,
+          0.325
+        ],
+        "K_angvel": [
+          0.45,
+          0.45,
+          0.0825
+        ]
+      },
+      "policy": {
+        "horizontal_reference": "camera",
+        "height_reference": "camera",
+        "kp_xy": 0.8,
+        "kd_xy": 0.15,
+        "speed_limit_m_s": 2.0,
+        "descent_speed_m_s": 0.5,
+        "h_min_m": 0.2,
+        "derivative_filter_tau_s": 0.1,
+        "derivative_speed_limit_m_s": 2.0,
+        "acquisition_timeout_s": 2.0,
+        "loss_timeout_s": 0.5,
+        "latency_compensation_enabled": true,
+        "max_pose_prediction_s": 0.2,
+        "touchdown_stop_lead_s": 0.08,
+        "yaw_kp": 1.0,
+        "yaw_rate_limit_rad_s": 0.35,
+        "yaw_deadband_deg": 1.0
+      }
+    },
+    "aruco_revision": "31bf003cdf2dfd7c2d265b00403f6a42750e0bdb",
+    "application_sources_sha256": {
+      "evaluate.py": "cac85f5c71e7f22d8c80b9a2af206e76c95fa0683dbdab553e4b3ad273a999d2",
+      "native_runtime.py": "8ea26b263c92b6dcd89678d9726348e220c9af4db320cc55e72baffdc8c10b4c",
+      "native_smoke.py": "4050594a38c0455064a7be10b2bc9530a2a62092b0075a7d97c342e1152e160d",
+      "pad_scene.py": "246acc0d3c4b716e309808172a3a3a09fead31664967e6ffac0a734eaedec02e",
+      "preflight.py": "bf82baae0a41317cde36d92ccaa6b2404a692ca73a0a976f78f76954a432acc8",
+      "trial_store.py": "9ac29a2dd81c58285b18c4fe61898077d1f611a6e6b5c7a84df0ef6730529bb6",
+      "trial_trace.py": "753e6d5d9ea1f93d44125c23db5877e2332fe58e2eea5bc867a02191a44d29b7"
+    },
+    "pad_sha256": "c0445244fe9da2e6bbdd434cbb133dcf7bc7c748fff2ae737c79a438d133766d",
+    "native_image": "nvcr.io/nvidia/isaac-lab:3.0.0-rc1@sha256:1e795d3f10b50e97f93141a8eb1fa4d2c90a192c226a1bceecc5338ca87652f3",
+    "termination": "vision camera height threshold, not physical ground contact",
+    "trace_schema_version": 1,
+    "trace_controller_states": {
+      "waiting": 0,
+      "descending": 1,
+      "touchdown": 2,
+      "aborted": 3
+    },
+    "trace_sampling": "active-trial image/control frames including terminal capture; no render warmup",
+    "trace_frame": "pad-local poses, world/pad-axis velocities; meters and simulation seconds",
+    "environment_from_pad_translation_m": [
+      0.0,
+      0.0,
+      0.002
+    ],
+    "terminal_positions_frame": "environment-local; explicit *_pad_m fields use marker plane",
+    "dropout_duration_convention": "missing frame count times image/control period",
+    "gpu_detector_library_sha256": "2951efcb5d6db1a2f15a8ccfbc81b199289ad2f89e2b4b71fec21dc9200fcf10"
+  },
+  "source_root_revision": "273fe9d3a97bcdc0f234a7f9dcec0aa3d36bc88e",
+  "native_dynamics_controller_and_runtime_changed": false,
+  "frame_logging_enabled": true,
+  "images_logged": false,
+  "qualifying_executions": 576,
+  "unique_initial_conditions": 150,
+  "comparison_groups": [
+    {
+      "counts": [
+        16,
+        24
+      ],
+      "trials": 96,
+      "trial_ids": [
+        0,
+        95
+      ],
+      "full_cohorts": true
+    },
+    {
+      "counts": [
+        25,
+        30
+      ],
+      "trials": 150,
+      "trial_ids": [
+        0,
+        149
+      ],
+      "full_cohorts": true
+    },
+    {
+      "counts": [
+        28
+      ],
+      "trials": 84,
+      "trial_ids": [
+        0,
+        83
+      ],
+      "full_cohorts": true
+    }
+  ],
+  "common_initial_conditions_and_fingerprint_verified": true,
+  "paired_25_vs_30": {
+    "trials": 150,
+    "initials_equal": true,
+    "maximum_event_time_difference_s": 0.016666666666666607,
+    "maximum_lateral_error_difference_m": 0.0006837770342826843
+  },
+  "results": [
+    {
+      "output": "data/results/isaac/parallel-screen-20261004-n16-t96",
+      "num_envs": 16,
+      "trials": 96,
+      "successes": 96,
+      "fingerprint": "66d3735e197f69253707d0c949ac5afe6e2851e7059270a6e5fcaa7126d24c29",
+      "loop_wall_s": 463.9532473300005,
+      "startup_wall_s": 19.938422907999666,
+      "process_wall_s": 486.0139046479999,
+      "trials_per_hour": 744.9026426453305,
+      "process_trials_per_hour": 711.0907665292087,
+      "gpu_peak_mib": 6545.0,
+      "gpu_free_at_peak_mib": 4719.0,
+      "stable_temperature_max_c": 76.0,
+      "stable_sm_clock_median_mhz": 1695.0,
+      "stable_gpu_util_median_pct": 72.0,
+      "camera_active_frame_fraction": 0.8323925710123816,
+      "timing_s": {
+        "physics_s": 24.082876298971314,
+        "render_s": 293.20676175199424,
+        "device_and_transfer_s": 54.099357894000605,
+        "detect_s": 0.0017864180063043023,
+        "pnp_s": 75.77205547398626,
+        "control_s": 1.6797193559896186,
+        "transferred_bytes": 32112968,
+        "markers": 889586,
+        "camera_batches": 1373,
+        "physics_steps": 2698
+      },
+      "active_frame_metrics": {
+        "trials": 96,
+        "successes": 96,
+        "capture_frames": 18286,
+        "valid_pose_frames": 18286,
+        "marker_detection_availability": 1.0,
+        "pose_availability": 1.0,
+        "macro_mean_marker_availability": 1.0,
+        "macro_mean_pose_availability": 1.0,
+        "maximum_lateral_error_m": 0.058439452201128006,
+        "localization_camera": {
+          "valid_frames": 18286,
+          "position_rmse_m": 0.0013661725194003735,
+          "position_axis_rmse_m": [
+            0.0009612879650418356,
+            0.0009621868665837352,
+            0.00012864382925062374
+          ],
+          "xy_rmse_m": 0.001360102245406756,
+          "rotation_rmse_deg": 0.036275718777388714,
+          "position_max_m": 0.009527304975933796
+        },
+        "localization_body": {
+          "valid_frames": 18286,
+          "position_rmse_m": 0.0013998879391223528,
+          "position_axis_rmse_m": [
+            0.0009863671412954091,
+            0.0009850400675771392,
+            0.0001283049879801134
+          ],
+          "xy_rmse_m": 0.0013939957217149737,
+          "rotation_rmse_deg": 0.03627571884709845,
+          "position_max_m": 0.009917943473905564
+        }
+      },
+      "active_rotation_max_deg": 0.26971409169892513,
+      "position_gate_passed": true,
+      "rotation_gate_passed": true,
+      "cohort_trials": [
+        16,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "approximate_cohort_wall_s": [
+        77.8906900882721,
+        75.98406863212585,
+        76.83207273483276,
+        74.41449785232544,
+        79.60181140899658,
+        79.21010684967041
+      ],
+      "approximate_cohort_trials_per_hour": [
+        739.4978775348244,
+        758.0536425190435,
+        749.686920445221,
+        774.0427156319246,
+        723.6016238882984,
+        727.1799305777564
+      ],
+      "trace_bytes": 5870109,
+      "maximum_marker_dropout_s": 0.0,
+      "maximum_pose_dropout_s": 0.0,
+      "active_loop_memory_first_quarter_range_mib": [
+        6540.0,
+        6545.0
+      ],
+      "active_loop_memory_last_quarter_range_mib": [
+        6540.0,
+        6540.0
+      ],
+      "trace_checksums_recomputed": true,
+      "trial_id_range": [
+        0,
+        95
+      ]
+    },
+    {
+      "output": "data/results/isaac/parallel-screen-20261004-n24-t96",
+      "num_envs": 24,
+      "trials": 96,
+      "successes": 96,
+      "fingerprint": "66d3735e197f69253707d0c949ac5afe6e2851e7059270a6e5fcaa7126d24c29",
+      "loop_wall_s": 432.2925197700006,
+      "startup_wall_s": 20.00279723499989,
+      "process_wall_s": 454.139713216,
+      "trials_per_hour": 799.4586632770677,
+      "process_trials_per_hour": 760.9992915013449,
+      "gpu_peak_mib": 8025.0,
+      "gpu_free_at_peak_mib": 3239.0,
+      "stable_temperature_max_c": 78.0,
+      "stable_sm_clock_median_mhz": 1695.0,
+      "stable_gpu_util_median_pct": 74.0,
+      "camera_active_frame_fraction": 0.8345198977729098,
+      "timing_s": {
+        "physics_s": 16.357387835022564,
+        "render_s": 288.1323057480058,
+        "device_and_transfer_s": 40.42409616898476,
+        "detect_s": 0.001209060005749052,
+        "pnp_s": 74.3829765130231,
+        "control_s": 1.5974095969968403,
+        "transferred_bytes": 32108748,
+        "markers": 889475,
+        "camera_batches": 913,
+        "physics_steps": 1794
+      },
+      "active_frame_metrics": {
+        "trials": 96,
+        "successes": 96,
+        "capture_frames": 18286,
+        "valid_pose_frames": 18285,
+        "marker_detection_availability": 1.0,
+        "pose_availability": 0.9999453133544788,
+        "macro_mean_marker_availability": 1.0,
+        "macro_mean_pose_availability": 0.9999543128654972,
+        "maximum_lateral_error_m": 0.058447178453207016,
+        "localization_camera": {
+          "valid_frames": 18285,
+          "position_rmse_m": 0.0013590246388177395,
+          "position_axis_rmse_m": [
+            0.0009456704570288811,
+            0.0009675802525335594,
+            0.00012823342202236836
+          ],
+          "xy_rmse_m": 0.0013529612553174314,
+          "rotation_rmse_deg": 0.03598973230725631,
+          "position_max_m": 0.009653778821366624
+        },
+        "localization_body": {
+          "valid_frames": 18285,
+          "position_rmse_m": 0.0013921736850097534,
+          "position_axis_rmse_m": [
+            0.0009695939412782135,
+            0.0009907975846424424,
+            0.00012788785922407818
+          ],
+          "xy_rmse_m": 0.0013862872230157492,
+          "rotation_rmse_deg": 0.03598973237728567,
+          "position_max_m": 0.010050766285322619
+        }
+      },
+      "active_rotation_max_deg": 0.2356690298008997,
+      "position_gate_passed": true,
+      "rotation_gate_passed": true,
+      "cohort_trials": [
+        24,
+        24,
+        24,
+        24
+      ],
+      "approximate_cohort_wall_s": [
+        109.06837821006775,
+        106.6560287475586,
+        104.88404679298401,
+        111.27606582641602
+      ],
+      "approximate_cohort_trials_per_hour": [
+        792.1636079853683,
+        810.080789755429,
+        823.7668419729542,
+        776.4472922216609
+      ],
+      "trace_bytes": 5868701,
+      "maximum_marker_dropout_s": 0.0,
+      "maximum_pose_dropout_s": 0.016666666666666666,
+      "active_loop_memory_first_quarter_range_mib": [
+        7887.0,
+        8025.0
+      ],
+      "active_loop_memory_last_quarter_range_mib": [
+        8019.0,
+        8019.0
+      ],
+      "trace_checksums_recomputed": true,
+      "trial_id_range": [
+        0,
+        95
+      ]
+    },
+    {
+      "output": "data/results/isaac/parallel-paired-20261004-n25-t150",
+      "num_envs": 25,
+      "trials": 150,
+      "successes": 150,
+      "fingerprint": "66d3735e197f69253707d0c949ac5afe6e2851e7059270a6e5fcaa7126d24c29",
+      "loop_wall_s": 667.1227109270003,
+      "startup_wall_s": 20.135672426000383,
+      "process_wall_s": 688.6465372890007,
+      "trials_per_hour": 809.446285001515,
+      "process_trials_per_hour": 784.1468311534993,
+      "gpu_peak_mib": 8041.0,
+      "gpu_free_at_peak_mib": 3223.0,
+      "stable_temperature_max_c": 77.0,
+      "stable_sm_clock_median_mhz": 1650.0,
+      "stable_gpu_util_median_pct": 73.0,
+      "camera_active_frame_fraction": 0.829593023255814,
+      "timing_s": {
+        "physics_s": 24.159665953033254,
+        "render_s": 448.430357908991,
+        "device_and_transfer_s": 61.80166181498589,
+        "detect_s": 0.003594668020014069,
+        "pnp_s": 113.34274419697704,
+        "control_s": 2.3770454860359678,
+        "transferred_bytes": 50084828,
+        "markers": 1387423,
+        "camera_batches": 1376,
+        "physics_steps": 2704
+      },
+      "active_frame_metrics": {
+        "trials": 150,
+        "successes": 150,
+        "capture_frames": 28538,
+        "valid_pose_frames": 28537,
+        "marker_detection_availability": 1.0,
+        "pose_availability": 0.9999649590020324,
+        "macro_mean_marker_availability": 1.0,
+        "macro_mean_pose_availability": 0.9999707602339182,
+        "maximum_lateral_error_m": 0.07592430710792542,
+        "localization_camera": {
+          "valid_frames": 28537,
+          "position_rmse_m": 0.0013181449244407104,
+          "position_axis_rmse_m": [
+            0.0009208416379498763,
+            0.0009359155300349818,
+            0.00011669978700037987
+          ],
+          "xy_rmse_m": 0.0013129688501799545,
+          "rotation_rmse_deg": 0.033906095986981605,
+          "position_max_m": 0.009653779084560783
+        },
+        "localization_body": {
+          "valid_frames": 28537,
+          "position_rmse_m": 0.0013471746250931194,
+          "position_axis_rmse_m": [
+            0.0009419729163379734,
+            0.0009560438224588132,
+            0.00011639031282224912
+          ],
+          "xy_rmse_m": 0.0013421373869972944,
+          "rotation_rmse_deg": 0.033906096061089845,
+          "position_max_m": 0.010050766561464867
+        }
+      },
+      "active_rotation_max_deg": 0.23925821518053697,
+      "position_gate_passed": true,
+      "rotation_gate_passed": true,
+      "cohort_trials": [
+        25,
+        25,
+        25,
+        25,
+        25,
+        25
+      ],
+      "approximate_cohort_wall_s": [
+        112.85717606544495,
+        109.21141338348389,
+        107.111483335495,
+        114.73149824142456,
+        112.16755151748657,
+        110.9675886631012
+      ],
+      "approximate_cohort_trials_per_hour": [
+        797.4681197747651,
+        824.0896918344504,
+        840.2460426964834,
+        784.4402049959887,
+        802.3710848851798,
+        811.047631874213
+      ],
+      "trace_bytes": 9160483,
+      "maximum_marker_dropout_s": 0.0,
+      "maximum_pose_dropout_s": 0.016666666666666666,
+      "active_loop_memory_first_quarter_range_mib": [
+        7887.0,
+        8041.0
+      ],
+      "active_loop_memory_last_quarter_range_mib": [
+        8036.0,
+        8036.0
+      ],
+      "trace_checksums_recomputed": true,
+      "trial_id_range": [
+        0,
+        149
+      ]
+    },
+    {
+      "output": "data/results/isaac/parallel-screen-20261004-n28-t84",
+      "num_envs": 28,
+      "trials": 84,
+      "successes": 84,
+      "fingerprint": "66d3735e197f69253707d0c949ac5afe6e2851e7059270a6e5fcaa7126d24c29",
+      "loop_wall_s": 362.3230810940004,
+      "startup_wall_s": 18.935626489000242,
+      "process_wall_s": 384.69728215099985,
+      "trials_per_hour": 834.6142318257279,
+      "process_trials_per_hour": 786.072618733249,
+      "gpu_peak_mib": 9012.0,
+      "gpu_free_at_peak_mib": 2252.0,
+      "stable_temperature_max_c": 78.0,
+      "stable_sm_clock_median_mhz": 1680.0,
+      "stable_gpu_util_median_pct": 77.0,
+      "camera_active_frame_fraction": 0.8251088534107403,
+      "timing_s": {
+        "physics_s": 12.35530940602257,
+        "render_s": 243.99894735399994,
+        "device_and_transfer_s": 32.65911455900641,
+        "detect_s": 0.0008310430030178395,
+        "pnp_s": 63.008230269974774,
+        "control_s": 1.2990395920069204,
+        "transferred_bytes": 27917120,
+        "markers": 773332,
+        "camera_batches": 689,
+        "physics_steps": 1354
+      },
+      "active_frame_metrics": {
+        "trials": 84,
+        "successes": 84,
+        "capture_frames": 15918,
+        "valid_pose_frames": 15918,
+        "marker_detection_availability": 1.0,
+        "pose_availability": 1.0,
+        "macro_mean_marker_availability": 1.0,
+        "macro_mean_pose_availability": 1.0,
+        "maximum_lateral_error_m": 0.0584271177649498,
+        "localization_camera": {
+          "valid_frames": 15918,
+          "position_rmse_m": 0.0013522916360166858,
+          "position_axis_rmse_m": [
+            0.0009604691679153167,
+            0.0009436016125524474,
+            0.00012572844989566017
+          ],
+          "xy_rmse_m": 0.0013464341891557565,
+          "rotation_rmse_deg": 0.03590966848891321,
+          "position_max_m": 0.009771990013924283
+        },
+        "localization_body": {
+          "valid_frames": 15918,
+          "position_rmse_m": 0.001385161130235788,
+          "position_axis_rmse_m": [
+            0.0009848521532147643,
+            0.0009659276765466173,
+            0.00012538467492314185
+          ],
+          "xy_rmse_m": 0.0013794745521431356,
+          "rotation_rmse_deg": 0.03590966855932966,
+          "position_max_m": 0.010175236099976146
+        }
+      },
+      "active_rotation_max_deg": 0.2714414051246575,
+      "position_gate_passed": true,
+      "rotation_gate_passed": true,
+      "cohort_trials": [
+        28,
+        28,
+        28
+      ],
+      "approximate_cohort_wall_s": [
+        119.9290063381195,
+        119.35097408294678,
+        122.81110215187073
+      ],
+      "approximate_cohort_trials_per_hour": [
+        840.4972498130393,
+        844.5678870617832,
+        820.7727007884731
+      ],
+      "trace_bytes": 5109013,
+      "maximum_marker_dropout_s": 0.0,
+      "maximum_pose_dropout_s": 0.0,
+      "active_loop_memory_first_quarter_range_mib": [
+        8874.0,
+        9012.0
+      ],
+      "active_loop_memory_last_quarter_range_mib": [
+        8874.0,
+        8874.0
+      ],
+      "trace_checksums_recomputed": true,
+      "trial_id_range": [
+        0,
+        83
+      ]
+    },
+    {
+      "output": "data/results/isaac/parallel-paired-20261004-n30-t150",
+      "num_envs": 30,
+      "trials": 150,
+      "successes": 150,
+      "fingerprint": "66d3735e197f69253707d0c949ac5afe6e2851e7059270a6e5fcaa7126d24c29",
+      "loop_wall_s": 640.3542411199996,
+      "startup_wall_s": 20.447848081000302,
+      "process_wall_s": 664.149152386999,
+      "trials_per_hour": 843.2832412502229,
+      "process_trials_per_hour": 813.0703744169541,
+      "gpu_peak_mib": 9002.0,
+      "gpu_free_at_peak_mib": 2262.0,
+      "stable_temperature_max_c": 76.0,
+      "stable_sm_clock_median_mhz": 1680.0,
+      "stable_gpu_util_median_pct": 76.0,
+      "camera_active_frame_fraction": 0.8272753623188406,
+      "timing_s": {
+        "physics_s": 20.279722410946306,
+        "render_s": 433.36754669899074,
+        "device_and_transfer_s": 55.144036400986806,
+        "detect_s": 0.0014871080429657013,
+        "pnp_s": 114.1023476539549,
+        "control_s": 2.328706854007578,
+        "transferred_bytes": 50103804,
+        "markers": 1387939,
+        "camera_batches": 1150,
+        "physics_steps": 2260
+      },
+      "active_frame_metrics": {
+        "trials": 150,
+        "successes": 150,
+        "capture_frames": 28541,
+        "valid_pose_frames": 28541,
+        "marker_detection_availability": 1.0,
+        "pose_availability": 1.0,
+        "macro_mean_marker_availability": 1.0,
+        "macro_mean_pose_availability": 1.0,
+        "maximum_lateral_error_m": 0.07592003047466278,
+        "localization_camera": {
+          "valid_frames": 28541,
+          "position_rmse_m": 0.0013238539929611663,
+          "position_axis_rmse_m": [
+            0.000932884249778955,
+            0.0009319372900790771,
+            0.00011751280165857048
+          ],
+          "xy_rmse_m": 0.0013186281265487921,
+          "rotation_rmse_deg": 0.03377189153798465,
+          "position_max_m": 0.009994328693390085
+        },
+        "localization_body": {
+          "valid_frames": 28541,
+          "position_rmse_m": 0.001352991252670185,
+          "position_axis_rmse_m": [
+            0.0009546258775284967,
+            0.0009515982190678045,
+            0.00011719894718796829
+          ],
+          "xy_rmse_m": 0.0013479056853430323,
+          "rotation_rmse_deg": 0.033771891612694574,
+          "position_max_m": 0.01044073034774795
+        }
+      },
+      "active_rotation_max_deg": 0.2579479715079862,
+      "position_gate_passed": true,
+      "rotation_gate_passed": true,
+      "cohort_trials": [
+        30,
+        30,
+        30,
+        30,
+        30
+      ],
+      "approximate_cohort_wall_s": [
+        128.41978096961975,
+        126.80759263038635,
+        128.9596061706543,
+        128.43562364578247,
+        127.61163806915283
+      ],
+      "approximate_cohort_trials_per_hour": [
+        840.9919342998221,
+        851.6840179656595,
+        837.4715401742301,
+        840.8881970150069,
+        846.3177938478834
+      ],
+      "trace_bytes": 9161134,
+      "maximum_marker_dropout_s": 0.0,
+      "maximum_pose_dropout_s": 0.0,
+      "active_loop_memory_first_quarter_range_mib": [
+        8864.0,
+        9002.0
+      ],
+      "active_loop_memory_last_quarter_range_mib": [
+        8864.0,
+        8864.0
+      ],
+      "trace_checksums_recomputed": true,
+      "trial_id_range": [
+        0,
+        149
+      ]
+    }
+  ],
+  "rejected_counts": [
+    {
+      "num_envs": 31,
+      "reason": "all rendered camera images uniform gray; zero decoded markers",
+      "optical_check_output": "data/results/isaac/parallel-smoke-20261004-n31",
+      "optical_detected": 0,
+      "optical_expected": 31
+    },
+    {
+      "num_envs": 32,
+      "reason": "all rendered camera images uniform gray; zero decoded markers",
+      "optical_check_output": "data/results/isaac/parallel-smoke-20261004-n32",
+      "optical_detected": 0,
+      "optical_expected": 32,
+      "timed_attempt": {
+        "output": "data/results/isaac/parallel-screen-20261004-n32-t96",
+        "trials": 96,
+        "successes": 0,
+        "outcome": "acquisition aborted",
+        "pose_availability": 0.0,
+        "excluded_termination_rate_per_hour": 6618.730053344557
+      }
+    }
+  ],
+  "isolation_optical_check": {
+    "output": "data/results/isaac/parallel-isolation-20261004-n30",
+    "detected": 30,
+    "expected": 30,
+    "foreign_occluder": true,
+    "passed": true
+  },
+  "native_tiled_resolution_px": {
+    "25": [
+      3600,
+      3600
+    ],
+    "28": [
+      4320,
+      3600
+    ],
+    "30": [
+      4320,
+      3600
+    ],
+    "31": [
+      4320,
+      4320
+    ],
+    "32": [
+      4320,
+      4320
+    ]
+  },
+  "rendering_failure_cause": "Unresolved; coincides with tile-layout transition, persists with partitioning off, spectator off and compact spacing. Not asserted as a general Isaac count limit.",
+  "diagnostic_outputs": [
+    "data/results/isaac/parallel-smoke-partition-off-20261004-n32",
+    "data/results/isaac/parallel-smoke-compact-20261004-n32",
+    "data/results/isaac/parallel-debug-spectator-off2-20261004-n32"
+  ],
+  "evidence_payload": "data/results/isaac/parallel-20261004-evidence",
+  "offline_report": "data/results/isaac/parallel-final-20261004-analysis.json",
+  "recommended_metrics_json": "data/results/isaac/parallel-paired-20261004-n30-t150-analysis/metrics.json",
+  "recommended_trials_csv": "data/results/isaac/parallel-paired-20261004-n30-t150-analysis/trials.csv",
+  "campaign_estimates_hours": {
+    "1000": 1.1858411872592585,
+    "10000": 11.858411872592585
+  },
+  "caveats": [
+    "Point estimates in fixed 720x720 GPU-experimental scene; N28/N30 differ by only ~1%, within observed cohort variation.",
+    "Sample sizes differ outside paired groups; 576 executions replay 150 unique initial conditions.",
+    "Trial-loop rates exclude ~20 s startup and shutdown; cold startup and wider initial bounds can add time.",
+    "Termination is the user-confirmed vision-height event, not physical contact.",
+    "Whole-GPU memory is sampled; very brief peaks can be missed."
+  ],
+  "loop_memory_window_note": "Approximate native-loop window from startup/loop durations, with two seconds trimmed at each boundary to exclude wrapper startup/shutdown; resource peak still uses all process samples."
+}

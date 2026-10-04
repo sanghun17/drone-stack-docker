@@ -11,3 +11,8 @@ exports `metrics.json` plus `trials.csv`. It verifies trace checksums and requir
 no Isaac, ROS or GPU runtime. Its input must be a completed evaluation directory
 with frame logging; the older pilots lack the necessary traces. See the Isaac
 stack README for field definitions and the current vision-height touchdown rule.
+
+[`isaac_parallelism_20261004.md`](isaac_parallelism_20261004.md) records the
+single-2080-Ti environment-count sweep, matched trial sets, throughput/memory
+measurements, N30 recommendation and rejected N31/N32 rendered observations.
+Machine-readable results are versioned in `data/manifests/`.
