@@ -40,6 +40,44 @@ to recover the driver state before continuing the sweep. Keep explicit UUID
 selection, since GPU indices can change. No GPU reset or further host change was
 performed, and the automated sweep was stopped.
 
+On 2026-10-04 the user confirmed that GPU1 is failed and chose software isolation.
+The stack now denies its full UUID even through `ISAAC_GPU_UUID` overrides, and
+evaluation preflight stops while PCI `0000:1a:00.0` remains bound to NVIDIA or
+nouveau. Other hosts should adjust `ISAAC_REQUIRED_ISOLATION_PCI` in this stack
+when using a different PCI layout.
+
+The native module supplies a host installer for early PCI `driver_override=none`.
+It matches the current slot to the confirmed UUID, refuses the boot display GPU,
+and backs up the current kernel initramfs under `~/drone-data/shared/archive/`.
+It verifies that the generated isolation script runs before udev, and restores
+the previous initramfs if generation or verification fails. It applies to the
+four NVIDIA functions in the failed slot while other slots retain their drivers.
+Installation requires a local sudo password and takes effect after reboot:
+
+```bash
+sudo python3 modules/simulation/isaac-lab/isolate_host_gpu.py --install \
+  --pci 0000:1a:00.0 --uuid GPU-8149eb0b-023a-17dd-b942-c622f0b8c4ca
+```
+
+After reboot, verify the isolation before restarting the service:
+
+```bash
+python3 modules/simulation/isaac-lab/isolate_host_gpu.py --check \
+  --pci 0000:1a:00.0 --uuid GPU-8149eb0b-023a-17dd-b942-c622f0b8c4ca
+# boot_isolation_active must be true.
+nvidia-smi --query-gpu=index,uuid,pci.bus_id --format=csv
+./setup.sh gen aruco-landing-isaac-x86
+docker compose -f .build/aruco-landing-isaac-x86/compose.yml up -d isaac
+```
+
+The installed filename is
+`/etc/initramfs-tools/scripts/init-top/00-drone-isolate-gpu-0000-1a-00-0`.
+To undo, remove that single file, run `sudo update-initramfs -u -k "$(uname -r)"`,
+and reboot. The card remains physically powered; this isolates Linux driver
+binding. Actual installation and boot verification are still pending the local
+sudo action. Its read-only inspection, ordering check and eight isolation tests
+passed on this host. Historical optical results remain unchanged.
+
 The completed APT migration was
 `nvidia-driver-570=570.211.01-0ubuntu1`: 22 packages added and 20 driver-535 packages
 replaced, with no general OS upgrade. Version 580 was not offered by this host's
@@ -143,5 +181,7 @@ bash stacks/aruco-landing-isaac-x86/scripts/evaluate.sh \
 Validation evidence is summarized in
 `data/manifests/isaac-landing-bootstrap-20261002.json` (before upgrade) and
 `data/manifests/isaac-landing-optical-20261002.json` (actual optical pilots);
+`data/manifests/isaac-landing-gpu-isolation-20261004.json` records the prepared
+failed-card isolation and its pending privileged installation/boot check.
 raw logs/reports are ignored
 under `.build/isaac-landing` and `data/results/isaac-landing-validation`.

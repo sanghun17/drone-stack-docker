@@ -2,6 +2,9 @@
 """Read-only host check for the pinned Isaac RTX runtime."""
 import argparse
 import json
+import os
+from pathlib import Path
+import re
 import subprocess
 import sys
 
@@ -11,6 +14,16 @@ def version(value):
 
 
 def check(uuid):
+    denied = os.environ.get('DSD_DENIED_GPU_UUIDS','').split(',')
+    if uuid.lower() in {value.strip().lower() for value in denied if value.strip()}:
+        raise RuntimeError('GPU UUID is explicitly denied by this stack: '+uuid)
+    for pci in filter(None,os.environ.get('ISAAC_REQUIRED_ISOLATION_PCI','').split(',')):
+        if not re.fullmatch(r'[0-9a-f]{4}:[0-9a-f]{2}:[0-9a-f]{2}\.[0-7]',pci):
+            raise RuntimeError('invalid required GPU isolation PCI address')
+        driver=Path('/sys/bus/pci/devices')/pci/'driver'
+        if driver.is_symlink() and driver.resolve().name in ('nvidia','nouveau'):
+            raise RuntimeError('Failed GPU '+pci+' is still attached to '+driver.resolve().name+
+                               '; install host PCI isolation and reboot before evaluation')
     result=subprocess.run(['nvidia-smi','--id='+uuid,
         '--query-gpu=uuid,name,driver_version,memory.total','--format=csv,noheader,nounits'],
         capture_output=True,text=True)

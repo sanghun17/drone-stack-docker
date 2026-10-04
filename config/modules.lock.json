@@ -830,9 +830,11 @@
     "simulation/isaac-lab": {
       "files": {
         "Dockerfile": "70b3cb6f9f7f07adcc032303d19f12cb42debd6cce9a1d8b3b73f00e233aa157",
-        "README.md": "21166a2f70562d9dc270c99eed8d43d57f58328da854477cc130a6811bf445ce",
+        "README.md": "20aa4516d7a520893de30e477acc3a3a3ba91707cb38699f58db9a67e188ba6c",
+        "isolate_host_gpu.py": "5b85fecb82137af508276023c8cf49602e1030425e254a796f433304f3c7b0e2",
         "module.yml": "b6362f341d65ea356d9c92e13118ce1da3974b62561b23e92928b2a4c79adf53",
         "run.sh": "d3a4d4f64792fac782d6d82c59e94dd7ffca1b1143de0c34b5e4c08f8f11023a",
+        "tests/test_isolate_host_gpu.py": "38343245317dab33dae2ed318342497db45c3f7d2909bf8880f2a845e1920525",
         "upgrade_host_driver.sh": "781287c3833d091b4cc26c0a4ed3d5c31e2baf2a157f5f65999e353bf97f0cd2"
       },
       "manifest": {
@@ -866,7 +868,7 @@
         ]
       },
       "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
-      "revision": "4fb69d3ccafbb6f882579834d7ceeeb5155f7fa1",
+      "revision": "3ebc99651cf790aa58ae71185372016a858a29cb",
       "subdir": "deployment/stack-modules/simulation/isaac-lab"
     },
     "utility/gui-vnc": {

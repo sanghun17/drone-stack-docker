@@ -41,6 +41,17 @@ class IsolatedContainerTest(unittest.TestCase):
             {'isaac':{'gpu_uuid':'GPU-1234','gpu_uuid_env':'ISAAC_GPU_UUID'}})
         self.assertEqual(services['isaac']['environment']['NVIDIA_VISIBLE_DEVICES'],'GPU-abcd-9876')
 
+    def test_failed_gpu_cannot_be_selected_by_an_environment_override(self):
+        overrides={'isaac':{'gpu_uuid':'GPU-1234','gpu_uuid_env':'ISAAC_GPU_UUID',
+                            'gpu_uuid_denylist':['GPU-dead-beef']}}
+        services=generator.isolated_services([ISAAC],'amd64','x',{},overrides)
+        self.assertEqual(services['isaac']['environment']['DSD_DENIED_GPU_UUIDS'],'GPU-dead-beef')
+        with self.assertRaisesRegex(ValueError,'explicitly denied'):
+            generator.isolated_services([ISAAC],'amd64','x',{'ISAAC_GPU_UUID':'GPU-DEAD-BEEF'},overrides)
+        for invalid in ('GPU-dead-beef',[1],['0']):
+            overrides['isaac']['gpu_uuid_denylist']=invalid
+            with self.assertRaises(ValueError): generator.isolated_services([ISAAC],'amd64','x',{},overrides)
+
     def test_reject_bad_uuid_unknown_override_and_name_collision(self):
         for overrides in ({'isaac':{'gpu_uuid':'0'}},{'typo':{}}, {'isaac':{'gpu_uuid':'GPU-abcd','image':'wrong'}}):
             with self.assertRaises(ValueError): generator.isolated_services([ISAAC],'amd64','x',{},overrides)

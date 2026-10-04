@@ -11,5 +11,8 @@ containers:
     # Override this value on another host before generating the stack.
     gpu_uuid: GPU-5f5e6979-51fc-3166-7a87-4e264c81e4dc
     gpu_uuid_env: ISAAC_GPU_UUID
+    gpu_uuid_denylist:
+      - GPU-8149eb0b-023a-17dd-b942-c622f0b8c4ca  # user-confirmed failed card, PCI 1a:00.0
     environment:
       ISAAC_SCRIPT: /work/stacks/aruco-landing-isaac-x86/scripts/evaluate.py
+      ISAAC_REQUIRED_ISOLATION_PCI: '0000:1a:00.0'

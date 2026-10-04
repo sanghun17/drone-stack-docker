@@ -1,0 +1,83 @@
+{
+  "date": "2026-10-04",
+  "stack": "aruco-landing-isaac-x86",
+  "status": "Software isolation prepared and tested; privileged installation and reboot verification pending",
+  "user_policy": {
+    "failed_gpu_confirmed": true,
+    "keep_card_installed": true,
+    "never_select_failed_gpu": true
+  },
+  "selected_gpu": "GPU-5f5e6979-51fc-3166-7a87-4e264c81e4dc",
+  "host": {
+    "kernel": "5.15.0-139-generic",
+    "driver": "570.211.01",
+    "reboot_after_driver_upgrade_completed": true
+  },
+  "failed_slot_read_only_inspection": {
+    "pci": "0000:1a:00.0",
+    "uuid": "GPU-8149eb0b-023a-17dd-b942-c622f0b8c4ca",
+    "uuid_verified": true,
+    "driver": "nvidia",
+    "driver_override": "(null)",
+    "boot_isolation_active": false,
+    "functions": [
+      {
+        "pci": "0000:1a:00.0",
+        "vendor": "0x10de",
+        "device": "0x1e04"
+      },
+      {
+        "pci": "0000:1a:00.1",
+        "vendor": "0x10de",
+        "device": "0x10f7"
+      },
+      {
+        "pci": "0000:1a:00.2",
+        "vendor": "0x10de",
+        "device": "0x1ad6"
+      },
+      {
+        "pci": "0000:1a:00.3",
+        "vendor": "0x10de",
+        "device": "0x1ad7"
+      }
+    ]
+  },
+  "native_module_revision": "3ebc99651cf790aa58ae71185372016a858a29cb",
+  "source_sha256": {
+    "modules/simulation/isaac-lab/isolate_host_gpu.py": "5b85fecb82137af508276023c8cf49602e1030425e254a796f433304f3c7b0e2",
+    "stacks/aruco-landing-isaac-x86/scripts/preflight.py": "bf82baae0a41317cde36d92ccaa6b2404a692ca73a0a976f78f76954a432acc8",
+    "scripts/gen_dockerfile_compose.py": "5e0f69c46bac16ff832151c29b2ac61091e9deff2f73e3b9bf8581fd8f43edde"
+  },
+  "isolation": {
+    "mechanism": "Per-function PCI driver_override=none before initramfs udev",
+    "boot_script": "/etc/initramfs-tools/scripts/init-top/00-drone-isolate-gpu-0000-1a-00-0",
+    "boot_order_verified_read_only": true,
+    "requires_local_sudo_password": true,
+    "host_installation_performed": false,
+    "initramfs_backup_directory": "~/drone-data/shared/archive/gpu-isolation-YYYYMMDD-HHMMSS/",
+    "installer_verifies_generated_initramfs": true,
+    "installer_restores_original_on_generation_failure": true,
+    "physical_power_removed": false,
+    "runtime_gate": "Refuse evaluation while failed PCI GPU is bound to nvidia/nouveau; deny UUID selection including environment overrides"
+  },
+  "validation": {
+    "module_isolation_tests_passed": 8,
+    "stack_tests_passed": 4,
+    "orchestration_tests_passed": 47,
+    "generated_hook_shellcheck_passed": true,
+    "compose_generation_passed": true,
+    "actual_host_preflight_rejected_unisolated_slot": true,
+    "privileged_installation_and_reboot_tested": false
+  },
+  "remaining": [
+    "Install the prepared isolation hook with local sudo and reboot",
+    "Verify boot_isolation_active=true and the failed card absent from NVIDIA enumeration",
+    "Remeasure GPU N1 and run N4/N8/N16 with the same 16 trial IDs and full GPU memory monitoring",
+    "Expand actual-image GPU detector pose validation before changing the CPU default"
+  ],
+  "historical_evidence": "data/manifests/isaac-landing-optical-20261002.json",
+  "evidence_paths": [
+    ".build/isaac-landing/isolation-orchestration-tests.log"
+  ]
+}

@@ -399,7 +399,7 @@ def isolated_services(mods, arch, stack, env, overrides=None):
         if arch not in cfg.get('arch', [arch]):
             raise ValueError('unsupported runtime architecture: '+arch)
         override = overrides.get(name, {})
-        if set(override)-{'environment', 'gpu_uuid', 'gpu_uuid_env'}:
+        if set(override)-{'environment', 'gpu_uuid', 'gpu_uuid_env', 'gpu_uuid_denylist'}:
             raise ValueError('unknown isolated container override for '+name)
         environment = dict(cfg.get('environment', {}))
         environment.update(override.get('environment', {}))
@@ -418,6 +418,14 @@ def isolated_services(mods, arch, stack, env, overrides=None):
             uuid = str(env.get(uuid_key) or expand(str(override.get('gpu_uuid', '')), env))
             if not re.fullmatch(r'GPU-[0-9a-fA-F-]+', uuid):
                 raise ValueError(name+' requires one explicit GPU UUID (container overrides gpu_uuid)')
+            denied = override.get('gpu_uuid_denylist', [])
+            if not isinstance(denied,list) or any(not isinstance(item,str) or
+                    not re.fullmatch(r'GPU-[0-9a-fA-F-]+',item) for item in denied):
+                raise ValueError(name+' GPU denylist must be a list of GPU UUIDs')
+            if uuid.lower() in {item.lower() for item in denied}:
+                raise ValueError(name+' GPU UUID is explicitly denied by this stack: '+uuid)
+            if denied:
+                service['environment']['DSD_DENIED_GPU_UUIDS'] = ','.join(denied)
             service['runtime'] = 'nvidia'
             service['environment'].update(NVIDIA_VISIBLE_DEVICES=uuid, NVIDIA_DRIVER_CAPABILITIES='all')
         services[name] = service
