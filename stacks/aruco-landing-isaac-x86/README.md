@@ -4,6 +4,11 @@ The stack adds an Ubuntu 24.04 Isaac container beside the existing ROS Noetic
 container. Host Ubuntu 20.04 and ROS1 can stay. The evaluation path directly
 calls ArUco/PnP and landing policy, without image RPC or ROS topics.
 
+For another Linux GPU workstation, see the [porting instructions](docs/porting.md).
+They retain the measured experiment's image/source/binary versions, select the
+destination UUID, scope the original failed-card PCI check to its host, and list
+the optical/landing checks before measuring a new optimum environment count.
+
 Native ARL Robot 1, native motor dynamics and native Lee velocity control remain
 unchanged. Configuration freezes gain/motor randomization so only initial
 position/yaw differ. Each environment owns an independent drone/camera/pad pose;

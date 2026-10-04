@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "experiment_stack_revision": "1d926048597cba50cd8c77a06d123193912cfbad",
+  "experiment_fingerprint": "66d3735e197f69253707d0c949ac5afe6e2851e7059270a6e5fcaa7126d24c29",
+  "application_sources_sha256": {
+    "evaluate.py": "cac85f5c71e7f22d8c80b9a2af206e76c95fa0683dbdab553e4b3ad273a999d2",
+    "native_runtime.py": "8ea26b263c92b6dcd89678d9726348e220c9af4db320cc55e72baffdc8c10b4c",
+    "native_smoke.py": "4050594a38c0455064a7be10b2bc9530a2a62092b0075a7d97c342e1152e160d",
+    "pad_scene.py": "246acc0d3c4b716e309808172a3a3a09fead31664967e6ffac0a734eaedec02e",
+    "preflight.py": "bf82baae0a41317cde36d92ccaa6b2404a692ca73a0a976f78f76954a432acc8",
+    "trial_store.py": "9ac29a2dd81c58285b18c4fe61898077d1f611a6e6b5c7a84df0ef6730529bb6",
+    "trial_trace.py": "753e6d5d9ea1f93d44125c23db5877e2332fe58e2eea5bc867a02191a44d29b7"
+  },
+  "native_image": "nvcr.io/nvidia/isaac-lab:3.0.0-rc1@sha256:1e795d3f10b50e97f93141a8eb1fa4d2c90a192c226a1bceecc5338ca87652f3",
+  "module_revisions": {
+    "planner/aruco-batch": "31bf003cdf2dfd7c2d265b00403f6a42750e0bdb",
+    "simulation/isaac-lab": "3ebc99651cf790aa58ae71185372016a858a29cb"
+  },
+  "detector": {
+    "backend": "gpu-experimental",
+    "filename": "libaruco_cuda.so",
+    "sha256": "2951efcb5d6db1a2f15a8ccfbc81b199289ad2f89e2b4b71fec21dc9200fcf10",
+    "bytes": 951728,
+    "source_sha256": "f38df3d082a8d5bab3309f317749add7e834e5442b10be11ef05e460a2f1244a",
+    "ptx_inspection": "PTX file    1: libaruco_cuda.1.sm_75.ptx",
+    "compile_flags": [
+      "-O3",
+      "-std=c++14",
+      "--shared",
+      "-Xcompiler",
+      "-fPIC",
+      "--cudart",
+      "static",
+      "-gencode",
+      "arch=compute_75,code=sm_75",
+      "-gencode",
+      "arch=compute_75,code=compute_75"
+    ]
+  },
+  "bundle_path": "data/assets/isaac-portable/aruco-cuda-2951efcb5d6d.tar.gz",
+  "bundle_members": [
+    "libaruco_cuda.so",
+    "manifest.json",
+    "SHA256SUMS"
+  ],
+  "platform": "Linux x86-64",
+  "destination_validation": "RTX 4080 execution and accuracy not tested; use optical, isolation and landing checks in stack porting guide.",
+  "compatibility_reference": "https://docs.nvidia.com/cuda/ada-compatibility-guide/index.html",
+  "measured_reference": "data/manifests/isaac-landing-parallelism-20261004.json"
+}
