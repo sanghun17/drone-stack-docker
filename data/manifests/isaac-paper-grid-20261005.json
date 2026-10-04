@@ -1,0 +1,2837 @@
+{
+  "experiment": "Isaac paper grid 2026-10-05",
+  "status": "complete",
+  "total_unique_configurations": 6,
+  "total_trials": 3000,
+  "total_successes": 3000,
+  "trace_checksums_verified": 3000,
+  "baseline_B2": "Same Yang 61-marker layout and same 500-trial dataset; not counted twice.",
+  "sampling": "Revised first-PDF funnel R(hmax): 10x10 inclusive +/-0.45 m camera grid; 5 repetitions; camera height 2 m; zero initial attitude/velocity.",
+  "metric_definitions": {
+    "A": "Per-trial fraction with at least one complete marker and minimum projected edge >=40 px, from GT projection; then equal trial mean.",
+    "E": "Per-trial sqrt(mean(||estimated camera position - GT camera position||^2)) on valid poses, then equal trial mean/sample std; cm.",
+    "d": "GT camera-to-pad horizontal distance at vision-height termination; cm; touchdown events only.",
+    "S": "Vision-height touchdown with lateral error <=10 cm; percentage of all trials.",
+    "missing_poses": "Excluded from RMSE, included in pose availability denominator.",
+    "projection": "Actual camera attitude; all four corners inside image; conservative minimum of the four projected edge lengths.",
+    "termination": "vision camera height threshold, not physical ground contact"
+  },
+  "reset_time_audit": {
+    "trials": 3000,
+    "maximum_initial_camera_position_error_m": 4.315837708960404e-06,
+    "maximum_initial_body_velocity": 0.0,
+    "maximum_capture_period_error_s": 3.8510861166685117e-16,
+    "minimum_capture_count": 171,
+    "total_capture_frames": 679923
+  },
+  "sources": [
+    {
+      "original_path": "/home/ml/Downloads/pad_design_Amit (3).pdf",
+      "preserved_path": "data/assets/isaac-paper-grid-20261005/pad_design_Amit (3).pdf",
+      "sha256": "fe3fc7427b0dd5b24ae726273147aa92b93bbdb547548f00d12bf5e9ff534834"
+    },
+    {
+      "original_path": "/home/ml/Downloads/bare_jrnl_new_sample4.pdf",
+      "preserved_path": "data/assets/isaac-paper-grid-20261005/bare_jrnl_new_sample4.pdf",
+      "sha256": "1ed1efa5df7177b2edf842b94060198c6eca4fb55098acf19bae3eeb5d637dd5"
+    },
+    {
+      "original_path": "/home/ml/aruco-stack-docker/.build/isaac-landing/bare-images/image-006.png",
+      "preserved_path": "data/assets/isaac-paper-grid-20261005/b3-source-image.png",
+      "sha256": "4ed3f7b4811eaf102aa1b0a105fb8d5482b744060cc427147a5c9e3831b9c544"
+    }
+  ],
+  "campaigns": [
+    {
+      "root_commit": "c3fa9f93447896df9da56f3458e8216d9f928089",
+      "num_envs": 90,
+      "trials_per_configuration": 500,
+      "configurations": [
+        {
+          "name": "paper-grid-pad1",
+          "config": "stacks/aruco-landing-isaac-x86/config/paper-grid-pad1.yaml",
+          "started_wall": 1791127923.0196927,
+          "state": "complete",
+          "exit_code": 0,
+          "finished_wall": 1791128326.2035935
+        },
+        {
+          "name": "paper-grid-pad2",
+          "config": "stacks/aruco-landing-isaac-x86/config/paper-grid-pad2.yaml",
+          "started_wall": 1791128326.2040737,
+          "state": "complete",
+          "exit_code": 0,
+          "finished_wall": 1791128724.547523
+        },
+        {
+          "name": "paper-grid-pad3",
+          "config": "stacks/aruco-landing-isaac-x86/config/paper-grid-pad3.yaml",
+          "started_wall": 1791128724.5479898,
+          "state": "complete",
+          "exit_code": 0,
+          "finished_wall": 1791129118.2670228
+        },
+        {
+          "name": "paper-grid-pad4",
+          "config": "stacks/aruco-landing-isaac-x86/config/paper-grid-pad4.yaml",
+          "started_wall": 1791129118.2675261,
+          "state": "complete",
+          "exit_code": 0,
+          "finished_wall": 1791129531.552152
+        },
+        {
+          "name": "paper-grid-10x10",
+          "config": "stacks/aruco-landing-isaac-x86/config/paper-grid-10x10.yaml",
+          "started_wall": 1791129531.5526502,
+          "state": "complete",
+          "exit_code": 0,
+          "finished_wall": 1791130161.220503
+        }
+      ],
+      "started_wall": 1791127923.0194976,
+      "state": "complete",
+      "finished_wall": 1791130161.220976,
+      "local_path": "data/results/isaac/paper-grid-20261005",
+      "gpu_memory_peak_mib": 19688,
+      "gpu_temperature_peak_c": 61
+    },
+    {
+      "root_commit": "d855a8ce9cc9ef3117e6ff406ef9abd8879cfa30",
+      "num_envs": 90,
+      "trials_per_configuration": 500,
+      "configurations": [
+        {
+          "name": "paper-grid-b3",
+          "config": "stacks/aruco-landing-isaac-x86/config/paper-grid-b3.yaml",
+          "started_wall": 1791130407.5912418,
+          "state": "complete",
+          "exit_code": 0,
+          "finished_wall": 1791130859.254966
+        }
+      ],
+      "started_wall": 1791130407.5909617,
+      "state": "complete",
+      "finished_wall": 1791130859.2554271,
+      "local_path": "data/results/isaac/paper-grid-b3-20261005",
+      "gpu_memory_peak_mib": 19672,
+      "gpu_temperature_peak_c": 61
+    }
+  ],
+  "configurations": [
+    {
+      "label": "Pad 1",
+      "marker_count": 2,
+      "trials": 500,
+      "successes": 500,
+      "trace_checksums_verified": 500,
+      "raw_path": "data/results/isaac/paper-grid-20261005/paper-grid-pad1",
+      "metrics_path": "data/results/isaac/paper-grid-20261005/analysis-pad1-v2/metrics.json",
+      "metrics_sha256": "fcecd663c293fc66ca910aecabbd4c1253bec74a764a00ed745992f283c098cf",
+      "fingerprint": "f2b6d52356d997c88be2217b3aa233852706e3f342f49bad657ed050266fcbbb",
+      "aruco_revision": "31bf003cdf2dfd7c2d265b00403f6a42750e0bdb",
+      "pad_sha256": "7650efc79b2f3a2144a8edad5578d6d85889eb01518dedb934d4d43f2e76a75e",
+      "application_sources_sha256": {
+        "evaluate.py": "a40c53f09e71dec307e72ade22307210e6f38dfa6c62e2286c1240bd949d7835",
+        "native_runtime.py": "8ea26b263c92b6dcd89678d9726348e220c9af4db320cc55e72baffdc8c10b4c",
+        "native_smoke.py": "4050594a38c0455064a7be10b2bc9530a2a62092b0075a7d97c342e1152e160d",
+        "pad_scene.py": "57a4e652fde40299b2f06f29dea40fbb4ceb45bf3146044b1784fcb3b85d8af4",
+        "paper_campaign.py": "b131f349d5871d7e9b03eb76f6c979f01127be3fe934bb964d64d22522cda429",
+        "preflight.py": "bf82baae0a41317cde36d92ccaa6b2404a692ca73a0a976f78f76954a432acc8",
+        "trial_inputs.py": "3f7daaef026837e6caf605e7664c6407150cacee39fc63e206a2288cca4e9cb0",
+        "trial_store.py": "9ac29a2dd81c58285b18c4fe61898077d1f611a6e6b5c7a84df0ef6730529bb6",
+        "trial_trace.py": "753e6d5d9ea1f93d44125c23db5877e2332fe58e2eea5bc867a02191a44d29b7"
+      },
+      "gpu_detector_library_sha256": "2951efcb5d6db1a2f15a8ccfbc81b199289ad2f89e2b4b71fec21dc9200fcf10",
+      "config": {
+        "physics_dt_s": 0.008333333333333333,
+        "control_decimation": 2,
+        "env_spacing_m": 20.0,
+        "seed": 1701,
+        "max_duration_s": 20.0,
+        "sensor_latency_s": 0.0,
+        "success_radius_m": 0.1,
+        "detector_backend": "gpu-experimental",
+        "pad_manifest": "config/proposed_pad_1_layout.yaml",
+        "configuration_label": "Pad 1",
+        "camera": {
+          "width": 720,
+          "height": 720,
+          "fx": 708.077114,
+          "fy": 708.077114,
+          "cx": 360.0,
+          "cy": 360.0,
+          "body_position_m": [
+            0.0,
+            0.0,
+            -0.1
+          ],
+          "body_quaternion_xyzw": [
+            0.7071067811865476,
+            -0.7071067811865476,
+            0.0,
+            0.0
+          ]
+        },
+        "native_controller": {
+          "trim_initial_motors": true,
+          "K_vel": [
+            3.0,
+            3.0,
+            1.75
+          ],
+          "K_rot": [
+            1.725,
+            1.725,
+            0.325
+          ],
+          "K_angvel": [
+            0.45,
+            0.45,
+            0.0825
+          ]
+        },
+        "policy": {
+          "horizontal_reference": "camera",
+          "height_reference": "camera",
+          "kp_xy": 1.0,
+          "kd_xy": 0.15,
+          "speed_limit_m_s": 2.0,
+          "descent_speed_m_s": 0.5,
+          "h_min_m": 0.2,
+          "derivative_filter_tau_s": 0.1,
+          "derivative_speed_limit_m_s": 2.0,
+          "acquisition_timeout_s": 2.0,
+          "loss_timeout_s": 0.5,
+          "latency_compensation_enabled": true,
+          "max_pose_prediction_s": 0.2,
+          "touchdown_stop_lead_s": 0.0,
+          "yaw_kp": 1.0,
+          "yaw_rate_limit_rad_s": 0.35,
+          "yaw_deadband_deg": 1.0
+        },
+        "initial_protocol": {
+          "kind": "funnel_grid",
+          "points_per_axis": 10,
+          "repeats": 5,
+          "pad_side_m": 0.7,
+          "lateral_uncertainty_m": 0.1,
+          "h_max_m": 2.0,
+          "funnel_formula": "max(epsilon, L/2 + epsilon - (vl/vz)*(hmax-h))",
+          "minimum_lateral_speed_m_s": 0.1,
+          "minimum_marker_edge_px": 40,
+          "grid_order": "repeat-major, then y, then x; endpoints included",
+          "position_reference": "camera in pad frame",
+          "initial_velocity": "zero",
+          "initial_body_attitude": "zero"
+        }
+      },
+      "summary": {
+        "A_marker_visible_40px_pct": {
+          "mean": 99.90319308226738,
+          "sample_std": 0.7826520446888265,
+          "trials": 500
+        },
+        "decoded_marker_availability_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        },
+        "pose_availability_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        },
+        "pose_availability_when_geometric_visible_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        },
+        "E_camera_rmse_cm": {
+          "mean": 3.6543861921795244,
+          "sample_std": 2.0580193970499776,
+          "trials": 500
+        },
+        "body_rmse_cm": {
+          "mean": 3.910761367633794,
+          "sample_std": 2.13939234655953,
+          "trials": 500
+        },
+        "d_touchdown_cm": {
+          "mean": 0.7253650653641671,
+          "sample_std": 0.3664784589479088,
+          "trials": 500
+        },
+        "S_land_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        }
+      },
+      "maximum_funnel_excess_m": 0.009731242591142664,
+      "trials_outside_funnel": 180,
+      "maximum_trial_camera_rmse_cm": 23.958335620789693,
+      "maximum_terminal_error_cm": 4.52500507235527,
+      "final_camera_height_range_m": [
+        0.18998510646820066,
+        0.2000309090614319
+      ],
+      "timing": {
+        "num_envs": 90,
+        "completed_trials": 500,
+        "wall_s": 388.3416085959998,
+        "startup_wall_s": 13.482835881000938,
+        "evaluation_wall_s": 401.82464388000153,
+        "new_trials": 500,
+        "trial_per_wall_hour": 4635.094360626648,
+        "aggregate_simulation_s": 1830.4333333333334,
+        "aggregate_simulation_per_wall_s": 4.71346178935354,
+        "gpu_peak_allocated_bytes": 149978624,
+        "hardware": {
+          "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+          "gpu_name": "NVIDIA GeForce RTX 4090",
+          "driver": "570.211.01",
+          "memory_mib": 24564,
+          "rtx_driver_floor_passed": true,
+          "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+          "renderer_log_minimum": "550.90.07",
+          "renderer_log_recommended": "580.95.05",
+          "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+        },
+        "timing": {
+          "physics_s": 12.264447862002271,
+          "render_s": 249.5582850559731,
+          "device_and_transfer_s": 51.71893466304937,
+          "detect_s": 0.0006044569563528057,
+          "pnp_s": 52.68942852201508,
+          "control_s": 3.3787667529795726,
+          "transferred_bytes": 8516160,
+          "markers": 222410,
+          "camera_batches": 1415,
+          "physics_steps": 2782
+        },
+        "pose_quality": {
+          "valid_poses": 126562,
+          "translation_sum_squared_m2": 203.45289064258813,
+          "translation_max_m": 1.5273526282585568,
+          "rotation_max_deg": 44.02987861406155
+        }
+      }
+    },
+    {
+      "label": "Pad 2",
+      "marker_count": 2,
+      "trials": 500,
+      "successes": 500,
+      "trace_checksums_verified": 500,
+      "raw_path": "data/results/isaac/paper-grid-20261005/paper-grid-pad2",
+      "metrics_path": "data/results/isaac/paper-grid-20261005/analysis-pad2/metrics.json",
+      "metrics_sha256": "9457389e11deffbb72ddf9d946145017e125d92e0db16e55603125b23f7242d9",
+      "fingerprint": "05ea657e6495eb264af916ba1748873af5642a000c7800eb3d585a003e61a44b",
+      "aruco_revision": "31bf003cdf2dfd7c2d265b00403f6a42750e0bdb",
+      "pad_sha256": "318196ef319d442b9b85c6aad8d5e885730df21e8bf209e86df57df2dbdfc601",
+      "application_sources_sha256": {
+        "evaluate.py": "a40c53f09e71dec307e72ade22307210e6f38dfa6c62e2286c1240bd949d7835",
+        "native_runtime.py": "8ea26b263c92b6dcd89678d9726348e220c9af4db320cc55e72baffdc8c10b4c",
+        "native_smoke.py": "4050594a38c0455064a7be10b2bc9530a2a62092b0075a7d97c342e1152e160d",
+        "pad_scene.py": "57a4e652fde40299b2f06f29dea40fbb4ceb45bf3146044b1784fcb3b85d8af4",
+        "paper_campaign.py": "b131f349d5871d7e9b03eb76f6c979f01127be3fe934bb964d64d22522cda429",
+        "preflight.py": "bf82baae0a41317cde36d92ccaa6b2404a692ca73a0a976f78f76954a432acc8",
+        "trial_inputs.py": "3f7daaef026837e6caf605e7664c6407150cacee39fc63e206a2288cca4e9cb0",
+        "trial_store.py": "9ac29a2dd81c58285b18c4fe61898077d1f611a6e6b5c7a84df0ef6730529bb6",
+        "trial_trace.py": "753e6d5d9ea1f93d44125c23db5877e2332fe58e2eea5bc867a02191a44d29b7"
+      },
+      "gpu_detector_library_sha256": "2951efcb5d6db1a2f15a8ccfbc81b199289ad2f89e2b4b71fec21dc9200fcf10",
+      "config": {
+        "physics_dt_s": 0.008333333333333333,
+        "control_decimation": 2,
+        "env_spacing_m": 20.0,
+        "seed": 1701,
+        "max_duration_s": 20.0,
+        "sensor_latency_s": 0.0,
+        "success_radius_m": 0.1,
+        "detector_backend": "gpu-experimental",
+        "pad_manifest": "config/proposed_pad_3_layout.yaml",
+        "configuration_label": "Pad 2",
+        "camera": {
+          "width": 720,
+          "height": 720,
+          "fx": 708.077114,
+          "fy": 708.077114,
+          "cx": 360.0,
+          "cy": 360.0,
+          "body_position_m": [
+            0.0,
+            0.0,
+            -0.1
+          ],
+          "body_quaternion_xyzw": [
+            0.7071067811865476,
+            -0.7071067811865476,
+            0.0,
+            0.0
+          ]
+        },
+        "native_controller": {
+          "trim_initial_motors": true,
+          "K_vel": [
+            3.0,
+            3.0,
+            1.75
+          ],
+          "K_rot": [
+            1.725,
+            1.725,
+            0.325
+          ],
+          "K_angvel": [
+            0.45,
+            0.45,
+            0.0825
+          ]
+        },
+        "policy": {
+          "horizontal_reference": "camera",
+          "height_reference": "camera",
+          "kp_xy": 1.0,
+          "kd_xy": 0.15,
+          "speed_limit_m_s": 2.0,
+          "descent_speed_m_s": 0.5,
+          "h_min_m": 0.2,
+          "derivative_filter_tau_s": 0.1,
+          "derivative_speed_limit_m_s": 2.0,
+          "acquisition_timeout_s": 2.0,
+          "loss_timeout_s": 0.5,
+          "latency_compensation_enabled": true,
+          "max_pose_prediction_s": 0.2,
+          "touchdown_stop_lead_s": 0.0,
+          "yaw_kp": 1.0,
+          "yaw_rate_limit_rad_s": 0.35,
+          "yaw_deadband_deg": 1.0
+        },
+        "initial_protocol": {
+          "kind": "funnel_grid",
+          "points_per_axis": 10,
+          "repeats": 5,
+          "pad_side_m": 0.7,
+          "lateral_uncertainty_m": 0.1,
+          "h_max_m": 2.0,
+          "funnel_formula": "max(epsilon, L/2 + epsilon - (vl/vz)*(hmax-h))",
+          "minimum_lateral_speed_m_s": 0.1,
+          "minimum_marker_edge_px": 40,
+          "grid_order": "repeat-major, then y, then x; endpoints included",
+          "position_reference": "camera in pad frame",
+          "initial_velocity": "zero",
+          "initial_body_attitude": "zero"
+        }
+      },
+      "summary": {
+        "A_marker_visible_40px_pct": {
+          "mean": 99.82098948393313,
+          "sample_std": 0.8546847768893736,
+          "trials": 500
+        },
+        "decoded_marker_availability_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        },
+        "pose_availability_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        },
+        "pose_availability_when_geometric_visible_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        },
+        "E_camera_rmse_cm": {
+          "mean": 3.6908720603386262,
+          "sample_std": 1.591576904286165,
+          "trials": 500
+        },
+        "body_rmse_cm": {
+          "mean": 3.8838845727688036,
+          "sample_std": 1.6610336289810912,
+          "trials": 500
+        },
+        "d_touchdown_cm": {
+          "mean": 0.591918731603073,
+          "sample_std": 0.2334025299565876,
+          "trials": 500
+        },
+        "S_land_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        }
+      },
+      "maximum_funnel_excess_m": 0.01056220211982728,
+      "trials_outside_funnel": 180,
+      "maximum_trial_camera_rmse_cm": 12.303851946537588,
+      "maximum_terminal_error_cm": 1.4954829588532448,
+      "final_camera_height_range_m": [
+        0.19141208338737487,
+        0.20001315879821777
+      ],
+      "timing": {
+        "num_envs": 90,
+        "completed_trials": 500,
+        "wall_s": 383.62241742399965,
+        "startup_wall_s": 13.39508179800032,
+        "evaluation_wall_s": 397.01770443500027,
+        "new_trials": 500,
+        "trial_per_wall_hour": 4692.113698899262,
+        "aggregate_simulation_s": 1846.7166666666667,
+        "aggregate_simulation_per_wall_s": 4.813891427584584,
+        "gpu_peak_allocated_bytes": 149978624,
+        "hardware": {
+          "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+          "gpu_name": "NVIDIA GeForce RTX 4090",
+          "driver": "570.211.01",
+          "memory_mib": 24564,
+          "rtx_driver_floor_passed": true,
+          "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+          "renderer_log_minimum": "550.90.07",
+          "renderer_log_recommended": "580.95.05",
+          "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+        },
+        "timing": {
+          "physics_s": 12.233894063972912,
+          "render_s": 249.4266605230241,
+          "device_and_transfer_s": 45.52359374501793,
+          "detect_s": 0.0006901890064909821,
+          "pnp_s": 54.29780322400438,
+          "control_s": 3.36526936503833,
+          "transferred_bytes": 8024976,
+          "markers": 208766,
+          "camera_batches": 1415,
+          "physics_steps": 2782
+        },
+        "pose_quality": {
+          "valid_poses": 122035,
+          "translation_sum_squared_m2": 199.02826525000282,
+          "translation_max_m": 1.3701188391342165,
+          "rotation_max_deg": 38.83308692670363
+        }
+      }
+    },
+    {
+      "label": "Pad 3",
+      "marker_count": 2,
+      "trials": 500,
+      "successes": 500,
+      "trace_checksums_verified": 500,
+      "raw_path": "data/results/isaac/paper-grid-20261005/paper-grid-pad3",
+      "metrics_path": "data/results/isaac/paper-grid-20261005/analysis-pad3/metrics.json",
+      "metrics_sha256": "fa8460d139c9577fd056890b2097d0addfe4476578c8a33bba2870a3a103e7d8",
+      "fingerprint": "971ce8bc1c762407ea28131ce079a29aba552396296169b915c38a52d2f138ab",
+      "aruco_revision": "31bf003cdf2dfd7c2d265b00403f6a42750e0bdb",
+      "pad_sha256": "75db44b19352ba699e88ac94861756a5e8258f0e0d0be5bcdc0170e07d49ab7f",
+      "application_sources_sha256": {
+        "evaluate.py": "a40c53f09e71dec307e72ade22307210e6f38dfa6c62e2286c1240bd949d7835",
+        "native_runtime.py": "8ea26b263c92b6dcd89678d9726348e220c9af4db320cc55e72baffdc8c10b4c",
+        "native_smoke.py": "4050594a38c0455064a7be10b2bc9530a2a62092b0075a7d97c342e1152e160d",
+        "pad_scene.py": "57a4e652fde40299b2f06f29dea40fbb4ceb45bf3146044b1784fcb3b85d8af4",
+        "paper_campaign.py": "b131f349d5871d7e9b03eb76f6c979f01127be3fe934bb964d64d22522cda429",
+        "preflight.py": "bf82baae0a41317cde36d92ccaa6b2404a692ca73a0a976f78f76954a432acc8",
+        "trial_inputs.py": "3f7daaef026837e6caf605e7664c6407150cacee39fc63e206a2288cca4e9cb0",
+        "trial_store.py": "9ac29a2dd81c58285b18c4fe61898077d1f611a6e6b5c7a84df0ef6730529bb6",
+        "trial_trace.py": "753e6d5d9ea1f93d44125c23db5877e2332fe58e2eea5bc867a02191a44d29b7"
+      },
+      "gpu_detector_library_sha256": "2951efcb5d6db1a2f15a8ccfbc81b199289ad2f89e2b4b71fec21dc9200fcf10",
+      "config": {
+        "physics_dt_s": 0.008333333333333333,
+        "control_decimation": 2,
+        "env_spacing_m": 20.0,
+        "seed": 1701,
+        "max_duration_s": 20.0,
+        "sensor_latency_s": 0.0,
+        "success_radius_m": 0.1,
+        "detector_backend": "gpu-experimental",
+        "pad_manifest": "config/proposed_pad_4_layout.yaml",
+        "configuration_label": "Pad 3",
+        "camera": {
+          "width": 720,
+          "height": 720,
+          "fx": 708.077114,
+          "fy": 708.077114,
+          "cx": 360.0,
+          "cy": 360.0,
+          "body_position_m": [
+            0.0,
+            0.0,
+            -0.1
+          ],
+          "body_quaternion_xyzw": [
+            0.7071067811865476,
+            -0.7071067811865476,
+            0.0,
+            0.0
+          ]
+        },
+        "native_controller": {
+          "trim_initial_motors": true,
+          "K_vel": [
+            3.0,
+            3.0,
+            1.75
+          ],
+          "K_rot": [
+            1.725,
+            1.725,
+            0.325
+          ],
+          "K_angvel": [
+            0.45,
+            0.45,
+            0.0825
+          ]
+        },
+        "policy": {
+          "horizontal_reference": "camera",
+          "height_reference": "camera",
+          "kp_xy": 1.0,
+          "kd_xy": 0.15,
+          "speed_limit_m_s": 2.0,
+          "descent_speed_m_s": 0.5,
+          "h_min_m": 0.2,
+          "derivative_filter_tau_s": 0.1,
+          "derivative_speed_limit_m_s": 2.0,
+          "acquisition_timeout_s": 2.0,
+          "loss_timeout_s": 0.5,
+          "latency_compensation_enabled": true,
+          "max_pose_prediction_s": 0.2,
+          "touchdown_stop_lead_s": 0.0,
+          "yaw_kp": 1.0,
+          "yaw_rate_limit_rad_s": 0.35,
+          "yaw_deadband_deg": 1.0
+        },
+        "initial_protocol": {
+          "kind": "funnel_grid",
+          "points_per_axis": 10,
+          "repeats": 5,
+          "pad_side_m": 0.7,
+          "lateral_uncertainty_m": 0.1,
+          "h_max_m": 2.0,
+          "funnel_formula": "max(epsilon, L/2 + epsilon - (vl/vz)*(hmax-h))",
+          "minimum_lateral_speed_m_s": 0.1,
+          "minimum_marker_edge_px": 40,
+          "grid_order": "repeat-major, then y, then x; endpoints included",
+          "position_reference": "camera in pad frame",
+          "initial_velocity": "zero",
+          "initial_body_attitude": "zero"
+        }
+      },
+      "summary": {
+        "A_marker_visible_40px_pct": {
+          "mean": 99.97437999385637,
+          "sample_std": 0.3315250987511278,
+          "trials": 500
+        },
+        "decoded_marker_availability_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        },
+        "pose_availability_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        },
+        "pose_availability_when_geometric_visible_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        },
+        "E_camera_rmse_cm": {
+          "mean": 3.97721120374686,
+          "sample_std": 1.1592601389517048,
+          "trials": 500
+        },
+        "body_rmse_cm": {
+          "mean": 4.188153345288039,
+          "sample_std": 1.2145509358409778,
+          "trials": 500
+        },
+        "d_touchdown_cm": {
+          "mean": 0.5994671702086635,
+          "sample_std": 0.2369916964334762,
+          "trials": 500
+        },
+        "S_land_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        }
+      },
+      "maximum_funnel_excess_m": 0.010829968237876852,
+      "trials_outside_funnel": 180,
+      "maximum_trial_camera_rmse_cm": 9.103715298791068,
+      "maximum_terminal_error_cm": 1.3772627338767052,
+      "final_camera_height_range_m": [
+        0.19133459734916686,
+        0.20004269886016846
+      ],
+      "timing": {
+        "num_envs": 90,
+        "completed_trials": 500,
+        "wall_s": 379.41438327000105,
+        "startup_wall_s": 12.99798184499923,
+        "evaluation_wall_s": 392.41254799700073,
+        "new_trials": 500,
+        "trial_per_wall_hour": 4744.153304064579,
+        "aggregate_simulation_s": 1819.5,
+        "aggregate_simulation_per_wall_s": 4.795548298191945,
+        "gpu_peak_allocated_bytes": 149978624,
+        "hardware": {
+          "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+          "gpu_name": "NVIDIA GeForce RTX 4090",
+          "driver": "570.211.01",
+          "memory_mib": 24564,
+          "rtx_driver_floor_passed": true,
+          "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+          "renderer_log_minimum": "550.90.07",
+          "renderer_log_recommended": "580.95.05",
+          "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+        },
+        "timing": {
+          "physics_s": 11.991562487955889,
+          "render_s": 246.69468235895147,
+          "device_and_transfer_s": 43.82842435200837,
+          "detect_s": 0.0005624000405077823,
+          "pnp_s": 55.952580534971275,
+          "control_s": 3.3577496989928477,
+          "transferred_bytes": 8352720,
+          "markers": 217970,
+          "camera_batches": 1405,
+          "physics_steps": 2762
+        },
+        "pose_quality": {
+          "valid_poses": 123388,
+          "translation_sum_squared_m2": 206.67836369155535,
+          "translation_max_m": 1.3252637183048448,
+          "rotation_max_deg": 37.66496220986197
+        }
+      }
+    },
+    {
+      "label": "Pad 4",
+      "marker_count": 2,
+      "trials": 500,
+      "successes": 500,
+      "trace_checksums_verified": 500,
+      "raw_path": "data/results/isaac/paper-grid-20261005/paper-grid-pad4",
+      "metrics_path": "data/results/isaac/paper-grid-20261005/analysis-pad4/metrics.json",
+      "metrics_sha256": "54f4f6e7a2cf548e205439b7be73fb57e7953e94c8af0c3c4e261db9fca8d840",
+      "fingerprint": "ce16d07b11ee94a1ff1f64059bc4842549fe08252e8bbf9aef85b6589c68c2fe",
+      "aruco_revision": "31bf003cdf2dfd7c2d265b00403f6a42750e0bdb",
+      "pad_sha256": "be902c70684544c461de52f44f5bad43c44da03a2d2e53a1cb6b2cdfa3b988bc",
+      "application_sources_sha256": {
+        "evaluate.py": "a40c53f09e71dec307e72ade22307210e6f38dfa6c62e2286c1240bd949d7835",
+        "native_runtime.py": "8ea26b263c92b6dcd89678d9726348e220c9af4db320cc55e72baffdc8c10b4c",
+        "native_smoke.py": "4050594a38c0455064a7be10b2bc9530a2a62092b0075a7d97c342e1152e160d",
+        "pad_scene.py": "57a4e652fde40299b2f06f29dea40fbb4ceb45bf3146044b1784fcb3b85d8af4",
+        "paper_campaign.py": "b131f349d5871d7e9b03eb76f6c979f01127be3fe934bb964d64d22522cda429",
+        "preflight.py": "bf82baae0a41317cde36d92ccaa6b2404a692ca73a0a976f78f76954a432acc8",
+        "trial_inputs.py": "3f7daaef026837e6caf605e7664c6407150cacee39fc63e206a2288cca4e9cb0",
+        "trial_store.py": "9ac29a2dd81c58285b18c4fe61898077d1f611a6e6b5c7a84df0ef6730529bb6",
+        "trial_trace.py": "753e6d5d9ea1f93d44125c23db5877e2332fe58e2eea5bc867a02191a44d29b7"
+      },
+      "gpu_detector_library_sha256": "2951efcb5d6db1a2f15a8ccfbc81b199289ad2f89e2b4b71fec21dc9200fcf10",
+      "config": {
+        "physics_dt_s": 0.008333333333333333,
+        "control_decimation": 2,
+        "env_spacing_m": 20.0,
+        "seed": 1701,
+        "max_duration_s": 20.0,
+        "sensor_latency_s": 0.0,
+        "success_radius_m": 0.1,
+        "detector_backend": "gpu-experimental",
+        "pad_manifest": "config/proposed_pad_5_layout.yaml",
+        "configuration_label": "Pad 4",
+        "camera": {
+          "width": 720,
+          "height": 720,
+          "fx": 708.077114,
+          "fy": 708.077114,
+          "cx": 360.0,
+          "cy": 360.0,
+          "body_position_m": [
+            0.0,
+            0.0,
+            -0.1
+          ],
+          "body_quaternion_xyzw": [
+            0.7071067811865476,
+            -0.7071067811865476,
+            0.0,
+            0.0
+          ]
+        },
+        "native_controller": {
+          "trim_initial_motors": true,
+          "K_vel": [
+            3.0,
+            3.0,
+            1.75
+          ],
+          "K_rot": [
+            1.725,
+            1.725,
+            0.325
+          ],
+          "K_angvel": [
+            0.45,
+            0.45,
+            0.0825
+          ]
+        },
+        "policy": {
+          "horizontal_reference": "camera",
+          "height_reference": "camera",
+          "kp_xy": 1.0,
+          "kd_xy": 0.15,
+          "speed_limit_m_s": 2.0,
+          "descent_speed_m_s": 0.5,
+          "h_min_m": 0.2,
+          "derivative_filter_tau_s": 0.1,
+          "derivative_speed_limit_m_s": 2.0,
+          "acquisition_timeout_s": 2.0,
+          "loss_timeout_s": 0.5,
+          "latency_compensation_enabled": true,
+          "max_pose_prediction_s": 0.2,
+          "touchdown_stop_lead_s": 0.0,
+          "yaw_kp": 1.0,
+          "yaw_rate_limit_rad_s": 0.35,
+          "yaw_deadband_deg": 1.0
+        },
+        "initial_protocol": {
+          "kind": "funnel_grid",
+          "points_per_axis": 10,
+          "repeats": 5,
+          "pad_side_m": 0.7,
+          "lateral_uncertainty_m": 0.1,
+          "h_max_m": 2.0,
+          "funnel_formula": "max(epsilon, L/2 + epsilon - (vl/vz)*(hmax-h))",
+          "minimum_lateral_speed_m_s": 0.1,
+          "minimum_marker_edge_px": 40,
+          "grid_order": "repeat-major, then y, then x; endpoints included",
+          "position_reference": "camera in pad frame",
+          "initial_velocity": "zero",
+          "initial_body_attitude": "zero"
+        }
+      },
+      "summary": {
+        "A_marker_visible_40px_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        },
+        "decoded_marker_availability_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        },
+        "pose_availability_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        },
+        "pose_availability_when_geometric_visible_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        },
+        "E_camera_rmse_cm": {
+          "mean": 4.341533677783235,
+          "sample_std": 2.1765330327619834,
+          "trials": 500
+        },
+        "body_rmse_cm": {
+          "mean": 4.571350504352751,
+          "sample_std": 2.2881241186256567,
+          "trials": 500
+        },
+        "d_touchdown_cm": {
+          "mean": 0.6142654299677816,
+          "sample_std": 0.22969852609334135,
+          "trials": 500
+        },
+        "S_land_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        }
+      },
+      "maximum_funnel_excess_m": 0.015303468191623704,
+      "trials_outside_funnel": 180,
+      "maximum_trial_camera_rmse_cm": 10.443358349001796,
+      "maximum_terminal_error_cm": 1.3070989400148392,
+      "final_camera_height_range_m": [
+        0.1913526873588562,
+        0.20007926630973816
+      ],
+      "timing": {
+        "num_envs": 90,
+        "completed_trials": 500,
+        "wall_s": 399.21036687500055,
+        "startup_wall_s": 12.750899868000488,
+        "evaluation_wall_s": 411.9614761740013,
+        "new_trials": 500,
+        "trial_per_wall_hour": 4508.900943856525,
+        "aggregate_simulation_s": 1808.85,
+        "aggregate_simulation_per_wall_s": 4.531069706830487,
+        "gpu_peak_allocated_bytes": 149978624,
+        "hardware": {
+          "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+          "gpu_name": "NVIDIA GeForce RTX 4090",
+          "driver": "570.211.01",
+          "memory_mib": 24564,
+          "rtx_driver_floor_passed": true,
+          "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+          "renderer_log_minimum": "550.90.07",
+          "renderer_log_recommended": "580.95.05",
+          "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+        },
+        "timing": {
+          "physics_s": 12.421137289022226,
+          "render_s": 253.8391498730216,
+          "device_and_transfer_s": 59.32321880598283,
+          "detect_s": 0.0005248379911790835,
+          "pnp_s": 52.532480972053236,
+          "control_s": 3.353118652004923,
+          "transferred_bytes": 8857404,
+          "markers": 231799,
+          "camera_batches": 1424,
+          "physics_steps": 2800
+        },
+        "pose_quality": {
+          "valid_poses": 127476,
+          "translation_sum_squared_m2": 259.85353974374834,
+          "translation_max_m": 0.9311136586627506,
+          "rotation_max_deg": 26.636604409905413
+        }
+      }
+    },
+    {
+      "label": "Baseline / B2",
+      "marker_count": 61,
+      "trials": 500,
+      "successes": 500,
+      "trace_checksums_verified": 500,
+      "raw_path": "data/results/isaac/paper-grid-20261005/paper-grid-10x10",
+      "metrics_path": "data/results/isaac/paper-grid-20261005/analysis-baseline/metrics.json",
+      "metrics_sha256": "237294772fe939fa4ab43b5da797255848477cc8f7ef9e34c9150a81b58e45d2",
+      "fingerprint": "c836c3cf7aa3ea4a322c2eae183d7eaeee341c749108a24b972fbdbdee07dc4d",
+      "aruco_revision": "31bf003cdf2dfd7c2d265b00403f6a42750e0bdb",
+      "pad_sha256": "ae1198da7d4d84e5987c8502ce3e23c017fd1c4a0eee3ec981d809c32eb9fad7",
+      "application_sources_sha256": {
+        "evaluate.py": "a40c53f09e71dec307e72ade22307210e6f38dfa6c62e2286c1240bd949d7835",
+        "native_runtime.py": "8ea26b263c92b6dcd89678d9726348e220c9af4db320cc55e72baffdc8c10b4c",
+        "native_smoke.py": "4050594a38c0455064a7be10b2bc9530a2a62092b0075a7d97c342e1152e160d",
+        "pad_scene.py": "57a4e652fde40299b2f06f29dea40fbb4ceb45bf3146044b1784fcb3b85d8af4",
+        "paper_campaign.py": "b131f349d5871d7e9b03eb76f6c979f01127be3fe934bb964d64d22522cda429",
+        "preflight.py": "bf82baae0a41317cde36d92ccaa6b2404a692ca73a0a976f78f76954a432acc8",
+        "trial_inputs.py": "3f7daaef026837e6caf605e7664c6407150cacee39fc63e206a2288cca4e9cb0",
+        "trial_store.py": "9ac29a2dd81c58285b18c4fe61898077d1f611a6e6b5c7a84df0ef6730529bb6",
+        "trial_trace.py": "753e6d5d9ea1f93d44125c23db5877e2332fe58e2eea5bc867a02191a44d29b7"
+      },
+      "gpu_detector_library_sha256": "2951efcb5d6db1a2f15a8ccfbc81b199289ad2f89e2b4b71fec21dc9200fcf10",
+      "config": {
+        "physics_dt_s": 0.008333333333333333,
+        "control_decimation": 2,
+        "env_spacing_m": 20.0,
+        "seed": 1701,
+        "max_duration_s": 20.0,
+        "sensor_latency_s": 0.0,
+        "success_radius_m": 0.1,
+        "detector_backend": "gpu-experimental",
+        "pad_manifest": "config/paper_pad_layout.yaml",
+        "configuration_label": "Baseline (61 markers)",
+        "camera": {
+          "width": 720,
+          "height": 720,
+          "fx": 708.077114,
+          "fy": 708.077114,
+          "cx": 360.0,
+          "cy": 360.0,
+          "body_position_m": [
+            0.0,
+            0.0,
+            -0.1
+          ],
+          "body_quaternion_xyzw": [
+            0.7071067811865476,
+            -0.7071067811865476,
+            0.0,
+            0.0
+          ]
+        },
+        "native_controller": {
+          "trim_initial_motors": true,
+          "K_vel": [
+            3.0,
+            3.0,
+            1.75
+          ],
+          "K_rot": [
+            1.725,
+            1.725,
+            0.325
+          ],
+          "K_angvel": [
+            0.45,
+            0.45,
+            0.0825
+          ]
+        },
+        "policy": {
+          "horizontal_reference": "camera",
+          "height_reference": "camera",
+          "kp_xy": 1.0,
+          "kd_xy": 0.15,
+          "speed_limit_m_s": 2.0,
+          "descent_speed_m_s": 0.5,
+          "h_min_m": 0.2,
+          "derivative_filter_tau_s": 0.1,
+          "derivative_speed_limit_m_s": 2.0,
+          "acquisition_timeout_s": 2.0,
+          "loss_timeout_s": 0.5,
+          "latency_compensation_enabled": true,
+          "max_pose_prediction_s": 0.2,
+          "touchdown_stop_lead_s": 0.0,
+          "yaw_kp": 1.0,
+          "yaw_rate_limit_rad_s": 0.35,
+          "yaw_deadband_deg": 1.0
+        },
+        "initial_protocol": {
+          "kind": "funnel_grid",
+          "points_per_axis": 10,
+          "repeats": 5,
+          "pad_side_m": 0.7,
+          "lateral_uncertainty_m": 0.1,
+          "h_max_m": 2.0,
+          "funnel_formula": "max(epsilon, L/2 + epsilon - (vl/vz)*(hmax-h))",
+          "minimum_lateral_speed_m_s": 0.1,
+          "minimum_marker_edge_px": 40,
+          "grid_order": "repeat-major, then y, then x; endpoints included",
+          "position_reference": "camera in pad frame",
+          "initial_velocity": "zero",
+          "initial_body_attitude": "zero"
+        }
+      },
+      "summary": {
+        "A_marker_visible_40px_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        },
+        "decoded_marker_availability_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        },
+        "pose_availability_pct": {
+          "mean": 99.97790485650061,
+          "sample_std": 0.09257409760443623,
+          "trials": 500
+        },
+        "pose_availability_when_geometric_visible_pct": {
+          "mean": 99.97790485650061,
+          "sample_std": 0.09257409760443623,
+          "trials": 500
+        },
+        "E_camera_rmse_cm": {
+          "mean": 0.30741291995256703,
+          "sample_std": 0.0964958794718285,
+          "trials": 500
+        },
+        "body_rmse_cm": {
+          "mean": 0.31970482336695966,
+          "sample_std": 0.1023388814925812,
+          "trials": 500
+        },
+        "d_touchdown_cm": {
+          "mean": 0.5338297567563132,
+          "sample_std": 0.2003962216663104,
+          "trials": 500
+        },
+        "S_land_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        }
+      },
+      "maximum_funnel_excess_m": 0.008730973535776121,
+      "trials_outside_funnel": 180,
+      "maximum_trial_camera_rmse_cm": 0.7141144658994297,
+      "maximum_terminal_error_cm": 0.9598012082278728,
+      "final_camera_height_range_m": [
+        0.19175291466712951,
+        0.19998923349380493
+      ],
+      "timing": {
+        "num_envs": 90,
+        "completed_trials": 500,
+        "wall_s": 614.529628577,
+        "startup_wall_s": 13.756009131999235,
+        "evaluation_wall_s": 628.2857967569998,
+        "new_trials": 500,
+        "trial_per_wall_hour": 2929.069513162556,
+        "aggregate_simulation_s": 2023.7833333333333,
+        "aggregate_simulation_per_wall_s": 3.2932233682850898,
+        "gpu_peak_allocated_bytes": 150248448,
+        "hardware": {
+          "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+          "gpu_name": "NVIDIA GeForce RTX 4090",
+          "driver": "570.211.01",
+          "memory_mib": 24564,
+          "rtx_driver_floor_passed": true,
+          "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+          "renderer_log_minimum": "550.90.07",
+          "renderer_log_recommended": "580.95.05",
+          "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+        },
+        "timing": {
+          "physics_s": 12.681370645017523,
+          "render_s": 292.27526841399595,
+          "device_and_transfer_s": 51.99705729799825,
+          "detect_s": 0.0006293020051089115,
+          "pnp_s": 231.99873934599964,
+          "control_s": 3.7155747310007428,
+          "transferred_bytes": 228805596,
+          "markers": 6340771,
+          "camera_batches": 1494,
+          "physics_steps": 2940
+        },
+        "pose_quality": {
+          "valid_poses": 133873,
+          "translation_sum_squared_m2": 1.385839121537646,
+          "translation_max_m": 0.038948405356887386,
+          "rotation_max_deg": 1.440393298746907
+        }
+      }
+    },
+    {
+      "label": "B3 (hybrid, reconstructed)",
+      "marker_count": 6,
+      "trials": 500,
+      "successes": 500,
+      "trace_checksums_verified": 500,
+      "raw_path": "data/results/isaac/paper-grid-b3-20261005/paper-grid-b3",
+      "metrics_path": "data/results/isaac/paper-grid-b3-20261005/analysis-b3/metrics.json",
+      "metrics_sha256": "703c1127bf76f73b05b8a82137124fcb3d086f900efc8247af031157d8d77d9f",
+      "fingerprint": "be131af14bba0e65a6fb9f2e16fa3017e56186c490a1fc4f7cd799cb2d9785bd",
+      "aruco_revision": "f18f7fbb2edc3ced6f945fa77c304da251ecc93b",
+      "pad_sha256": "849034dfd116bc77d08266cce9756a7b9ea94520eada275cc0b53788a7b7f3ac",
+      "application_sources_sha256": {
+        "evaluate.py": "88e153bf4ab2d4b7ce86ba94bd5fe901a6073212238a6c1aae303b660187cff9",
+        "native_runtime.py": "8ea26b263c92b6dcd89678d9726348e220c9af4db320cc55e72baffdc8c10b4c",
+        "native_smoke.py": "4050594a38c0455064a7be10b2bc9530a2a62092b0075a7d97c342e1152e160d",
+        "pad_scene.py": "e87df4699e6798223542eb2dea9928505db6b2c54abdd11d06960ba207d1a840",
+        "paper_campaign.py": "b131f349d5871d7e9b03eb76f6c979f01127be3fe934bb964d64d22522cda429",
+        "preflight.py": "bf82baae0a41317cde36d92ccaa6b2404a692ca73a0a976f78f76954a432acc8",
+        "trial_inputs.py": "3f7daaef026837e6caf605e7664c6407150cacee39fc63e206a2288cca4e9cb0",
+        "trial_store.py": "9ac29a2dd81c58285b18c4fe61898077d1f611a6e6b5c7a84df0ef6730529bb6",
+        "trial_trace.py": "753e6d5d9ea1f93d44125c23db5877e2332fe58e2eea5bc867a02191a44d29b7"
+      },
+      "gpu_detector_library_sha256": "ef04df2192eafdde6f75c57bc6385a756b6fdee67dc02c1881746cbfd43afbcf",
+      "config": {
+        "physics_dt_s": 0.008333333333333333,
+        "control_decimation": 2,
+        "env_spacing_m": 20.0,
+        "seed": 1701,
+        "max_duration_s": 20.0,
+        "sensor_latency_s": 0.0,
+        "success_radius_m": 0.1,
+        "detector_backend": "gpu-experimental",
+        "pad_manifest": "config/paper-b3-layout.yaml",
+        "configuration_label": "B3 (hybrid, reconstructed)",
+        "camera": {
+          "width": 720,
+          "height": 720,
+          "fx": 708.077114,
+          "fy": 708.077114,
+          "cx": 360.0,
+          "cy": 360.0,
+          "body_position_m": [
+            0.0,
+            0.0,
+            -0.1
+          ],
+          "body_quaternion_xyzw": [
+            0.7071067811865476,
+            -0.7071067811865476,
+            0.0,
+            0.0
+          ]
+        },
+        "native_controller": {
+          "trim_initial_motors": true,
+          "K_vel": [
+            3.0,
+            3.0,
+            1.75
+          ],
+          "K_rot": [
+            1.725,
+            1.725,
+            0.325
+          ],
+          "K_angvel": [
+            0.45,
+            0.45,
+            0.0825
+          ]
+        },
+        "policy": {
+          "horizontal_reference": "camera",
+          "height_reference": "camera",
+          "kp_xy": 1.0,
+          "kd_xy": 0.15,
+          "speed_limit_m_s": 2.0,
+          "descent_speed_m_s": 0.5,
+          "h_min_m": 0.2,
+          "derivative_filter_tau_s": 0.1,
+          "derivative_speed_limit_m_s": 2.0,
+          "acquisition_timeout_s": 2.0,
+          "loss_timeout_s": 0.5,
+          "latency_compensation_enabled": true,
+          "max_pose_prediction_s": 0.2,
+          "touchdown_stop_lead_s": 0.0,
+          "yaw_kp": 1.0,
+          "yaw_rate_limit_rad_s": 0.35,
+          "yaw_deadband_deg": 1.0
+        },
+        "initial_protocol": {
+          "kind": "funnel_grid",
+          "points_per_axis": 10,
+          "repeats": 5,
+          "pad_side_m": 0.7,
+          "lateral_uncertainty_m": 0.1,
+          "h_max_m": 2.0,
+          "funnel_formula": "max(epsilon, L/2 + epsilon - (vl/vz)*(hmax-h))",
+          "minimum_lateral_speed_m_s": 0.1,
+          "minimum_marker_edge_px": 40,
+          "grid_order": "repeat-major, then y, then x; endpoints included",
+          "position_reference": "camera in pad frame",
+          "initial_velocity": "zero",
+          "initial_body_attitude": "zero"
+        },
+        "pad_manifest_root": "stack"
+      },
+      "summary": {
+        "A_marker_visible_40px_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        },
+        "decoded_marker_availability_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        },
+        "pose_availability_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        },
+        "pose_availability_when_geometric_visible_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        },
+        "E_camera_rmse_cm": {
+          "mean": 2.2192698250878946,
+          "sample_std": 0.30256900882201554,
+          "trials": 500
+        },
+        "body_rmse_cm": {
+          "mean": 2.5975562059240866,
+          "sample_std": 0.3557085614499572,
+          "trials": 500
+        },
+        "d_touchdown_cm": {
+          "mean": 0.8697110945475288,
+          "sample_std": 0.42384766725699896,
+          "trials": 500
+        },
+        "S_land_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        }
+      },
+      "maximum_funnel_excess_m": 0.008779234671592695,
+      "trials_outside_funnel": 180,
+      "maximum_trial_camera_rmse_cm": 3.7560785528544223,
+      "maximum_terminal_error_cm": 2.1788103505969048,
+      "final_camera_height_range_m": [
+        0.19001353192329407,
+        0.20058076786994933
+      ],
+      "timing": {
+        "num_envs": 90,
+        "completed_trials": 500,
+        "wall_s": 436.87889981100125,
+        "startup_wall_s": 13.50024224399931,
+        "evaluation_wall_s": 450.3793148989989,
+        "new_trials": 500,
+        "trial_per_wall_hour": 4120.1348949988205,
+        "aggregate_simulation_s": 1952.7666666666667,
+        "aggregate_simulation_per_wall_s": 4.469812269513258,
+        "gpu_peak_allocated_bytes": 149990400,
+        "hardware": {
+          "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+          "gpu_name": "NVIDIA GeForce RTX 4090",
+          "driver": "570.211.01",
+          "memory_mib": 24564,
+          "rtx_driver_floor_passed": true,
+          "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+          "renderer_log_minimum": "550.90.07",
+          "renderer_log_recommended": "580.95.05",
+          "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+        },
+        "timing": {
+          "physics_s": 12.43204774298647,
+          "render_s": 260.0527919349861,
+          "device_and_transfer_s": 80.8630561100581,
+          "detect_s": 0.0006251389440876665,
+          "pnp_s": 61.058499610984654,
+          "control_s": 3.615418903018508,
+          "transferred_bytes": 21254040,
+          "markers": 575870,
+          "camera_batches": 1452,
+          "physics_steps": 2856
+        },
+        "pose_quality": {
+          "valid_poses": 130080,
+          "translation_sum_squared_m2": 105.53862770746343,
+          "translation_max_m": 0.4117296536793945,
+          "rotation_max_deg": 14.825118503464239
+        }
+      }
+    }
+  ],
+  "shared_aruco_algorithm_sources_sha256": {
+    "batch_landing.py": "b389e54ab5ea62e3bede55181e0e27fb824f0bd167195dd36d61557e7d915255",
+    "physical_pad.py": "a6919b7dfd0417afd63d3e768158108dbdc20d7b0731ae20356ac714893e950a",
+    "batched_detection.py": "2b6cd7aa05d261762f590f3441799a4bc4a4d5a030baa7a0aad8fca66fb49637",
+    "pose_alignment.py": "8c3fb988ed4f4055aff40e14a311dee2f6b857cf7d9858c001bb06d383830a5a",
+    "landing_math.py": "25a353e4188e9649f0ca51c84eaff8376f06aefbcd9cbe1905ce8329c04047e0",
+    "yaw_control.py": "6d985c3081399b345ed25ee4842847730873a8fafa2777aee471872410c33192"
+  },
+  "comparison": [
+    {
+      "configuration": "Pad 1",
+      "N": 2,
+      "trials": 500,
+      "successes": 500,
+      "fingerprint": "f2b6d52356d997c88be2217b3aa233852706e3f342f49bad657ed050266fcbbb",
+      "maximum_funnel_excess_m": 0.009731242591142664,
+      "trials_outside_funnel_0_1mm": 180,
+      "A_marker_visible_40px_pct_mean": 99.90319308226738,
+      "A_marker_visible_40px_pct_sample_std": 0.7826520446888265,
+      "A_marker_visible_40px_pct_trials": 500,
+      "decoded_marker_availability_pct_mean": 100.0,
+      "decoded_marker_availability_pct_sample_std": 0.0,
+      "decoded_marker_availability_pct_trials": 500,
+      "pose_availability_pct_mean": 100.0,
+      "pose_availability_pct_sample_std": 0.0,
+      "pose_availability_pct_trials": 500,
+      "pose_availability_when_geometric_visible_pct_mean": 100.0,
+      "pose_availability_when_geometric_visible_pct_sample_std": 0.0,
+      "pose_availability_when_geometric_visible_pct_trials": 500,
+      "E_camera_rmse_cm_mean": 3.6543861921795244,
+      "E_camera_rmse_cm_sample_std": 2.0580193970499776,
+      "E_camera_rmse_cm_trials": 500,
+      "body_rmse_cm_mean": 3.910761367633794,
+      "body_rmse_cm_sample_std": 2.13939234655953,
+      "body_rmse_cm_trials": 500,
+      "d_touchdown_cm_mean": 0.7253650653641671,
+      "d_touchdown_cm_sample_std": 0.3664784589479088,
+      "d_touchdown_cm_trials": 500,
+      "S_land_pct_mean": 100.0,
+      "S_land_pct_sample_std": 0.0,
+      "S_land_pct_trials": 500
+    },
+    {
+      "configuration": "Pad 2",
+      "N": 2,
+      "trials": 500,
+      "successes": 500,
+      "fingerprint": "05ea657e6495eb264af916ba1748873af5642a000c7800eb3d585a003e61a44b",
+      "maximum_funnel_excess_m": 0.01056220211982728,
+      "trials_outside_funnel_0_1mm": 180,
+      "A_marker_visible_40px_pct_mean": 99.82098948393313,
+      "A_marker_visible_40px_pct_sample_std": 0.8546847768893736,
+      "A_marker_visible_40px_pct_trials": 500,
+      "decoded_marker_availability_pct_mean": 100.0,
+      "decoded_marker_availability_pct_sample_std": 0.0,
+      "decoded_marker_availability_pct_trials": 500,
+      "pose_availability_pct_mean": 100.0,
+      "pose_availability_pct_sample_std": 0.0,
+      "pose_availability_pct_trials": 500,
+      "pose_availability_when_geometric_visible_pct_mean": 100.0,
+      "pose_availability_when_geometric_visible_pct_sample_std": 0.0,
+      "pose_availability_when_geometric_visible_pct_trials": 500,
+      "E_camera_rmse_cm_mean": 3.6908720603386262,
+      "E_camera_rmse_cm_sample_std": 1.591576904286165,
+      "E_camera_rmse_cm_trials": 500,
+      "body_rmse_cm_mean": 3.8838845727688036,
+      "body_rmse_cm_sample_std": 1.6610336289810912,
+      "body_rmse_cm_trials": 500,
+      "d_touchdown_cm_mean": 0.591918731603073,
+      "d_touchdown_cm_sample_std": 0.2334025299565876,
+      "d_touchdown_cm_trials": 500,
+      "S_land_pct_mean": 100.0,
+      "S_land_pct_sample_std": 0.0,
+      "S_land_pct_trials": 500
+    },
+    {
+      "configuration": "Pad 3",
+      "N": 2,
+      "trials": 500,
+      "successes": 500,
+      "fingerprint": "971ce8bc1c762407ea28131ce079a29aba552396296169b915c38a52d2f138ab",
+      "maximum_funnel_excess_m": 0.010829968237876852,
+      "trials_outside_funnel_0_1mm": 180,
+      "A_marker_visible_40px_pct_mean": 99.97437999385637,
+      "A_marker_visible_40px_pct_sample_std": 0.3315250987511278,
+      "A_marker_visible_40px_pct_trials": 500,
+      "decoded_marker_availability_pct_mean": 100.0,
+      "decoded_marker_availability_pct_sample_std": 0.0,
+      "decoded_marker_availability_pct_trials": 500,
+      "pose_availability_pct_mean": 100.0,
+      "pose_availability_pct_sample_std": 0.0,
+      "pose_availability_pct_trials": 500,
+      "pose_availability_when_geometric_visible_pct_mean": 100.0,
+      "pose_availability_when_geometric_visible_pct_sample_std": 0.0,
+      "pose_availability_when_geometric_visible_pct_trials": 500,
+      "E_camera_rmse_cm_mean": 3.97721120374686,
+      "E_camera_rmse_cm_sample_std": 1.1592601389517048,
+      "E_camera_rmse_cm_trials": 500,
+      "body_rmse_cm_mean": 4.188153345288039,
+      "body_rmse_cm_sample_std": 1.2145509358409778,
+      "body_rmse_cm_trials": 500,
+      "d_touchdown_cm_mean": 0.5994671702086635,
+      "d_touchdown_cm_sample_std": 0.2369916964334762,
+      "d_touchdown_cm_trials": 500,
+      "S_land_pct_mean": 100.0,
+      "S_land_pct_sample_std": 0.0,
+      "S_land_pct_trials": 500
+    },
+    {
+      "configuration": "Pad 4",
+      "N": 2,
+      "trials": 500,
+      "successes": 500,
+      "fingerprint": "ce16d07b11ee94a1ff1f64059bc4842549fe08252e8bbf9aef85b6589c68c2fe",
+      "maximum_funnel_excess_m": 0.015303468191623704,
+      "trials_outside_funnel_0_1mm": 180,
+      "A_marker_visible_40px_pct_mean": 100.0,
+      "A_marker_visible_40px_pct_sample_std": 0.0,
+      "A_marker_visible_40px_pct_trials": 500,
+      "decoded_marker_availability_pct_mean": 100.0,
+      "decoded_marker_availability_pct_sample_std": 0.0,
+      "decoded_marker_availability_pct_trials": 500,
+      "pose_availability_pct_mean": 100.0,
+      "pose_availability_pct_sample_std": 0.0,
+      "pose_availability_pct_trials": 500,
+      "pose_availability_when_geometric_visible_pct_mean": 100.0,
+      "pose_availability_when_geometric_visible_pct_sample_std": 0.0,
+      "pose_availability_when_geometric_visible_pct_trials": 500,
+      "E_camera_rmse_cm_mean": 4.341533677783235,
+      "E_camera_rmse_cm_sample_std": 2.1765330327619834,
+      "E_camera_rmse_cm_trials": 500,
+      "body_rmse_cm_mean": 4.571350504352751,
+      "body_rmse_cm_sample_std": 2.2881241186256567,
+      "body_rmse_cm_trials": 500,
+      "d_touchdown_cm_mean": 0.6142654299677816,
+      "d_touchdown_cm_sample_std": 0.22969852609334135,
+      "d_touchdown_cm_trials": 500,
+      "S_land_pct_mean": 100.0,
+      "S_land_pct_sample_std": 0.0,
+      "S_land_pct_trials": 500
+    },
+    {
+      "configuration": "Baseline / B2",
+      "N": 61,
+      "trials": 500,
+      "successes": 500,
+      "fingerprint": "c836c3cf7aa3ea4a322c2eae183d7eaeee341c749108a24b972fbdbdee07dc4d",
+      "maximum_funnel_excess_m": 0.008730973535776121,
+      "trials_outside_funnel_0_1mm": 180,
+      "A_marker_visible_40px_pct_mean": 100.0,
+      "A_marker_visible_40px_pct_sample_std": 0.0,
+      "A_marker_visible_40px_pct_trials": 500,
+      "decoded_marker_availability_pct_mean": 100.0,
+      "decoded_marker_availability_pct_sample_std": 0.0,
+      "decoded_marker_availability_pct_trials": 500,
+      "pose_availability_pct_mean": 99.97790485650061,
+      "pose_availability_pct_sample_std": 0.09257409760443623,
+      "pose_availability_pct_trials": 500,
+      "pose_availability_when_geometric_visible_pct_mean": 99.97790485650061,
+      "pose_availability_when_geometric_visible_pct_sample_std": 0.09257409760443623,
+      "pose_availability_when_geometric_visible_pct_trials": 500,
+      "E_camera_rmse_cm_mean": 0.30741291995256703,
+      "E_camera_rmse_cm_sample_std": 0.0964958794718285,
+      "E_camera_rmse_cm_trials": 500,
+      "body_rmse_cm_mean": 0.31970482336695966,
+      "body_rmse_cm_sample_std": 0.1023388814925812,
+      "body_rmse_cm_trials": 500,
+      "d_touchdown_cm_mean": 0.5338297567563132,
+      "d_touchdown_cm_sample_std": 0.2003962216663104,
+      "d_touchdown_cm_trials": 500,
+      "S_land_pct_mean": 100.0,
+      "S_land_pct_sample_std": 0.0,
+      "S_land_pct_trials": 500
+    },
+    {
+      "configuration": "B3 (hybrid, reconstructed)",
+      "N": 6,
+      "trials": 500,
+      "successes": 500,
+      "fingerprint": "be131af14bba0e65a6fb9f2e16fa3017e56186c490a1fc4f7cd799cb2d9785bd",
+      "maximum_funnel_excess_m": 0.008779234671592695,
+      "trials_outside_funnel_0_1mm": 180,
+      "A_marker_visible_40px_pct_mean": 100.0,
+      "A_marker_visible_40px_pct_sample_std": 0.0,
+      "A_marker_visible_40px_pct_trials": 500,
+      "decoded_marker_availability_pct_mean": 100.0,
+      "decoded_marker_availability_pct_sample_std": 0.0,
+      "decoded_marker_availability_pct_trials": 500,
+      "pose_availability_pct_mean": 100.0,
+      "pose_availability_pct_sample_std": 0.0,
+      "pose_availability_pct_trials": 500,
+      "pose_availability_when_geometric_visible_pct_mean": 100.0,
+      "pose_availability_when_geometric_visible_pct_sample_std": 0.0,
+      "pose_availability_when_geometric_visible_pct_trials": 500,
+      "E_camera_rmse_cm_mean": 2.2192698250878946,
+      "E_camera_rmse_cm_sample_std": 0.30256900882201554,
+      "E_camera_rmse_cm_trials": 500,
+      "body_rmse_cm_mean": 2.5975562059240866,
+      "body_rmse_cm_sample_std": 0.3557085614499572,
+      "body_rmse_cm_trials": 500,
+      "d_touchdown_cm_mean": 0.8697110945475288,
+      "d_touchdown_cm_sample_std": 0.42384766725699896,
+      "d_touchdown_cm_trials": 500,
+      "S_land_pct_mean": 100.0,
+      "S_land_pct_sample_std": 0.0,
+      "S_land_pct_trials": 500
+    }
+  ],
+  "qualifications": [
+    {
+      "path": "data/results/isaac/paper-grid-gpu6-synthetic-20261005.json",
+      "sha256": "013a5969d7fd0c68089d2185d2551deae4a64abc55a993b0e7998c0609f0231e",
+      "data": {
+        "scope": "synthetic decoding only; no renderer or landing accuracy claim",
+        "cases": [
+          {
+            "dictionary": "DICT_4X4_100",
+            "id": 0,
+            "rotation": 0,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": true
+          },
+          {
+            "dictionary": "DICT_4X4_100",
+            "id": 0,
+            "rotation": 1,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": true
+          },
+          {
+            "dictionary": "DICT_4X4_100",
+            "id": 0,
+            "rotation": 2,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": true
+          },
+          {
+            "dictionary": "DICT_4X4_100",
+            "id": 0,
+            "rotation": 3,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": true
+          },
+          {
+            "dictionary": "DICT_4X4_100",
+            "id": 17,
+            "rotation": 0,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": true
+          },
+          {
+            "dictionary": "DICT_4X4_100",
+            "id": 17,
+            "rotation": 1,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": true
+          },
+          {
+            "dictionary": "DICT_4X4_100",
+            "id": 17,
+            "rotation": 2,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": true
+          },
+          {
+            "dictionary": "DICT_4X4_100",
+            "id": 17,
+            "rotation": 3,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": true
+          },
+          {
+            "dictionary": "DICT_4X4_100",
+            "id": 43,
+            "rotation": 0,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": true
+          },
+          {
+            "dictionary": "DICT_4X4_100",
+            "id": 43,
+            "rotation": 1,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": true
+          },
+          {
+            "dictionary": "DICT_4X4_100",
+            "id": 43,
+            "rotation": 2,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": true
+          },
+          {
+            "dictionary": "DICT_4X4_100",
+            "id": 43,
+            "rotation": 3,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": true
+          },
+          {
+            "dictionary": "DICT_4X4_100",
+            "id": 99,
+            "rotation": 0,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": true
+          },
+          {
+            "dictionary": "DICT_4X4_100",
+            "id": 99,
+            "rotation": 1,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": true
+          },
+          {
+            "dictionary": "DICT_4X4_100",
+            "id": 99,
+            "rotation": 2,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": true
+          },
+          {
+            "dictionary": "DICT_4X4_100",
+            "id": 99,
+            "rotation": 3,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": true
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 0,
+            "rotation": 0,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 0,
+            "rotation": 1,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 0,
+            "rotation": 2,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 0,
+            "rotation": 3,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 1,
+            "rotation": 0,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 1,
+            "rotation": 1,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 1,
+            "rotation": 2,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 1,
+            "rotation": 3,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 2,
+            "rotation": 0,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 2,
+            "rotation": 1,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 2,
+            "rotation": 2,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 2,
+            "rotation": 3,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 3,
+            "rotation": 0,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 3,
+            "rotation": 1,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 3,
+            "rotation": 2,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 3,
+            "rotation": 3,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 4,
+            "rotation": 0,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 4,
+            "rotation": 1,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 4,
+            "rotation": 2,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 4,
+            "rotation": 3,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 19,
+            "rotation": 0,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 19,
+            "rotation": 1,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 19,
+            "rotation": 2,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 19,
+            "rotation": 3,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 43,
+            "rotation": 0,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 43,
+            "rotation": 1,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 43,
+            "rotation": 2,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 43,
+            "rotation": 3,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 49,
+            "rotation": 0,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 49,
+            "rotation": 1,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 49,
+            "rotation": 2,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          },
+          {
+            "dictionary": "DICT_6X6_50",
+            "id": 49,
+            "rotation": 3,
+            "reference_corner_max_delta_px": 0.7071067690849304,
+            "transferred_bytes": 40,
+            "previous_4x4_exact_match": false
+          }
+        ],
+        "passed": true
+      }
+    },
+    {
+      "path": "data/results/isaac/paper-grid-scene4-compat-20261005.json",
+      "sha256": "5ceb536d94f634e42601bbbfedcaef24d59353b328bdc677667c2707f01b772a",
+      "data": [
+        {
+          "source": "paper_pad_layout.yaml",
+          "quads": 1732,
+          "exact_match": true
+        },
+        {
+          "source": "proposed_pad_1_layout.yaml",
+          "quads": 56,
+          "exact_match": true
+        },
+        {
+          "source": "proposed_pad_3_layout.yaml",
+          "quads": 56,
+          "exact_match": true
+        },
+        {
+          "source": "proposed_pad_4_layout.yaml",
+          "quads": 56,
+          "exact_match": true
+        },
+        {
+          "source": "proposed_pad_5_layout.yaml",
+          "quads": 56,
+          "exact_match": true
+        }
+      ]
+    },
+    {
+      "path": "data/results/isaac/paper-grid-validation-20261005.json",
+      "sha256": "b924369da7fcb5d8698cc78d03ffdff69f5e868426f9e12e2e3e4d8f4d55616d",
+      "data": [
+        {
+          "path": "data/results/isaac/paper-grid-pilot-20261005/paper-grid-pad1",
+          "fingerprint": "f2b6d52356d997c88be2217b3aa233852706e3f342f49bad657ed050266fcbbb",
+          "backend": "gpu-experimental",
+          "configuration": "Pad 1",
+          "trials": 10,
+          "successes": 10,
+          "trace_checksums_verified": 10,
+          "camera_rmse_trial_mean_m": 0.032564113355734024,
+          "touchdown_trial_mean_m": 0.008870363049209119
+        },
+        {
+          "path": "data/results/isaac/paper-grid-pilot-20261005/paper-grid-10x10",
+          "fingerprint": "c836c3cf7aa3ea4a322c2eae183d7eaeee341c749108a24b972fbdbdee07dc4d",
+          "backend": "gpu-experimental",
+          "configuration": "Baseline (61 markers)",
+          "trials": 10,
+          "successes": 10,
+          "trace_checksums_verified": 10,
+          "camera_rmse_trial_mean_m": 0.0023422496841691053,
+          "touchdown_trial_mean_m": 0.006986650126054883
+        },
+        {
+          "path": "data/results/isaac/paper-grid-pad1-cpu-pilot-20261005",
+          "fingerprint": "a1e9ea3bbabd30ed884ee57ffc9ffbbe7526689fb86d9c1844ecd6012ea740bf",
+          "backend": "cpu",
+          "configuration": "Pad 1",
+          "trials": 10,
+          "successes": 10,
+          "trace_checksums_verified": 10,
+          "camera_rmse_trial_mean_m": 0.0514143547701475,
+          "touchdown_trial_mean_m": 0.010756271751597523
+        }
+      ]
+    },
+    {
+      "path": "data/results/isaac/paper-grid-reset-time-audit-20261005.json",
+      "sha256": "251c0be57649f4260b7b64a8b657bfd5150f45fd87cdaf26944caa17bfd6bd65",
+      "data": {
+        "trials": 3000,
+        "maximum_initial_camera_position_error_m": 4.315837708960404e-06,
+        "maximum_initial_body_velocity": 0.0,
+        "maximum_capture_period_error_s": 3.8510861166685117e-16,
+        "minimum_capture_count": 171,
+        "total_capture_frames": 679923
+      }
+    },
+    {
+      "path": "data/results/isaac/paper-b3-rendered-comparison-20261005.json",
+      "sha256": "a63e2cee32d3cb05a543e7ea2ff50f396b71d4d59741a0a3a190214ebbf6bfaa",
+      "data": {
+        "scope": "Same rendered reset images; expected camera reset GT (ignores <= tens-of-micrometers world-origin rounding).",
+        "recorded_gpu_smoke": {
+          "valid_poses": 30,
+          "translation_sum_squared_m2": 0.0023314791447472394,
+          "translation_max_m": 0.01276405520170563,
+          "rotation_max_deg": 0.3674986498140827
+        },
+        "passed": false,
+        "images": 10,
+        "rows": [
+          {
+            "camera": 0,
+            "image_sha256": "07f11c447644e5e5784f32b1a5e0b8f50e1d8bc61459b212084df81e6f0a6ea8",
+            "gpu_ids": [
+              43,
+              4,
+              1,
+              2,
+              3,
+              19
+            ],
+            "cpu_inlier_ids": [
+              3,
+              2,
+              1,
+              43
+            ],
+            "transferred_bytes": 220,
+            "gpu_position_error_m": 0.0037029623031299996,
+            "cpu_position_error_m": 0.007974675015843195,
+            "cpu_gpu_position_delta_m": 0.008949574693023274
+          },
+          {
+            "camera": 1,
+            "image_sha256": "00eb718451f94e5c87a23dda1a15570a43340ccbc959eb058bd3785f109df4c1",
+            "gpu_ids": [
+              43,
+              2,
+              3,
+              4,
+              1,
+              19
+            ],
+            "cpu_inlier_ids": [
+              4,
+              1,
+              3,
+              43
+            ],
+            "transferred_bytes": 220,
+            "gpu_position_error_m": 0.010465441451345942,
+            "cpu_position_error_m": 0.013055774374596603,
+            "cpu_gpu_position_delta_m": 0.006747888566031027
+          },
+          {
+            "camera": 2,
+            "image_sha256": "9bd6dc44a2f1d138bcd78a394a67655440223d10907cc02dbf2be602426e19c3",
+            "gpu_ids": [
+              43,
+              2,
+              4,
+              1,
+              3,
+              19
+            ],
+            "cpu_inlier_ids": [
+              3,
+              2,
+              4,
+              1,
+              43
+            ],
+            "transferred_bytes": 220,
+            "gpu_position_error_m": 0.0035507896560461553,
+            "cpu_position_error_m": 0.0023839298652410038,
+            "cpu_gpu_position_delta_m": 0.0027810727269695786
+          },
+          {
+            "camera": 3,
+            "image_sha256": "16a0de348aa62bd9d19c9c5bb17e16cdb9cb44ce0dc12b9b8e85f86a88543670",
+            "gpu_ids": [
+              43,
+              4,
+              1,
+              3,
+              2,
+              19
+            ],
+            "cpu_inlier_ids": [
+              3,
+              2,
+              4,
+              1,
+              43
+            ],
+            "transferred_bytes": 220,
+            "gpu_position_error_m": 0.012763248845473682,
+            "cpu_position_error_m": 0.010634811687841344,
+            "cpu_gpu_position_delta_m": 0.004961498043175886
+          },
+          {
+            "camera": 4,
+            "image_sha256": "558cab6f349cf450496fcf000af4a4a88c91ef635cd861b040f5087489a62d2d",
+            "gpu_ids": [
+              43,
+              3,
+              2,
+              4,
+              1,
+              19
+            ],
+            "cpu_inlier_ids": [
+              4,
+              3,
+              2,
+              43
+            ],
+            "transferred_bytes": 220,
+            "gpu_position_error_m": 0.010521810734231973,
+            "cpu_position_error_m": 0.07379746256678406,
+            "cpu_gpu_position_delta_m": 0.06561486721014197
+          },
+          {
+            "camera": 5,
+            "image_sha256": "6e4449306153d07ca509d37e968f05247beb6eb087cae8c650ebecdff14c4c54",
+            "gpu_ids": [
+              43,
+              4,
+              1,
+              3,
+              2,
+              19
+            ],
+            "cpu_inlier_ids": [
+              3,
+              2,
+              4,
+              1,
+              43
+            ],
+            "transferred_bytes": 220,
+            "gpu_position_error_m": 0.012693377617524659,
+            "cpu_position_error_m": 0.014185426420058907,
+            "cpu_gpu_position_delta_m": 0.0035795044850901146
+          },
+          {
+            "camera": 6,
+            "image_sha256": "e66213c896a69db5da990a1dcbd161bfe0f3a1027495afd7130b0bde0cbd1bea",
+            "gpu_ids": [
+              43,
+              2,
+              3,
+              4,
+              1,
+              19
+            ],
+            "cpu_inlier_ids": [
+              4,
+              3,
+              2,
+              43
+            ],
+            "transferred_bytes": 220,
+            "gpu_position_error_m": 0.010500103182109179,
+            "cpu_position_error_m": 0.039483363875244724,
+            "cpu_gpu_position_delta_m": 0.03318504497230568
+          },
+          {
+            "camera": 7,
+            "image_sha256": "386d6f1173c698f6b7fc430ba829eb3780971c5cb070199438a7538f9d2eceb0",
+            "gpu_ids": [
+              43,
+              2,
+              4,
+              1,
+              3,
+              19
+            ],
+            "cpu_inlier_ids": [
+              4,
+              1,
+              43
+            ],
+            "transferred_bytes": 220,
+            "gpu_position_error_m": 0.003929205438094488,
+            "cpu_position_error_m": 0.04479976960506554,
+            "cpu_gpu_position_delta_m": 0.0448209274835766
+          },
+          {
+            "camera": 8,
+            "image_sha256": "0515e118ccb6e7a6cd6a9e68cfb9380a1f69baa781830f36c1f33b817197ec26",
+            "gpu_ids": [
+              43,
+              4,
+              1,
+              2,
+              3,
+              19
+            ],
+            "cpu_inlier_ids": [
+              4,
+              43
+            ],
+            "transferred_bytes": 220,
+            "gpu_position_error_m": 0.00819577199801034,
+            "cpu_position_error_m": 0.6999470861119889,
+            "cpu_gpu_position_delta_m": 0.7030479695805971
+          },
+          {
+            "camera": 9,
+            "image_sha256": "8efadf23bf81f33044e0f368a80af83e21a7a2af28580171790bf5dada4d6326",
+            "gpu_ids": [
+              43,
+              4,
+              1,
+              2,
+              3,
+              19
+            ],
+            "cpu_inlier_ids": [
+              4,
+              1,
+              2,
+              43
+            ],
+            "transferred_bytes": 220,
+            "gpu_position_error_m": 0.003696871152476211,
+            "cpu_position_error_m": 0.018839818307766543,
+            "cpu_gpu_position_delta_m": 0.021532936254555924
+          }
+        ]
+      }
+    },
+    {
+      "path": "data/results/isaac/paper-b3-rendered-comparison-im-20261005.json",
+      "sha256": "93f0d0bdcc3c98eb0830578a7389fc366a5628f6271c78bedd1299fe2d51536b",
+      "data": {
+        "scope": "Same rendered reset images; expected camera reset GT (ignores <= tens-of-micrometers world-origin rounding).",
+        "opencv_version": "4.14.0",
+        "torch_version": "2.11.0+cu128",
+        "cuda_device": "NVIDIA GeForce RTX 4090",
+        "library_sha256": "ef04df2192eafdde6f75c57bc6385a756b6fdee67dc02c1881746cbfd43afbcf",
+        "recorded_gpu_smoke": {
+          "valid_poses": 30,
+          "translation_sum_squared_m2": 0.0023314791447472394,
+          "translation_max_m": 0.01276405520170563,
+          "rotation_max_deg": 0.3674986498140827
+        },
+        "passed": false,
+        "images": 10,
+        "rows": [
+          {
+            "camera": 0,
+            "image_sha256": "07f11c447644e5e5784f32b1a5e0b8f50e1d8bc61459b212084df81e6f0a6ea8",
+            "gpu_ids": [
+              43,
+              4,
+              3,
+              2,
+              1,
+              19
+            ],
+            "cpu_inlier_ids": [
+              3,
+              2,
+              1,
+              43
+            ],
+            "transferred_bytes": 220,
+            "gpu_position_error_m": 0.003702962300927593,
+            "cpu_position_error_m": 0.007974805877712732,
+            "cpu_gpu_position_delta_m": 0.00894968443120989
+          },
+          {
+            "camera": 1,
+            "image_sha256": "00eb718451f94e5c87a23dda1a15570a43340ccbc959eb058bd3785f109df4c1",
+            "gpu_ids": [
+              43,
+              2,
+              3,
+              4,
+              1,
+              19
+            ],
+            "cpu_inlier_ids": [
+              4,
+              1,
+              3,
+              43
+            ],
+            "transferred_bytes": 220,
+            "gpu_position_error_m": 0.010465444235168691,
+            "cpu_position_error_m": 0.013055697429741369,
+            "cpu_gpu_position_delta_m": 0.006747936642023551
+          },
+          {
+            "camera": 2,
+            "image_sha256": "9bd6dc44a2f1d138bcd78a394a67655440223d10907cc02dbf2be602426e19c3",
+            "gpu_ids": [
+              43,
+              4,
+              2,
+              3,
+              1,
+              19
+            ],
+            "cpu_inlier_ids": [
+              3,
+              2,
+              4,
+              1,
+              43
+            ],
+            "transferred_bytes": 220,
+            "gpu_position_error_m": 0.0035507897205989255,
+            "cpu_position_error_m": 0.002383899284025775,
+            "cpu_gpu_position_delta_m": 0.002781079114755914
+          },
+          {
+            "camera": 3,
+            "image_sha256": "16a0de348aa62bd9d19c9c5bb17e16cdb9cb44ce0dc12b9b8e85f86a88543670",
+            "gpu_ids": [
+              43,
+              4,
+              1,
+              3,
+              2,
+              19
+            ],
+            "cpu_inlier_ids": [
+              3,
+              2,
+              4,
+              1,
+              43
+            ],
+            "transferred_bytes": 220,
+            "gpu_position_error_m": 0.012763248845472096,
+            "cpu_position_error_m": 0.010634863342867984,
+            "cpu_gpu_position_delta_m": 0.0049614877717833235
+          },
+          {
+            "camera": 4,
+            "image_sha256": "558cab6f349cf450496fcf000af4a4a88c91ef635cd861b040f5087489a62d2d",
+            "gpu_ids": [
+              43,
+              2,
+              3,
+              4,
+              1,
+              19
+            ],
+            "cpu_inlier_ids": [
+              4,
+              3,
+              2,
+              43
+            ],
+            "transferred_bytes": 220,
+            "gpu_position_error_m": 0.010521810734231703,
+            "cpu_position_error_m": 0.07379680992457753,
+            "cpu_gpu_position_delta_m": 0.06561420637258575
+          },
+          {
+            "camera": 5,
+            "image_sha256": "6e4449306153d07ca509d37e968f05247beb6eb087cae8c650ebecdff14c4c54",
+            "gpu_ids": [
+              43,
+              4,
+              1,
+              3,
+              2,
+              19
+            ],
+            "cpu_inlier_ids": [
+              3,
+              2,
+              4,
+              1,
+              43
+            ],
+            "transferred_bytes": 220,
+            "gpu_position_error_m": 0.012693377617527776,
+            "cpu_position_error_m": 0.014185360310657784,
+            "cpu_gpu_position_delta_m": 0.0035795042626122304
+          },
+          {
+            "camera": 6,
+            "image_sha256": "e66213c896a69db5da990a1dcbd161bfe0f3a1027495afd7130b0bde0cbd1bea",
+            "gpu_ids": [
+              43,
+              2,
+              3,
+              4,
+              1,
+              19
+            ],
+            "cpu_inlier_ids": [
+              4,
+              3,
+              2,
+              43
+            ],
+            "transferred_bytes": 220,
+            "gpu_position_error_m": 0.01050010318211038,
+            "cpu_position_error_m": 0.03948336387524431,
+            "cpu_gpu_position_delta_m": 0.03318504497230571
+          },
+          {
+            "camera": 7,
+            "image_sha256": "386d6f1173c698f6b7fc430ba829eb3780971c5cb070199438a7538f9d2eceb0",
+            "gpu_ids": [
+              43,
+              4,
+              2,
+              3,
+              1,
+              19
+            ],
+            "cpu_inlier_ids": [
+              4,
+              1,
+              43
+            ],
+            "transferred_bytes": 220,
+            "gpu_position_error_m": 0.003929205443716304,
+            "cpu_position_error_m": 0.044799826303852486,
+            "cpu_gpu_position_delta_m": 0.044820972864151
+          },
+          {
+            "camera": 8,
+            "image_sha256": "0515e118ccb6e7a6cd6a9e68cfb9380a1f69baa781830f36c1f33b817197ec26",
+            "gpu_ids": [
+              43,
+              4,
+              1,
+              2,
+              3,
+              19
+            ],
+            "cpu_inlier_ids": [
+              4,
+              43
+            ],
+            "transferred_bytes": 220,
+            "gpu_position_error_m": 0.008195772750942104,
+            "cpu_position_error_m": 0.6999480815054209,
+            "cpu_gpu_position_delta_m": 0.7030489601783031
+          },
+          {
+            "camera": 9,
+            "image_sha256": "8efadf23bf81f33044e0f368a80af83e21a7a2af28580171790bf5dada4d6326",
+            "gpu_ids": [
+              43,
+              4,
+              2,
+              1,
+              3,
+              19
+            ],
+            "cpu_inlier_ids": [
+              4,
+              1,
+              2,
+              43
+            ],
+            "transferred_bytes": 220,
+            "gpu_position_error_m": 0.0036968711524749576,
+            "cpu_position_error_m": 0.018839835005249862,
+            "cpu_gpu_position_delta_m": 0.021532952127161515
+          }
+        ]
+      }
+    },
+    {
+      "path": "data/results/isaac/paper-b3-cpu-corner-diagnostic-20261005.json",
+      "sha256": "962b9ebce07398944e24d8a9b3de476706b0d914acd2a6c4dff165f2bfe27a4b",
+      "data": [
+        {
+          "camera": 0,
+          "subpix": {
+            "error_m": 0.007974675015843195,
+            "inlier_ids": [
+              3,
+              2,
+              1,
+              43
+            ]
+          },
+          "none": {
+            "error_m": 0.006683420465880653,
+            "inlier_ids": [
+              3,
+              2,
+              1,
+              43
+            ]
+          },
+          "contour": {
+            "error_m": 0.0021569005827247628,
+            "inlier_ids": [
+              3,
+              2,
+              1,
+              43
+            ]
+          }
+        },
+        {
+          "camera": 1,
+          "subpix": {
+            "error_m": 0.013055774374596603,
+            "inlier_ids": [
+              4,
+              1,
+              3,
+              43
+            ]
+          },
+          "none": {
+            "error_m": 0.01281419578860019,
+            "inlier_ids": [
+              4,
+              1,
+              3,
+              43
+            ]
+          },
+          "contour": {
+            "error_m": 0.0170718422484737,
+            "inlier_ids": [
+              4,
+              1,
+              3,
+              43
+            ]
+          }
+        },
+        {
+          "camera": 2,
+          "subpix": {
+            "error_m": 0.0023839298652410038,
+            "inlier_ids": [
+              3,
+              2,
+              4,
+              1,
+              43
+            ]
+          },
+          "none": {
+            "error_m": 0.0024129454008027873,
+            "inlier_ids": [
+              3,
+              2,
+              4,
+              1,
+              43
+            ]
+          },
+          "contour": {
+            "error_m": 0.0048452900073749925,
+            "inlier_ids": [
+              3,
+              2,
+              4,
+              1,
+              43
+            ]
+          }
+        },
+        {
+          "camera": 3,
+          "subpix": {
+            "error_m": 0.010634811687841344,
+            "inlier_ids": [
+              3,
+              2,
+              4,
+              1,
+              43
+            ]
+          },
+          "none": {
+            "error_m": 0.010609515123821403,
+            "inlier_ids": [
+              3,
+              2,
+              4,
+              1,
+              43
+            ]
+          },
+          "contour": {
+            "error_m": 0.011381531878828092,
+            "inlier_ids": [
+              3,
+              2,
+              4,
+              1,
+              43
+            ]
+          }
+        },
+        {
+          "camera": 4,
+          "subpix": {
+            "error_m": 0.07379746256678406,
+            "inlier_ids": [
+              4,
+              3,
+              2,
+              43
+            ]
+          },
+          "none": {
+            "error_m": 0.06490561924260546,
+            "inlier_ids": [
+              4,
+              3,
+              2,
+              43
+            ]
+          },
+          "contour": {
+            "error_m": 0.057539629498717784,
+            "inlier_ids": [
+              4,
+              3,
+              2,
+              43
+            ]
+          }
+        },
+        {
+          "camera": 5,
+          "subpix": {
+            "error_m": 0.014185426420058907,
+            "inlier_ids": [
+              3,
+              2,
+              4,
+              1,
+              43
+            ]
+          },
+          "none": {
+            "error_m": 0.014384905232838831,
+            "inlier_ids": [
+              3,
+              2,
+              4,
+              1,
+              43
+            ]
+          },
+          "contour": {
+            "error_m": 0.014239628336913817,
+            "inlier_ids": [
+              3,
+              2,
+              4,
+              1,
+              43
+            ]
+          }
+        },
+        {
+          "camera": 6,
+          "subpix": {
+            "error_m": 0.039483363875244724,
+            "inlier_ids": [
+              4,
+              3,
+              2,
+              43
+            ]
+          },
+          "none": {
+            "error_m": 0.041272064470371114,
+            "inlier_ids": [
+              4,
+              3,
+              2,
+              43
+            ]
+          },
+          "contour": {
+            "error_m": 0.026290291720460948,
+            "inlier_ids": [
+              4,
+              3,
+              2,
+              43
+            ]
+          }
+        },
+        {
+          "camera": 7,
+          "subpix": {
+            "error_m": 0.04479976960506554,
+            "inlier_ids": [
+              4,
+              1,
+              43
+            ]
+          },
+          "none": {
+            "error_m": 0.027845247713004236,
+            "inlier_ids": [
+              4,
+              1,
+              43
+            ]
+          },
+          "contour": {
+            "error_m": 0.021971343056749488,
+            "inlier_ids": [
+              4,
+              1,
+              43
+            ]
+          }
+        },
+        {
+          "camera": 8,
+          "subpix": {
+            "error_m": 0.6999470861119889,
+            "inlier_ids": [
+              4,
+              43
+            ]
+          },
+          "none": {
+            "error_m": 0.7022056470618029,
+            "inlier_ids": [
+              4,
+              43
+            ]
+          },
+          "contour": {
+            "error_m": 0.5635805252897245,
+            "inlier_ids": [
+              4,
+              43
+            ]
+          }
+        },
+        {
+          "camera": 9,
+          "subpix": {
+            "error_m": 0.018839818307766543,
+            "inlier_ids": [
+              4,
+              1,
+              2,
+              43
+            ]
+          },
+          "none": {
+            "error_m": 0.02000052512273171,
+            "inlier_ids": [
+              4,
+              1,
+              2,
+              43
+            ]
+          },
+          "contour": {
+            "error_m": 0.004723442962040186,
+            "inlier_ids": [
+              4,
+              1,
+              2,
+              43
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "path": "data/results/isaac/paper-grid-body-funnel-audit-20261005.json",
+      "sha256": "f0a427ad7595073db3ddfabc7123920236773a04f7d6723ae3888e1395231c49",
+      "scope": "Body XY against camera-height-defined funnel width; not a body-height funnel certificate.",
+      "data": [
+        {
+          "configuration": "paper-grid-pad1",
+          "body_xy_funnel_at_camera_height_max_excess_m": 0.001266733789443919,
+          "trials_outside_0_1mm": 180
+        },
+        {
+          "configuration": "paper-grid-pad2",
+          "body_xy_funnel_at_camera_height_max_excess_m": 0.0015731660366057887,
+          "trials_outside_0_1mm": 180
+        },
+        {
+          "configuration": "paper-grid-pad3",
+          "body_xy_funnel_at_camera_height_max_excess_m": 0.0016592101097106515,
+          "trials_outside_0_1mm": 180
+        },
+        {
+          "configuration": "paper-grid-pad4",
+          "body_xy_funnel_at_camera_height_max_excess_m": 0.0055762735843657985,
+          "trials_outside_0_1mm": 180
+        },
+        {
+          "configuration": "paper-grid-10x10",
+          "body_xy_funnel_at_camera_height_max_excess_m": 0.0008623806476592555,
+          "trials_outside_0_1mm": 180
+        },
+        {
+          "configuration": "paper-grid-b3",
+          "body_xy_funnel_at_camera_height_max_excess_m": 0.000869355583190845,
+          "trials_outside_0_1mm": 180
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Vision-height event at estimated camera height 0.2 m, not physical contact.",
+    "Experimental fixed-threshold CUDA detector; same-image CPU/GPU equivalence failed for B3 on both local OpenCV 4.13.0 and SDK OpenCV 4.14.0.",
+    "B3 and baseline are source-figure reconstructions uniformly scaled to 0.7 m, not supplied metric CAD.",
+    "Camera XY at camera-height-defined funnel width: 180 boundary-start trials per configuration exceed the region; maximum camera excess is 1.53035 cm. Body XY against that same camera-height width has a smaller maximum excess of 0.55763 cm. Neither comparison certifies the paper body-height funnel condition.",
+    "Nominal rendering, frozen dynamics parameters and deterministic initial conditions; five repetitions do not introduce stochastic perturbations.",
+    "Geometric 40 px availability is separate from decoded/valid-pose availability; the reused PnP accepts mean marker sides down to 12 px."
+  ],
+  "analysis_sources_sha256": {
+    "isaac_paper_grid.py": "cb3243a3f5e82b2a9ce3e72f31b02620b07d7d69cc3e2e7fc2fa7a1afd8c6b72",
+    "isaac_paper_comparison.py": "7273408b61134d10209993027cd41346419f295add118610c444baf048abd3e1",
+    "isaac_rendered_detector_check.py": "7e6ed15f10f0bc4ca3dd7ebaa5272f00ddd932b8a55d3433e7daa431878b8668"
+  }
+}

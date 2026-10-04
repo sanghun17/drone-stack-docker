@@ -41,7 +41,7 @@ Analysis loads checksum-matched geometry/grid helpers from committed history
 and compares the hashes of the shared control/estimation code across reports.
 
 The baseline is the existing reconstruction of the Yang 61-marker figure,
-whose source paper does not provide CAD coordinates. All five configurations
+whose source paper does not provide CAD coordinates. All six configurations
 use nominal 0.7 m print geometry; none uses the fitted physical print calibration.
 Print-image right maps to pad -Y; print-image up maps to pad +X. The same metric
 conversion feeds rendering, corner models, pose estimation, and offline
@@ -67,11 +67,28 @@ successful landing requiring a touchdown event and XY error <= 10 cm. Auxiliary
 metrics include decoded marker availability, pose availability, body RMSE,
 pose availability conditional on geometric visibility, and funnel excursions.
 
+Funnel excursions compare GT camera XY against the width at GT camera height.
+The camera is mounted 0.1 m below the body; camera tilt therefore changes its
+XY coordinates relative to the body. The separate body-XY audit uses that same
+camera-height width, not a body-height funnel. These measured comparisons do
+not certify the paper's body-height condition or theoretical visibility guarantee.
+
 The minimum-edge projection is conservative for oblique views. It does not
 model occlusion; this scene has no inter-environment visibility and no extra
 occluding objects. The first PDF's body RMSE and conditional localization
 availability can be read from the auxiliary statistics. Results from ideal
 rendered observations are simulation results.
+
+The 2026-10-05 B3 optical smoke passed on all ten cameras, with a maximum GT
+position error of 1.2764 cm. A subsequent same-image CPU/GPU equivalence check
+failed on both local OpenCV 4.13.0 and the IM SDK's OpenCV 4.14.0. On the SDK,
+the existing CPU estimator's worst position error was 69.9948 cm and the maximum
+CPU/GPU position difference was 70.3049 cm. GPU decoding found
+all six tags; CPU pose inliers never included large nested ID 19 and only IDs
+4/43 remained in the worst case. Changing CPU corner-refinement modes did not
+remove that worst-case error. This is unresolved reference-pipeline behavior;
+the GPU experiment is assessed independently against the saved simulation GT.
+Do not interpret the B3 result as CPU/GPU equivalence or as a CPU-baseline run.
 
 On IM, run the committed configurations through the SSD Docker daemon:
 
@@ -109,14 +126,15 @@ The processor verifies all 500 trace hashes and exact initial grid coordinates.
 It exports the trial/cell CSV files, metrics JSON, table, heatmaps, terminal
 positions, and funnel trajectories in PDF, SVG, and 300 dpi PNG.
 
-Compare the five complete reports with shared color scales:
+Compare the six complete reports with shared color scales:
 
 ```bash
 python3 data/analysis/aruco/isaac_paper_comparison.py \
-  --inputs data/results/isaac/paper-grid-20261005/analysis-pad1 \
+  --inputs data/results/isaac/paper-grid-20261005/analysis-pad1-v2 \
            data/results/isaac/paper-grid-20261005/analysis-pad2 \
            data/results/isaac/paper-grid-20261005/analysis-pad3 \
            data/results/isaac/paper-grid-20261005/analysis-pad4 \
            data/results/isaac/paper-grid-20261005/analysis-baseline \
+           data/results/isaac/paper-grid-b3-20261005/analysis-b3 \
   --output data/results/isaac/paper-grid-20261005/comparison
 ```
