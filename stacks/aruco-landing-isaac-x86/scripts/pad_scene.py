@@ -6,6 +6,9 @@ geometry, so the renderer supplies the optical observation through the camera.
 import cv2
 import numpy as np
 
+MARKER_PLANE_Z_M = .002
+PAPER_PLANE_Z_M = .001
+
 
 def marker_cells(manifest):
     dictionary = cv2.aruco.getPredefinedDictionary(getattr(cv2.aruco, manifest['dictionary']))
@@ -40,7 +43,7 @@ def add_pad(stage, env_count, manifest):
         material.CreateSurfaceOutput().ConnectToSource(shader.ConnectableAPI(), 'surface')
         mesh = UsdGeom.Mesh.Define(stage, root+'/'+label)
         cells = quads if label == 'Black' else np.array([[[-extent,-extent],[extent,-extent],[extent,extent],[-extent,extent]]])
-        z = .002 if label == 'Black' else .001
+        z = MARKER_PLANE_Z_M if label == 'Black' else PAPER_PLANE_Z_M
         vertices = np.c_[cells.reshape(-1,2), np.full(len(cells)*4,z)]
         mesh.CreatePointsAttr(vertices.tolist())
         mesh.CreateFaceVertexCountsAttr([4]*len(cells))

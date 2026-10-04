@@ -172,6 +172,9 @@ a pinned upstream Warp/Torch mismatch without patching native sources.
 
 Touchdown means reaching the configured **estimated camera height** threshold,
 matching the current AirSim policy. It is not a ground-contact/gear-dynamics test.
+The user confirmed this termination definition for touchdown metrics on
+2026-10-04. The pilot stops near 24 cm of camera height (about 34 cm body height),
+including the configured lead compensation; it records the threshold event.
 Outputs contain stable seed/initial conditions, terminal state/errors, source and
 configuration fingerprints, durable per-trial JSON, stage timing, transfer bytes,
 trials/hour and aggregate simulated seconds/wall second. Images are not logged
@@ -179,6 +182,54 @@ every frame. `wall_s` measures the trial loop; `startup_wall_s` separately inclu
 scene/application startup, and `evaluation_wall_s` includes both. The Torch peak
 allocation excludes RTX/PhysX allocations. `--resume` rejects changed settings/code
 and skips completed trials.
+
+Each new completed trial also saves `trace-0000000.npz` and `trial-0000000.json`.
+The compressed trace holds every active image/control frame, including the final
+threshold frame: trial-relative simulation timestamp, estimated and ground-truth
+camera transforms, body velocity, decoded marker IDs, PnP inlier IDs/reprojection
+RMS, commanded velocity/yaw rate, controller state and latest accepted capture
+timestamp. Camera images are not included. Missing estimates are NaN matrices in
+the NPZ and count as unavailable; JSON metrics use null when RMSE has no samples.
+Trace files are synced before the JSON completion record and referenced by SHA256.
+Resume and postprocessing reject missing/corrupt completed traces.
+
+Transforms are `pad_from_camera`. The marker coordinate origin is at the black
+geometry plane, 2 mm above the environment ground. Body transforms are recovered
+using the recorded fixed camera mount. Legacy `final_*_position_m` fields remain
+environment-local; new `final_*_position_pad_m` fields use the marker plane.
+`touchdown` records the vision-height event time and terminal body velocity.
+
+The trial JSON includes `metrics`: camera/body localization position RMSE,
+per-axis/XY RMSE, rotation RMSE, marker detection availability, valid-pose
+availability and longest detection/pose gaps. Marker availability means at least
+one decoded ID from the pad's marker set; valid-pose availability separately
+requires successful PnP. Their denominator contains active capture frames only,
+excluding warmup, completed trials and unused batch slots. Dropout seconds mean
+consecutive missing frames times the configured image period. Missing poses are
+excluded from RMSE, so always report availability with RMSE.
+
+Recompute pooled and per-trial metrics without Isaac, ROS or GPU dependencies:
+
+```bash
+python3 data/analysis/aruco/isaac_trial_metrics.py \
+  --input data/results/isaac/metrics-padframe-gpu-n4-five \
+  --output data/results/isaac/metrics-padframe-gpu-n4-five-analysis
+# Writes metrics.json and trials.csv.
+```
+
+The older pilots do not have these frame traces. Their terminal results remain
+available, but per-trial RMSE/detection gaps cannot be reconstructed from them.
+`summary.json.pose_quality` is a renderer diagnostic that includes warmup/inactive
+views; use the trace-based metrics for evaluation. Source fingerprints change
+when logging code changes, so collect into a fresh directory.
+
+Logging validation completed on 2026-10-04: a 4-environment/5-trial run verifies
+partial batches, a CPU trial separates decoded-marker availability from rejected
+PnP frames, and an off-pad trial records zero availability, null RMSE and an
+`aborted` result. A full 16-environment/16-trial GPU run also completed 16/16 and
+reached 740 trials/hour with logging, close to the earlier 743 without it. These
+are single-pilot timing estimates. Complete compressed traces in that run occupy
+roughly 47--73 KB per trial; no per-frame image transfer is added.
 
 The CPU baseline transfers one grayscale batch and reuses the calibrated
 61-marker physical pad estimator. The same metric marker model generates the
@@ -218,5 +269,7 @@ Validation evidence is summarized in
 failed-card isolation before installation;
 `data/manifests/isaac-landing-isolated-pilots-20261004.json` records the completed
 boot isolation and subsequent GPU pilots.
+`data/manifests/isaac-landing-frame-metrics-20261004.json` records the active-frame
+trace/metric schema and its successful CPU/GPU and unavailable-marker tests.
 raw logs/reports are ignored
 under `.build/isaac-landing` and `data/results/isaac-landing-validation`.

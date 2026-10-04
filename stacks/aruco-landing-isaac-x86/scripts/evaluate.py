@@ -53,6 +53,8 @@ def main():
     if not hardware['rtx_driver_floor_passed']:
         parser.error('RTX renderer rejects driver '+hardware['driver']+'; minimum 550.90.07, recommended 580.95.05')
     from trial_store import TrialStore
+    from trial_trace import SCHEMA_VERSION, STATES
+    from pad_scene import MARKER_PLANE_Z_M
     manifest_path = ARUCO / cfg['pad_manifest']
     manifest = yaml.safe_load(manifest_path.read_text())
     source = subprocess.check_output(['git','-C',str(ARUCO),'rev-parse','HEAD'],text=True).strip()
@@ -65,7 +67,13 @@ def main():
     metadata = dict(config=cfg, aruco_revision=source, application_sources_sha256=application_sources,
                     pad_sha256=hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
                     native_image=lock['modules']['simulation/isaac-lab']['manifest']['container']['image'],
-                    termination='vision camera height threshold, not physical ground contact')
+                    termination='vision camera height threshold, not physical ground contact',
+                    trace_schema_version=SCHEMA_VERSION, trace_controller_states=STATES,
+                    trace_sampling='active-trial image/control frames including terminal capture; no render warmup',
+                    trace_frame='pad-local poses, world/pad-axis velocities; meters and simulation seconds',
+                    environment_from_pad_translation_m=[0.,0.,MARKER_PLANE_Z_M],
+                    terminal_positions_frame='environment-local; explicit *_pad_m fields use marker plane',
+                    dropout_duration_convention='missing frame count times image/control period')
     if cfg['detector_backend']=='gpu-experimental':
         library=Path(os.environ.get('ARUCO_CUDA_LIBRARY',''))
         if not library.is_file(): parser.error('gpu-experimental requires ARUCO_CUDA_LIBRARY')
@@ -105,7 +113,8 @@ def run(args, cfg, manifest, pending, store):
     from aruco_landing.batched_detection import BatchedPadDetector
     from aruco_landing.pose_alignment import pose_matrix
     from aruco_landing.physical_pad import inverse
-    from pad_scene import add_pad
+    from pad_scene import add_pad, MARKER_PLANE_Z_M
+    from trial_trace import TrialTrace, trace_metrics
 
     dt = cfg['physics_dt_s']
     decimation = cfg['control_decimation']
@@ -156,6 +165,7 @@ def run(args, cfg, manifest, pending, store):
     optical_quat = torch.tensor(camera_cfg['body_quaternion_xyzw'],device=sim.device).expand(args.num_envs,-1)
     body_from_camera = pose_matrix(camera_cfg['body_position_m'],camera_cfg['body_quaternion_xyzw'])
     camera_from_body = inverse(body_from_camera)
+    environment_from_pad = np.array([0.,0.,MARKER_PLANE_Z_M])
     origins = scene.env_origins
     if not isinstance(origins,torch.Tensor): origins = origins.torch
     totals = dict(physics_s=0.,render_s=0.,device_and_transfer_s=0.,detect_s=0.,pnp_s=0.,
@@ -163,8 +173,11 @@ def run(args, cfg, manifest, pending, store):
     quality = dict(valid_poses=0,translation_sum_squared_m2=0.,translation_max_m=0.,rotation_max_deg=0.)
     start = time.perf_counter()
     new_rows = []
+    sampled_truth = None
+    sampled_velocity = None
 
     def capture():
+        nonlocal sampled_truth, sampled_velocity
         # Camera-only headless runs have no visualizer to call forward(). Sync
         # PhysX articulation transforms into Fabric before RTX reads geometry,
         # including the first image after a trial reset. This does not step time.
@@ -182,7 +195,11 @@ def run(args, cfg, manifest, pending, store):
         observations, stats = detector.detect(rgb)
         # Independent rendered-pose validation. These values never feed policy.
         gt_rotations = math_utils.matrix_from_quat(pose[:,3:7]).cpu().numpy()
-        gt_positions = (pose[:,:3]-origins).cpu().numpy()
+        gt_positions = (pose[:,:3]-origins).cpu().numpy()-environment_from_pad
+        sampled_truth = np.tile(np.eye(4), (args.num_envs,1,1))
+        sampled_truth[:,:3,:3] = gt_rotations @ body_from_camera[:3,:3]
+        sampled_truth[:,:3,3] = gt_positions + gt_rotations @ body_from_camera[:3,3]
+        sampled_velocity = robot.data.root_link_vel_w.torch.detach().cpu().numpy()
         for env, observation in enumerate(observations):
             if observation is None: continue
             estimated = inverse(observation['camera_from_pad'])
@@ -233,6 +250,9 @@ def run(args, cfg, manifest, pending, store):
                 raise RuntimeError('optical pose smoke exceeds .03 m / 5 degree limits')
             return
         active = set(range(len(cohort)))
+        traces = [TrialTrace(trial_id, body_from_camera,
+                            [marker['id'] for marker in manifest['markers']], dt*decimation)
+                  for trial_id in cohort]
         command = torch.zeros((args.num_envs,4),device=sim.device)
         host_command = np.zeros((args.num_envs,4),np.float32)
         steps = math.ceil(cfg['max_duration_s']/dt)
@@ -257,6 +277,8 @@ def run(args, cfg, manifest, pending, store):
                     policies[env].submit(now, selected, cfg['sensor_latency_s'])
                     velocity = policies[env].command(now)
                     host_command[env] = velocity
+                    traces[env].append(now, sampled_truth[env], sampled_velocity[env], measurement,
+                        detector.last_detected_ids[env], velocity, policies[env])
                 command.copy_(torch.from_numpy(host_command))
                 totals['control_s'] += time.perf_counter()-begin
             # Ground truth is used ONLY for terminal metrics/bounds and native
@@ -274,13 +296,21 @@ def run(args, cfg, manifest, pending, store):
                     finite = bool(np.isfinite(pos).all() and np.isfinite(camera_positions[env]).all())
                     target_position = camera_positions[env] if cfg['policy']['horizontal_reference']=='camera' else pos
                     error = float(np.linalg.norm(target_position[:2])) if finite else None
+                    terminal_velocity = robot.data.root_link_vel_w.torch[env].detach().cpu().numpy()
+                    trace = traces[env].arrays()
                     row = dict(trial_id=cohort[env],initial=initial[env],outcome=outcome,
                         simulation_duration_s=now, final_body_position_m=pos.tolist() if finite else None,
                         final_camera_position_m=camera_positions[env].tolist() if finite else None,
+                        final_body_position_pad_m=(pos-environment_from_pad).tolist() if finite else None,
+                        final_camera_position_pad_m=(camera_positions[env]-environment_from_pad).tolist() if finite else None,
                         lateral_error_m=error,
                         success=outcome=='touchdown' and finite and error<=cfg['success_radius_m'],
-                        valid_pose_frames=policies[env].visible_count)
-                    store.write(row)
+                        valid_pose_frames=policies[env].visible_count,
+                        touchdown=dict(criterion='vision_height_threshold',
+                            event_time_s=now if outcome=='touchdown' else None,
+                            final_body_velocity_w=terminal_velocity.tolist() if np.isfinite(terminal_velocity).all() else None),
+                        metrics=trace_metrics(trace))
+                    store.write(row, trace=trace)
                     new_rows.append(row)
                     print(json.dumps(row),flush=True)
                     completed.append(env)

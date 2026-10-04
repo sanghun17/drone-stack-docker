@@ -1,0 +1,267 @@
+{
+  "date": "2026-10-04",
+  "stack": "aruco-landing-isaac-x86",
+  "status": "Frame-level evaluation traces and offline metrics implemented and validated on GPU/CPU success and missing-marker failure cases",
+  "termination": "vision_height_threshold",
+  "termination_confirmed_by_user": true,
+  "native_dynamics_and_controller_modified": false,
+  "aruco_revision": "31bf003cdf2dfd7c2d265b00403f6a42750e0bdb",
+  "trace_schema_version": 1,
+  "pose_frame": "pad_from_camera at marker plane, 0.002 m above environment ground",
+  "time_frame": "trial-relative capture simulation seconds; independent of wall time",
+  "raw_fields": [
+    "capture_time_s",
+    "gt_pad_from_camera",
+    "estimated_pad_from_camera",
+    "body_from_camera",
+    "pad_marker_ids",
+    "decoded_marker_ids",
+    "decoded_marker_offsets",
+    "inlier_marker_ids",
+    "inlier_marker_offsets",
+    "pnp_reprojection_rms_px",
+    "body_velocity_w",
+    "command_world_velocity_yawrate",
+    "controller_state",
+    "controller_capture_time_s",
+    "controller_visible"
+  ],
+  "images_logged_per_frame": false,
+  "metrics": {
+    "localization": "capture-time 3D/XYZ/XY position and rotation RMSE; camera and derived body; finite matched poses only",
+    "marker_detection_availability": "active capture frames with >=1 decoded pad marker / all active capture frames",
+    "pose_availability": "active capture frames with valid PnP pose / all active capture frames",
+    "dropout": "longest consecutive unavailable-frame run; seconds = run length * configured image period",
+    "touchdown": "vision-height event time, final camera/body positions and body velocity; terminal criterion unchanged"
+  },
+  "validation": {
+    "stack_unit_tests_passed": 11,
+    "reference_detector_metadata_test_passed": true,
+    "raw_trace_checksums_verified": true,
+    "npz_loaded_without_pickle": true,
+    "terminal_timestamps_and_active_frame_counts_verified": true,
+    "terminal_ground_truth_tolerance_m": 1e-05,
+    "final_runtime_sources_match_all_three_result_manifests": true,
+    "offline_json_and_csv_exports_verified": true,
+    "cases": {
+      "gpu_success": {
+        "output": "data/results/isaac/metrics-padframe-gpu-n4-five",
+        "manifest_fingerprint": "66d3735e197f69253707d0c949ac5afe6e2851e7059270a6e5fcaa7126d24c29",
+        "summary": {
+          "trials": 5,
+          "successes": 5,
+          "capture_frames": 1032,
+          "valid_pose_frames": 1032,
+          "marker_detection_availability": 1.0,
+          "pose_availability": 1.0,
+          "macro_mean_marker_availability": 1.0,
+          "macro_mean_pose_availability": 1.0,
+          "maximum_lateral_error_m": 0.02670419029891491,
+          "localization_camera": {
+            "valid_frames": 1032,
+            "position_rmse_m": 0.0014136351741850565,
+            "position_axis_rmse_m": [
+              0.0010481999269364958,
+              0.0009397088542234955,
+              0.00012879669311556503
+            ],
+            "xy_rmse_m": 0.0014077555958104764,
+            "rotation_rmse_deg": 0.036872489381511435,
+            "position_max_m": 0.0045679768619416245
+          },
+          "localization_body": {
+            "valid_frames": 1032,
+            "position_rmse_m": 0.0014460469901321307,
+            "position_axis_rmse_m": [
+              0.0010720596523246463,
+              0.0009618721081867769,
+              0.00012861588945413432
+            ],
+            "xy_rmse_m": 0.0014403158857174757,
+            "rotation_rmse_deg": 0.03687248945357607,
+            "position_max_m": 0.0047226351886476125
+          }
+        },
+        "trace_bytes": 322441,
+        "trace_capture_frames": [
+          203,
+          220,
+          203,
+          212,
+          194
+        ]
+      },
+      "cpu_success": {
+        "output": "data/results/isaac/metrics-padframe-cpu-n1-one",
+        "manifest_fingerprint": "76b73ebff9820290bd02329139393b9b2bdf101aa2e2aaef359530651eb1b372",
+        "summary": {
+          "trials": 1,
+          "successes": 1,
+          "capture_frames": 203,
+          "valid_pose_frames": 200,
+          "marker_detection_availability": 1.0,
+          "pose_availability": 0.9852216748768473,
+          "macro_mean_marker_availability": 1.0,
+          "macro_mean_pose_availability": 0.9852216748768473,
+          "maximum_lateral_error_m": 0.009188691154122353,
+          "localization_camera": {
+            "valid_frames": 200,
+            "position_rmse_m": 0.0023784308322537784,
+            "position_axis_rmse_m": [
+              0.0016760130616990188,
+              0.001639760690895294,
+              0.00039887130433796495
+            ],
+            "xy_rmse_m": 0.0023447462349668316,
+            "rotation_rmse_deg": 0.08924330384996526,
+            "position_max_m": 0.00860652871320686
+          },
+          "localization_body": {
+            "valid_frames": 200,
+            "position_rmse_m": 0.002501492418384075,
+            "position_axis_rmse_m": [
+              0.0017585194814530333,
+              0.0017339302314334653,
+              0.00039819531024894264
+            ],
+            "xy_rmse_m": 0.0024695960831943257,
+            "rotation_rmse_deg": 0.0892433038817792,
+            "position_max_m": 0.009014671284230504
+          }
+        },
+        "trace_bytes": 61699,
+        "trace_capture_frames": [
+          203
+        ]
+      },
+      "gpu_no_pad": {
+        "output": "data/results/isaac/metrics-padframe-gpu-no-pad",
+        "manifest_fingerprint": "aecf7bdcfbf8e2ab67e4e5641047c72f367bbb4b109a5b0d56131271b605400b",
+        "summary": {
+          "trials": 1,
+          "successes": 0,
+          "capture_frames": 121,
+          "valid_pose_frames": 0,
+          "marker_detection_availability": 0.0,
+          "pose_availability": 0.0,
+          "macro_mean_marker_availability": 0.0,
+          "macro_mean_pose_availability": 0.0,
+          "maximum_lateral_error_m": 2.5,
+          "localization_camera": {
+            "valid_frames": 0,
+            "position_rmse_m": null,
+            "position_axis_rmse_m": null,
+            "xy_rmse_m": null,
+            "rotation_rmse_deg": null,
+            "position_max_m": null
+          },
+          "localization_body": {
+            "valid_frames": 0,
+            "position_rmse_m": null,
+            "position_axis_rmse_m": null,
+            "xy_rmse_m": null,
+            "rotation_rmse_deg": null,
+            "position_max_m": null
+          }
+        },
+        "trace_bytes": 7357,
+        "trace_capture_frames": [
+          121
+        ]
+      },
+      "gpu_full_batch": {
+        "output": "data/results/isaac/metrics-padframe-gpu-n16-sixteen",
+        "manifest_fingerprint": "66d3735e197f69253707d0c949ac5afe6e2851e7059270a6e5fcaa7126d24c29",
+        "summary": {
+          "trials": 16,
+          "successes": 16,
+          "capture_frames": 3061,
+          "valid_pose_frames": 3061,
+          "marker_detection_availability": 1.0,
+          "pose_availability": 1.0,
+          "macro_mean_marker_availability": 1.0,
+          "macro_mean_pose_availability": 1.0,
+          "maximum_lateral_error_m": 0.048272378742694855,
+          "localization_camera": {
+            "valid_frames": 3061,
+            "position_rmse_m": 0.0014638440950737648,
+            "position_axis_rmse_m": [
+              0.0010385333353435896,
+              0.0010211033590620522,
+              0.00014709172707750006
+            ],
+            "xy_rmse_m": 0.001456435222901344,
+            "rotation_rmse_deg": 0.04012698601114362,
+            "position_max_m": 0.009527304975933687
+          },
+          "localization_body": {
+            "valid_frames": 3061,
+            "position_rmse_m": 0.001504808699035099,
+            "position_axis_rmse_m": [
+              0.0010688038776090834,
+              0.0010490850522436965,
+              0.00014672438467526466
+            ],
+            "xy_rmse_m": 0.0014976385330357164,
+            "rotation_rmse_deg": 0.040126986075010924,
+            "position_max_m": 0.009917943473905446
+          }
+        },
+        "trace_bytes": 978040,
+        "trace_capture_frames": [
+          203,
+          220,
+          203,
+          212,
+          194,
+          147,
+          206,
+          212,
+          205,
+          228,
+          151,
+          214,
+          183,
+          172,
+          160,
+          151
+        ]
+      }
+    }
+  },
+  "legacy_results": "Historical pilots remain unchanged; they lack frame traces and cannot provide per-trial RMSE or detection gaps.",
+  "renderer_summary_note": "summary.json.pose_quality includes warmup/inactive views; use trace-based metrics for evaluation.",
+  "postprocessor": "data/analysis/aruco/isaac_trial_metrics.py",
+  "evidence_paths": [
+    ".build/isaac-landing/metrics-tests.log",
+    ".build/isaac-landing/metrics-padframe-gpu-n4-five.log",
+    ".build/isaac-landing/metrics-padframe-cpu-n1-one.log",
+    ".build/isaac-landing/metrics-padframe-gpu-no-pad.log",
+    ".build/isaac-landing/metrics-gpu16-performance.log"
+  ],
+  "caveats": [
+    "Small controlled validation cases; not a large-scale success-rate estimate.",
+    "Missing poses are excluded from RMSE; report pose availability alongside RMSE."
+  ],
+  "intermediate_outputs_excluded": {
+    "paths": [
+      "data/results/isaac/metrics-gpu-n4-five/",
+      "data/results/isaac/metrics-cpu-n1-one/"
+    ],
+    "reason": "Prototype logs before ground truth was translated from environment ground to the rendered marker plane; preserved but excluded from the final validation results."
+  },
+  "logging_performance_pilot": {
+    "same_16_initial_conditions": true,
+    "num_envs": 16,
+    "resolution": [
+      720,
+      720
+    ],
+    "with_logging_trials_per_wall_hour": 739.7989245167117,
+    "previous_without_logging_trials_per_wall_hour": 742.5140912125701,
+    "with_logging_loop_wall_s": 77.85899396600007,
+    "previous_without_logging_loop_wall_s": 77.57428536599991,
+    "sampled_gpu_peak_used_mib": 6837,
+    "note": "Single-pilot point estimates remain similar; not an isolated statistical estimate of logging overhead."
+  }
+}
