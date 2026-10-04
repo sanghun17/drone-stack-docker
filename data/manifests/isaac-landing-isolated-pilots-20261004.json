@@ -1,0 +1,520 @@
+{
+  "date": "2026-10-04",
+  "stack": "aruco-landing-isaac-x86",
+  "status": "Boot-time isolation confirmed and same-trial GPU environment-count pilots completed",
+  "host": {
+    "kernel": "5.15.0-139-generic",
+    "driver": "570.211.01",
+    "boot_time_local": "2026-10-04 15:26:05",
+    "failed_slot_check": {
+      "pci": "0000:1a:00.0",
+      "uuid": "GPU-8149eb0b-023a-17dd-b942-c622f0b8c4ca",
+      "uuid_verified": false,
+      "driver": null,
+      "driver_override": "none",
+      "boot_isolation_active": true,
+      "functions": [
+        {
+          "pci": "0000:1a:00.0",
+          "vendor": "0x10de",
+          "device": "0x1e04"
+        },
+        {
+          "pci": "0000:1a:00.1",
+          "vendor": "0x10de",
+          "device": "0x10f7"
+        },
+        {
+          "pci": "0000:1a:00.2",
+          "vendor": "0x10de",
+          "device": "0x1ad6"
+        },
+        {
+          "pci": "0000:1a:00.3",
+          "vendor": "0x10de",
+          "device": "0x1ad7"
+        }
+      ],
+      "boot_script": "/etc/initramfs-tools/scripts/init-top/00-drone-isolate-gpu-0000-1a-00-0",
+      "boot_order_verified": true
+    },
+    "visible_healthy_gpus": [
+      {
+        "index": "0",
+        "uuid": "GPU-5f5e6979-51fc-3166-7a87-4e264c81e4dc",
+        "pci.bus_id": "00000000:19:00.0",
+        "name": "NVIDIA GeForce RTX 2080 Ti",
+        "driver_version": "570.211.01"
+      },
+      {
+        "index": "1",
+        "uuid": "GPU-c753de94-40f2-9f84-0ccb-a477c4fb75f7",
+        "pci.bus_id": "00000000:67:00.0",
+        "name": "NVIDIA GeForce RTX 2080 Ti",
+        "driver_version": "570.211.01"
+      },
+      {
+        "index": "2",
+        "uuid": "GPU-7c011021-4d7b-081c-e685-4504ae63bc1a",
+        "pci.bus_id": "00000000:68:00.0",
+        "name": "NVIDIA GeForce RTX 2080 Ti",
+        "driver_version": "570.211.01"
+      }
+    ],
+    "note": "GPU indices changed; current GPU 1 is healthy PCI 67:00.0. Select by UUID.",
+    "boot_kernel_xid_errors": [],
+    "uuid_verification_note": "NVIDIA no longer exposes the isolated GPU UUID; PCI/UUID identity was verified before installation and preserved in the backup plan."
+  },
+  "isolation_backup": "/home/ml/drone-data/shared/archive/gpu-isolation-20261004-152418/",
+  "sources": {
+    "orchestration_revision_before_pilots": "c9ec285178bc0b729987020e808c50283f1d29c5",
+    "native_module_revision": "3ebc99651cf790aa58ae71185372016a858a29cb",
+    "aruco_revision": "0cc8a10ceae7df7f24506e4e8e1f2094eaee8e01"
+  },
+  "optical_isolation_smoke": {
+    "output": "data/results/isaac/isolation-pci-blocked-gpu-n4",
+    "result": {
+      "smoke_detected": 4,
+      "expected": 4,
+      "statistics": {
+        "physics_s": 0.0,
+        "render_s": 0.7216258680000465,
+        "device_and_transfer_s": 0.39707216099998277,
+        "detect_s": 3.0900000638212077e-06,
+        "pnp_s": 0.06392936599991117,
+        "control_s": 0.0,
+        "transferred_bytes": 26292,
+        "markers": 729,
+        "camera_batches": 3,
+        "physics_steps": 0
+      },
+      "pose_quality": {
+        "valid_poses": 12,
+        "translation_sum_squared_m2": 9.774461585317552e-05,
+        "translation_max_m": 0.003394205624670542,
+        "rotation_max_deg": 0.03191493262254901
+      },
+      "hardware": {
+        "gpu_uuid": "GPU-5f5e6979-51fc-3166-7a87-4e264c81e4dc",
+        "gpu_name": "NVIDIA GeForce RTX 2080 Ti",
+        "driver": "570.211.01",
+        "memory_mib": 11264,
+        "rtx_driver_floor_passed": true,
+        "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+        "renderer_log_minimum": "550.90.07",
+        "renderer_log_recommended": "580.95.05",
+        "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+      },
+      "foreign_occluder": true,
+      "scene_partitioning": true,
+      "passed": true
+    }
+  },
+  "same_trial_ids_and_initial_conditions": true,
+  "stable_initial_conditions": {
+    "0": {
+      "x": -0.06854869149747023,
+      "y": -0.13605682249941203,
+      "z": 1.773676359203111,
+      "yaw_deg": -17.089395942189938
+    },
+    "1": {
+      "x": 0.29649207691465995,
+      "y": -0.19726337855429413,
+      "z": 1.926543259505289,
+      "yaw_deg": 5.921266092998405
+    },
+    "2": {
+      "x": 0.27204291545632,
+      "y": 0.18893523806196522,
+      "z": 1.7819324279359552,
+      "yaw_deg": -18.184303973493492
+    },
+    "3": {
+      "x": -0.14079979481757093,
+      "y": -0.15452733602284288,
+      "z": 1.849577204877294,
+      "yaw_deg": -2.5809993253957053
+    },
+    "4": {
+      "x": 0.2424564711246272,
+      "y": -0.2712279147722199,
+      "z": 1.7120939198510408,
+      "yaw_deg": 2.5008061923617433
+    },
+    "5": {
+      "x": -0.03364038586858975,
+      "y": -0.016646774729275504,
+      "z": 1.303410406215218,
+      "yaw_deg": 18.81033204976047
+    },
+    "6": {
+      "x": -0.2779332209965783,
+      "y": -0.3470645369905499,
+      "z": 1.8185436155980512,
+      "yaw_deg": 4.0081410255230665
+    },
+    "7": {
+      "x": 0.11416997782880456,
+      "y": -0.26057905274843063,
+      "z": 1.8540158729702307,
+      "yaw_deg": -2.4008650514386893
+    },
+    "8": {
+      "x": -0.002946000819161909,
+      "y": 0.14174303892372847,
+      "z": 1.7890449518463456,
+      "yaw_deg": -12.96674475610559
+    },
+    "9": {
+      "x": 0.1944877418989136,
+      "y": -0.020577045209922873,
+      "z": 1.9830553443533816,
+      "yaw_deg": 0.7573331949145405
+    },
+    "10": {
+      "x": -0.322799147106742,
+      "y": -0.03838638849603038,
+      "z": 1.346960778566496,
+      "yaw_deg": -13.550425935217875
+    },
+    "11": {
+      "x": -0.03187931802053534,
+      "y": -0.09209223444482428,
+      "z": 1.8637757422809103,
+      "yaw_deg": 1.6902745552521914
+    },
+    "12": {
+      "x": -0.3144288225541515,
+      "y": 0.2081909090201759,
+      "z": 1.614235648007207,
+      "yaw_deg": 8.666544410531039
+    },
+    "13": {
+      "x": -0.12076041778367505,
+      "y": 0.32295118462078787,
+      "z": 1.5298326835524994,
+      "yaw_deg": 20.59259955151434
+    },
+    "14": {
+      "x": 0.29379187894799974,
+      "y": 0.09704482432102146,
+      "z": 1.423911574787849,
+      "yaw_deg": 15.152983749145072
+    },
+    "15": {
+      "x": 0.10877465791840663,
+      "y": -0.2829670537379024,
+      "z": 1.353249800782667,
+      "yaw_deg": 22.946829181412888
+    }
+  },
+  "pilots": {
+    "1": {
+      "output": "data/results/isaac/pilot-pci-isolated-gpu-n1",
+      "summary": {
+        "num_envs": 1,
+        "completed_trials": 16,
+        "wall_s": 230.909343927,
+        "startup_wall_s": 19.282916756000077,
+        "evaluation_wall_s": 250.19228172700002,
+        "new_trials": 16,
+        "trial_per_wall_hour": 249.44854556517961,
+        "aggregate_simulation_s": 50.75,
+        "aggregate_simulation_per_wall_s": 0.21978322374015394,
+        "gpu_peak_allocated_bytes": 10115584,
+        "hardware": {
+          "gpu_uuid": "GPU-5f5e6979-51fc-3166-7a87-4e264c81e4dc",
+          "gpu_name": "NVIDIA GeForce RTX 2080 Ti",
+          "driver": "570.211.01",
+          "memory_mib": 11264,
+          "rtx_driver_floor_passed": true,
+          "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+          "renderer_log_minimum": "550.90.07",
+          "renderer_log_recommended": "580.95.05",
+          "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+        },
+        "timing": {
+          "physics_s": 51.97946758600153,
+          "render_s": 97.08753381299641,
+          "device_and_transfer_s": 40.02848156999505,
+          "detect_s": 0.0035419089986135077,
+          "pnp_s": 16.445977700004278,
+          "control_s": 0.5582890989999214,
+          "transferred_bytes": 5266060,
+          "markers": 145934,
+          "camera_batches": 3109,
+          "physics_steps": 6090
+        },
+        "pose_quality": {
+          "valid_poses": 3109,
+          "translation_sum_squared_m2": 0.019474937072745016,
+          "translation_max_m": 0.009696263570669751,
+          "rotation_max_deg": 0.23553149794533693
+        }
+      },
+      "successes": 16,
+      "trials": 16,
+      "maximum_lateral_error_m": 0.04826612398028374,
+      "process_wall_s": 252.69599310699994,
+      "sampled_total_gpu_peak_used_mib": 3944,
+      "memory_sample_period_s": 1,
+      "memory_valid_samples": 195,
+      "process_exit_code": 0,
+      "memory_sample_errors": [],
+      "metadata_fingerprint": "4f6819171a0102772eb611a988616fdae5c74dcc8dac45e9262a24fe1b2b3c29"
+    },
+    "4": {
+      "output": "data/results/isaac/pilot-pci-isolated-gpu-n4",
+      "summary": {
+        "num_envs": 4,
+        "completed_trials": 16,
+        "wall_s": 113.16819213500003,
+        "startup_wall_s": 17.852668976000018,
+        "evaluation_wall_s": 131.02088567199996,
+        "new_trials": 16,
+        "trial_per_wall_hour": 508.9769387787701,
+        "aggregate_simulation_s": 50.75,
+        "aggregate_simulation_per_wall_s": 0.4484475632469198,
+        "gpu_peak_allocated_bytes": 14818816,
+        "hardware": {
+          "gpu_uuid": "GPU-5f5e6979-51fc-3166-7a87-4e264c81e4dc",
+          "gpu_name": "NVIDIA GeForce RTX 2080 Ti",
+          "driver": "570.211.01",
+          "memory_mib": 11264,
+          "rtx_driver_floor_passed": true,
+          "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+          "renderer_log_minimum": "550.90.07",
+          "renderer_log_recommended": "580.95.05",
+          "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+        },
+        "timing": {
+          "physics_s": 14.984008390999861,
+          "render_s": 57.673992070000395,
+          "device_and_transfer_s": 19.335702371997172,
+          "detect_s": 0.0010011610033870966,
+          "pnp_s": 13.398860145996537,
+          "control_s": 0.2719332019984222,
+          "transferred_bytes": 5312448,
+          "markers": 147188,
+          "camera_batches": 855,
+          "physics_steps": 1678
+        },
+        "pose_quality": {
+          "valid_poses": 3420,
+          "translation_sum_squared_m2": 0.020731832067036007,
+          "translation_max_m": 0.009871264357466561,
+          "rotation_max_deg": 0.29517438445812294
+        }
+      },
+      "successes": 16,
+      "trials": 16,
+      "maximum_lateral_error_m": 0.048265814781188965,
+      "process_wall_s": 133.895522464,
+      "sampled_total_gpu_peak_used_mib": 4569,
+      "memory_sample_period_s": 1,
+      "memory_valid_samples": 104,
+      "process_exit_code": 0,
+      "memory_sample_errors": [],
+      "metadata_fingerprint": "4f6819171a0102772eb611a988616fdae5c74dcc8dac45e9262a24fe1b2b3c29"
+    },
+    "8": {
+      "output": "data/results/isaac/pilot-pci-isolated-gpu-n8",
+      "summary": {
+        "num_envs": 8,
+        "completed_trials": 16,
+        "wall_s": 92.38058600400007,
+        "startup_wall_s": 19.688763738000034,
+        "evaluation_wall_s": 112.06937503500001,
+        "new_trials": 16,
+        "trial_per_wall_hour": 623.5076274305721,
+        "aggregate_simulation_s": 50.75,
+        "aggregate_simulation_per_wall_s": 0.5493578488212072,
+        "gpu_peak_allocated_bytes": 21100544,
+        "hardware": {
+          "gpu_uuid": "GPU-5f5e6979-51fc-3166-7a87-4e264c81e4dc",
+          "gpu_name": "NVIDIA GeForce RTX 2080 Ti",
+          "driver": "570.211.01",
+          "memory_mib": 11264,
+          "rtx_driver_floor_passed": true,
+          "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+          "renderer_log_minimum": "550.90.07",
+          "renderer_log_recommended": "580.95.05",
+          "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+        },
+        "timing": {
+          "physics_s": 8.477392604999864,
+          "render_s": 53.39969140500068,
+          "device_and_transfer_s": 12.929325907000134,
+          "detect_s": 0.0005459770002289588,
+          "pnp_s": 13.077691994998986,
+          "control_s": 0.2350272689997155,
+          "transferred_bytes": 5341088,
+          "markers": 147960,
+          "camera_batches": 454,
+          "physics_steps": 892
+        },
+        "pose_quality": {
+          "valid_poses": 3632,
+          "translation_sum_squared_m2": 0.021449349798625592,
+          "translation_max_m": 0.00948803142231556,
+          "rotation_max_deg": 0.24498240667490792
+        }
+      },
+      "successes": 16,
+      "trials": 16,
+      "maximum_lateral_error_m": 0.04828257858753204,
+      "process_wall_s": 114.04892835500004,
+      "sampled_total_gpu_peak_used_mib": 5397,
+      "memory_sample_period_s": 1,
+      "memory_valid_samples": 89,
+      "process_exit_code": 0,
+      "memory_sample_errors": [],
+      "metadata_fingerprint": "4f6819171a0102772eb611a988616fdae5c74dcc8dac45e9262a24fe1b2b3c29"
+    },
+    "16": {
+      "output": "data/results/isaac/pilot-pci-isolated-gpu-n16",
+      "summary": {
+        "num_envs": 16,
+        "completed_trials": 16,
+        "wall_s": 77.57428536599991,
+        "startup_wall_s": 20.76981716099999,
+        "evaluation_wall_s": 98.34412548599994,
+        "new_trials": 16,
+        "trial_per_wall_hour": 742.5140912125701,
+        "aggregate_simulation_s": 50.75,
+        "aggregate_simulation_per_wall_s": 0.6542116341846863,
+        "gpu_peak_allocated_bytes": 33917440,
+        "hardware": {
+          "gpu_uuid": "GPU-5f5e6979-51fc-3166-7a87-4e264c81e4dc",
+          "gpu_name": "NVIDIA GeForce RTX 2080 Ti",
+          "driver": "570.211.01",
+          "memory_mib": 11264,
+          "rtx_driver_floor_passed": true,
+          "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+          "renderer_log_minimum": "550.90.07",
+          "renderer_log_recommended": "580.95.05",
+          "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+        },
+        "timing": {
+          "physics_s": 4.6098867570033235,
+          "render_s": 49.415512107999575,
+          "device_and_transfer_s": 8.353146486999549,
+          "detect_s": 0.00030430099923250964,
+          "pnp_s": 12.515616181000269,
+          "control_s": 0.18632660499997655,
+          "transferred_bytes": 5349048,
+          "markers": 148174,
+          "camera_batches": 231,
+          "physics_steps": 454
+        },
+        "pose_quality": {
+          "valid_poses": 3696,
+          "translation_sum_squared_m2": 0.021718945311487287,
+          "translation_max_m": 0.009583107583543724,
+          "rotation_max_deg": 0.545814636590362
+        }
+      },
+      "successes": 16,
+      "trials": 16,
+      "maximum_lateral_error_m": 0.048272378742694855,
+      "process_wall_s": 100.50322140000003,
+      "sampled_total_gpu_peak_used_mib": 6545,
+      "memory_sample_period_s": 1,
+      "memory_valid_samples": 76,
+      "process_exit_code": 0,
+      "memory_sample_errors": [],
+      "metadata_fingerprint": "4f6819171a0102772eb611a988616fdae5c74dcc8dac45e9262a24fe1b2b3c29"
+    }
+  },
+  "caveats": [
+    "16 unique initial conditions, evaluated at four batch sizes; 64 executions are not 64 independent initial conditions.",
+    "Time estimates are small-pilot throughput, not confidence bounds for thousands of trials.",
+    "NVML memory values are whole-card 1 second samples, including RTX/PhysX; peaks shorter than the sampling interval may be missed.",
+    "GPU detector remains experimental; prior strict CPU corner/ID agreement gate failed.",
+    "Touchdown uses estimated camera-height threshold, not physical ground contact.",
+    "Failed GPU remains electrically powered; PCI driver isolation does not change physical hardware."
+  ],
+  "excluded_run": {
+    "output": "data/results/isaac/pilot-pci-isolated-gpu-n1-aborted",
+    "reason": "Interrupted pre-pilot overlapped preceding optical smoke; excluded from performance and success counts"
+  },
+  "evidence_paths": [
+    "data/results/isaac/host-isolation-20261004/",
+    ".build/isaac-landing/gpu-sweep-pci-isolated.log",
+    "data/results/isaac/pilot-pci-isolated-gpu-n{1,4,8,16}/",
+    "data/results/isaac/pilot-pci-isolated-gpu360-n16/",
+    ".build/isaac-landing/gpu360-pilot-pci-isolated.log"
+  ],
+  "resolution_variant_rejected": {
+    "output": "data/results/isaac/pilot-pci-isolated-gpu360-n16",
+    "resolution": [
+      360,
+      360
+    ],
+    "same_field_of_view_and_initial_conditions": true,
+    "successes": 16,
+    "trials": 16,
+    "summary": {
+      "num_envs": 16,
+      "completed_trials": 16,
+      "wall_s": 33.46631341299985,
+      "startup_wall_s": 17.784370065000076,
+      "evaluation_wall_s": 51.25072065299992,
+      "new_trials": 16,
+      "trial_per_wall_hour": 1721.1337050834381,
+      "aggregate_simulation_s": 50.21666666666667,
+      "aggregate_simulation_per_wall_s": 1.5005138464746526,
+      "gpu_peak_allocated_bytes": 14964224,
+      "hardware": {
+        "gpu_uuid": "GPU-5f5e6979-51fc-3166-7a87-4e264c81e4dc",
+        "gpu_name": "NVIDIA GeForce RTX 2080 Ti",
+        "driver": "570.211.01",
+        "memory_mib": 11264,
+        "rtx_driver_floor_passed": true,
+        "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+        "renderer_log_minimum": "550.90.07",
+        "renderer_log_recommended": "580.95.05",
+        "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+      },
+      "timing": {
+        "physics_s": 4.488510002995326,
+        "render_s": 15.042215253000222,
+        "device_and_transfer_s": 3.185918593001361,
+        "detect_s": 0.0002587089986718638,
+        "pnp_s": 8.212027098998533,
+        "control_s": 0.18121216099962112,
+        "transferred_bytes": 2828968,
+        "markers": 78186,
+        "camera_batches": 223,
+        "physics_steps": 438
+      },
+      "pose_quality": {
+        "valid_poses": 3548,
+        "translation_sum_squared_m2": 0.23759096744698652,
+        "translation_max_m": 0.07844681576876925,
+        "rotation_max_deg": 2.3683885020511632
+      }
+    },
+    "maximum_lateral_error_m": 0.048438772559165955,
+    "process_exit_code": 0,
+    "sampled_total_gpu_peak_used_mib": 4884,
+    "optical_pose_gate_passed": false,
+    "gate_translation_limit_m": 0.03,
+    "observed_translation_max_m": 0.07844681576876925,
+    "decision": "Retain 720 x 720; do not recommend the 360 x 360 GPU variant despite faster throughput and 16/16 landing outcomes."
+  },
+  "recommendation": {
+    "first_gpu_pilot_num_envs": 16,
+    "resolution": [
+      720,
+      720
+    ],
+    "backend": "gpu-experimental",
+    "default_backend_remains": "cpu",
+    "scope": "Best measured throughput among 1/4/8/16 for these 16 initial conditions; broader GPU detector validation remains necessary.",
+    "dominant_stage": "RTX rendering",
+    "render_fraction_of_trial_loop": 0.637008924733942,
+    "cpu_pnp_fraction_of_trial_loop": 0.16133717664237415
+  }
+}

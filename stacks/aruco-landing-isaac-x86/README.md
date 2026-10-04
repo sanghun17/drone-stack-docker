@@ -35,8 +35,7 @@ The GPU environment-count sweep stopped after a **GPU1 bus-loss incident** at
 The kernel logged Xid79 and then Xid154 with `Node Reboot Required`. The selected
 GPU0 finished its trials, but an RTX shutdown thread remained blocked in
 `drm_release`. The cause of GPU1's loss is undetermined. GPU N1 timing was collected
-during this incident and needs remeasurement; GPU N4/N8/N16 were not run. Reboot
-to recover the driver state before continuing the sweep. Keep explicit UUID
+during this incident; GPU N4/N8/N16 were not run then. Keep explicit UUID
 selection, since GPU indices can change. No GPU reset or further host change was
 performed, and the automated sweep was stopped.
 
@@ -74,9 +73,43 @@ The installed filename is
 `/etc/initramfs-tools/scripts/init-top/00-drone-isolate-gpu-0000-1a-00-0`.
 To undo, remove that single file, run `sudo update-initramfs -u -k "$(uname -r)"`,
 and reboot. The card remains physically powered; this isolates Linux driver
-binding. Actual installation and boot verification are still pending the local
-sudo action. Its read-only inspection, ordering check and eight isolation tests
-passed on this host. Historical optical results remain unchanged.
+binding. Installation and boot verification completed on 2026-10-04. All four
+functions `0000:1a:00.0` through `.3` have no driver and report
+`driver_override=none`. The check reports `boot_isolation_active=true`, and NVIDIA
+lists only the three healthy UUIDs. GPU indices were reassigned: index 1 now
+belongs to the healthy card at PCI `67:00.0`. Continue selecting by UUID. Its
+read-only inspection, ordering check and eight isolation tests passed. Historical
+optical results remain unchanged.
+
+After PCI isolation, the GPU detector pilots completed with normal process exits
+and no new Xid/bus-loss messages in this boot's kernel log. Each row evaluates the
+same 16 trial IDs and initial conditions at 720 x 720 resolution:
+
+| Environments | Successes | Trials/hour, excluding startup | Whole-GPU peak sample, MiB |
+| --- | --- | --- | --- |
+| 1 | 16/16 | 249 | 3944 |
+| 4 | 16/16 | 509 | 4569 |
+| 8 | 16/16 | 624 | 5397 |
+| 16 | 16/16 | 743 | 6545 |
+
+The largest lateral landing error was 4.83 cm, and the largest optical position
+error across these runs was 9.87 mm. These are 64 executions of 16 unique initial
+conditions. They validate this small pilot and do not establish a large-scale
+success rate. Memory is sampled once per second through NVML in the container
+that exposes only the selected healthy UUID; it includes RTX/PhysX allocations.
+The first optical smoke after container recreation spent about three minutes
+initializing rendering; subsequent pilot startup took about 18--20 seconds.
+The interrupted pilot that overlapped that smoke is excluded from results.
+
+For the first larger **experimental GPU** pilot, keep 720 x 720 and start with
+16 environments: this had the best measured throughput among the four counts.
+Rendering consumed about 64% of its trial-loop time and CPU PnP about 16%, so
+moving PnP to GPU would address a smaller part of the current runtime.
+A 360 x 360 variant with unchanged field of view reached 1721 trials/hour and
+16/16 landing successes, but its maximum optical position error was 7.84 cm,
+exceeding the existing 3 cm accuracy limit. That candidate is rejected; default
+camera settings and the CPU reference backend remain unchanged. Trial success
+alone does not qualify a detector's pose accuracy.
 
 The completed APT migration was
 `nvidia-driver-570=570.211.01-0ubuntu1`: 22 packages added and 20 driver-535 packages
@@ -174,14 +207,16 @@ must be visible inside the container:
 ```bash
 ARUCO_CUDA_LIBRARY=/work/.build/isaac-landing/libaruco_cuda.so \
 bash stacks/aruco-landing-isaac-x86/scripts/evaluate.sh \
-  --detector gpu-experimental --num-envs 4 --trials 16 \
-  --output /work/data/results/isaac/gpu-pilot-4
+  --detector gpu-experimental --num-envs 16 --trials 16 \
+  --output /work/data/results/isaac/gpu-pilot-16-new
 ```
 
 Validation evidence is summarized in
 `data/manifests/isaac-landing-bootstrap-20261002.json` (before upgrade) and
 `data/manifests/isaac-landing-optical-20261002.json` (actual optical pilots);
 `data/manifests/isaac-landing-gpu-isolation-20261004.json` records the prepared
-failed-card isolation and its pending privileged installation/boot check.
+failed-card isolation before installation;
+`data/manifests/isaac-landing-isolated-pilots-20261004.json` records the completed
+boot isolation and subsequent GPU pilots.
 raw logs/reports are ignored
 under `.build/isaac-landing` and `data/results/isaac-landing-validation`.
