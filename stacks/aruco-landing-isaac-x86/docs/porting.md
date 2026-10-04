@@ -31,6 +31,9 @@ The pinned runtime rejected drivers below 550.90.07 on the original host and
 its renderer recommended 580.95.05. Select the driver for the destination OS;
 passing this version check still requires the optical tests below. The existing
 Ubuntu 20.04 driver-upgrade script is specific to the original host's packages.
+For the separately inspected IM RTX 4090 host, use its
+[reviewed offline driver bundle](im-driver-upgrade.md) and existing SSD Docker
+socket; preserve the running legacy training container and daemon configuration.
 
 Host ROS and a matching host Ubuntu 24.04 installation are unnecessary for this
 evaluation path: the Ubuntu 24.04 Isaac runtime and Python dependencies are in

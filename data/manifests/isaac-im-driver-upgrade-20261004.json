@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "prepared_date": "2026-10-04",
+  "phase": "prepared_before_user_sudo_install",
+  "host": "IM",
+  "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+  "ubuntu": "20.04",
+  "kernel": "5.15.0-139-generic",
+  "driver_before": "535.183.01",
+  "driver_target": "570.211.01",
+  "source_repository": "https://github.com/sanghun17/drone-runtime-modules.git",
+  "installer_revision": "e643237dd52514ea6091586375ddae18f08df4f8",
+  "bundle_path_on_im": "/media/im/ETE4090/isaac-porting/driver-review-20261004",
+  "new_package_count": 25,
+  "previous_package_count": 22,
+  "removed_package_count": 21,
+  "archive_bytes": 812331322,
+  "checks": {
+    "signed_archive_metadata": "pass",
+    "archive_hashes_and_identities": "pass",
+    "exact_local_apt_simulation_on_im": "pass",
+    "existing_torch_gpu_forward_backward": "pass",
+    "existing_spconv_gpu_forward_backward": "pass_optional"
+  },
+  "training_container": "drone-stack-ete-train-4090",
+  "docker_host": "unix:///tmp/docker-ssd.sock",
+  "baseline": {
+    "torch": "2.2.2",
+    "cuda": "12.2",
+    "gpu": "NVIDIA GeForce RTX 4090",
+    "loss": 0.053927045315504074,
+    "forward_backward": "PASS"
+  },
+  "evidence_sha256": {
+    "bundle.json": "25786ec363459593ce967d7cd618d2b482222042f4103bc8ac961a56a37f89ca",
+    "installer-check.txt": "2659fa68820d124e7fcd8e56b38756030ffdae647d6656c8eb5c11e637f40f0f",
+    "torch-smoke.before.txt": "3063ed14bc6d667d581d49f4d0020b34fa814a2c514f2551205bf7b097332153",
+    "learning-smoke.before.txt": "9e6f7174d85f0c99c1e5a7e815b32cf68fd5b525581c52dd245067d52f1b5ba8"
+  },
+  "remaining": [
+    "interactive sudo package installation",
+    "reboot and loaded-driver verification",
+    "post-reboot PyTorch GPU check",
+    "Isaac optical and landing qualification"
+  ],
+  "spconv_required_after_upgrade": false
+}
