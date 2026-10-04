@@ -17,8 +17,14 @@ Its loop took 195.807 seconds (2,757.82 trials/hour); startup plus evaluation to
 against the original 2080 Ti run, with 3.2703 times its loop throughput. The
 largest paired event-time difference was one control frame (1/60 second).
 
-Thirty environments are a qualified reference count. The optimum on IM has
-not been measured. Physics remains 120 Hz and camera/control 60 Hz in simulation
+Use **90 environments** on IM following the count sweep: 180/180 successes,
+3,430.10 trials/hour, and 4,524 MiB sampled GPU headroom. N100 reached
+3,438.03 trials/hour, only 0.23% faster, with 2,762 MiB headroom. This is a
+practical selection from the measured plateau, not a unique mathematical optimum.
+The user ended further refinement; the interrupted N96 output is preserved and
+excluded from throughput selection. See the
+[count-sweep report](../../../data/analysis/aruco/isaac_im_parallelism_20261004.md).
+Physics remains 120 Hz and camera/control 60 Hz in simulation
 time. Termination remains the agreed vision-height event. Each trial saves JSON
 and a compressed frame trace; the hashes of all 166 qualification traces were
 checked. Localization, detection availability, and terminal event metrics were
@@ -32,8 +38,8 @@ cd /media/im/ETE4090/isaac-porting/aruco-stack-docker
 export DOCKER_HOST=unix:///tmp/docker-ssd.sock
 export ARUCO_CUDA_LIBRARY=/work/.build/isaac-landing/libaruco_cuda.so
 bash stacks/aruco-landing-isaac-x86/scripts/evaluate.sh \
-  --detector gpu-experimental --num-envs 30 --trials 1000 --trial-start 0 \
-  --output /work/data/results/isaac/im-campaign-n30-t1000
+  --detector gpu-experimental --num-envs 90 --trials 1000 --trial-start 0 \
+  --output /work/data/results/isaac/im-campaign-n90-t1000
 ```
 
 The qualified container is `drone-stack-aruco-landing-isaac-x86-isaac`. After a
@@ -65,3 +71,6 @@ docker exec drone-stack-aruco-landing-isaac-x86-isaac \
 The source workstation retains an evidence download in
 `data/results/isaac/im-qualification-20261004/`. The versioned qualification
 record is `data/manifests/isaac-im-qualification-20261004.json`.
+The subsequent count-sweep evidence is in
+`data/results/isaac/im-parallelism-20261004/`, with the selection recorded in
+`data/manifests/isaac-im-parallelism-20261004.json`.
