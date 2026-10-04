@@ -92,6 +92,9 @@ docker exec drone-stack-aruco-landing-isaac-x86-isaac \
 ```
 
 Use both Compose files whenever starting/recreating this destination service.
+If the destination Docker daemon disables NAT (the IM SSD daemon does), also
+set `network_mode: host` and `build: {network: host}` under the `isaac` service
+in this override so runtime asset requests and build package requests can connect.
 Run only the `isaac` service; `./setup.sh up` also builds the optional ROS
 development service and does not apply this extra host Compose file. The selected
 GPU appears as `cuda:0` inside the Isaac container.

@@ -1,0 +1,368 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-04",
+  "host": "IM",
+  "status": "ArUco Isaac landing qualification completed",
+  "completion_scope": "Isaac rendering, CPU/GPU marker detection, scene isolation, landing, durable traces and offline metrics",
+  "hardware": {
+    "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+    "gpu_name": "NVIDIA GeForce RTX 4090",
+    "driver": "570.211.01",
+    "memory_mib": 24564,
+    "rtx_driver_floor_passed": true,
+    "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+    "renderer_log_minimum": "550.90.07",
+    "renderer_log_recommended": "580.95.05",
+    "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+  },
+  "host_kernel": "5.15.0-139-generic",
+  "host_ubuntu": "20.04.6",
+  "docker_host": "unix:///tmp/docker-ssd.sock",
+  "docker_data_root": "/media/im/ETE4090/docker",
+  "remote_checkout": "/media/im/ETE4090/isaac-porting/aruco-stack-docker",
+  "orchestration_revision": "1d926048597cba50cd8c77a06d123193912cfbad",
+  "runtime_module_revision": "3ebc99651cf790aa58ae71185372016a858a29cb",
+  "aruco_revision": "31bf003cdf2dfd7c2d265b00403f6a42750e0bdb",
+  "native_image": "nvcr.io/nvidia/isaac-lab:3.0.0-rc1@sha256:1e795d3f10b50e97f93141a8eb1fa4d2c90a192c226a1bceecc5338ca87652f3",
+  "detector_library_sha256": "2951efcb5d6db1a2f15a8ccfbc81b199289ad2f89e2b4b71fec21dc9200fcf10",
+  "evaluation_fingerprint": "66d3735e197f69253707d0c949ac5afe6e2851e7059270a6e5fcaa7126d24c29",
+  "host_overrides": {
+    "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+    "failed_slot_requirement": "cleared for this destination",
+    "runtime_network_mode": "host",
+    "build_network": "host"
+  },
+  "optical_checks": {
+    "im-cpu-smoke-n1-r2": {
+      "smoke_detected": 1,
+      "expected": 1,
+      "statistics": {
+        "physics_s": 0.0,
+        "render_s": 0.8782767679995231,
+        "device_and_transfer_s": 0.002894933999868954,
+        "detect_s": 0.4099523249997219,
+        "pnp_s": 0.0078877780001676,
+        "control_s": 0.0,
+        "transferred_bytes": 1555200,
+        "markers": 183,
+        "camera_batches": 3,
+        "physics_steps": 0
+      },
+      "pose_quality": {
+        "valid_poses": 3,
+        "translation_sum_squared_m2": 7.530550254057956e-06,
+        "translation_max_m": 0.0019954941912627994,
+        "rotation_max_deg": 0.09236795447487166
+      },
+      "hardware": {
+        "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+        "gpu_name": "NVIDIA GeForce RTX 4090",
+        "driver": "570.211.01",
+        "memory_mib": 24564,
+        "rtx_driver_floor_passed": true,
+        "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+        "renderer_log_minimum": "550.90.07",
+        "renderer_log_recommended": "580.95.05",
+        "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+      },
+      "foreign_occluder": false,
+      "scene_partitioning": true,
+      "passed": true
+    },
+    "im-gpu-smoke-n1": {
+      "smoke_detected": 1,
+      "expected": 1,
+      "statistics": {
+        "physics_s": 0.0,
+        "render_s": 0.0935247080001318,
+        "device_and_transfer_s": 0.16526000300018495,
+        "detect_s": 1.8729997464106418e-06,
+        "pnp_s": 0.007327303999772994,
+        "control_s": 0.0,
+        "transferred_bytes": 6492,
+        "markers": 180,
+        "camera_batches": 3,
+        "physics_steps": 0
+      },
+      "pose_quality": {
+        "valid_poses": 3,
+        "translation_sum_squared_m2": 2.0299348441071277e-05,
+        "translation_max_m": 0.002601240014576024,
+        "rotation_max_deg": 0.03191493262254901
+      },
+      "hardware": {
+        "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+        "gpu_name": "NVIDIA GeForce RTX 4090",
+        "driver": "570.211.01",
+        "memory_mib": 24564,
+        "rtx_driver_floor_passed": true,
+        "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+        "renderer_log_minimum": "550.90.07",
+        "renderer_log_recommended": "580.95.05",
+        "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+      },
+      "foreign_occluder": false,
+      "scene_partitioning": true,
+      "passed": true
+    },
+    "im-gpu-isolation-n4": {
+      "smoke_detected": 4,
+      "expected": 4,
+      "statistics": {
+        "physics_s": 0.0,
+        "render_s": 0.15372941799978435,
+        "device_and_transfer_s": 0.016159145000074204,
+        "detect_s": 1.8030000319413375e-06,
+        "pnp_s": 0.028112480000345386,
+        "control_s": 0.0,
+        "transferred_bytes": 26292,
+        "markers": 729,
+        "camera_batches": 3,
+        "physics_steps": 0
+      },
+      "pose_quality": {
+        "valid_poses": 12,
+        "translation_sum_squared_m2": 4.271135768659134e-05,
+        "translation_max_m": 0.0026008093234374534,
+        "rotation_max_deg": 0.03191493262254901
+      },
+      "hardware": {
+        "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+        "gpu_name": "NVIDIA GeForce RTX 4090",
+        "driver": "570.211.01",
+        "memory_mib": 24564,
+        "rtx_driver_floor_passed": true,
+        "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+        "renderer_log_minimum": "550.90.07",
+        "renderer_log_recommended": "580.95.05",
+        "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+      },
+      "foreign_occluder": true,
+      "scene_partitioning": true,
+      "passed": true
+    },
+    "im-gpu-isolation-n30": {
+      "smoke_detected": 30,
+      "expected": 30,
+      "statistics": {
+        "physics_s": 0.0,
+        "render_s": 0.5427517230004923,
+        "device_and_transfer_s": 0.04372596400025941,
+        "detect_s": 1.6539997886866331e-06,
+        "pnp_s": 0.18444230800014338,
+        "control_s": 0.0,
+        "transferred_bytes": 194040,
+        "markers": 5380,
+        "camera_batches": 3,
+        "physics_steps": 0
+      },
+      "pose_quality": {
+        "valid_poses": 90,
+        "translation_sum_squared_m2": 0.00044255177301351747,
+        "translation_max_m": 0.0069867435926930475,
+        "rotation_max_deg": 0.17621847194306006
+      },
+      "hardware": {
+        "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+        "gpu_name": "NVIDIA GeForce RTX 4090",
+        "driver": "570.211.01",
+        "memory_mib": 24564,
+        "rtx_driver_floor_passed": true,
+        "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+        "renderer_log_minimum": "550.90.07",
+        "renderer_log_recommended": "580.95.05",
+        "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+      },
+      "foreign_occluder": true,
+      "scene_partitioning": true,
+      "passed": true
+    }
+  },
+  "pilot_n4": {
+    "trials": 16,
+    "successes": 16,
+    "summary": {
+      "num_envs": 4,
+      "completed_trials": 16,
+      "wall_s": 45.09806991100004,
+      "startup_wall_s": 11.888438677000067,
+      "evaluation_wall_s": 56.98652949699999,
+      "new_trials": 16,
+      "trial_per_wall_hour": 1277.2165219858016,
+      "aggregate_simulation_s": 50.75,
+      "aggregate_simulation_per_wall_s": 1.1253253210204763,
+      "gpu_peak_allocated_bytes": 14818816,
+      "hardware": {
+        "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+        "gpu_name": "NVIDIA GeForce RTX 4090",
+        "driver": "570.211.01",
+        "memory_mib": 24564,
+        "rtx_driver_floor_passed": true,
+        "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+        "renderer_log_minimum": "550.90.07",
+        "renderer_log_recommended": "580.95.05",
+        "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+      },
+      "timing": {
+        "physics_s": 7.057816071010166,
+        "render_s": 15.509142281998265,
+        "device_and_transfer_s": 12.826105903991447,
+        "detect_s": 0.000324102003560256,
+        "pnp_s": 5.733210280993717,
+        "control_s": 0.1585028880012942,
+        "transferred_bytes": 5312268,
+        "markers": 147183,
+        "camera_batches": 855,
+        "physics_steps": 1678
+      },
+      "pose_quality": {
+        "valid_poses": 3420,
+        "translation_sum_squared_m2": 0.007029130146462034,
+        "translation_max_m": 0.009783075633056323,
+        "rotation_max_deg": 0.23549622977217313
+      }
+    },
+    "metrics": {
+      "trials": 16,
+      "successes": 16,
+      "capture_frames": 3061,
+      "valid_pose_frames": 3061,
+      "marker_detection_availability": 1.0,
+      "pose_availability": 1.0,
+      "macro_mean_marker_availability": 1.0,
+      "macro_mean_pose_availability": 1.0,
+      "maximum_lateral_error_m": 0.048265308141708374,
+      "localization_camera": {
+        "valid_frames": 3061,
+        "position_rmse_m": 0.001481331609415231,
+        "position_axis_rmse_m": [
+          0.0010431966168803787,
+          0.001040735817805432,
+          0.00015150284855047842
+        ],
+        "xy_rmse_m": 0.0014735637834630063,
+        "rotation_rmse_deg": 0.0413205476874257,
+        "position_max_m": 0.009783075633056354
+      },
+      "localization_body": {
+        "valid_frames": 3061,
+        "position_rmse_m": 0.001523928339398804,
+        "position_axis_rmse_m": [
+          0.0010736415696665442,
+          0.0010709019933178854,
+          0.0001510638415191915
+        ],
+        "xy_rmse_m": 0.0015164225332697547,
+        "rotation_rmse_deg": 0.04132054774879119,
+        "position_max_m": 0.010189031238187842
+      }
+    }
+  },
+  "reference_n30": {
+    "summary": {
+      "num_envs": 30,
+      "completed_trials": 150,
+      "wall_s": 195.8070101010003,
+      "startup_wall_s": 11.773510784999871,
+      "evaluation_wall_s": 207.580601526,
+      "new_trials": 150,
+      "trial_per_wall_hour": 2757.817504702511,
+      "aggregate_simulation_s": 473.1666666666667,
+      "aggregate_simulation_per_wall_s": 2.4164950295834657,
+      "gpu_peak_allocated_bytes": 55590912,
+      "hardware": {
+        "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+        "gpu_name": "NVIDIA GeForce RTX 4090",
+        "driver": "570.211.01",
+        "memory_mib": 24564,
+        "rtx_driver_floor_passed": true,
+        "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+        "renderer_log_minimum": "550.90.07",
+        "renderer_log_recommended": "580.95.05",
+        "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+      },
+      "timing": {
+        "physics_s": 10.225011718001952,
+        "render_s": 90.81426003999968,
+        "device_and_transfer_s": 32.864304204004384,
+        "detect_s": 0.0005155099920557404,
+        "pnp_s": 51.96361851199572,
+        "control_s": 0.969823168001767,
+        "transferred_bytes": 50099916,
+        "markers": 1387831,
+        "camera_batches": 1150,
+        "physics_steps": 2260
+      },
+      "pose_quality": {
+        "valid_poses": 34500,
+        "translation_sum_squared_m2": 0.052295391702355525,
+        "translation_max_m": 0.009994328693389032,
+        "rotation_max_deg": 0.5540521440871156
+      }
+    },
+    "metrics": {
+      "trials": 150,
+      "successes": 150,
+      "capture_frames": 28540,
+      "valid_pose_frames": 28540,
+      "marker_detection_availability": 1.0,
+      "pose_availability": 1.0,
+      "macro_mean_marker_availability": 1.0,
+      "macro_mean_pose_availability": 1.0,
+      "maximum_lateral_error_m": 0.07591860741376877,
+      "localization_camera": {
+        "valid_frames": 28540,
+        "position_rmse_m": 0.0013253007227348919,
+        "position_axis_rmse_m": [
+          0.000931591687002763,
+          0.0009352557272286335,
+          0.0001177100636097609
+        ],
+        "xy_rmse_m": 0.0013200630085744445,
+        "rotation_rmse_deg": 0.033876179094676655,
+        "position_max_m": 0.009994328693389065
+      },
+      "localization_body": {
+        "valid_frames": 28540,
+        "position_rmse_m": 0.0013545989311137168,
+        "position_axis_rmse_m": [
+          0.0009532654803314276,
+          0.0009552178714185233,
+          0.00011739679001395525
+        ],
+        "xy_rmse_m": 0.0013495022259592021,
+        "rotation_rmse_deg": 0.033876179169000875,
+        "position_max_m": 0.01044073034774688
+      }
+    },
+    "relative_loop_throughput_to_2080ti": 3.270333584020791,
+    "baseline_loop_trials_per_hour": 843.2832412502229,
+    "paired_comparison": {
+      "trial_ids": [
+        0,
+        149
+      ],
+      "initials_equal": true,
+      "fingerprint_equal": true,
+      "maximum_event_time_difference_s": 0.016666666666666607,
+      "maximum_lateral_error_difference_m": 0.0002658199518918991
+    }
+  },
+  "frame_trace_archive_hashes_verified": 166,
+  "termination": "vision camera height threshold, not physical ground contact",
+  "physics_dt_s": 0.008333333333333333,
+  "control_decimation": 2,
+  "training_compatibility_required": false,
+  "network_recovery": "First IM override omitted runtime host networking; bridge-mode external requests stalled with this NAT-disabled daemon. Preserved the interrupted first attempt, added runtime host networking, and confirmed container HTTPS status 200 before repeating qualification.",
+  "evidence_local_root": "data/results/isaac/im-qualification-20261004",
+  "evidence_remote_root": "/media/im/ETE4090/isaac-porting/aruco-stack-docker/data/results/isaac",
+  "post_run_audit": {
+    "source_checkout_clean": true,
+    "repository_layout_passed": true,
+    "container_running_with_host_network": true,
+    "remaining_gpu_compute_processes": 0,
+    "kernel_gpu_error_query": "No entries for NVRM Xid, GPU fallen off bus, or RmInitAdapter in the current boot",
+    "evidence": "data/results/isaac/im-qualification-20261004/im-setup-20261004/final-check.json"
+  },
+  "steady_state_count_optimum_on_im": "not measured; N30 is the matched reference configuration"
+}
