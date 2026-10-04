@@ -154,6 +154,8 @@ def extract(directory):
         trials=len(records),successes=sum(r['S_land_pct']==100 for r in records),
         trace_checksums_verified=len(records),summary=summary,
         maximum_funnel_excess_m=max(r['maximum_funnel_excess_m'] for r in records),
+        funnel_excursions=dict(tolerance_m=.0001,
+            trials_outside=sum(r['maximum_funnel_excess_m']>.0001 for r in records)),
         final_camera_height_range_m=[min(r['final_camera_height_m'] for r in records),max(r['final_camera_height_m'] for r in records)],
         definitions=dict(A='Per-trial fraction with at least one complete marker and minimum projected edge >=40 px, from GT projection; then equal trial mean.',
             E='Per-trial sqrt(mean(||estimated camera position - GT camera position||^2)) on valid poses, then equal trial mean/sample std; cm.',

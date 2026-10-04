@@ -31,6 +31,7 @@ def main():
     def monitor():
         with (output/'gpu.csv').open('w') as stream:
             stream.write('timestamp,uuid,memory.used [MiB],utilization.gpu [%],temperature.gpu\n')
+            stream.flush()
             while not stop.is_set():
                 subprocess.run(['nvidia-smi','--query-gpu=timestamp,uuid,memory.used,utilization.gpu,temperature.gpu',
                                 '--format=csv,noheader'],stdout=stream,stderr=subprocess.STDOUT)

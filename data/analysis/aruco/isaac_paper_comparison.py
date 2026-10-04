@@ -45,7 +45,9 @@ def compare(inputs,output):
     for label,r in zip(labels,reports):
         s=r['summary']
         table+=f"| {label} | {r['marker_count']} | {r['trials']} | {statistic(s,'A_marker_visible_40px_pct')} | {statistic(s,'E_camera_rmse_cm')} | {statistic(s,'d_touchdown_cm')} | {s['S_land_pct']['mean']:.2f} |\n"
-        record=dict(configuration=label,N=r['marker_count'],trials=r['trials'],successes=r['successes'],fingerprint=r['fingerprint'])
+        record=dict(configuration=label,N=r['marker_count'],trials=r['trials'],successes=r['successes'],fingerprint=r['fingerprint'],
+            maximum_funnel_excess_m=r['maximum_funnel_excess_m'],
+            trials_outside_funnel_0_1mm=sum(row['maximum_funnel_excess_m']>.0001 for row in r['trials_detail']))
         for key,value in s.items():
             record.update({key+'_'+field:item for field,item in value.items()})
         records.append(record)
@@ -63,12 +65,14 @@ def compare(inputs,output):
         pad_root=ROOT/'stacks/aruco-landing-isaac-x86' if r['config'].get('pad_manifest_root')=='stack' else ROOT/'ws/aruco-landing/src/aruco_landing'
         path=pad_root/r['config']['pad_manifest']
         pad=metric_pad_manifest(yaml.safe_load(path.read_text()),protocol['pad_side_m'])
-        ax.add_collection(PolyCollection(marker_cells(pad),facecolors='black',edgecolors='none'))
+        quads=marker_cells(pad)
+        print_quads=np.stack((-quads[...,1],quads[...,0]),axis=-1)
+        ax.add_collection(PolyCollection(print_quads,facecolors='black',edgecolors='none'))
         half=protocol['pad_side_m']/2
         ax.plot([-half,half,half,-half,-half],[-half,-half,half,half,-half],color='.6')
-        ax.set(title=f"{label}\nN = {r['marker_count']}",xlabel='Pad x (m)',ylabel='Pad y (m)',
+        ax.set(title=f"{label}\nN = {r['marker_count']}",xlabel='Print x (m)',ylabel='Print y (m)',
                xlim=(-half,half),ylim=(-half,half),aspect='equal')
-    fig.suptitle('Nominal landing pad layouts (same 0.7 m side length)')
+    fig.suptitle('Nominal landing pad layouts (0.7 m); print x = −pad Y, print y = pad X')
     figures.append(('pad_layouts',fig))
     panels=[('A_marker_visible_40px_pct','Marker availability: complete marker with all edges ≥ 40 px','%',100),
             ('E_camera_rmse_cm','Mean per-trial camera localization RMSE','cm',None),
