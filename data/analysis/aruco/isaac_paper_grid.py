@@ -3,8 +3,11 @@
 import argparse
 import csv
 import hashlib
+import importlib.util
 import json
+from functools import lru_cache
 from pathlib import Path
+import subprocess
 import sys
 import numpy as np
 import yaml
@@ -14,6 +17,30 @@ sys.path.insert(0,str(ROOT/'stacks/aruco-landing-isaac-x86/scripts'))
 from trial_inputs import grid_shape, trial_initial_condition
 from pad_scene import metric_pad_manifest
 from isaac_trial_metrics import recompute
+
+
+@lru_cache(maxsize=None)
+def recorded_helper(name,checksum):
+    """Load the checksum-matched, committed helper used during this experiment."""
+    relative=Path('stacks/aruco-landing-isaac-x86/scripts')/name
+    path=ROOT/relative
+    if hashlib.sha256(path.read_bytes()).hexdigest()!=checksum:
+        revisions=subprocess.check_output(['git','-C',str(ROOT),'log','--all','--format=%H','--',str(relative)],text=True).splitlines()
+        payload=None
+        for revision in revisions:
+            candidate=subprocess.check_output(['git','-C',str(ROOT),'show',revision+':'+str(relative)])
+            if hashlib.sha256(candidate).hexdigest()==checksum:
+                payload=candidate; break
+        if payload is None: raise ValueError('recorded helper unavailable from committed history: '+name)
+        path=ROOT/'.build/isaac-landing/analysis-sources'/(checksum+'-'+name)
+        path.parent.mkdir(parents=True,exist_ok=True)
+        if not path.exists(): path.write_bytes(payload)
+        if hashlib.sha256(path.read_bytes()).hexdigest()!=checksum:
+            raise ValueError('cached helper checksum mismatch')
+    spec=importlib.util.spec_from_file_location('recorded_'+checksum,path)
+    module=importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def marker_corners(manifest):
@@ -55,20 +82,23 @@ def mean_std(values):
 def extract(directory):
     manifest,rows=recompute(directory)  # verifies every trace SHA256
     config=manifest['config']
-    shape=grid_shape(config)
+    inputs=recorded_helper('trial_inputs.py',manifest['application_sources_sha256']['trial_inputs.py'])
+    scene=recorded_helper('pad_scene.py',manifest['application_sources_sha256']['pad_scene.py'])
+    shape=inputs.grid_shape(config)
     if shape is None: raise ValueError('paper grid protocol required')
     n,repeats=shape
     if sorted(r['trial_id'] for r in rows)!=list(range(n*n*repeats)):
         raise ValueError('paper report requires the complete prescribed trial set')
-    pad_path=ROOT/'ws/aruco-landing/src/aruco_landing'/config['pad_manifest']
+    pad_root=ROOT/'stacks/aruco-landing-isaac-x86' if config.get('pad_manifest_root')=='stack' else ROOT/'ws/aruco-landing/src/aruco_landing'
+    pad_path=pad_root/config['pad_manifest']
     if hashlib.sha256(pad_path.read_bytes()).hexdigest()!=manifest['pad_sha256']:
         raise ValueError('analysis pad differs from recorded scene/detector model')
-    pad=metric_pad_manifest(yaml.safe_load(pad_path.read_text()),config['initial_protocol']['pad_side_m'])
+    pad=scene.metric_pad_manifest(yaml.safe_load(pad_path.read_text()),config['initial_protocol']['pad_side_m'])
     models=marker_corners(pad)
     protocol=config['initial_protocol']
     records=[]
     for row in rows:
-        expected=trial_initial_condition(config,row['trial_id'],.002,None)
+        expected=inputs.trial_initial_condition(config,row['trial_id'],.002,None)
         if row['initial']!=expected: raise ValueError('saved input differs from prescribed grid')
         with np.load(directory/row['trace']['path'],allow_pickle=False) as trace:
             truth=trace['gt_pad_from_camera']
@@ -110,7 +140,17 @@ def extract(directory):
             cells.append(dict(grid_x_index=ix,grid_y_index=iy,
                 initial_camera_x_m=group[0]['initial_camera_x_m'],initial_camera_y_m=group[0]['initial_camera_y_m'],
                 **{key:mean_std([r[key] for r in group])['mean'] for key in keys}))
+    owner=ROOT/'ws/aruco-landing/src/aruco_landing'
+    algorithm_files=('batch_landing.py','physical_pad.py','batched_detection.py','pose_alignment.py','landing_math.py','yaw_control.py')
+    algorithm_hashes={}
+    for name in algorithm_files:
+        relative='src/aruco_landing/'+name
+        payload=subprocess.check_output(['git','-C',str(owner),'show',manifest['aruco_revision']+':'+relative])
+        algorithm_hashes[name]=hashlib.sha256(payload).hexdigest()
     result=dict(fingerprint=manifest['fingerprint'],config=config,marker_count=len(pad['markers']),
+        aruco_algorithm_sources_sha256=algorithm_hashes,
+        application_sources_sha256=manifest['application_sources_sha256'],
+        aruco_revision=manifest['aruco_revision'],pad_sha256=manifest['pad_sha256'],
         trials=len(records),successes=sum(r['S_land_pct']==100 for r in records),
         trace_checksums_verified=len(records),summary=summary,
         maximum_funnel_excess_m=max(r['maximum_funnel_excess_m'] for r in records),

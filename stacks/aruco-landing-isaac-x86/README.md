@@ -9,6 +9,10 @@ They retain the measured experiment's image/source/binary versions, select the
 destination UUID, scope the original failed-card PCI check to its host, and list
 the optical/landing checks before measuring a new optimum environment count.
 
+For the paper's 10 × 10 initial-position grid with five repetitions per layout,
+see [the grid protocol and pad mapping](docs/paper-grid.md). It uses the revised
+funnel, nominal print geometry, and matched 500-trial inputs for each configuration.
+
 Native ARL Robot 1, native motor dynamics and native Lee velocity control remain
 unchanged. Configuration freezes gain/motor randomization so only initial
 position/yaw differ. Each environment owns an independent drone/camera/pad pose;

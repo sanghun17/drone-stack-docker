@@ -474,7 +474,7 @@
     },
     "planner/aruco-batch": {
       "files": {
-        "README.md": "8c0487b917faa4a29a48c511354ae55ff7e115bf2559fe39856adca4bb38b1f7",
+        "README.md": "4e60da3a22e57f16fbddac7d823497611e1ea884f2cba129aa5372cea10f8873",
         "clone.sh": "70b54f46107eb1ebf1bb95370a796bad2f56235cb705c9681a092bacf8fdf154",
         "module.yml": "03c78ee51aea8e4b04881c009e36660e2da6652a44e291a95cec358b5d08e37a",
         "run.sh": "3d731c4cdc9058203fbca663b6d34f0a545768f247180e0f4acd82e85d4f384d"
@@ -495,7 +495,7 @@
         "runtime_service": "isaac"
       },
       "repository": "https://github.com/sanghun17/aruco_landing.git",
-      "revision": "31bf003cdf2dfd7c2d265b00403f6a42750e0bdb",
+      "revision": "f18f7fbb2edc3ced6f945fa77c304da251ecc93b",
       "subdir": "deployment/stack-modules/planner/aruco-batch"
     },
     "planner/aruco-landing": {

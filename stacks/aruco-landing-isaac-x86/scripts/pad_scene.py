@@ -34,16 +34,18 @@ def metric_pad_manifest(manifest, pad_side_m=None):
 
 def marker_cells(manifest):
     dictionary = cv2.aruco.getPredefinedDictionary(getattr(cv2.aruco, manifest['dictionary']))
+    cells_per_side = dictionary.markerSize + 2
     quads = []
     for marker in manifest['markers']:
-        bits = cv2.aruco.generateImageMarker(dictionary, marker['id'], 6)
+        bits = cv2.aruco.generateImageMarker(dictionary, marker['id'], cells_per_side)
         a = np.radians(marker['yaw_deg'])
         R = np.array([[np.cos(a), -np.sin(a)], [np.sin(a), np.cos(a)]])
         center = np.array([marker['center_m']['x'], marker['center_m']['y']])
         for row, col in np.argwhere(bits == 0):
-            x, y = col/6-.5, .5-row/6
+            x, y = col/cells_per_side-.5, .5-row/cells_per_side
             # Counterclockwise vertices with outward +Z face normal.
-            square = np.array([[x,y-1/6],[x+1/6,y-1/6],[x+1/6,y],[x,y]])
+            cell = 1/cells_per_side
+            square = np.array([[x,y-cell],[x+cell,y-cell],[x+cell,y],[x,y]])
             quads.append(square @ R.T * marker['side_m'] + center)
     return np.asarray(quads)
 

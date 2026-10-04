@@ -59,7 +59,8 @@ def main():
     shape = grid_shape(cfg)
     if shape and (args.num_envs if args.smoke else args.trial_start+args.trials) > shape[0]**2*shape[1]:
         parser.error('requested trials exceed prescribed grid')
-    manifest_path = ARUCO / cfg['pad_manifest']
+    manifest_root = HERE.parent if cfg.get('pad_manifest_root') == 'stack' else ARUCO
+    manifest_path = manifest_root / cfg['pad_manifest']
     manifest = metric_pad_manifest(yaml.safe_load(manifest_path.read_text()),
                                    cfg.get('initial_protocol',{}).get('pad_side_m'))
     source = subprocess.check_output(['git','-C',str(ARUCO),'rev-parse','HEAD'],text=True).strip()

@@ -1,0 +1,41 @@
+# Pixel-faithful six-marker nested/hybrid reconstruction from Fig. 6(f).
+name: he_eecr2023_hybrid_b3_reconstruction
+dictionary: DICT_6X6_50
+canvas_units: 341.0
+marker_border_bits: 1
+source:
+  pdf: bare_jrnl_new_sample4.pdf
+  page: 7
+  pdf_image_object: 336 0
+  image_size_px:
+  - 341
+  - 341
+  image_sha256: 4ed3f7b4811eaf102aa1b0a105fb8d5482b744060cc427147a5c9e3831b9c544
+  reference_doi: 10.1109/EECR56827.2023.10149915
+  reconstruction: pixel-faithful nominal print reconstruction; uniformly scaled to
+    0.7 m, not original metric CAD
+markers:
+- id: 1
+  x: 12.0
+  y: 12.0
+  size: 45.0
+- id: 2
+  x: 12.0
+  y: 284.0
+  size: 45.0
+- id: 3
+  x: 284.0
+  y: 284.0
+  size: 45.0
+- id: 4
+  x: 284.0
+  y: 12.0
+  size: 45.0
+- id: 19
+  x: 57.0
+  y: 57.0
+  size: 227.0
+- id: 43
+  x: 159.0
+  y: 159.0
+  size: 23.0

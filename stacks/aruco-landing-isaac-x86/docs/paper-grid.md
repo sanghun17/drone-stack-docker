@@ -19,6 +19,26 @@ the following committed nominal print layouts in the ArUco owner repository:
 | Pad 3 | paper-grid-pad3.yaml | proposed_pad_4_layout.yaml |
 | Pad 4 | paper-grid-pad4.yaml | proposed_pad_5_layout.yaml |
 | Baseline | paper-grid-10x10.yaml | paper_pad_layout.yaml |
+| B3, reconstructed | paper-grid-b3.yaml | stack-owned paper-b3-layout.yaml |
+
+The second PDF's B2 is the same Yang baseline; its 500 trials are reused rather
+than counted as another independent configuration. B3 is the six-marker hybrid
+in Fig. 6(f), reconstructed from its embedded 341 × 341 source image (PDF object
+336 0). CPU dictionary decoding identifies corner IDs 1–4 and nested ID 43 in
+DICT_6X6_50. The large marker's sampled 6 × 6 bit matrix exactly matches ID 19.
+The inner marker lies within the large marker's white cells, so both are drawn
+without erasing any large-marker black cells. Pixel footprints are scaled
+uniformly to the same 0.7 m pad. This is a figure reconstruction, not supplied
+metric CAD. Its source image hash and measured footprint coordinates are in
+the stack-owned layout file.
+
+B3 uses an added CUDA 6 × 6 decoding entry point and a new detector binary.
+Synthetic checks cover all six B3 IDs and rotations. The 4 × 4 path has exact
+ID/corner agreement with the previous binary on 16 regression cases, and all
+five 4 × 4 scene meshes have exactly unchanged marker vertices. Core pose
+estimation, landing policy and native dynamics sources remain unchanged.
+Analysis loads checksum-matched geometry/grid helpers from committed history
+and compares the hashes of the shared control/estimation code across reports.
 
 The baseline is the existing reconstruction of the Yang 61-marker figure,
 whose source paper does not provide CAD coordinates. All five configurations
@@ -65,6 +85,16 @@ python3 stacks/aruco-landing-isaac-x86/scripts/paper_campaign.py \
             paper-grid-pad4.yaml paper-grid-10x10.yaml
 ```
 
+Run B3 separately after deploying its committed module revision and selecting
+the rebuilt detector library. Keep the completed 4 × 4 output unchanged:
+
+```bash
+export ARUCO_CUDA_LIBRARY=/work/.build/isaac-landing/libaruco_cuda6.so
+python3 stacks/aruco-landing-isaac-x86/scripts/paper_campaign.py \
+  --output data/results/isaac/paper-grid-b3-20261005 \
+  --num-envs 90 --trials 500 --configs paper-grid-b3.yaml
+```
+
 Use a fresh output directory. GPU usage, per-configuration process logs and the
 campaign state are saved alongside the immutable trace outputs. Analyze each
 complete configuration on the source workstation with:
@@ -78,3 +108,15 @@ python3 data/analysis/aruco/isaac_paper_grid.py \
 The processor verifies all 500 trace hashes and exact initial grid coordinates.
 It exports the trial/cell CSV files, metrics JSON, table, heatmaps, terminal
 positions, and funnel trajectories in PDF, SVG, and 300 dpi PNG.
+
+Compare the five complete reports with shared color scales:
+
+```bash
+python3 data/analysis/aruco/isaac_paper_comparison.py \
+  --inputs data/results/isaac/paper-grid-20261005/analysis-pad1 \
+           data/results/isaac/paper-grid-20261005/analysis-pad2 \
+           data/results/isaac/paper-grid-20261005/analysis-pad3 \
+           data/results/isaac/paper-grid-20261005/analysis-pad4 \
+           data/results/isaac/paper-grid-20261005/analysis-baseline \
+  --output data/results/isaac/paper-grid-20261005/comparison
+```

@@ -1,0 +1,73 @@
+physics_dt_s: 0.008333333333333333
+control_decimation: 2
+env_spacing_m: 20.0
+seed: 1701
+max_duration_s: 20.0
+sensor_latency_s: 0.0
+success_radius_m: 0.1
+detector_backend: gpu-experimental
+pad_manifest: config/paper-b3-layout.yaml
+configuration_label: B3 (hybrid, reconstructed)
+camera:
+  width: 720
+  height: 720
+  fx: 708.077114
+  fy: 708.077114
+  cx: 360.0
+  cy: 360.0
+  body_position_m:
+  - 0.0
+  - 0.0
+  - -0.1
+  body_quaternion_xyzw:
+  - 0.7071067811865476
+  - -0.7071067811865476
+  - 0.0
+  - 0.0
+native_controller:
+  trim_initial_motors: true
+  K_vel:
+  - 3.0
+  - 3.0
+  - 1.75
+  K_rot:
+  - 1.725
+  - 1.725
+  - 0.325
+  K_angvel:
+  - 0.45
+  - 0.45
+  - 0.0825
+policy:
+  horizontal_reference: camera
+  height_reference: camera
+  kp_xy: 1.0
+  kd_xy: 0.15
+  speed_limit_m_s: 2.0
+  descent_speed_m_s: 0.5
+  h_min_m: 0.2
+  derivative_filter_tau_s: 0.1
+  derivative_speed_limit_m_s: 2.0
+  acquisition_timeout_s: 2.0
+  loss_timeout_s: 0.5
+  latency_compensation_enabled: true
+  max_pose_prediction_s: 0.2
+  touchdown_stop_lead_s: 0.0
+  yaw_kp: 1.0
+  yaw_rate_limit_rad_s: 0.35
+  yaw_deadband_deg: 1.0
+initial_protocol:
+  kind: funnel_grid
+  points_per_axis: 10
+  repeats: 5
+  pad_side_m: 0.7
+  lateral_uncertainty_m: 0.1
+  h_max_m: 2.0
+  funnel_formula: max(epsilon, L/2 + epsilon - (vl/vz)*(hmax-h))
+  minimum_lateral_speed_m_s: 0.1
+  minimum_marker_edge_px: 40
+  grid_order: repeat-major, then y, then x; endpoints included
+  position_reference: camera in pad frame
+  initial_velocity: zero
+  initial_body_attitude: zero
+pad_manifest_root: stack
