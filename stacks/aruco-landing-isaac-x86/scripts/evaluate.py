@@ -54,9 +54,14 @@ def main():
         parser.error('RTX renderer rejects driver '+hardware['driver']+'; minimum 550.90.07, recommended 580.95.05')
     from trial_store import TrialStore
     from trial_trace import SCHEMA_VERSION, STATES
-    from pad_scene import MARKER_PLANE_Z_M
+    from pad_scene import MARKER_PLANE_Z_M, metric_pad_manifest
+    from trial_inputs import grid_shape
+    shape = grid_shape(cfg)
+    if shape and (args.num_envs if args.smoke else args.trial_start+args.trials) > shape[0]**2*shape[1]:
+        parser.error('requested trials exceed prescribed grid')
     manifest_path = ARUCO / cfg['pad_manifest']
-    manifest = yaml.safe_load(manifest_path.read_text())
+    manifest = metric_pad_manifest(yaml.safe_load(manifest_path.read_text()),
+                                   cfg.get('initial_protocol',{}).get('pad_side_m'))
     source = subprocess.check_output(['git','-C',str(ARUCO),'rev-parse','HEAD'],text=True).strip()
     if subprocess.check_output(['git','-C',str(ARUCO),'status','--porcelain'],text=True).strip():
         parser.error('commit ArUco source before collecting reproducible evaluation results')
@@ -109,7 +114,8 @@ def run(args, cfg, manifest, pending, store):
     import isaaclab.utils.math as math_utils
     from isaaclab_physx.renderers.isaac_rtx_renderer_cfg import IsaacRtxRendererCfg, IsaacRtxRendererGlobalSettingsCfg
     from native_runtime import robot_config, velocity_controller, reset_robot
-    from aruco_landing.batch_landing import LandingPolicy, initial_condition
+    from aruco_landing.batch_landing import LandingPolicy, initial_condition as random_initial_condition
+    from trial_inputs import trial_initial_condition
     from aruco_landing.batched_detection import BatchedPadDetector
     from aruco_landing.pose_alignment import pose_matrix
     from aruco_landing.physical_pad import inverse
@@ -144,7 +150,7 @@ def run(args, cfg, manifest, pending, store):
     if args.isolation_smoke:
         # A visible foreign object within env-0's clipping range would cover
         # its pad completely without RTX partition culling. No physics is run.
-        first = initial_condition(cfg['seed'],pending[0],cfg['initial_bounds'])
+        first = trial_initial_condition(cfg,pending[0],MARKER_PLANE_Z_M,random_initial_condition)
         origins = scene.env_origins
         if not isinstance(origins,torch.Tensor): origins = origins.torch
         point = origins[0]-origins[1]+torch.tensor(
@@ -218,7 +224,7 @@ def run(args, cfg, manifest, pending, store):
     for base in range(0,len(pending),args.num_envs):
         cohort = pending[base:base+args.num_envs]
         policies = [LandingPolicy(cfg['policy']) for _ in range(args.num_envs)]
-        initial = [initial_condition(cfg['seed'],i,cfg['initial_bounds']) for i in cohort]
+        initial = [trial_initial_condition(cfg,i,MARKER_PLANE_Z_M,random_initial_condition) for i in cohort]
         poses = robot.data.default_root_pose.torch.clone()
         poses[:,:3] += origins
         for env, row in enumerate(initial):

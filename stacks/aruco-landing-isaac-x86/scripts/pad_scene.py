@@ -10,6 +10,28 @@ MARKER_PLANE_Z_M = .002
 PAPER_PLANE_Z_M = .001
 
 
+def metric_pad_manifest(manifest, pad_side_m=None):
+    """Convert nominal print coordinates to the existing camera/pad convention.
+
+    Print image right is pad -Y, and image up is pad +X. Existing calibrated
+    runtime manifests already use this convention and pass through unchanged.
+    """
+    if 'canvas_units' not in manifest:
+        return manifest
+    if pad_side_m is None or pad_side_m <= 0:
+        raise ValueError('nominal print layout requires a positive pad side')
+    canvas = float(manifest['canvas_units'])
+    scale = pad_side_m / canvas
+    markers = []
+    for marker in manifest['markers']:
+        size = float(marker['size'])
+        markers.append(dict(id=int(marker['id']), side_m=size*scale,
+            center_m=dict(x=(canvas/2-marker['y']-size/2)*scale,
+                          y=(canvas/2-marker['x']-size/2)*scale), yaw_deg=-90.))
+    return dict(name=manifest['name'], dictionary=manifest['dictionary'],
+                pad_side_m=pad_side_m, markers=markers)
+
+
 def marker_cells(manifest):
     dictionary = cv2.aruco.getPredefinedDictionary(getattr(cv2.aruco, manifest['dictionary']))
     quads = []
