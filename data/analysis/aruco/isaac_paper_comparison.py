@@ -42,7 +42,9 @@ def compare(inputs,output):
                 raise ValueError('common GPU frontend requires identical recorded library and source hashes')
     caveat=('Multiple detector backends; not a uniform-frontend comparison.' if mixed_frontends else
             'Common OpenCV-compatible GPU image frontend with CPU grouping, decoding, subpixel and PnP.'
-            if backends=={'gpu-opencv-compat'} else '')
+            if backends=={'gpu-opencv-compat'} else
+            'Ordinary CPU OpenCV extraction and shared PnP for every pad; no B1 tracker; no published detector reproduction.'
+            if backends=={'cpu'} else '')
     if backends=={'gpu-experimental','cpu-nested-apriltag'}:
         caveat='B1 uses a compatible CPU template tracker; other pads use the CUDA detector. Not a uniform-frontend comparison.'
     def shared_algorithm_hashes(report):
@@ -56,8 +58,8 @@ def compare(inputs,output):
     output.mkdir(parents=True,exist_ok=False)
     plt.rcParams.update({'font.size':10,'font.family':'DejaVu Sans','pdf.fonttype':42})
     labels=['B1 (CPU tracker)' if r['config']['detector_backend']=='cpu-nested-apriltag'
-            else 'B1' if backends=={'gpu-opencv-compat'} and Path(r['config']['pad_manifest']).name=='paper-b1-layout.yaml'
-            else 'B3' if backends=={'gpu-opencv-compat'} and Path(r['config']['pad_manifest']).name=='paper-b3-layout.yaml'
+            else 'B1' if backends in ({'gpu-opencv-compat'},{'cpu'}) and Path(r['config']['pad_manifest']).name=='paper-b1-layout.yaml'
+            else 'B3' if backends in ({'gpu-opencv-compat'},{'cpu'}) and Path(r['config']['pad_manifest']).name=='paper-b3-layout.yaml'
             else 'Baseline / B2' if r['marker_count']==61 else r['config']['configuration_label'] for r in reports]
     table='| Configuration | N | Trials | A (%) | E (cm) | d (cm) | S_land (%) |\n| --- | --- | --- | --- | --- | --- | --- |\n'
     records=[]
@@ -102,7 +104,9 @@ def compare(inputs,output):
     frontend_note=('\nB1: compatible CPU tracker; other configurations: CUDA detector'
                    if backends=={'gpu-experimental','cpu-nested-apriltag'} else
                    '\nCommon GPU compatibility prototype; CPU compact stages and PnP'
-                   if backends=={'gpu-opencv-compat'} else '\nMultiple detector backends' if mixed_frontends else '')
+                   if backends=={'gpu-opencv-compat'} else
+                   '\nOrdinary CPU OpenCV for every pad; common PnP and controller; no B1 tracker'
+                   if backends=={'cpu'} else '\nMultiple detector backends' if mixed_frontends else '')
     if backends=={'gpu-opencv-compat'} and all(r['aruco_revision']=='31401c7328ca78090fbcfdf605b39e2534843f54' for r in reports):
         frontend_note+='\nCapture precedes OpenCV 4.14 decoder and warp corrections.'
     fig.suptitle('Nominal landing pad layouts (0.7 m); print x = −pad Y, print y = pad X'+frontend_note)
