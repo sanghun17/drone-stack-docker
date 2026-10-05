@@ -20,6 +20,7 @@ the following committed nominal print layouts in the ArUco owner repository:
 | Pad 4 | paper-grid-pad4.yaml | proposed_pad_5_layout.yaml |
 | Baseline | paper-grid-10x10.yaml | paper_pad_layout.yaml |
 | B3, reconstructed | paper-grid-b3.yaml | stack-owned paper-b3-layout.yaml |
+| B1, original AprilTag reconstruction | paper-grid-b1.yaml | stack-owned paper-b1-layout.yaml |
 
 The second PDF's B2 is the same Yang baseline; its 500 trials are reused rather
 than counted as another independent configuration. B3 is the six-marker hybrid
@@ -32,6 +33,31 @@ uniformly to the same 0.7 m pad. This is a figure reconstruction, not supplied
 metric CAD. Its source image hash and measured footprint coordinates are in
 the stack-owned layout file.
 
+B1 is the separate nested pattern in Fig. 6(d), reference [14] (Yu et al.,
+2017, DOI 10.1016/j.ast.2017.03.008). The first PDF's baseline is therefore
+B2 [17], not B1. B1's embedded source image is object 334 0, 167 × 168 pixels.
+All ten code grids exactly identify DICT_APRILTAG_36h11 IDs, rotated 180 degrees:
+parent 166 and children 6, 20, 7 / 29, 15, 21 / 12, 24, 9. The reconstruction
+uses a symmetric eight-cell parent, one-cell child footprints at coordinates
+0, 3.5 and 7, and omits the source figure's red annotation boxes. Child white
+cells replace the parent ink beneath them. No quiet borders or replacement
+ArUco patterns are added. This recovers the coding and nominal layout, not CAD.
+
+The generic CUDA frontend cannot extract these connected nested contours from
+the saved rendered images. B1 consequently uses `cpu-nested-apriltag`: an
+OpenCV optical pose acquisition followed by child-template tracking. Previous
+optical poses rectify child ROIs; ECC affine alignment updates their corners;
+the dictionary must verify the expected ID before PnP accepts a measurement.
+All nine child templates have 64 × 64 pixels; ECC uses up to 40 iterations,
+epsilon 1e-5 and correlation >= 0.9. Mean marker side must be >= 12 px and
+corner motion is bounded by one quarter of that side plus 2 px. Tracker state
+resets between trials. Up to eight CPU workers share the grayscale batch.
+Only optical observations enter this frontend; simulator GT is used for audit.
+PnP, native dynamics and landing control remain shared. This compatible tracker
+is an experimental frontend, not a reproduction of the published MVFAN detector.
+Comparisons identify the frontend difference explicitly; a B1 failure here is
+not evidence that the original paper's detector would fail on the same trial.
+
 B3 uses an added CUDA 6 × 6 decoding entry point and a new detector binary.
 Synthetic checks cover all six B3 IDs and rotations. The 4 × 4 path has exact
 ID/corner agreement with the previous binary on 16 regression cases, and all
@@ -41,7 +67,7 @@ Analysis loads checksum-matched geometry/grid helpers from committed history
 and compares the hashes of the shared control/estimation code across reports.
 
 The baseline is the existing reconstruction of the Yang 61-marker figure,
-whose source paper does not provide CAD coordinates. All six configurations
+whose source paper does not provide CAD coordinates. All seven configurations
 use nominal 0.7 m print geometry; none uses the fitted physical print calibration.
 Print-image right maps to pad -Y; print-image up maps to pad +X. The same metric
 conversion feeds rendering, corner models, pose estimation, and offline
@@ -112,6 +138,16 @@ python3 stacks/aruco-landing-isaac-x86/scripts/paper_campaign.py \
   --num-envs 90 --trials 500 --configs paper-grid-b3.yaml
 ```
 
+Run B1 with its original pattern and configured CPU tracker (no CUDA detector
+library is needed for this configuration):
+
+```bash
+export DOCKER_HOST=unix:///tmp/docker-ssd.sock
+python3 stacks/aruco-landing-isaac-x86/scripts/paper_campaign.py \
+  --output data/results/isaac/paper-grid-b1-20261005 \
+  --num-envs 90 --trials 500 --configs paper-grid-b1.yaml
+```
+
 Use a fresh output directory. GPU usage, per-configuration process logs and the
 campaign state are saved alongside the immutable trace outputs. Analyze each
 complete configuration on the source workstation with:
@@ -138,3 +174,7 @@ python3 data/analysis/aruco/isaac_paper_comparison.py \
            data/results/isaac/paper-grid-b3-20261005/analysis-b3 \
   --output data/results/isaac/paper-grid-20261005/comparison
 ```
+
+Include the completed B1 report as a seventh input for the updated comparison.
+The figures and CSV identify B1's CPU tracker separately from the CUDA runs.
+The historical six-configuration comparison remains unchanged.

@@ -38,7 +38,7 @@ def compare(inputs,output):
     mixed_frontends=len(backends)>1
     def shared_algorithm_hashes(report):
         return {name:digest for name,digest in report['aruco_algorithm_sources_sha256'].items()
-                if name!='batched_detection.py'}
+                if name!='batched_detection.py' or not mixed_frontends}
     dynamics_files=('native_runtime.py','trial_inputs.py','trial_trace.py')
     for r in reports:
         if any(r['application_sources_sha256'][name]!=reports[0]['application_sources_sha256'][name]
@@ -70,8 +70,14 @@ def compare(inputs,output):
     n=protocol['points_per_axis']
     axes=np.linspace(-1,1,n)
     figures=[]
-    fig,axs=plt.subplots(1,count,figsize=(3.1*count,3.4),layout='constrained',squeeze=False)
-    for ax,label,r in zip(axs.flat,labels,reports):
+    def panel_axes():
+        rows=2 if count>6 else 1
+        columns=(count+rows-1)//rows
+        fig,axs=plt.subplots(rows,columns,figsize=(3.1*columns,3.7*rows),layout='constrained',squeeze=False)
+        for ax in list(axs.flat)[count:]:ax.set_visible(False)
+        return fig,list(axs.flat)[:count]
+    fig,axs=panel_axes()
+    for ax,label,r in zip(axs,labels,reports):
         pad_root=ROOT/'stacks/aruco-landing-isaac-x86' if r['config'].get('pad_manifest_root')=='stack' else ROOT/'ws/aruco-landing/src/aruco_landing'
         path=pad_root/r['config']['pad_manifest']
         pad=metric_pad_manifest(yaml.safe_load(path.read_text()),protocol['pad_side_m'])
@@ -95,14 +101,14 @@ def compare(inputs,output):
         if vmax is None:
             finite=np.concatenate([a[np.isfinite(a)] for a in arrays])
             vmax=float(finite.max()) if len(finite) else 1.
-        fig,axs=plt.subplots(1,count,figsize=(3.1*count,3.4),layout='constrained',squeeze=False)
-        for ax,label,array in zip(axs.flat,labels,arrays):
+        fig,axs=panel_axes()
+        for ax,label,array in zip(axs,labels,arrays):
             artist=ax.pcolormesh(axes,axes,array,shading='nearest',cmap='viridis',vmin=0,vmax=vmax)
             mean=float(np.nanmean(array)) if np.isfinite(array).any() else None
             subtitle=f'Mean {mean:.3f} {unit}' if mean is not None else 'No valid values'
             ax.set(title=label+'\n'+subtitle,xlabel=r'$x_0/f_w(h_{max})$',ylabel=r'$y_0/f_w(h_{max})$',
                    xlim=(-1,1),ylim=(-1,1),aspect='equal')
-        fig.colorbar(artist,ax=list(axs.flat),label=unit,shrink=.85)
+        fig.colorbar(artist,ax=axs,label=unit,shrink=.85)
         fig.suptitle(title+f"; {n}×{n} cells, {protocol['repeats']} trials/cell"+frontend_note)
         figures.append((key,fig))
     fig,axs=plt.subplots(1,3,figsize=(13,4.3),layout='constrained')
