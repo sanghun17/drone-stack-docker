@@ -7,4 +7,7 @@ detector_env=()
 if [[ -n "${ARUCO_CUDA_LIBRARY:-}" ]]; then
   detector_env=(-e "ARUCO_CUDA_LIBRARY=$ARUCO_CUDA_LIBRARY")
 fi
+if [[ -n "${ARUCO_OPENCV_CUDA_LIBRARY:-}" ]]; then
+  detector_env+=(-e "ARUCO_OPENCV_CUDA_LIBRARY=$ARUCO_OPENCV_CUDA_LIBRARY")
+fi
 exec docker exec -i "${detector_env[@]}" "$container" bash /work/modules/planner/aruco-batch/run.sh "$@"

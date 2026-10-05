@@ -33,9 +33,14 @@ def compare(inputs,output):
     if any(common_config(r)!=common_config(reports[0]) for r in reports):
             raise ValueError('camera, dynamics and policy must match across configurations')
     backends={r['config']['detector_backend'] for r in reports}
-    if not backends<= {'gpu-experimental','cpu-nested-apriltag'}:
+    if not backends<= {'gpu-experimental','cpu-nested-apriltag','gpu-opencv-compat','cpu'}:
         raise ValueError('unsupported detector comparison; describe a new protocol explicitly')
     mixed_frontends=len(backends)>1
+    caveat=('Multiple detector backends; not a uniform-frontend comparison.' if mixed_frontends else
+            'Common OpenCV-compatible GPU image frontend with CPU grouping, decoding, subpixel and PnP.'
+            if backends=={'gpu-opencv-compat'} else '')
+    if backends=={'gpu-experimental','cpu-nested-apriltag'}:
+        caveat='B1 uses a compatible CPU template tracker; other pads use the CUDA detector. Not a uniform-frontend comparison.'
     def shared_algorithm_hashes(report):
         return {name:digest for name,digest in report['aruco_algorithm_sources_sha256'].items()
                 if name!='batched_detection.py' or not mixed_frontends}
@@ -55,7 +60,7 @@ def compare(inputs,output):
         table+=f"| {label} | {r['marker_count']} | {r['trials']} | {statistic(s,'A_marker_visible_40px_pct')} | {statistic(s,'E_camera_rmse_cm')} | {statistic(s,'d_touchdown_cm')} | {s['S_land_pct']['mean']:.2f} |\n"
         record=dict(configuration=label,N=r['marker_count'],trials=r['trials'],successes=r['successes'],fingerprint=r['fingerprint'],
             detector_backend=r['config']['detector_backend'],
-            comparison_caveat='B1 uses a compatible CPU template tracker; other pads use the CUDA detector. Not a uniform-frontend comparison.' if mixed_frontends else '',
+            comparison_caveat=caveat,
             maximum_funnel_excess_m=r['maximum_funnel_excess_m'],
             trials_outside_funnel_0_1mm=sum(row['maximum_funnel_excess_m']>.0001 for row in r['trials_detail']))
         for key,value in s.items():
@@ -88,7 +93,10 @@ def compare(inputs,output):
         ax.plot([-half,half,half,-half,-half],[-half,-half,half,half,-half],color='.6')
         ax.set(title=f"{label}\nN = {r['marker_count']}",xlabel='Print x (m)',ylabel='Print y (m)',
                xlim=(-half,half),ylim=(-half,half),aspect='equal')
-    frontend_note='\nB1: compatible CPU tracker; other configurations: CUDA detector' if mixed_frontends else ''
+    frontend_note=('\nB1: compatible CPU tracker; other configurations: CUDA detector'
+                   if backends=={'gpu-experimental','cpu-nested-apriltag'} else
+                   '\nCommon OpenCV-compatible GPU image frontend; CPU compact stages and PnP'
+                   if backends=={'gpu-opencv-compat'} else '\nMultiple detector backends' if mixed_frontends else '')
     fig.suptitle('Nominal landing pad layouts (0.7 m); print x = −pad Y, print y = pad X'+frontend_note)
     figures.append(('pad_layouts',fig))
     panels=[('A_marker_visible_40px_pct','Marker availability: complete marker with all edges ≥ 40 px','%',100),

@@ -18,6 +18,7 @@ def main():
     parser.add_argument('--num-envs',type=int,default=90)
     parser.add_argument('--trials',type=int,default=500)
     parser.add_argument('--configs',nargs='+',required=True)
+    parser.add_argument('--detector',choices=['cpu','gpu-experimental','cpu-nested-apriltag','gpu-opencv-compat'])
     args=parser.parse_args()
     if args.num_envs<1 or not 1<=args.trials<=500: parser.error('invalid cohort/trial count')
     if os.environ.get('DOCKER_HOST')!='unix:///tmp/docker-ssd.sock':
@@ -40,7 +41,8 @@ def main():
     worker=threading.Thread(target=monitor,daemon=True)
     worker.start()
     status=dict(root_commit=subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip(),
-                num_envs=args.num_envs,trials_per_configuration=args.trials,configurations=[],started_wall=time.time())
+                num_envs=args.num_envs,trials_per_configuration=args.trials,detector_override=args.detector,
+                configurations=[],started_wall=time.time())
     def save():
         temp=output/'campaign.json.tmp'
         temp.write_text(json.dumps(status,indent=2)+'\n')
@@ -57,6 +59,7 @@ def main():
                 '--config','/work/'+str(config.relative_to(ROOT)),
                 '--num-envs',str(args.num_envs),'--trials',str(args.trials),
                 '--output','/work/'+str(relative_output)]
+            if args.detector: command.extend(['--detector',args.detector])
             print('Starting '+name,flush=True)
             with (output/(name+'.log')).open('w') as stream:
                 completed=subprocess.run(command,cwd=ROOT,stdout=stream,stderr=subprocess.STDOUT)
