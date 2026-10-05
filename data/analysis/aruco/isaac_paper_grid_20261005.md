@@ -1,5 +1,7 @@
 # Isaac paper grid evaluation — 2026-10-05
 
+The later [original-AprilTag B1 supplement](isaac_paper_grid_b1_20261005.md) adds 500 trials and the final seven-configuration comparison. The six-configuration results below are preserved.
+
 All six configurations completed 500/500 vision-height landings, for 3,000/3,000 successes. B2 is the same 61-marker baseline used in the first PDF and shares its 500 trials. The GPU trial loops and application startup took 44 min 49.87 s across the two campaigns, excluding deployment and qualification. Both campaigns used 90 environments on the RTX 4090, UUID GPU-da2b812f-807b-5663-59cf-98dc4c7be812, driver 570.211.01. Peak sampled memory was 19,688 MiB and peak sampled temperature 61 °C. No evaluation process remains running.
 
 The sampling follows the revised first-PDF funnel and the second PDF's grid protocol: 10 × 10 inclusive camera positions in [-0.45, 0.45]² m, with five repetitions per position. Camera height starts at 2 m above the marker plane, with zero body attitude and velocity. Physics runs at 120 Hz and image/control captures at 60 Hz of simulation time. All 3,000 trace checksums and prescribed input IDs/coordinates were verified. Initial GT positions differed from prescribed positions by at most 0.000004316 m, all initial velocity components were zero, and capture-period error was at most 3.85e-16 s.
