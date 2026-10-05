@@ -32,8 +32,13 @@ def compare(cpu, gpu):
         a, b = groups[0][tid], groups[1][tid]
         if a['initial'] != b['initial']:
             raise ValueError('initial conditions differ')
+        with np.load(cpu/a['trace']['path'],allow_pickle=False) as ca, np.load(gpu/b['trace']['path'],allow_pickle=False) as ga:
+            fields=sorted(set(ca.files)|set(ga.files))
+            differing=[key for key in fields if key not in ca or key not in ga
+                       or not np.array_equal(ca[key],ga[key],equal_nan=True)]
         paired.append(dict(trial_id=tid, cpu_outcome=a['outcome'], gpu_outcome=b['outcome'],
                            cpu_success=a['success'], gpu_success=b['success'],
+                           trace_array_mismatch_fields=differing,
                            simulation_duration_delta_s=b['simulation_duration_s']-a['simulation_duration_s']))
     pilots = []
     for directory, manifest, group, runtime in zip((cpu, gpu), manifests, groups, runtimes):
@@ -42,6 +47,10 @@ def compare(cpu, gpu):
                 if r['metrics']['localization_camera']['valid_frames']]
         terminal = [r['lateral_error_m']*100 for r in rows if r['outcome']=='touchdown']
         pilots.append(dict(input=str(directory), fingerprint=manifest['fingerprint'],
+            aruco_revision=manifest['aruco_revision'],
+            application_sources_sha256=manifest['application_sources_sha256'],
+            gpu_detector_library_sha256=manifest.get('gpu_detector_library_sha256'),
+            gpu_compatibility_sources_sha256=manifest.get('gpu_compatibility_sources_sha256'),
             summary_sha256=hashlib.sha256((directory/'summary.json').read_bytes()).hexdigest(),
             backend=manifest['config']['detector_backend'], runtime=runtime,
             trace_checksums_verified=len(rows), metrics=summarize(rows),
@@ -54,6 +63,7 @@ def compare(cpu, gpu):
         success_disagreements=sum(r['cpu_success']!=r['gpu_success'] for r in paired),
         maximum_simulation_duration_delta_s=max(abs(r['simulation_duration_delta_s']) for r in paired),
         matched_initial_conditions=True, paired_trials=paired,
+        trace_arrays_exact_equal=all(not r['trace_array_mismatch_fields'] for r in paired),
         scope='One matched closed-loop pilot per backend; includes rendering, physics, grayscale, transfer, detection, PnP and control. Eight CPU workers per frontend. No statistical speedup claim or physical contact metric.')
 
 

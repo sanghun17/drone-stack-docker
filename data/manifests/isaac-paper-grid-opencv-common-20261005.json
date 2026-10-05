@@ -1,0 +1,2182 @@
+{
+  "experiment": "Seven-layout common OpenCV-compatible frontend rerun on IM",
+  "status": "complete",
+  "capture_root_commit": "e903e58346e3a4fada6015e4f97447923ab7a7e3",
+  "analysis_parent_commit": "f9be46bf88c028d45f39ddde3b912cc3b26ef868",
+  "trials": 3500,
+  "successes": 2999,
+  "num_envs": 90,
+  "frontend": "gpu-opencv-compat: GPU raster/contour/warp processing; CPU grouping, decode, subpixel and shared PnP",
+  "uniform_detector_frontend": true,
+  "published_B1_MVFAN_reproduced": false,
+  "physics_hz": 120,
+  "control_capture_hz": 60,
+  "clock": "simulation time; wall computation blocks the next simulation step",
+  "termination": "estimated camera height <=0.2 m, with GT camera XY radius <=0.1 m for success; not physical contact",
+  "campaign_wall_s": 7850.5291476249695,
+  "runtime_wall_s": 7841.259557017023,
+  "whole_gpu_peak_sample_memory_mib": 19860,
+  "whole_gpu_peak_sample_temperature_c": 57,
+  "gpu_monitor_path": "data/results/isaac/paper-grid-opencv-common-20261005/campaign/gpu.csv",
+  "gpu_monitor_sha256": "48c44f13c130db38502465a714ebaf936607030570b2fa8cbbb0a9b7df7ffd69",
+  "pilot_path": "data/results/isaac/paper-grid-opencv-common-20261005/frontend-pilot-corrected.json",
+  "pilot_sha256": "a4e980034a134b00fa134937eae022e5bc1068919be3b5467fafba036199c2eb",
+  "pilot": {
+    "pilots": [
+      {
+        "input": "data/results/isaac/paper-grid-opencv-common-20261005/pilot-cpu-corrected/paper-grid-10x10",
+        "fingerprint": "9d896dd56c5968d3ce41f8ee7bfdcd4c016eaad7b709a5452636b8d9564a591d",
+        "aruco_revision": "c95b1f64126bfabc5be721d6c665ac1c38c1aae7",
+        "application_sources_sha256": {
+          "camera_samples.py": "ba699c01c582f36b4e4d9fd53d2889da6248fcbc7cf89602e88062195b701201",
+          "evaluate.py": "8d0613d4546a7bedbc0802e36c35d99c012a0b2f02bc207bd43ee3e0510b997c",
+          "native_runtime.py": "8ea26b263c92b6dcd89678d9726348e220c9af4db320cc55e72baffdc8c10b4c",
+          "native_smoke.py": "4050594a38c0455064a7be10b2bc9530a2a62092b0075a7d97c342e1152e160d",
+          "pad_scene.py": "340e80d950bcb05f179bba4c9ff8329925c382a753b71c61680269dbb8927285",
+          "paper_campaign.py": "58cb120ad0605a570a9994f1812201ab92b3867f9b04546a9d5612f6441d0ddd",
+          "preflight.py": "bf82baae0a41317cde36d92ccaa6b2404a692ca73a0a976f78f76954a432acc8",
+          "trial_inputs.py": "3f7daaef026837e6caf605e7664c6407150cacee39fc63e206a2288cca4e9cb0",
+          "trial_store.py": "9ac29a2dd81c58285b18c4fe61898077d1f611a6e6b5c7a84df0ef6730529bb6",
+          "trial_trace.py": "753e6d5d9ea1f93d44125c23db5877e2332fe58e2eea5bc867a02191a44d29b7"
+        },
+        "gpu_detector_library_sha256": null,
+        "gpu_compatibility_sources_sha256": null,
+        "summary_sha256": "6708c1c321b05af27645ad2f64152141c85b0c591491df88a2eb67741713ddd3",
+        "backend": "cpu",
+        "runtime": {
+          "num_envs": 8,
+          "completed_trials": 16,
+          "wall_s": 85.06620807600848,
+          "startup_wall_s": 11.91781768099463,
+          "evaluation_wall_s": 96.98404485199717,
+          "new_trials": 16,
+          "trial_per_wall_hour": 677.119637782998,
+          "aggregate_simulation_s": 64.46666666666667,
+          "aggregate_simulation_per_wall_s": 0.7578410760835175,
+          "gpu_peak_allocated_bytes": 109208064,
+          "hardware": {
+            "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+            "gpu_name": "NVIDIA GeForce RTX 4090",
+            "driver": "570.211.01",
+            "memory_mib": 24564,
+            "rtx_driver_floor_passed": true,
+            "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+            "renderer_log_minimum": "550.90.07",
+            "renderer_log_recommended": "580.95.05",
+            "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+          },
+          "timing": {
+            "physics_s": 4.460676358110504,
+            "render_s": 14.476448769040871,
+            "device_and_transfer_s": 0.300271255968255,
+            "detect_s": 54.462817379200715,
+            "pnp_s": 8.449217117027729,
+            "control_s": 0.17496258903702255,
+            "transferred_bytes": 2052864000,
+            "markers": 193423,
+            "camera_batches": 495,
+            "physics_steps": 974
+          },
+          "pose_quality": {
+            "valid_poses": 3907,
+            "translation_sum_squared_m2": 0.03280750624925373,
+            "translation_max_m": 0.013529155176089757,
+            "rotation_max_deg": 0.43168206133805637
+          }
+        },
+        "trace_checksums_verified": 16,
+        "metrics": {
+          "trials": 16,
+          "successes": 16,
+          "capture_frames": 3884,
+          "valid_pose_frames": 3831,
+          "marker_detection_availability": 1.0,
+          "pose_availability": 0.9863542739443872,
+          "macro_mean_marker_availability": 1.0,
+          "macro_mean_pose_availability": 0.9863730322338152,
+          "maximum_lateral_error_m": 0.00895793829113245,
+          "localization_camera": {
+            "valid_frames": 3831,
+            "position_rmse_m": 0.002835633454624028,
+            "position_axis_rmse_m": [
+              0.0019167541342263472,
+              0.0019980043413078403,
+              0.0006122494018161464
+            ],
+            "xy_rmse_m": 0.002768748410195258,
+            "rotation_rmse_deg": 0.09188793335983261,
+            "position_max_m": 0.01352915517608973
+          },
+          "localization_body": {
+            "valid_frames": 3831,
+            "position_rmse_m": 0.002956684692522182,
+            "position_axis_rmse_m": [
+              0.0020034205641759335,
+              0.002087178757444629,
+              0.0006098977361032503
+            ],
+            "xy_rmse_m": 0.0028930968048945615,
+            "rotation_rmse_deg": 0.0918879333909613,
+            "position_max_m": 0.014076970383375999
+          }
+        },
+        "mean_trial_camera_rmse_cm": 0.2832211241008742,
+        "mean_terminal_error_cm": 0.6444341532187536
+      },
+      {
+        "input": "data/results/isaac/paper-grid-opencv-common-20261005/pilot-gpu-corrected/paper-grid-10x10",
+        "fingerprint": "68932631f1f70788c9ed8fca131c1b59385778180209d107cc2e664e44bbfc17",
+        "aruco_revision": "c95b1f64126bfabc5be721d6c665ac1c38c1aae7",
+        "application_sources_sha256": {
+          "camera_samples.py": "ba699c01c582f36b4e4d9fd53d2889da6248fcbc7cf89602e88062195b701201",
+          "evaluate.py": "8d0613d4546a7bedbc0802e36c35d99c012a0b2f02bc207bd43ee3e0510b997c",
+          "native_runtime.py": "8ea26b263c92b6dcd89678d9726348e220c9af4db320cc55e72baffdc8c10b4c",
+          "native_smoke.py": "4050594a38c0455064a7be10b2bc9530a2a62092b0075a7d97c342e1152e160d",
+          "pad_scene.py": "340e80d950bcb05f179bba4c9ff8329925c382a753b71c61680269dbb8927285",
+          "paper_campaign.py": "58cb120ad0605a570a9994f1812201ab92b3867f9b04546a9d5612f6441d0ddd",
+          "preflight.py": "bf82baae0a41317cde36d92ccaa6b2404a692ca73a0a976f78f76954a432acc8",
+          "trial_inputs.py": "3f7daaef026837e6caf605e7664c6407150cacee39fc63e206a2288cca4e9cb0",
+          "trial_store.py": "9ac29a2dd81c58285b18c4fe61898077d1f611a6e6b5c7a84df0ef6730529bb6",
+          "trial_trace.py": "753e6d5d9ea1f93d44125c23db5877e2332fe58e2eea5bc867a02191a44d29b7"
+        },
+        "gpu_detector_library_sha256": "881b384188e320e895526aa967df83371ae2a9e2ca2b7c6376f60a2c110fa715",
+        "gpu_compatibility_sources_sha256": {
+          "gpu_opencv.py": "e197fe763acda658aa4c791379f0d2896db4a5e9b9b9444730d46c89f5764b86",
+          "cuda/opencv_candidates.cu": "5fbc32be1a96175265bce37a53e112e2ef614ac01cfb24874640442891b32a86"
+        },
+        "summary_sha256": "137baab55406a855436ffc3df44c964b1a67f5a78680404f3f256665f2cc8608",
+        "backend": "gpu-opencv-compat",
+        "runtime": {
+          "num_envs": 8,
+          "completed_trials": 16,
+          "wall_s": 106.23025674399105,
+          "startup_wall_s": 11.926313427000423,
+          "evaluation_wall_s": 118.15658998799336,
+          "new_trials": 16,
+          "trial_per_wall_hour": 542.2184014749467,
+          "aggregate_simulation_s": 64.46666666666667,
+          "aggregate_simulation_per_wall_s": 0.6068578636878165,
+          "gpu_peak_allocated_bytes": 186672128,
+          "hardware": {
+            "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+            "gpu_name": "NVIDIA GeForce RTX 4090",
+            "driver": "570.211.01",
+            "memory_mib": 24564,
+            "rtx_driver_floor_passed": true,
+            "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+            "renderer_log_minimum": "550.90.07",
+            "renderer_log_recommended": "580.95.05",
+            "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+          },
+          "timing": {
+            "physics_s": 4.4134471667639446,
+            "render_s": 14.17637471514172,
+            "device_and_transfer_s": 77.75288413482485,
+            "detect_s": 0.00019916213932447135,
+            "pnp_s": 7.070021396968514,
+            "control_s": 0.16301345394458622,
+            "transferred_bytes": 1091832156,
+            "markers": 193423,
+            "camera_batches": 495,
+            "physics_steps": 974
+          },
+          "pose_quality": {
+            "valid_poses": 3907,
+            "translation_sum_squared_m2": 0.03280750624925373,
+            "translation_max_m": 0.013529155176089757,
+            "rotation_max_deg": 0.43168206133805637
+          }
+        },
+        "trace_checksums_verified": 16,
+        "metrics": {
+          "trials": 16,
+          "successes": 16,
+          "capture_frames": 3884,
+          "valid_pose_frames": 3831,
+          "marker_detection_availability": 1.0,
+          "pose_availability": 0.9863542739443872,
+          "macro_mean_marker_availability": 1.0,
+          "macro_mean_pose_availability": 0.9863730322338152,
+          "maximum_lateral_error_m": 0.00895793829113245,
+          "localization_camera": {
+            "valid_frames": 3831,
+            "position_rmse_m": 0.002835633454624028,
+            "position_axis_rmse_m": [
+              0.0019167541342263472,
+              0.0019980043413078403,
+              0.0006122494018161464
+            ],
+            "xy_rmse_m": 0.002768748410195258,
+            "rotation_rmse_deg": 0.09188793335983261,
+            "position_max_m": 0.01352915517608973
+          },
+          "localization_body": {
+            "valid_frames": 3831,
+            "position_rmse_m": 0.002956684692522182,
+            "position_axis_rmse_m": [
+              0.0020034205641759335,
+              0.002087178757444629,
+              0.0006098977361032503
+            ],
+            "xy_rmse_m": 0.0028930968048945615,
+            "rotation_rmse_deg": 0.0918879333909613,
+            "position_max_m": 0.014076970383375999
+          }
+        },
+        "mean_trial_camera_rmse_cm": 0.2832211241008742,
+        "mean_terminal_error_cm": 0.6444341532187536
+      }
+    ],
+    "trials": 16,
+    "num_envs": 8,
+    "cpu_to_gpu_loop_time_ratio": 0.800771933376884,
+    "cpu_to_gpu_evaluation_time_ratio": 0.8208094433146076,
+    "outcome_disagreements": 0,
+    "success_disagreements": 0,
+    "maximum_simulation_duration_delta_s": 0.0,
+    "matched_initial_conditions": true,
+    "paired_trials": [
+      {
+        "trial_id": 0,
+        "cpu_outcome": "touchdown",
+        "gpu_outcome": "touchdown",
+        "cpu_success": true,
+        "gpu_success": true,
+        "trace_array_mismatch_fields": [],
+        "simulation_duration_delta_s": 0.0
+      },
+      {
+        "trial_id": 1,
+        "cpu_outcome": "touchdown",
+        "gpu_outcome": "touchdown",
+        "cpu_success": true,
+        "gpu_success": true,
+        "trace_array_mismatch_fields": [],
+        "simulation_duration_delta_s": 0.0
+      },
+      {
+        "trial_id": 2,
+        "cpu_outcome": "touchdown",
+        "gpu_outcome": "touchdown",
+        "cpu_success": true,
+        "gpu_success": true,
+        "trace_array_mismatch_fields": [],
+        "simulation_duration_delta_s": 0.0
+      },
+      {
+        "trial_id": 3,
+        "cpu_outcome": "touchdown",
+        "gpu_outcome": "touchdown",
+        "cpu_success": true,
+        "gpu_success": true,
+        "trace_array_mismatch_fields": [],
+        "simulation_duration_delta_s": 0.0
+      },
+      {
+        "trial_id": 4,
+        "cpu_outcome": "touchdown",
+        "gpu_outcome": "touchdown",
+        "cpu_success": true,
+        "gpu_success": true,
+        "trace_array_mismatch_fields": [],
+        "simulation_duration_delta_s": 0.0
+      },
+      {
+        "trial_id": 5,
+        "cpu_outcome": "touchdown",
+        "gpu_outcome": "touchdown",
+        "cpu_success": true,
+        "gpu_success": true,
+        "trace_array_mismatch_fields": [],
+        "simulation_duration_delta_s": 0.0
+      },
+      {
+        "trial_id": 6,
+        "cpu_outcome": "touchdown",
+        "gpu_outcome": "touchdown",
+        "cpu_success": true,
+        "gpu_success": true,
+        "trace_array_mismatch_fields": [],
+        "simulation_duration_delta_s": 0.0
+      },
+      {
+        "trial_id": 7,
+        "cpu_outcome": "touchdown",
+        "gpu_outcome": "touchdown",
+        "cpu_success": true,
+        "gpu_success": true,
+        "trace_array_mismatch_fields": [],
+        "simulation_duration_delta_s": 0.0
+      },
+      {
+        "trial_id": 8,
+        "cpu_outcome": "touchdown",
+        "gpu_outcome": "touchdown",
+        "cpu_success": true,
+        "gpu_success": true,
+        "trace_array_mismatch_fields": [],
+        "simulation_duration_delta_s": 0.0
+      },
+      {
+        "trial_id": 9,
+        "cpu_outcome": "touchdown",
+        "gpu_outcome": "touchdown",
+        "cpu_success": true,
+        "gpu_success": true,
+        "trace_array_mismatch_fields": [],
+        "simulation_duration_delta_s": 0.0
+      },
+      {
+        "trial_id": 10,
+        "cpu_outcome": "touchdown",
+        "gpu_outcome": "touchdown",
+        "cpu_success": true,
+        "gpu_success": true,
+        "trace_array_mismatch_fields": [],
+        "simulation_duration_delta_s": 0.0
+      },
+      {
+        "trial_id": 11,
+        "cpu_outcome": "touchdown",
+        "gpu_outcome": "touchdown",
+        "cpu_success": true,
+        "gpu_success": true,
+        "trace_array_mismatch_fields": [],
+        "simulation_duration_delta_s": 0.0
+      },
+      {
+        "trial_id": 12,
+        "cpu_outcome": "touchdown",
+        "gpu_outcome": "touchdown",
+        "cpu_success": true,
+        "gpu_success": true,
+        "trace_array_mismatch_fields": [],
+        "simulation_duration_delta_s": 0.0
+      },
+      {
+        "trial_id": 13,
+        "cpu_outcome": "touchdown",
+        "gpu_outcome": "touchdown",
+        "cpu_success": true,
+        "gpu_success": true,
+        "trace_array_mismatch_fields": [],
+        "simulation_duration_delta_s": 0.0
+      },
+      {
+        "trial_id": 14,
+        "cpu_outcome": "touchdown",
+        "gpu_outcome": "touchdown",
+        "cpu_success": true,
+        "gpu_success": true,
+        "trace_array_mismatch_fields": [],
+        "simulation_duration_delta_s": 0.0
+      },
+      {
+        "trial_id": 15,
+        "cpu_outcome": "touchdown",
+        "gpu_outcome": "touchdown",
+        "cpu_success": true,
+        "gpu_success": true,
+        "trace_array_mismatch_fields": [],
+        "simulation_duration_delta_s": 0.0
+      }
+    ],
+    "trace_arrays_exact_equal": true,
+    "scope": "One matched closed-loop pilot per backend; includes rendering, physics, grayscale, transfer, detection, PnP and control. Eight CPU workers per frontend. No statistical speedup claim or physical contact metric."
+  },
+  "configurations": [
+    {
+      "label": "Pad 1",
+      "raw_path": "data/results/isaac/paper-grid-opencv-common-20261005/campaign/paper-grid-pad1",
+      "metrics_path": "data/results/isaac/paper-grid-opencv-common-20261005/analysis-pad1/metrics.json",
+      "metrics_sha256": "491aad8820b7f6f29e6e2659bd662e8edcf50911799f0422932861190a5086ab",
+      "runtime": {
+        "num_envs": 90,
+        "completed_trials": 500,
+        "wall_s": 828.4140168410086,
+        "startup_wall_s": 13.049901781996596,
+        "evaluation_wall_s": 841.464123865997,
+        "new_trials": 500,
+        "trial_per_wall_hour": 2172.8265859913145,
+        "aggregate_simulation_s": 1713.8666666666666,
+        "aggregate_simulation_per_wall_s": 2.068852810098693,
+        "gpu_peak_allocated_bytes": 1128477696,
+        "hardware": {
+          "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+          "gpu_name": "NVIDIA GeForce RTX 4090",
+          "driver": "570.211.01",
+          "memory_mib": 24564,
+          "rtx_driver_floor_passed": true,
+          "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+          "renderer_log_minimum": "550.90.07",
+          "renderer_log_recommended": "580.95.05",
+          "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+        },
+        "timing": {
+          "physics_s": 11.767731192623614,
+          "render_s": 237.05749266220664,
+          "device_and_transfer_s": 507.40227780475107,
+          "detect_s": 0.0005350000865291804,
+          "pnp_s": 51.33080280586728,
+          "control_s": 3.216977525196853,
+          "transferred_bytes": 1876835136,
+          "markers": 208332,
+          "camera_batches": 1334,
+          "physics_steps": 2620
+        },
+        "pose_quality": {
+          "valid_poses": 119227,
+          "translation_sum_squared_m2": 356.03438701626357,
+          "translation_max_m": 1.448528034336262,
+          "rotation_max_deg": 40.825279227659586
+        }
+      },
+      "fingerprint": "0d9f22c9477c70235f9dabf147af175b138fc524fd9414170f84a76e59967fa6",
+      "aruco_revision": "31401c7328ca78090fbcfdf605b39e2534843f54",
+      "pad_sha256": "7650efc79b2f3a2144a8edad5578d6d85889eb01518dedb934d4d43f2e76a75e",
+      "trials": 500,
+      "successes": 499,
+      "outcomes": {
+        "touchdown": 499,
+        "aborted": 1
+      },
+      "trace_checksums_verified": 500,
+      "summary": {
+        "A_marker_visible_40px_pct": {
+          "mean": 99.8960581165302,
+          "sample_std": 1.1771660757692781,
+          "trials": 500
+        },
+        "decoded_marker_availability_pct": {
+          "mean": 99.96389765930527,
+          "sample_std": 0.7231417924623601,
+          "trials": 500
+        },
+        "pose_availability_pct": {
+          "mean": 99.96389765930527,
+          "sample_std": 0.7231417924623601,
+          "trials": 500
+        },
+        "pose_availability_when_geometric_visible_pct": {
+          "mean": 99.99618932597194,
+          "sample_std": 0.04248273978402632,
+          "trials": 500
+        },
+        "E_camera_rmse_cm": {
+          "mean": 5.320282634178565,
+          "sample_std": 2.39254756492326,
+          "trials": 500
+        },
+        "body_rmse_cm": {
+          "mean": 5.673402765521169,
+          "sample_std": 2.4918690449001635,
+          "trials": 500
+        },
+        "d_touchdown_cm": {
+          "mean": 0.9296279248827228,
+          "sample_std": 0.5669969010493207,
+          "trials": 499
+        },
+        "S_land_pct": {
+          "mean": 99.8,
+          "sample_std": 4.472135954999581,
+          "trials": 500
+        }
+      },
+      "quality": {
+        "maximum_active_frame_position_error_cm": 144.8528034336262,
+        "trials_with_camera_rmse_above_10cm": 10,
+        "failed_trial_ids": [
+          290
+        ],
+        "maximum_funnel_excess_m": 0.027289212122559553,
+        "trials_outside_funnel_0_1mm": 180
+      },
+      "application_sources_sha256": {
+        "evaluate.py": "1e77b1bbe07d92793e3b2e94052e013a5d84a7487ec6281a577739c77bbf0321",
+        "native_runtime.py": "8ea26b263c92b6dcd89678d9726348e220c9af4db320cc55e72baffdc8c10b4c",
+        "native_smoke.py": "4050594a38c0455064a7be10b2bc9530a2a62092b0075a7d97c342e1152e160d",
+        "pad_scene.py": "340e80d950bcb05f179bba4c9ff8329925c382a753b71c61680269dbb8927285",
+        "paper_campaign.py": "fda22739df01a1387d8d0c044ac3211aaa07f89df6f3a438f54b160b8f6c2a04",
+        "preflight.py": "bf82baae0a41317cde36d92ccaa6b2404a692ca73a0a976f78f76954a432acc8",
+        "trial_inputs.py": "3f7daaef026837e6caf605e7664c6407150cacee39fc63e206a2288cca4e9cb0",
+        "trial_store.py": "9ac29a2dd81c58285b18c4fe61898077d1f611a6e6b5c7a84df0ef6730529bb6",
+        "trial_trace.py": "753e6d5d9ea1f93d44125c23db5877e2332fe58e2eea5bc867a02191a44d29b7"
+      },
+      "gpu_detector_library_sha256": "8749b3a8f2ab5b7bdf6dc3adfe5d5d74399084780c616cab0731b2527d170926",
+      "gpu_compatibility_sources_sha256": {
+        "gpu_opencv.py": "5404391323de54d931f34d53c8030ef75a3234907999b9ac6d0e15d6f906d0b2",
+        "cuda/opencv_candidates.cu": "faac14ff821bd49bac9c200bd19c0220b3888e016fabfbe200dd415b6577c2e6"
+      },
+      "previous": {
+        "metrics_path": "data/results/isaac/paper-grid-20261005/analysis-pad1-v2/metrics.json",
+        "metrics_sha256": "fcecd663c293fc66ca910aecabbd4c1253bec74a764a00ed745992f283c098cf",
+        "detector_backend": "gpu-experimental",
+        "successes": 500,
+        "summary": {
+          "A_marker_visible_40px_pct": {
+            "mean": 99.90319308226738,
+            "sample_std": 0.7826520446888265,
+            "trials": 500
+          },
+          "decoded_marker_availability_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          },
+          "pose_availability_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          },
+          "pose_availability_when_geometric_visible_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          },
+          "E_camera_rmse_cm": {
+            "mean": 3.6543861921795244,
+            "sample_std": 2.0580193970499776,
+            "trials": 500
+          },
+          "body_rmse_cm": {
+            "mean": 3.910761367633794,
+            "sample_std": 2.13939234655953,
+            "trials": 500
+          },
+          "d_touchdown_cm": {
+            "mean": 0.7253650653641671,
+            "sample_std": 0.3664784589479088,
+            "trials": 500
+          },
+          "S_land_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          }
+        }
+      }
+    },
+    {
+      "label": "Pad 2",
+      "raw_path": "data/results/isaac/paper-grid-opencv-common-20261005/campaign/paper-grid-pad2",
+      "metrics_path": "data/results/isaac/paper-grid-opencv-common-20261005/analysis-pad2/metrics.json",
+      "metrics_sha256": "fa82c456cf89acef339b4d0fbf1ce86a1770dcfd9822e07d2c1c6df59cfcf83f",
+      "runtime": {
+        "num_envs": 90,
+        "completed_trials": 500,
+        "wall_s": 818.8323185839981,
+        "startup_wall_s": 13.143561388002126,
+        "evaluation_wall_s": 831.9760783630045,
+        "new_trials": 500,
+        "trial_per_wall_hour": 2198.252266242653,
+        "aggregate_simulation_s": 1704.9166666666667,
+        "aggregate_simulation_per_wall_s": 2.08213162569715,
+        "gpu_peak_allocated_bytes": 1128477696,
+        "hardware": {
+          "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+          "gpu_name": "NVIDIA GeForce RTX 4090",
+          "driver": "570.211.01",
+          "memory_mib": 24564,
+          "rtx_driver_floor_passed": true,
+          "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+          "renderer_log_minimum": "550.90.07",
+          "renderer_log_recommended": "580.95.05",
+          "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+        },
+        "timing": {
+          "physics_s": 11.729212315942277,
+          "render_s": 237.25058237000485,
+          "device_and_transfer_s": 495.60881601591245,
+          "detect_s": 0.0005234457494225353,
+          "pnp_s": 53.895315673653386,
+          "control_s": 3.1649610488530016,
+          "transferred_bytes": 1584100044,
+          "markers": 198849,
+          "camera_batches": 1333,
+          "physics_steps": 2618
+        },
+        "pose_quality": {
+          "valid_poses": 118798,
+          "translation_sum_squared_m2": 411.393606115833,
+          "translation_max_m": 1.3530496017470415,
+          "rotation_max_deg": 38.27773737078118
+        }
+      },
+      "fingerprint": "27947473a5e09fc4f652d0bb44990f7905070ee3467d6dfb16ba546e7243cb58",
+      "aruco_revision": "31401c7328ca78090fbcfdf605b39e2534843f54",
+      "pad_sha256": "318196ef319d442b9b85c6aad8d5e885730df21e8bf209e86df57df2dbdfc601",
+      "trials": 500,
+      "successes": 500,
+      "outcomes": {
+        "touchdown": 500
+      },
+      "trace_checksums_verified": 500,
+      "summary": {
+        "A_marker_visible_40px_pct": {
+          "mean": 99.81505197705418,
+          "sample_std": 0.9766761567303894,
+          "trials": 500
+        },
+        "decoded_marker_availability_pct": {
+          "mean": 99.98441704900293,
+          "sample_std": 0.08596854484428337,
+          "trials": 500
+        },
+        "pose_availability_pct": {
+          "mean": 99.98441704900293,
+          "sample_std": 0.08596854484428337,
+          "trials": 500
+        },
+        "pose_availability_when_geometric_visible_pct": {
+          "mean": 99.9842744827377,
+          "sample_std": 0.08686866683480114,
+          "trials": 500
+        },
+        "E_camera_rmse_cm": {
+          "mean": 5.702740275510967,
+          "sample_std": 2.599831247589491,
+          "trials": 500
+        },
+        "body_rmse_cm": {
+          "mean": 6.029219436664125,
+          "sample_std": 2.7254988732752343,
+          "trials": 500
+        },
+        "d_touchdown_cm": {
+          "mean": 0.8185419851506595,
+          "sample_std": 0.5014407792976261,
+          "trials": 500
+        },
+        "S_land_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        }
+      },
+      "quality": {
+        "maximum_active_frame_position_error_cm": 135.30496017470415,
+        "trials_with_camera_rmse_above_10cm": 17,
+        "failed_trial_ids": [],
+        "maximum_funnel_excess_m": 0.011092575424909601,
+        "trials_outside_funnel_0_1mm": 180
+      },
+      "application_sources_sha256": {
+        "evaluate.py": "1e77b1bbe07d92793e3b2e94052e013a5d84a7487ec6281a577739c77bbf0321",
+        "native_runtime.py": "8ea26b263c92b6dcd89678d9726348e220c9af4db320cc55e72baffdc8c10b4c",
+        "native_smoke.py": "4050594a38c0455064a7be10b2bc9530a2a62092b0075a7d97c342e1152e160d",
+        "pad_scene.py": "340e80d950bcb05f179bba4c9ff8329925c382a753b71c61680269dbb8927285",
+        "paper_campaign.py": "fda22739df01a1387d8d0c044ac3211aaa07f89df6f3a438f54b160b8f6c2a04",
+        "preflight.py": "bf82baae0a41317cde36d92ccaa6b2404a692ca73a0a976f78f76954a432acc8",
+        "trial_inputs.py": "3f7daaef026837e6caf605e7664c6407150cacee39fc63e206a2288cca4e9cb0",
+        "trial_store.py": "9ac29a2dd81c58285b18c4fe61898077d1f611a6e6b5c7a84df0ef6730529bb6",
+        "trial_trace.py": "753e6d5d9ea1f93d44125c23db5877e2332fe58e2eea5bc867a02191a44d29b7"
+      },
+      "gpu_detector_library_sha256": "8749b3a8f2ab5b7bdf6dc3adfe5d5d74399084780c616cab0731b2527d170926",
+      "gpu_compatibility_sources_sha256": {
+        "gpu_opencv.py": "5404391323de54d931f34d53c8030ef75a3234907999b9ac6d0e15d6f906d0b2",
+        "cuda/opencv_candidates.cu": "faac14ff821bd49bac9c200bd19c0220b3888e016fabfbe200dd415b6577c2e6"
+      },
+      "previous": {
+        "metrics_path": "data/results/isaac/paper-grid-20261005/analysis-pad2/metrics.json",
+        "metrics_sha256": "9457389e11deffbb72ddf9d946145017e125d92e0db16e55603125b23f7242d9",
+        "detector_backend": "gpu-experimental",
+        "successes": 500,
+        "summary": {
+          "A_marker_visible_40px_pct": {
+            "mean": 99.82098948393313,
+            "sample_std": 0.8546847768893736,
+            "trials": 500
+          },
+          "decoded_marker_availability_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          },
+          "pose_availability_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          },
+          "pose_availability_when_geometric_visible_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          },
+          "E_camera_rmse_cm": {
+            "mean": 3.6908720603386262,
+            "sample_std": 1.591576904286165,
+            "trials": 500
+          },
+          "body_rmse_cm": {
+            "mean": 3.8838845727688036,
+            "sample_std": 1.6610336289810912,
+            "trials": 500
+          },
+          "d_touchdown_cm": {
+            "mean": 0.591918731603073,
+            "sample_std": 0.2334025299565876,
+            "trials": 500
+          },
+          "S_land_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          }
+        }
+      }
+    },
+    {
+      "label": "Pad 3",
+      "raw_path": "data/results/isaac/paper-grid-opencv-common-20261005/campaign/paper-grid-pad3",
+      "metrics_path": "data/results/isaac/paper-grid-opencv-common-20261005/analysis-pad3/metrics.json",
+      "metrics_sha256": "ba9e4954057f312664973fec2f6625941ee70001044ac03ed95794e2cbaa3a34",
+      "runtime": {
+        "num_envs": 90,
+        "completed_trials": 500,
+        "wall_s": 808.1968057430058,
+        "startup_wall_s": 13.466565180002362,
+        "evaluation_wall_s": 821.6635621200112,
+        "new_trials": 500,
+        "trial_per_wall_hour": 2227.180294711994,
+        "aggregate_simulation_s": 1663.1333333333332,
+        "aggregate_simulation_per_wall_s": 2.057832104154819,
+        "gpu_peak_allocated_bytes": 1128477696,
+        "hardware": {
+          "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+          "gpu_name": "NVIDIA GeForce RTX 4090",
+          "driver": "570.211.01",
+          "memory_mib": 24564,
+          "rtx_driver_floor_passed": true,
+          "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+          "renderer_log_minimum": "550.90.07",
+          "renderer_log_recommended": "580.95.05",
+          "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+        },
+        "timing": {
+          "physics_s": 11.591118432188523,
+          "render_s": 235.46309394427226,
+          "device_and_transfer_s": 486.05584010476014,
+          "detect_s": 0.0005169614596525207,
+          "pnp_s": 54.62490571178205,
+          "control_s": 3.2095746669219807,
+          "transferred_bytes": 1503344872,
+          "markers": 203092,
+          "camera_batches": 1319,
+          "physics_steps": 2590
+        },
+        "pose_quality": {
+          "valid_poses": 117859,
+          "translation_sum_squared_m2": 495.3226418954698,
+          "translation_max_m": 0.9212352090700109,
+          "rotation_max_deg": 25.892063211160306
+        }
+      },
+      "fingerprint": "783c5b0de862b3e284e72ebd05c549038d80ab331b3bd844a0140f7fcc81eba5",
+      "aruco_revision": "31401c7328ca78090fbcfdf605b39e2534843f54",
+      "pad_sha256": "75db44b19352ba699e88ac94861756a5e8258f0e0d0be5bcdc0170e07d49ab7f",
+      "trials": 500,
+      "successes": 500,
+      "outcomes": {
+        "touchdown": 500
+      },
+      "trace_checksums_verified": 500,
+      "summary": {
+        "A_marker_visible_40px_pct": {
+          "mean": 99.9981220657277,
+          "sample_std": 0.041991886901404714,
+          "trials": 500
+        },
+        "decoded_marker_availability_pct": {
+          "mean": 99.99490660790306,
+          "sample_std": 0.05076362911912327,
+          "trials": 500
+        },
+        "pose_availability_pct": {
+          "mean": 99.99278640710097,
+          "sample_std": 0.06065379617289188,
+          "trials": 500
+        },
+        "pose_availability_when_geometric_visible_pct": {
+          "mean": 99.99278640710097,
+          "sample_std": 0.06065379617289188,
+          "trials": 500
+        },
+        "E_camera_rmse_cm": {
+          "mean": 6.447758464163148,
+          "sample_std": 2.5098643994734546,
+          "trials": 500
+        },
+        "body_rmse_cm": {
+          "mean": 6.8248640389668305,
+          "sample_std": 2.645249301194737,
+          "trials": 500
+        },
+        "d_touchdown_cm": {
+          "mean": 0.9065784172853455,
+          "sample_std": 0.47137784788251874,
+          "trials": 500
+        },
+        "S_land_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        }
+      },
+      "quality": {
+        "maximum_active_frame_position_error_cm": 89.33669189399045,
+        "trials_with_camera_rmse_above_10cm": 65,
+        "failed_trial_ids": [],
+        "maximum_funnel_excess_m": 0.013365010851621617,
+        "trials_outside_funnel_0_1mm": 180
+      },
+      "application_sources_sha256": {
+        "evaluate.py": "1e77b1bbe07d92793e3b2e94052e013a5d84a7487ec6281a577739c77bbf0321",
+        "native_runtime.py": "8ea26b263c92b6dcd89678d9726348e220c9af4db320cc55e72baffdc8c10b4c",
+        "native_smoke.py": "4050594a38c0455064a7be10b2bc9530a2a62092b0075a7d97c342e1152e160d",
+        "pad_scene.py": "340e80d950bcb05f179bba4c9ff8329925c382a753b71c61680269dbb8927285",
+        "paper_campaign.py": "fda22739df01a1387d8d0c044ac3211aaa07f89df6f3a438f54b160b8f6c2a04",
+        "preflight.py": "bf82baae0a41317cde36d92ccaa6b2404a692ca73a0a976f78f76954a432acc8",
+        "trial_inputs.py": "3f7daaef026837e6caf605e7664c6407150cacee39fc63e206a2288cca4e9cb0",
+        "trial_store.py": "9ac29a2dd81c58285b18c4fe61898077d1f611a6e6b5c7a84df0ef6730529bb6",
+        "trial_trace.py": "753e6d5d9ea1f93d44125c23db5877e2332fe58e2eea5bc867a02191a44d29b7"
+      },
+      "gpu_detector_library_sha256": "8749b3a8f2ab5b7bdf6dc3adfe5d5d74399084780c616cab0731b2527d170926",
+      "gpu_compatibility_sources_sha256": {
+        "gpu_opencv.py": "5404391323de54d931f34d53c8030ef75a3234907999b9ac6d0e15d6f906d0b2",
+        "cuda/opencv_candidates.cu": "faac14ff821bd49bac9c200bd19c0220b3888e016fabfbe200dd415b6577c2e6"
+      },
+      "previous": {
+        "metrics_path": "data/results/isaac/paper-grid-20261005/analysis-pad3/metrics.json",
+        "metrics_sha256": "fa8460d139c9577fd056890b2097d0addfe4476578c8a33bba2870a3a103e7d8",
+        "detector_backend": "gpu-experimental",
+        "successes": 500,
+        "summary": {
+          "A_marker_visible_40px_pct": {
+            "mean": 99.97437999385637,
+            "sample_std": 0.3315250987511278,
+            "trials": 500
+          },
+          "decoded_marker_availability_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          },
+          "pose_availability_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          },
+          "pose_availability_when_geometric_visible_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          },
+          "E_camera_rmse_cm": {
+            "mean": 3.97721120374686,
+            "sample_std": 1.1592601389517048,
+            "trials": 500
+          },
+          "body_rmse_cm": {
+            "mean": 4.188153345288039,
+            "sample_std": 1.2145509358409778,
+            "trials": 500
+          },
+          "d_touchdown_cm": {
+            "mean": 0.5994671702086635,
+            "sample_std": 0.2369916964334762,
+            "trials": 500
+          },
+          "S_land_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          }
+        }
+      }
+    },
+    {
+      "label": "Pad 4",
+      "raw_path": "data/results/isaac/paper-grid-opencv-common-20261005/campaign/paper-grid-pad4",
+      "metrics_path": "data/results/isaac/paper-grid-opencv-common-20261005/analysis-pad4/metrics.json",
+      "metrics_sha256": "f47905cca749d45b644fd72d044d19fd89c02fca875e5a05479f869eef0e635e",
+      "runtime": {
+        "num_envs": 90,
+        "completed_trials": 500,
+        "wall_s": 824.0725319119956,
+        "startup_wall_s": 13.149957289002487,
+        "evaluation_wall_s": 837.2226939640095,
+        "new_trials": 500,
+        "trial_per_wall_hour": 2184.2737505443583,
+        "aggregate_simulation_s": 1650.5833333333333,
+        "aggregate_simulation_per_wall_s": 2.002958804492227,
+        "gpu_peak_allocated_bytes": 1128477696,
+        "hardware": {
+          "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+          "gpu_name": "NVIDIA GeForce RTX 4090",
+          "driver": "570.211.01",
+          "memory_mib": 24564,
+          "rtx_driver_floor_passed": true,
+          "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+          "renderer_log_minimum": "550.90.07",
+          "renderer_log_recommended": "580.95.05",
+          "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+        },
+        "timing": {
+          "physics_s": 11.606276528254966,
+          "render_s": 235.6654211262503,
+          "device_and_transfer_s": 506.4242850861483,
+          "detect_s": 0.0005089190672151744,
+          "pnp_s": 50.51111410789599,
+          "control_s": 3.0912187686917605,
+          "transferred_bytes": 1802958272,
+          "markers": 211842,
+          "camera_batches": 1311,
+          "physics_steps": 2574
+        },
+        "pose_quality": {
+          "valid_poses": 117322,
+          "translation_sum_squared_m2": 510.05617903597584,
+          "translation_max_m": 1.066094805747288,
+          "rotation_max_deg": 31.127482141296685
+        }
+      },
+      "fingerprint": "506e3ee4e07f8d76c2d3dce549b10e4353b1dfee7891286400e3c5e886626c87",
+      "aruco_revision": "31401c7328ca78090fbcfdf605b39e2534843f54",
+      "pad_sha256": "be902c70684544c461de52f44f5bad43c44da03a2d2e53a1cb6b2cdfa3b988bc",
+      "trials": 500,
+      "successes": 500,
+      "outcomes": {
+        "touchdown": 500
+      },
+      "trace_checksums_verified": 500,
+      "summary": {
+        "A_marker_visible_40px_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        },
+        "decoded_marker_availability_pct": {
+          "mean": 99.99260691342214,
+          "sample_std": 0.062116477218415504,
+          "trials": 500
+        },
+        "pose_availability_pct": {
+          "mean": 99.9916453749606,
+          "sample_std": 0.06562384385583006,
+          "trials": 500
+        },
+        "pose_availability_when_geometric_visible_pct": {
+          "mean": 99.9916453749606,
+          "sample_std": 0.06562384385583006,
+          "trials": 500
+        },
+        "E_camera_rmse_cm": {
+          "mean": 6.708448105239004,
+          "sample_std": 2.390321547311805,
+          "trials": 500
+        },
+        "body_rmse_cm": {
+          "mean": 7.093242385687125,
+          "sample_std": 2.5112500872375527,
+          "trials": 500
+        },
+        "d_touchdown_cm": {
+          "mean": 0.8981152827152983,
+          "sample_std": 0.27285110211571134,
+          "trials": 500
+        },
+        "S_land_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        }
+      },
+      "quality": {
+        "maximum_active_frame_position_error_cm": 106.60948057472879,
+        "trials_with_camera_rmse_above_10cm": 60,
+        "failed_trial_ids": [],
+        "maximum_funnel_excess_m": 0.012472630524635264,
+        "trials_outside_funnel_0_1mm": 180
+      },
+      "application_sources_sha256": {
+        "evaluate.py": "1e77b1bbe07d92793e3b2e94052e013a5d84a7487ec6281a577739c77bbf0321",
+        "native_runtime.py": "8ea26b263c92b6dcd89678d9726348e220c9af4db320cc55e72baffdc8c10b4c",
+        "native_smoke.py": "4050594a38c0455064a7be10b2bc9530a2a62092b0075a7d97c342e1152e160d",
+        "pad_scene.py": "340e80d950bcb05f179bba4c9ff8329925c382a753b71c61680269dbb8927285",
+        "paper_campaign.py": "fda22739df01a1387d8d0c044ac3211aaa07f89df6f3a438f54b160b8f6c2a04",
+        "preflight.py": "bf82baae0a41317cde36d92ccaa6b2404a692ca73a0a976f78f76954a432acc8",
+        "trial_inputs.py": "3f7daaef026837e6caf605e7664c6407150cacee39fc63e206a2288cca4e9cb0",
+        "trial_store.py": "9ac29a2dd81c58285b18c4fe61898077d1f611a6e6b5c7a84df0ef6730529bb6",
+        "trial_trace.py": "753e6d5d9ea1f93d44125c23db5877e2332fe58e2eea5bc867a02191a44d29b7"
+      },
+      "gpu_detector_library_sha256": "8749b3a8f2ab5b7bdf6dc3adfe5d5d74399084780c616cab0731b2527d170926",
+      "gpu_compatibility_sources_sha256": {
+        "gpu_opencv.py": "5404391323de54d931f34d53c8030ef75a3234907999b9ac6d0e15d6f906d0b2",
+        "cuda/opencv_candidates.cu": "faac14ff821bd49bac9c200bd19c0220b3888e016fabfbe200dd415b6577c2e6"
+      },
+      "previous": {
+        "metrics_path": "data/results/isaac/paper-grid-20261005/analysis-pad4/metrics.json",
+        "metrics_sha256": "54f4f6e7a2cf548e205439b7be73fb57e7953e94c8af0c3c4e261db9fca8d840",
+        "detector_backend": "gpu-experimental",
+        "successes": 500,
+        "summary": {
+          "A_marker_visible_40px_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          },
+          "decoded_marker_availability_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          },
+          "pose_availability_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          },
+          "pose_availability_when_geometric_visible_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          },
+          "E_camera_rmse_cm": {
+            "mean": 4.341533677783235,
+            "sample_std": 2.1765330327619834,
+            "trials": 500
+          },
+          "body_rmse_cm": {
+            "mean": 4.571350504352751,
+            "sample_std": 2.2881241186256567,
+            "trials": 500
+          },
+          "d_touchdown_cm": {
+            "mean": 0.6142654299677816,
+            "sample_std": 0.22969852609334135,
+            "trials": 500
+          },
+          "S_land_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          }
+        }
+      }
+    },
+    {
+      "label": "B1",
+      "raw_path": "data/results/isaac/paper-grid-opencv-common-20261005/campaign/paper-grid-b1",
+      "metrics_path": "data/results/isaac/paper-grid-opencv-common-20261005/analysis-b1/metrics.json",
+      "metrics_sha256": "31e79caa650db2a8b7af68e95973c57d2a823c8ac637080d988c708200b82e79",
+      "runtime": {
+        "num_envs": 90,
+        "completed_trials": 500,
+        "wall_s": 1118.6217751310032,
+        "startup_wall_s": 13.096793988006539,
+        "evaluation_wall_s": 1131.718765024998,
+        "new_trials": 500,
+        "trial_per_wall_hour": 1609.122976163413,
+        "aggregate_simulation_s": 1675.1499999999999,
+        "aggregate_simulation_per_wall_s": 1.4975124186223006,
+        "gpu_peak_allocated_bytes": 1128477696,
+        "hardware": {
+          "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+          "gpu_name": "NVIDIA GeForce RTX 4090",
+          "driver": "570.211.01",
+          "memory_mib": 24564,
+          "rtx_driver_floor_passed": true,
+          "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+          "renderer_log_minimum": "550.90.07",
+          "renderer_log_recommended": "580.95.05",
+          "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+        },
+        "timing": {
+          "physics_s": 11.499503611761611,
+          "render_s": 229.98030336502416,
+          "device_and_transfer_s": 828.567372363992,
+          "detect_s": 0.0005913261702517048,
+          "pnp_s": 29.627210908787674,
+          "control_s": 2.6898898997023934,
+          "transferred_bytes": 9221995188,
+          "markers": 85319,
+          "camera_batches": 1299,
+          "physics_steps": 2550
+        },
+        "pose_quality": {
+          "valid_poses": 85304,
+          "translation_sum_squared_m2": 26.207695524567235,
+          "translation_max_m": 1.3246975241483578,
+          "rotation_max_deg": 41.24608898110515
+        }
+      },
+      "fingerprint": "0b9d0a19ff53ca2e7a39c6e6ba795e50d5c7eea411dafeccd20b66b575ffb24a",
+      "aruco_revision": "31401c7328ca78090fbcfdf605b39e2534843f54",
+      "pad_sha256": "e4dad7fe7c83e4447ddf6c7d71251708f011cc53e8a238e606d95447637803e7",
+      "trials": 500,
+      "successes": 0,
+      "outcomes": {
+        "aborted": 500
+      },
+      "trace_checksums_verified": 500,
+      "summary": {
+        "A_marker_visible_40px_pct": {
+          "mean": 98.65601066549911,
+          "sample_std": 2.583722863929611,
+          "trials": 500
+        },
+        "decoded_marker_availability_pct": {
+          "mean": 82.88668701449683,
+          "sample_std": 3.531587341029489,
+          "trials": 500
+        },
+        "pose_availability_pct": {
+          "mean": 82.87281509552116,
+          "sample_std": 3.530110511681855,
+          "trials": 500
+        },
+        "pose_availability_when_geometric_visible_pct": {
+          "mean": 83.96792076312849,
+          "sample_std": 1.7181172153969335,
+          "trials": 500
+        },
+        "E_camera_rmse_cm": {
+          "mean": 1.2918445542204764,
+          "sample_std": 1.2568379295921264,
+          "trials": 500
+        },
+        "body_rmse_cm": {
+          "mean": 1.3623716944636726,
+          "sample_std": 1.3294492313367001,
+          "trials": 500
+        },
+        "d_touchdown_cm": {
+          "mean": null,
+          "sample_std": null,
+          "trials": 0
+        },
+        "S_land_pct": {
+          "mean": 0.0,
+          "sample_std": 0.0,
+          "trials": 500
+        }
+      },
+      "quality": {
+        "maximum_active_frame_position_error_cm": 132.46975241483577,
+        "trials_with_camera_rmse_above_10cm": 2,
+        "failed_trial_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94,
+          95,
+          96,
+          97,
+          98,
+          99,
+          100,
+          101,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110,
+          111,
+          112,
+          113,
+          114,
+          115,
+          116,
+          117,
+          118,
+          119,
+          120,
+          121,
+          122,
+          123,
+          124,
+          125,
+          126,
+          127,
+          128,
+          129,
+          130,
+          131,
+          132,
+          133,
+          134,
+          135,
+          136,
+          137,
+          138,
+          139,
+          140,
+          141,
+          142,
+          143,
+          144,
+          145,
+          146,
+          147,
+          148,
+          149,
+          150,
+          151,
+          152,
+          153,
+          154,
+          155,
+          156,
+          157,
+          158,
+          159,
+          160,
+          161,
+          162,
+          163,
+          164,
+          165,
+          166,
+          167,
+          168,
+          169,
+          170,
+          171,
+          172,
+          173,
+          174,
+          175,
+          176,
+          177,
+          178,
+          179,
+          180,
+          181,
+          182,
+          183,
+          184,
+          185,
+          186,
+          187,
+          188,
+          189,
+          190,
+          191,
+          192,
+          193,
+          194,
+          195,
+          196,
+          197,
+          198,
+          199,
+          200,
+          201,
+          202,
+          203,
+          204,
+          205,
+          206,
+          207,
+          208,
+          209,
+          210,
+          211,
+          212,
+          213,
+          214,
+          215,
+          216,
+          217,
+          218,
+          219,
+          220,
+          221,
+          222,
+          223,
+          224,
+          225,
+          226,
+          227,
+          228,
+          229,
+          230,
+          231,
+          232,
+          233,
+          234,
+          235,
+          236,
+          237,
+          238,
+          239,
+          240,
+          241,
+          242,
+          243,
+          244,
+          245,
+          246,
+          247,
+          248,
+          249,
+          250,
+          251,
+          252,
+          253,
+          254,
+          255,
+          256,
+          257,
+          258,
+          259,
+          260,
+          261,
+          262,
+          263,
+          264,
+          265,
+          266,
+          267,
+          268,
+          269,
+          270,
+          271,
+          272,
+          273,
+          274,
+          275,
+          276,
+          277,
+          278,
+          279,
+          280,
+          281,
+          282,
+          283,
+          284,
+          285,
+          286,
+          287,
+          288,
+          289,
+          290,
+          291,
+          292,
+          293,
+          294,
+          295,
+          296,
+          297,
+          298,
+          299,
+          300,
+          301,
+          302,
+          303,
+          304,
+          305,
+          306,
+          307,
+          308,
+          309,
+          310,
+          311,
+          312,
+          313,
+          314,
+          315,
+          316,
+          317,
+          318,
+          319,
+          320,
+          321,
+          322,
+          323,
+          324,
+          325,
+          326,
+          327,
+          328,
+          329,
+          330,
+          331,
+          332,
+          333,
+          334,
+          335,
+          336,
+          337,
+          338,
+          339,
+          340,
+          341,
+          342,
+          343,
+          344,
+          345,
+          346,
+          347,
+          348,
+          349,
+          350,
+          351,
+          352,
+          353,
+          354,
+          355,
+          356,
+          357,
+          358,
+          359,
+          360,
+          361,
+          362,
+          363,
+          364,
+          365,
+          366,
+          367,
+          368,
+          369,
+          370,
+          371,
+          372,
+          373,
+          374,
+          375,
+          376,
+          377,
+          378,
+          379,
+          380,
+          381,
+          382,
+          383,
+          384,
+          385,
+          386,
+          387,
+          388,
+          389,
+          390,
+          391,
+          392,
+          393,
+          394,
+          395,
+          396,
+          397,
+          398,
+          399,
+          400,
+          401,
+          402,
+          403,
+          404,
+          405,
+          406,
+          407,
+          408,
+          409,
+          410,
+          411,
+          412,
+          413,
+          414,
+          415,
+          416,
+          417,
+          418,
+          419,
+          420,
+          421,
+          422,
+          423,
+          424,
+          425,
+          426,
+          427,
+          428,
+          429,
+          430,
+          431,
+          432,
+          433,
+          434,
+          435,
+          436,
+          437,
+          438,
+          439,
+          440,
+          441,
+          442,
+          443,
+          444,
+          445,
+          446,
+          447,
+          448,
+          449,
+          450,
+          451,
+          452,
+          453,
+          454,
+          455,
+          456,
+          457,
+          458,
+          459,
+          460,
+          461,
+          462,
+          463,
+          464,
+          465,
+          466,
+          467,
+          468,
+          469,
+          470,
+          471,
+          472,
+          473,
+          474,
+          475,
+          476,
+          477,
+          478,
+          479,
+          480,
+          481,
+          482,
+          483,
+          484,
+          485,
+          486,
+          487,
+          488,
+          489,
+          490,
+          491,
+          492,
+          493,
+          494,
+          495,
+          496,
+          497,
+          498,
+          499
+        ],
+        "maximum_funnel_excess_m": 0.00904305078983303,
+        "trials_outside_funnel_0_1mm": 180
+      },
+      "application_sources_sha256": {
+        "evaluate.py": "1e77b1bbe07d92793e3b2e94052e013a5d84a7487ec6281a577739c77bbf0321",
+        "native_runtime.py": "8ea26b263c92b6dcd89678d9726348e220c9af4db320cc55e72baffdc8c10b4c",
+        "native_smoke.py": "4050594a38c0455064a7be10b2bc9530a2a62092b0075a7d97c342e1152e160d",
+        "pad_scene.py": "340e80d950bcb05f179bba4c9ff8329925c382a753b71c61680269dbb8927285",
+        "paper_campaign.py": "fda22739df01a1387d8d0c044ac3211aaa07f89df6f3a438f54b160b8f6c2a04",
+        "preflight.py": "bf82baae0a41317cde36d92ccaa6b2404a692ca73a0a976f78f76954a432acc8",
+        "trial_inputs.py": "3f7daaef026837e6caf605e7664c6407150cacee39fc63e206a2288cca4e9cb0",
+        "trial_store.py": "9ac29a2dd81c58285b18c4fe61898077d1f611a6e6b5c7a84df0ef6730529bb6",
+        "trial_trace.py": "753e6d5d9ea1f93d44125c23db5877e2332fe58e2eea5bc867a02191a44d29b7"
+      },
+      "gpu_detector_library_sha256": "8749b3a8f2ab5b7bdf6dc3adfe5d5d74399084780c616cab0731b2527d170926",
+      "gpu_compatibility_sources_sha256": {
+        "gpu_opencv.py": "5404391323de54d931f34d53c8030ef75a3234907999b9ac6d0e15d6f906d0b2",
+        "cuda/opencv_candidates.cu": "faac14ff821bd49bac9c200bd19c0220b3888e016fabfbe200dd415b6577c2e6"
+      },
+      "previous": {
+        "metrics_path": "data/results/isaac/paper-grid-b1-20261005/analysis-b1/metrics.json",
+        "metrics_sha256": "26accc1469f090cd77d8b9bfe061469359c901e31c88e85715f21b0dc6f150b2",
+        "detector_backend": "cpu-nested-apriltag",
+        "successes": 490,
+        "summary": {
+          "A_marker_visible_40px_pct": {
+            "mean": 97.43902437672479,
+            "sample_std": 3.79045364266562,
+            "trials": 500
+          },
+          "decoded_marker_availability_pct": {
+            "mean": 99.30928449905912,
+            "sample_std": 1.9844073593976015,
+            "trials": 500
+          },
+          "pose_availability_pct": {
+            "mean": 99.27953056268731,
+            "sample_std": 2.1021672852259954,
+            "trials": 500
+          },
+          "pose_availability_when_geometric_visible_pct": {
+            "mean": 99.88468197227839,
+            "sample_std": 0.6894957695625616,
+            "trials": 500
+          },
+          "E_camera_rmse_cm": {
+            "mean": 3.118689331694096,
+            "sample_std": 1.2828469638523308,
+            "trials": 500
+          },
+          "body_rmse_cm": {
+            "mean": 3.506888203668844,
+            "sample_std": 1.313677111631171,
+            "trials": 500
+          },
+          "d_touchdown_cm": {
+            "mean": 1.6230446051359855,
+            "sample_std": 0.8456931311573036,
+            "trials": 490
+          },
+          "S_land_pct": {
+            "mean": 98.0,
+            "sample_std": 14.014021035061361,
+            "trials": 500
+          }
+        }
+      }
+    },
+    {
+      "label": "Baseline / B2",
+      "raw_path": "data/results/isaac/paper-grid-opencv-common-20261005/campaign/paper-grid-10x10",
+      "metrics_path": "data/results/isaac/paper-grid-opencv-common-20261005/analysis-10x10/metrics.json",
+      "metrics_sha256": "1efe55531d11539cd40916022423f5ec422e7622927eeb05517641b7beb29b38",
+      "runtime": {
+        "num_envs": 90,
+        "completed_trials": 500,
+        "wall_s": 2340.4153979039984,
+        "startup_wall_s": 13.178510944999289,
+        "evaluation_wall_s": 2353.594050243002,
+        "new_trials": 500,
+        "trial_per_wall_hour": 769.0942392585619,
+        "aggregate_simulation_s": 2026.9833333333333,
+        "aggregate_simulation_per_wall_s": 0.8660784470776577,
+        "gpu_peak_allocated_bytes": 1128477696,
+        "hardware": {
+          "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+          "gpu_name": "NVIDIA GeForce RTX 4090",
+          "driver": "570.211.01",
+          "memory_mib": 24564,
+          "rtx_driver_floor_passed": true,
+          "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+          "renderer_log_minimum": "550.90.07",
+          "renderer_log_recommended": "580.95.05",
+          "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+        },
+        "timing": {
+          "physics_s": 13.387942506931722,
+          "render_s": 293.41408980662527,
+          "device_and_transfer_s": 1777.7449133308837,
+          "detect_s": 0.0007248961483128369,
+          "pnp_s": 230.99071720773645,
+          "control_s": 3.7192034881736618,
+          "transferred_bytes": 36355336048,
+          "markers": 6303020,
+          "camera_batches": 1500,
+          "physics_steps": 2952
+        },
+        "pose_quality": {
+          "valid_poses": 132771,
+          "translation_sum_squared_m2": 1.3646098301487233,
+          "translation_max_m": 0.33827672656555696,
+          "rotation_max_deg": 177.8601484787275
+        }
+      },
+      "fingerprint": "34a620add3d75621204b55dd0be40eba2523cc7f10f563f580850eea19614e09",
+      "aruco_revision": "31401c7328ca78090fbcfdf605b39e2534843f54",
+      "pad_sha256": "ae1198da7d4d84e5987c8502ce3e23c017fd1c4a0eee3ec981d809c32eb9fad7",
+      "trials": 500,
+      "successes": 500,
+      "outcomes": {
+        "touchdown": 500
+      },
+      "trace_checksums_verified": 500,
+      "summary": {
+        "A_marker_visible_40px_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        },
+        "decoded_marker_availability_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        },
+        "pose_availability_pct": {
+          "mean": 98.82823132048084,
+          "sample_std": 0.6790130341742788,
+          "trials": 500
+        },
+        "pose_availability_when_geometric_visible_pct": {
+          "mean": 98.82823132048084,
+          "sample_std": 0.6790130341742788,
+          "trials": 500
+        },
+        "E_camera_rmse_cm": {
+          "mean": 0.3025771456749693,
+          "sample_std": 0.054493224785263444,
+          "trials": 500
+        },
+        "body_rmse_cm": {
+          "mean": 0.3159424495475521,
+          "sample_std": 0.05757974252781669,
+          "trials": 500
+        },
+        "d_touchdown_cm": {
+          "mean": 0.536743674473837,
+          "sample_std": 0.20210489023532843,
+          "trials": 500
+        },
+        "S_land_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        }
+      },
+      "quality": {
+        "maximum_active_frame_position_error_cm": 2.6921320284731345,
+        "trials_with_camera_rmse_above_10cm": 0,
+        "failed_trial_ids": [],
+        "maximum_funnel_excess_m": 0.008735034996271152,
+        "trials_outside_funnel_0_1mm": 180
+      },
+      "application_sources_sha256": {
+        "evaluate.py": "1e77b1bbe07d92793e3b2e94052e013a5d84a7487ec6281a577739c77bbf0321",
+        "native_runtime.py": "8ea26b263c92b6dcd89678d9726348e220c9af4db320cc55e72baffdc8c10b4c",
+        "native_smoke.py": "4050594a38c0455064a7be10b2bc9530a2a62092b0075a7d97c342e1152e160d",
+        "pad_scene.py": "340e80d950bcb05f179bba4c9ff8329925c382a753b71c61680269dbb8927285",
+        "paper_campaign.py": "fda22739df01a1387d8d0c044ac3211aaa07f89df6f3a438f54b160b8f6c2a04",
+        "preflight.py": "bf82baae0a41317cde36d92ccaa6b2404a692ca73a0a976f78f76954a432acc8",
+        "trial_inputs.py": "3f7daaef026837e6caf605e7664c6407150cacee39fc63e206a2288cca4e9cb0",
+        "trial_store.py": "9ac29a2dd81c58285b18c4fe61898077d1f611a6e6b5c7a84df0ef6730529bb6",
+        "trial_trace.py": "753e6d5d9ea1f93d44125c23db5877e2332fe58e2eea5bc867a02191a44d29b7"
+      },
+      "gpu_detector_library_sha256": "8749b3a8f2ab5b7bdf6dc3adfe5d5d74399084780c616cab0731b2527d170926",
+      "gpu_compatibility_sources_sha256": {
+        "gpu_opencv.py": "5404391323de54d931f34d53c8030ef75a3234907999b9ac6d0e15d6f906d0b2",
+        "cuda/opencv_candidates.cu": "faac14ff821bd49bac9c200bd19c0220b3888e016fabfbe200dd415b6577c2e6"
+      },
+      "previous": {
+        "metrics_path": "data/results/isaac/paper-grid-20261005/analysis-baseline/metrics.json",
+        "metrics_sha256": "237294772fe939fa4ab43b5da797255848477cc8f7ef9e34c9150a81b58e45d2",
+        "detector_backend": "gpu-experimental",
+        "successes": 500,
+        "summary": {
+          "A_marker_visible_40px_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          },
+          "decoded_marker_availability_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          },
+          "pose_availability_pct": {
+            "mean": 99.97790485650061,
+            "sample_std": 0.09257409760443623,
+            "trials": 500
+          },
+          "pose_availability_when_geometric_visible_pct": {
+            "mean": 99.97790485650061,
+            "sample_std": 0.09257409760443623,
+            "trials": 500
+          },
+          "E_camera_rmse_cm": {
+            "mean": 0.30741291995256703,
+            "sample_std": 0.0964958794718285,
+            "trials": 500
+          },
+          "body_rmse_cm": {
+            "mean": 0.31970482336695966,
+            "sample_std": 0.1023388814925812,
+            "trials": 500
+          },
+          "d_touchdown_cm": {
+            "mean": 0.5338297567563132,
+            "sample_std": 0.2003962216663104,
+            "trials": 500
+          },
+          "S_land_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          }
+        }
+      }
+    },
+    {
+      "label": "B3",
+      "raw_path": "data/results/isaac/paper-grid-opencv-common-20261005/campaign/paper-grid-b3",
+      "metrics_path": "data/results/isaac/paper-grid-opencv-common-20261005/analysis-b3/metrics.json",
+      "metrics_sha256": "6e85eae7418c6a9ed8f40909c190af946fd9f9005b62a5993b2a45c883c31514",
+      "runtime": {
+        "num_envs": 90,
+        "completed_trials": 500,
+        "wall_s": 1010.0901052550034,
+        "startup_wall_s": 13.529959331994178,
+        "evaluation_wall_s": 1023.620283436001,
+        "new_trials": 500,
+        "trial_per_wall_hour": 1782.019238318921,
+        "aggregate_simulation_s": 1632.4333333333334,
+        "aggregate_simulation_per_wall_s": 1.6161264473739356,
+        "gpu_peak_allocated_bytes": 1128477696,
+        "hardware": {
+          "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+          "gpu_name": "NVIDIA GeForce RTX 4090",
+          "driver": "570.211.01",
+          "memory_mib": 24564,
+          "rtx_driver_floor_passed": true,
+          "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+          "renderer_log_minimum": "550.90.07",
+          "renderer_log_recommended": "580.95.05",
+          "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+        },
+        "timing": {
+          "physics_s": 11.722010435216362,
+          "render_s": 243.94453368382528,
+          "device_and_transfer_s": 680.1973546659283,
+          "detect_s": 0.0005634791014017537,
+          "pnp_s": 54.04869604505075,
+          "control_s": 3.058224709937349,
+          "transferred_bytes": 8900436112,
+          "markers": 408754,
+          "camera_batches": 1305,
+          "physics_steps": 2562
+        },
+        "pose_quality": {
+          "valid_poses": 116503,
+          "translation_sum_squared_m2": 1552.0382297177537,
+          "translation_max_m": 1.6480807798788597,
+          "rotation_max_deg": 45.85651369458594
+        }
+      },
+      "fingerprint": "ef9fe523e345fb74f9d100ddaba07ccd97a8ac0debcee0fcba3f0d7ef8aa8d19",
+      "aruco_revision": "31401c7328ca78090fbcfdf605b39e2534843f54",
+      "pad_sha256": "849034dfd116bc77d08266cce9756a7b9ea94520eada275cc0b53788a7b7f3ac",
+      "trials": 500,
+      "successes": 500,
+      "outcomes": {
+        "touchdown": 500
+      },
+      "trace_checksums_verified": 500,
+      "summary": {
+        "A_marker_visible_40px_pct": {
+          "mean": 99.9132920882029,
+          "sample_std": 0.7024907645382064,
+          "trials": 500
+        },
+        "decoded_marker_availability_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        },
+        "pose_availability_pct": {
+          "mean": 99.98412867135228,
+          "sample_std": 0.09655904825964293,
+          "trials": 500
+        },
+        "pose_availability_when_geometric_visible_pct": {
+          "mean": 99.9861388096455,
+          "sample_std": 0.08507624233280114,
+          "trials": 500
+        },
+        "E_camera_rmse_cm": {
+          "mean": 11.450687021729467,
+          "sample_std": 3.3346072696346516,
+          "trials": 500
+        },
+        "body_rmse_cm": {
+          "mean": 12.080756349512061,
+          "sample_std": 3.4750372613876923,
+          "trials": 500
+        },
+        "d_touchdown_cm": {
+          "mean": 1.6994669825769961,
+          "sample_std": 1.0966954475770496,
+          "trials": 500
+        },
+        "S_land_pct": {
+          "mean": 100.0,
+          "sample_std": 0.0,
+          "trials": 500
+        }
+      },
+      "quality": {
+        "maximum_active_frame_position_error_cm": 164.8080779878859,
+        "trials_with_camera_rmse_above_10cm": 299,
+        "failed_trial_ids": [],
+        "maximum_funnel_excess_m": 0.03479622521400455,
+        "trials_outside_funnel_0_1mm": 180
+      },
+      "application_sources_sha256": {
+        "evaluate.py": "1e77b1bbe07d92793e3b2e94052e013a5d84a7487ec6281a577739c77bbf0321",
+        "native_runtime.py": "8ea26b263c92b6dcd89678d9726348e220c9af4db320cc55e72baffdc8c10b4c",
+        "native_smoke.py": "4050594a38c0455064a7be10b2bc9530a2a62092b0075a7d97c342e1152e160d",
+        "pad_scene.py": "340e80d950bcb05f179bba4c9ff8329925c382a753b71c61680269dbb8927285",
+        "paper_campaign.py": "fda22739df01a1387d8d0c044ac3211aaa07f89df6f3a438f54b160b8f6c2a04",
+        "preflight.py": "bf82baae0a41317cde36d92ccaa6b2404a692ca73a0a976f78f76954a432acc8",
+        "trial_inputs.py": "3f7daaef026837e6caf605e7664c6407150cacee39fc63e206a2288cca4e9cb0",
+        "trial_store.py": "9ac29a2dd81c58285b18c4fe61898077d1f611a6e6b5c7a84df0ef6730529bb6",
+        "trial_trace.py": "753e6d5d9ea1f93d44125c23db5877e2332fe58e2eea5bc867a02191a44d29b7"
+      },
+      "gpu_detector_library_sha256": "8749b3a8f2ab5b7bdf6dc3adfe5d5d74399084780c616cab0731b2527d170926",
+      "gpu_compatibility_sources_sha256": {
+        "gpu_opencv.py": "5404391323de54d931f34d53c8030ef75a3234907999b9ac6d0e15d6f906d0b2",
+        "cuda/opencv_candidates.cu": "faac14ff821bd49bac9c200bd19c0220b3888e016fabfbe200dd415b6577c2e6"
+      },
+      "previous": {
+        "metrics_path": "data/results/isaac/paper-grid-b3-20261005/analysis-b3/metrics.json",
+        "metrics_sha256": "703c1127bf76f73b05b8a82137124fcb3d086f900efc8247af031157d8d77d9f",
+        "detector_backend": "gpu-experimental",
+        "successes": 500,
+        "summary": {
+          "A_marker_visible_40px_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          },
+          "decoded_marker_availability_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          },
+          "pose_availability_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          },
+          "pose_availability_when_geometric_visible_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          },
+          "E_camera_rmse_cm": {
+            "mean": 2.2192698250878946,
+            "sample_std": 0.30256900882201554,
+            "trials": 500
+          },
+          "body_rmse_cm": {
+            "mean": 2.5975562059240866,
+            "sample_std": 0.3557085614499572,
+            "trials": 500
+          },
+          "d_touchdown_cm": {
+            "mean": 0.8697110945475288,
+            "sample_std": 0.42384766725699896,
+            "trials": 500
+          },
+          "S_land_pct": {
+            "mean": 100.0,
+            "sample_std": 0.0,
+            "trials": 500
+          }
+        }
+      }
+    }
+  ],
+  "comparison_pdf_path": "data/results/isaac/paper-grid-opencv-common-20261005/comparison/paper_figures.pdf",
+  "comparison_pdf_sha256": "a16ce51172884f66a2e378b948d30ed8814f78f252551d4ddfe1c38d32da885e",
+  "caveats": [
+    "Finite 125-image prior qualification does not prove universal bitwise CPU/GPU equivalence.",
+    "Matched closed-loop pilot has separate trajectories and one timing sample per backend.",
+    "Prior B1 used a special template tracker; prior other pads used an experimental CUDA frontend.",
+    "B1/B3 geometry reconstructed from figures; no original metric CAD or published detector reproduction.",
+    "Failed trials remain in success/availability statistics; RMSE uses valid poses; d uses touchdown events only.",
+    "The landing image audit found CPU/GPU differences; this prototype is not fully CPU-equivalent.",
+    "Full 3,500-trial results precede the decoder/warp corrections; correction qualification replays the same images and does not replace those trajectories."
+  ],
+  "original_pilot": {
+    "path": "data/results/isaac/paper-grid-opencv-common-20261005/frontend-pilot.json",
+    "sha256": "90086a4b05b4db1525cdaba08d5a7422e4532aaa1bb4c970b16f2b4e3aad837f"
+  },
+  "same_image_landing_audit": {
+    "path": "data/results/isaac/paper-grid-opencv-common-20261005/same-image-native-audit.json",
+    "sha256": "f45076b86bd317ac9a40fe7efe8692862adb1b4dd1723ac9b8fc3bcc2642e347",
+    "summary": {
+      "images": 1960,
+      "opencv_version": "4.14.0",
+      "torch_version": "2.11.0+cu128",
+      "library_sha256": "8749b3a8f2ab5b7bdf6dc3adfe5d5d74399084780c616cab0731b2527d170926",
+      "inputs": [
+        "/work/data/results/isaac/paper-grid-opencv-common-20261005/native-image-audit/paper-grid-pad1",
+        "/work/data/results/isaac/paper-grid-opencv-common-20261005/native-image-audit/paper-grid-pad2",
+        "/work/data/results/isaac/paper-grid-opencv-common-20261005/native-image-audit/paper-grid-pad3",
+        "/work/data/results/isaac/paper-grid-opencv-common-20261005/native-image-audit/paper-grid-pad4",
+        "/work/data/results/isaac/paper-grid-opencv-common-20261005/native-image-audit/paper-grid-b1",
+        "/work/data/results/isaac/paper-grid-opencv-common-20261005/native-image-audit/paper-grid-10x10",
+        "/work/data/results/isaac/paper-grid-opencv-common-20261005/native-image-audit/paper-grid-b3"
+      ],
+      "passed": 1721,
+      "failed": 239,
+      "ordered_ids_mismatches": 19,
+      "max_corner_delta_px": 0,
+      "max_pose_position_delta_m": 0.0017324244152128092,
+      "main_replay_ids_mismatches": 0,
+      "max_main_position_replay_delta_m": 0.00024330801536894935,
+      "max_cpu_gt_position_error_m": 1.3879961690652398,
+      "max_gpu_gt_position_error_m": 1.3879961690652398,
+      "scope": "Identical saved landing grayscale images; ordered IDs, corners and shared PnP; sampled captures, not exhaustive universal equivalence.",
+      "pose_validity_mismatches": 2,
+      "reference_failed": 19,
+      "captured_position_replay_over_1um": 221
+    },
+    "capture_root_commit": "bedaa37fcbdab0c7aef16ea0a759c71e4489df1e"
+  },
+  "corrected_frontend_audit": {
+    "path": "data/results/isaac/paper-grid-opencv-common-20261005/same-image-native-audit-corrected.json",
+    "sha256": "9f2b2218fd8ba50c9b87369feacf767a03c38c2921f8a80bbb4815c8b23b733f",
+    "summary": {
+      "images": 1960,
+      "opencv_version": "4.14.0",
+      "torch_version": "2.11.0+cu128",
+      "library_sha256": "881b384188e320e895526aa967df83371ae2a9e2ca2b7c6376f60a2c110fa715",
+      "inputs": [
+        "/work/data/results/isaac/paper-grid-opencv-common-20261005/native-image-audit/paper-grid-pad1",
+        "/work/data/results/isaac/paper-grid-opencv-common-20261005/native-image-audit/paper-grid-pad2",
+        "/work/data/results/isaac/paper-grid-opencv-common-20261005/native-image-audit/paper-grid-pad3",
+        "/work/data/results/isaac/paper-grid-opencv-common-20261005/native-image-audit/paper-grid-pad4",
+        "/work/data/results/isaac/paper-grid-opencv-common-20261005/native-image-audit/paper-grid-b1",
+        "/work/data/results/isaac/paper-grid-opencv-common-20261005/native-image-audit/paper-grid-10x10",
+        "/work/data/results/isaac/paper-grid-opencv-common-20261005/native-image-audit/paper-grid-b3"
+      ],
+      "passed": 1721,
+      "failed": 239,
+      "reference_failed": 0,
+      "reference_gate_passed": true,
+      "capture_replay_failed": 239,
+      "pose_validity_mismatches": 0,
+      "main_pose_validity_mismatches": 2,
+      "decoder_mode": "cell ratios",
+      "replay_source_sha256": "e197fe763acda658aa4c791379f0d2896db4a5e9b9b9444730d46c89f5764b86",
+      "capture_source_sha256": [
+        "5404391323de54d931f34d53c8030ef75a3234907999b9ac6d0e15d6f906d0b2",
+        "5404391323de54d931f34d53c8030ef75a3234907999b9ac6d0e15d6f906d0b2",
+        "5404391323de54d931f34d53c8030ef75a3234907999b9ac6d0e15d6f906d0b2",
+        "5404391323de54d931f34d53c8030ef75a3234907999b9ac6d0e15d6f906d0b2",
+        "5404391323de54d931f34d53c8030ef75a3234907999b9ac6d0e15d6f906d0b2",
+        "5404391323de54d931f34d53c8030ef75a3234907999b9ac6d0e15d6f906d0b2",
+        "5404391323de54d931f34d53c8030ef75a3234907999b9ac6d0e15d6f906d0b2"
+      ],
+      "frontend_change_allowed": true,
+      "capture_library_sha256": [
+        "8749b3a8f2ab5b7bdf6dc3adfe5d5d74399084780c616cab0731b2527d170926",
+        "8749b3a8f2ab5b7bdf6dc3adfe5d5d74399084780c616cab0731b2527d170926",
+        "8749b3a8f2ab5b7bdf6dc3adfe5d5d74399084780c616cab0731b2527d170926",
+        "8749b3a8f2ab5b7bdf6dc3adfe5d5d74399084780c616cab0731b2527d170926",
+        "8749b3a8f2ab5b7bdf6dc3adfe5d5d74399084780c616cab0731b2527d170926",
+        "8749b3a8f2ab5b7bdf6dc3adfe5d5d74399084780c616cab0731b2527d170926",
+        "8749b3a8f2ab5b7bdf6dc3adfe5d5d74399084780c616cab0731b2527d170926"
+      ],
+      "ordered_ids_mismatches": 0,
+      "max_corner_delta_px": 0,
+      "max_pose_position_delta_m": 0,
+      "main_replay_ids_mismatches": 19,
+      "max_main_position_replay_delta_m": 0.0017323463106625353,
+      "max_cpu_gt_position_error_m": 1.3879961690652398,
+      "max_gpu_gt_position_error_m": 1.3879961690652398,
+      "scope": "Identical saved landing grayscale images; ordered IDs, corners and shared PnP; sampled captures, not exhaustive universal equivalence."
+    },
+    "aruco_revision": "c95b1f64126bfabc5be721d6c665ac1c38c1aae7",
+    "replay_root_commit": "f9be46bf88c028d45f39ddde3b912cc3b26ef868",
+    "main_campaign_rerun_after_correction": false
+  }
+}

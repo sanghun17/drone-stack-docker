@@ -101,8 +101,10 @@ def compare(inputs,output):
                xlim=(-half,half),ylim=(-half,half),aspect='equal')
     frontend_note=('\nB1: compatible CPU tracker; other configurations: CUDA detector'
                    if backends=={'gpu-experimental','cpu-nested-apriltag'} else
-                   '\nCommon OpenCV-compatible GPU image frontend; CPU compact stages and PnP'
+                   '\nCommon GPU compatibility prototype; CPU compact stages and PnP'
                    if backends=={'gpu-opencv-compat'} else '\nMultiple detector backends' if mixed_frontends else '')
+    if backends=={'gpu-opencv-compat'} and all(r['aruco_revision']=='31401c7328ca78090fbcfdf605b39e2534843f54' for r in reports):
+        frontend_note+='\nCapture precedes OpenCV 4.14 decoder and warp corrections.'
     fig.suptitle('Nominal landing pad layouts (0.7 m); print x = −pad Y, print y = pad X'+frontend_note)
     figures.append(('pad_layouts',fig))
     panels=[('A_marker_visible_40px_pct','Marker availability: complete marker with all edges ≥ 40 px','%',100),
@@ -126,16 +128,24 @@ def compare(inputs,output):
         fig.colorbar(artist,ax=axs,label=unit,shrink=.85)
         fig.suptitle(title+f"; {n}×{n} cells, {protocol['repeats']} trials/cell"+frontend_note)
         figures.append((key,fig))
-    fig,axs=plt.subplots(1,3,figsize=(13,4.3),layout='constrained')
+    fig,axs=plt.subplots(1,3,figsize=(13,5.2),layout='constrained')
     for ax,key,title,unit in zip(axs,['A_marker_visible_40px_pct','E_camera_rmse_cm','d_touchdown_cm'],
-                                ['Marker availability','Camera localization RMSE','Terminal lateral error'],['%','cm','cm']):
+                                ['Geometric visibility (≥40 px)','Camera localization RMSE','Terminal lateral error'],['%','cm','cm']):
         means=np.array([r['summary'][key]['mean'] if r['summary'][key]['mean'] is not None else np.nan for r in reports])
         errors=np.array([r['summary'][key]['sample_std'] or 0 for r in reports])
         ax.bar(np.arange(count),means,yerr=errors,capsize=3,color=plt.cm.tab10(np.arange(count)))
         ax.set_xticks(np.arange(count),labels,rotation=25,ha='right')
         ax.set(title=title,ylabel=unit)
         ax.set_ylim(bottom=0); ax.grid(axis='y',alpha=.2)
-    fig.suptitle('Equal-weight trial means ± sample standard deviations'+frontend_note)
+        if key=='d_touchdown_cm':
+            for index,report in enumerate(reports):
+                if report['summary'][key]['trials']==0:
+                    ax.text(index,.02,'n/a\n0 events',transform=ax.get_xaxis_transform(),
+                            ha='center',va='bottom',fontsize=8,color='.35')
+    early_abort_note=''
+    if any(r['summary']['d_touchdown_cm']['trials']==0 for r in reports):
+        early_abort_note='\nRMSE for configurations without height events uses valid poses before abort.'
+    fig.suptitle('Equal-weight trial means ± sample standard deviations'+frontend_note+early_abort_note)
     figures.append(('metric_comparison',fig))
     with PdfPages(output/'paper_figures.pdf') as pdf:
         for name,fig in figures:

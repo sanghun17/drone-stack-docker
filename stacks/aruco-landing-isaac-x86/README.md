@@ -33,6 +33,17 @@ batched grayscale image tensor. The OpenCV-compatible GPU frontend also retains
 compact CPU stages; it is not a complete CUDA OpenCV build. Measure complete
 landing throughput on the target host before selecting either frontend.
 
+The [IM rerun and correction report](../../data/analysis/aruco/isaac_paper_grid_opencv_common_20261005.md)
+records the 2026-10-06 baseline pilot: both frontends succeeded in 16/16 trials,
+with CPU at 97 seconds and the corrected GPU prototype at 118 seconds, including
+startup. CPU grayscale/device/download work totaled 0.30 seconds. CPU detection
+is the preferred option for this measured baseline; rendering and physics remain
+on GPU. This does not establish optimal counts or timing for every pad.
+The corrected frontend matches CPU IDs, corners and shared PnP on 1,960 saved
+landing images. OpenCV 4.14 ratio decoding and candidate-warp arithmetic were
+fixed after the archived 3,500-trial campaign; its statistics remain explicitly
+labeled as pre-correction.
+
 For a separate same-image audit, add `--save-audit-images-every 10` to a fresh
 short evaluation/campaign. It saves exact grayscale PNGs, checksums, optical
 estimates and matching GT every ten camera captures, plus up to sixteen batches
@@ -42,6 +53,12 @@ corpus may include warmup/inactive cameras. On the same SDK, run
 `data/analysis/aruco/isaac_camera_frontend_audit.py --inputs <capture directories>
 --output <new audit.json>` with `ARUCO_OPENCV_CUDA_LIBRARY` set to replay identical
 pixels through CPU/GPU extraction and shared PnP.
+For a correction audit, `--allow-frontend-change` records the changed source and
+binary and reports CPU-reference agreement separately from strict reproduction
+of the old captured output. The combined exit status still fails if the captured
+output differs; failed checks are retained in JSON. On IM/local, the old library
+is preserved as `.build/isaac-landing/libaruco_opencv_cuda_legacy_20261005.so`;
+the canonical library path above now contains the qualified corrected build.
 
 Native ARL Robot 1, native motor dynamics and native Lee velocity control remain
 unchanged. Configuration freezes gain/motor randomization so only initial
