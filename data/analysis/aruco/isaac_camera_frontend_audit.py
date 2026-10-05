@@ -83,7 +83,9 @@ def audit(inputs, output):
                         gpu_gt_position_error_m=None if b is None else float(np.linalg.norm(b[:3,3]-truth[:3,3])),
                         main_ids_replayed=entry['main_gpu_ids']==ids,main_position_replay_delta_m=replay,
                         passed=equal and (corner is None or corner<=1e-3) and validity_equal
-                            and (delta is None or delta<=.03) and (angle is None or angle<=5.)))
+                            and (delta is None or delta<=.03) and (angle is None or angle<=5.)
+                            and entry['main_gpu_ids']==ids and (captured is None)==(b is None)
+                            and (replay is None or replay<=1e-6)))
         gpu.close()
         print(cfg['configuration_label'],len(entries),'images audited',flush=True)
     result=dict(images=len(cases),opencv_version=cv2.__version__,torch_version=torch.__version__,
@@ -93,6 +95,8 @@ def audit(inputs, output):
         ordered_ids_mismatches=sum(not c['ordered_ids_equal'] for c in cases),
         max_corner_delta_px=max((c['corner_max_delta_px'] or 0 for c in cases),default=0),
         max_pose_position_delta_m=max((c['pose_position_delta_m'] or 0 for c in cases),default=0),
+        main_replay_ids_mismatches=sum(not c['main_ids_replayed'] for c in cases),
+        max_main_position_replay_delta_m=max((c['main_position_replay_delta_m'] or 0 for c in cases),default=0),
         max_cpu_gt_position_error_m=max((c['cpu_gt_position_error_m'] or 0 for c in cases),default=0),
         max_gpu_gt_position_error_m=max((c['gpu_gt_position_error_m'] or 0 for c in cases),default=0),
         scope='Identical saved landing grayscale images; ordered IDs, corners and shared PnP; sampled captures, not exhaustive universal equivalence.')
