@@ -29,6 +29,7 @@ for e in d['configurations']:
  rows=[json.loads(p.read_text()) for p in (b/'campaign'/e['name']).glob('trial-*.json')]
  valid=[r['metrics']['localization_camera'] for r in rows if r['metrics']['localization_camera']['valid_frames']]
  progress.append(dict(name=e['name'],state=e['state'],trials=len(rows),successes=sum(r['success'] for r in rows),
+   fingerprint=json.loads((b/'campaign'/e['name']/'manifest.json').read_text())['fingerprint'] if (b/'campaign'/e['name']/'manifest.json').exists() else None,
    mean_E_cm=sum(r['position_rmse_m'] for r in valid)/len(valid)*100 if valid else None,
    maximum_frame_error_cm=max((r['position_max_m'] for r in valid),default=0)*100))
 print(json.dumps(dict(state=d.get('state','running'),elapsed_s=time.time()-d['started_wall'],progress=progress)))
@@ -47,12 +48,22 @@ print(json.dumps(dict(state=d.get('state','running'),elapsed_s=time.time()-d['st
             if entry['state']!='complete' or name in finished: continue
             if entry['trials']!=500: raise ValueError('incomplete capture')
             target=base/'campaign'/name
-            if target.exists(): raise ValueError('collector refuses to overwrite an existing capture')
-            target.parent.mkdir(parents=True,exist_ok=True)
-            run(['scp','-r',args.remote+':'+source+'/campaign/'+name,str(target)])
-            analysis=base/('analysis-'+name.removeprefix('paper-grid-'))
-            run([sys.executable,str(ROOT/'data/analysis/aruco/isaac_paper_grid.py'),
-                '--input',str(target),'--output',str(analysis)])
+            if target.exists():
+                captured=json.loads((target/'manifest.json').read_text())
+                if captured['fingerprint']!=entry['fingerprint'] or len(list(target.glob('trial-*.json')))!=500:
+                    raise ValueError('existing local capture is incomplete or differs; preserve and inspect it')
+            else:
+                target.parent.mkdir(parents=True,exist_ok=True)
+                run(['scp','-r',args.remote+':'+source+'/campaign/'+name,str(target)])
+            analysis=base/('analysis-'+name[len('paper-grid-'):])
+            if not (analysis/'collector-complete.json').is_file():
+                if analysis.exists():
+                    raise ValueError('partial analysis exists; preserve it before reanalysis')
+                run([sys.executable,str(ROOT/'data/analysis/aruco/isaac_paper_grid.py'),
+                    '--input',str(target),'--output',str(analysis)])
+                (analysis/'collector-complete.json').write_text(json.dumps(dict(fingerprint=entry['fingerprint']))+'\n')
+            elif json.loads((analysis/'collector-complete.json').read_text())['fingerprint']!=entry['fingerprint']:
+                raise ValueError('analysis belongs to a different capture')
             finished.add(name)
             print('Verified and plotted '+name,flush=True)
         if state['state']=='complete': break
@@ -60,7 +71,7 @@ print(json.dumps(dict(state=d.get('state','running'),elapsed_s=time.time()-d['st
     if finished!={name for _,name,_ in CASES}: raise ValueError('campaign layout set differs from expected seven pads')
     for filename in ('campaign.json','gpu.csv'):
         run(['scp',args.remote+':'+source+'/campaign/'+filename,str(base/'campaign'/filename)])
-    inputs=[str(base/('analysis-'+name.removeprefix('paper-grid-'))) for _,name,_ in CASES]
+    inputs=[str(base/('analysis-'+name[len('paper-grid-'):])) for _,name,_ in CASES]
     run([sys.executable,str(ROOT/'data/analysis/aruco/isaac_paper_comparison.py'),
          '--inputs',*inputs,'--output',str(base/'comparison')])
     run([sys.executable,str(ROOT/'data/analysis/aruco/isaac_common_campaign_report.py'),

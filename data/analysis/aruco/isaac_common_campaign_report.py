@@ -41,7 +41,7 @@ def publish(base, report_path, manifest_path):
     delta='| Pad | Previous success (%) | Common frontend success (%) | Previous E (cm) | Common E (cm) |\n| --- | ---: | ---: | ---: | ---: |\n'
     for label, name, previous in CASES:
         raw=base/'campaign'/name
-        analysis=base/('analysis-'+name.removeprefix('paper-grid-'))
+        analysis=base/('analysis-'+name[len('paper-grid-'):])
         metrics=json.loads((analysis/'metrics.json').read_text())
         manifest=json.loads((raw/'manifest.json').read_text())
         runtime=json.loads((raw/'summary.json').read_text())

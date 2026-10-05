@@ -56,6 +56,8 @@ def compare(inputs,output):
     output.mkdir(parents=True,exist_ok=False)
     plt.rcParams.update({'font.size':10,'font.family':'DejaVu Sans','pdf.fonttype':42})
     labels=['B1 (CPU tracker)' if r['config']['detector_backend']=='cpu-nested-apriltag'
+            else 'B1' if backends=={'gpu-opencv-compat'} and Path(r['config']['pad_manifest']).name=='paper-b1-layout.yaml'
+            else 'B3' if backends=={'gpu-opencv-compat'} and Path(r['config']['pad_manifest']).name=='paper-b3-layout.yaml'
             else 'Baseline / B2' if r['marker_count']==61 else r['config']['configuration_label'] for r in reports]
     table='| Configuration | N | Trials | A (%) | E (cm) | d (cm) | S_land (%) |\n| --- | --- | --- | --- | --- | --- | --- |\n'
     records=[]
