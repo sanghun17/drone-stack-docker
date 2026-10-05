@@ -13,6 +13,26 @@ For the paper's 10 × 10 initial-position grid with five repetitions per layout,
 see [the grid protocol and pad mapping](docs/paper-grid.md). It uses the revised
 funnel, nominal print geometry, and matched 500-trial inputs for each configuration.
 
+The campaign runner accepts a common detector override without changing the
+historical configuration files. On IM's SSD Docker daemon, for example:
+
+```bash
+DOCKER_HOST=unix:///tmp/docker-ssd.sock \
+ARUCO_OPENCV_CUDA_LIBRARY=/work/.build/isaac-landing/libaruco_opencv_cuda.so \
+python3 stacks/aruco-landing-isaac-x86/scripts/paper_campaign.py \
+  --output data/results/isaac/my-common-opencv-campaign \
+  --num-envs 90 --trials 500 --detector gpu-opencv-compat \
+  --configs paper-grid-pad1.yaml paper-grid-pad2.yaml paper-grid-pad3.yaml \
+    paper-grid-pad4.yaml paper-grid-b1.yaml paper-grid-10x10.yaml paper-grid-b3.yaml
+```
+
+`--detector cpu` uses ordinary OpenCV detection with up to eight independent
+CPU workers, one detector per environment, followed by the same PnP and landing
+policy. CPU detection still uses Isaac's GPU rendering/physics and downloads one
+batched grayscale image tensor. The OpenCV-compatible GPU frontend also retains
+compact CPU stages; it is not a complete CUDA OpenCV build. Measure complete
+landing throughput on the target host before selecting either frontend.
+
 Native ARL Robot 1, native motor dynamics and native Lee velocity control remain
 unchanged. Configuration freezes gain/motor randomization so only initial
 position/yaw differ. Each environment owns an independent drone/camera/pad pose;

@@ -151,6 +151,8 @@ def extract(directory):
         aruco_algorithm_sources_sha256=algorithm_hashes,
         application_sources_sha256=manifest['application_sources_sha256'],
         aruco_revision=manifest['aruco_revision'],pad_sha256=manifest['pad_sha256'],
+        gpu_detector_library_sha256=manifest.get('gpu_detector_library_sha256'),
+        gpu_compatibility_sources_sha256=manifest.get('gpu_compatibility_sources_sha256'),
         trials=len(records),successes=sum(r['S_land_pct']==100 for r in records),
         trace_checksums_verified=len(records),summary=summary,
         maximum_funnel_excess_m=max(r['maximum_funnel_excess_m'] for r in records),

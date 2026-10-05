@@ -36,6 +36,10 @@ def compare(inputs,output):
     if not backends<= {'gpu-experimental','cpu-nested-apriltag','gpu-opencv-compat','cpu'}:
         raise ValueError('unsupported detector comparison; describe a new protocol explicitly')
     mixed_frontends=len(backends)>1
+    if backends=={'gpu-opencv-compat'}:
+        for key in ('gpu_detector_library_sha256','gpu_compatibility_sources_sha256'):
+            if not reports[0].get(key) or any(r.get(key)!=reports[0][key] for r in reports):
+                raise ValueError('common GPU frontend requires identical recorded library and source hashes')
     caveat=('Multiple detector backends; not a uniform-frontend comparison.' if mixed_frontends else
             'Common OpenCV-compatible GPU image frontend with CPU grouping, decoding, subpixel and PnP.'
             if backends=={'gpu-opencv-compat'} else '')

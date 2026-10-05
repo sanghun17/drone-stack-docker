@@ -9,6 +9,16 @@ vehicle/camera funnel cross-section R, not the common visible ground region G.
 Initial attitude and velocity are zero. Trial IDs are repeat-major, then Y,
 then X. All configurations receive the same 500 inputs.
 
+For a common frontend across all seven configurations, the campaign runner's
+`--detector gpu-opencv-compat` override selects the OpenCV-compatible GPU image
+path, with compact grouping, decoding, subpixel refinement and PnP on CPU.
+This includes ordinary AprilTag-dictionary detection for B1; it does not invoke
+the special B1 tracker described below. `--detector cpu` selects ordinary OpenCV
+with up to eight independent CPU workers. These overrides preserve pad patterns,
+sampling, controller and simulation schedule. The original configuration defaults
+and the separate B1/B3 frontend descriptions below document the historical runs.
+Use a fresh output directory for a new common-frontend comparison.
+
 Figure 5 of the first PDF labels four two-marker layouts. Its pictures match
 the following committed nominal print layouts in the ArUco owner repository:
 
