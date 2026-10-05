@@ -33,6 +33,16 @@ batched grayscale image tensor. The OpenCV-compatible GPU frontend also retains
 compact CPU stages; it is not a complete CUDA OpenCV build. Measure complete
 landing throughput on the target host before selecting either frontend.
 
+For a separate same-image audit, add `--save-audit-images-every 10` to a fresh
+short evaluation/campaign. It saves exact grayscale PNGs, checksums, optical
+estimates and matching GT every ten camera captures, plus up to sixteen batches
+with position errors above 0.3 m. It does not alter the policy and adds wall-time
+overhead; exclude that diagnostic run from throughput comparisons. The saved
+corpus may include warmup/inactive cameras. On the same SDK, run
+`data/analysis/aruco/isaac_camera_frontend_audit.py --inputs <capture directories>
+--output <new audit.json>` with `ARUCO_OPENCV_CUDA_LIBRARY` set to replay identical
+pixels through CPU/GPU extraction and shared PnP.
+
 Native ARL Robot 1, native motor dynamics and native Lee velocity control remain
 unchanged. Configuration freezes gain/motor randomization so only initial
 position/yaw differ. Each environment owns an independent drone/camera/pad pose;

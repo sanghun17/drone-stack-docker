@@ -17,10 +17,14 @@ def main():
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--num-envs',type=int,default=90)
     parser.add_argument('--trials',type=int,default=500)
+    parser.add_argument('--trial-start',type=int,default=0)
+    parser.add_argument('--save-audit-images-every',type=int,default=0)
     parser.add_argument('--configs',nargs='+',required=True)
     parser.add_argument('--detector',choices=['cpu','gpu-experimental','cpu-nested-apriltag','gpu-opencv-compat'])
     args=parser.parse_args()
-    if args.num_envs<1 or not 1<=args.trials<=500: parser.error('invalid cohort/trial count')
+    if args.num_envs<1 or not 1<=args.trials<=500 or not 0<=args.trial_start<=500-args.trials:
+        parser.error('invalid cohort/trial range')
+    if args.save_audit_images_every<0: parser.error('invalid camera evidence interval')
     if os.environ.get('DOCKER_HOST')!='unix:///tmp/docker-ssd.sock':
         parser.error('this IM runner requires the SSD Docker daemon')
     configs=[HERE.parent/'config'/name for name in args.configs]
@@ -42,6 +46,7 @@ def main():
     worker.start()
     status=dict(root_commit=subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip(),
                 num_envs=args.num_envs,trials_per_configuration=args.trials,detector_override=args.detector,
+                trial_start=args.trial_start,save_audit_images_every=args.save_audit_images_every,
                 configurations=[],started_wall=time.time())
     def save():
         temp=output/'campaign.json.tmp'
@@ -58,8 +63,11 @@ def main():
             command=['bash',str(HERE/'evaluate.sh'),
                 '--config','/work/'+str(config.relative_to(ROOT)),
                 '--num-envs',str(args.num_envs),'--trials',str(args.trials),
+                '--trial-start',str(args.trial_start),
                 '--output','/work/'+str(relative_output)]
             if args.detector: command.extend(['--detector',args.detector])
+            if args.save_audit_images_every:
+                command.extend(['--save-audit-images-every',str(args.save_audit_images_every)])
             print('Starting '+name,flush=True)
             with (output/(name+'.log')).open('w') as stream:
                 completed=subprocess.run(command,cwd=ROOT,stdout=stream,stderr=subprocess.STDOUT)
