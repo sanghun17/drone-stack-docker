@@ -1,0 +1,79 @@
+# Nested AprilTag figure reconstruction, preserving the original code family.
+name: yu_ast2017_nested_b1_reconstruction
+dictionary: DICT_APRILTAG_36h11
+canvas_units: 8.0
+marker_border_bits: 1
+source:
+  pdf: bare_jrnl_new_sample4.pdf
+  page: 7
+  pdf_image_object: 334 0
+  image_size_px:
+  - 167
+  - 168
+  image_sha256: b4c86d200bc89c0afa92294dcc898bb17bdef382fc8ab9d64c5d1a36b9d4b55e
+  reference_doi: 10.1016/j.ast.2017.03.008
+  reconstruction: 'Figure reconstruction: all ten sampled code grids exactly identify
+    AprilTag 36h11 IDs, rotated 180 degrees; red annotation boxes omitted; symmetric
+    8-cell parent with one-cell children at 0, 3.5, 7; nominal 0.7 m scale, not supplied
+    metric CAD.'
+markers:
+- id: 166
+  x: 0.0
+  y: 0.0
+  size: 8.0
+  rotation_deg: 180.0
+  render_cutouts_ids:
+  - 6
+  - 20
+  - 7
+  - 29
+  - 15
+  - 21
+  - 12
+  - 24
+  - 9
+- id: 6
+  x: 0.0
+  y: 0.0
+  size: 1.0
+  rotation_deg: 180.0
+- id: 20
+  x: 3.5
+  y: 0.0
+  size: 1.0
+  rotation_deg: 180.0
+- id: 7
+  x: 7.0
+  y: 0.0
+  size: 1.0
+  rotation_deg: 180.0
+- id: 29
+  x: 0.0
+  y: 3.5
+  size: 1.0
+  rotation_deg: 180.0
+- id: 15
+  x: 3.5
+  y: 3.5
+  size: 1.0
+  rotation_deg: 180.0
+- id: 21
+  x: 7.0
+  y: 3.5
+  size: 1.0
+  rotation_deg: 180.0
+- id: 12
+  x: 0.0
+  y: 7.0
+  size: 1.0
+  rotation_deg: 180.0
+- id: 24
+  x: 3.5
+  y: 7.0
+  size: 1.0
+  rotation_deg: 180.0
+- id: 9
+  x: 7.0
+  y: 7.0
+  size: 1.0
+  rotation_deg: 180.0

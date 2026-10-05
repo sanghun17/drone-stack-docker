@@ -27,7 +27,9 @@ def metric_pad_manifest(manifest, pad_side_m=None):
         size = float(marker['size'])
         markers.append(dict(id=int(marker['id']), side_m=size*scale,
             center_m=dict(x=(canvas/2-marker['y']-size/2)*scale,
-                          y=(canvas/2-marker['x']-size/2)*scale), yaw_deg=-90.))
+                          y=(canvas/2-marker['x']-size/2)*scale),
+            yaw_deg=-90.+float(marker.get('rotation_deg',0)),
+            **({'render_cutouts_ids':marker['render_cutouts_ids']} if 'render_cutouts_ids' in marker else {})))
     return dict(name=manifest['name'], dictionary=manifest['dictionary'],
                 pad_side_m=pad_side_m, markers=markers)
 
@@ -46,7 +48,32 @@ def marker_cells(manifest):
             # Counterclockwise vertices with outward +Z face normal.
             cell = 1/cells_per_side
             square = np.array([[x,y-cell],[x+cell,y-cell],[x+cell,y],[x,y]])
-            quads.append(square @ R.T * marker['side_m'] + center)
+            quad = square @ R.T * marker['side_m'] + center
+            cutouts = marker.get('render_cutouts_ids',[])
+            if not cutouts:
+                quads.append(quad)
+                continue
+            if abs(marker['yaw_deg']/90-round(marker['yaw_deg']/90))>1e-8:
+                raise ValueError('render cutouts require axis-aligned marker rotations')
+            rectangles = [(quad.min(axis=0),quad.max(axis=0))]
+            for mid in cutouts:
+                child = next(m for m in manifest['markers'] if m['id']==mid)
+                if abs(child['yaw_deg']/90-round(child['yaw_deg']/90))>1e-8:
+                    raise ValueError('render cutouts require axis-aligned marker rotations')
+                child_center=np.array([child['center_m']['x'],child['center_m']['y']])
+                low,high=child_center-child['side_m']/2,child_center+child['side_m']/2
+                pieces=[]
+                for a,b in rectangles:
+                    u,v=np.maximum(a,low),np.minimum(b,high)
+                    if np.any(v<=u):
+                        pieces.append((a,b));continue
+                    for p,q in [(a,[u[0],b[1]]),([v[0],a[1]],b),
+                                ([u[0],a[1]],[v[0],u[1]]),([u[0],v[1]],[v[0],b[1]])]:
+                        p,q=np.asarray(p),np.asarray(q)
+                        if np.all(q-p>1e-12):pieces.append((p,q))
+                rectangles=pieces
+            for a,b in rectangles:
+                quads.append(np.array([[a[0],a[1]],[b[0],a[1]],[b[0],b[1]],[a[0],b[1]]]))
     return np.asarray(quads)
 
 
