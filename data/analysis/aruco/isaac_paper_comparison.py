@@ -92,6 +92,7 @@ def compare(inputs,output):
     fig.suptitle('Nominal landing pad layouts (0.7 m); print x = −pad Y, print y = pad X'+frontend_note)
     figures.append(('pad_layouts',fig))
     panels=[('A_marker_visible_40px_pct','Marker availability: complete marker with all edges ≥ 40 px','%',100),
+            ('decoded_marker_availability_pct','Actual decoded pad marker availability','%',100),
             ('E_camera_rmse_cm','Mean per-trial camera localization RMSE','cm',None),
             ('d_touchdown_cm','Mean vision-height terminal lateral error','cm',None),
             ('S_land_pct','Vision-height landing success','%',100),
