@@ -74,6 +74,10 @@ def audit(inputs, output):
                     validity_equal=(a is None)==(b is None)
                     captured=entry['main_estimated_pad_from_camera']
                     replay=None if captured is None or b is None else float(np.linalg.norm(np.array(captured)[:3,3]-b[:3,3]))
+                    reference_passed=(equal and (corner is None or corner<=1e-3) and validity_equal
+                            and (delta is None or delta<=.03) and (angle is None or angle<=5.))
+                    capture_passed=(entry['main_gpu_ids']==ids and (captured is None)==(b is None)
+                            and (replay is None or replay<=1e-6))
                     cases.append(dict(configuration=cfg['configuration_label'],image=Path(entry['path']).name,
                         gray_sha256=entry['gray_sha256'],camera_batch=entry['camera_batch'],environment=entry['environment'],
                         cpu_ids=rids,gpu_ids=ids,ordered_ids_equal=equal,corner_max_delta_px=corner,
@@ -82,16 +86,23 @@ def audit(inputs, output):
                         cpu_gt_position_error_m=None if a is None else float(np.linalg.norm(a[:3,3]-truth[:3,3])),
                         gpu_gt_position_error_m=None if b is None else float(np.linalg.norm(b[:3,3]-truth[:3,3])),
                         main_ids_replayed=entry['main_gpu_ids']==ids,main_position_replay_delta_m=replay,
-                        passed=equal and (corner is None or corner<=1e-3) and validity_equal
-                            and (delta is None or delta<=.03) and (angle is None or angle<=5.)
-                            and entry['main_gpu_ids']==ids and (captured is None)==(b is None)
-                            and (replay is None or replay<=1e-6)))
+                        main_pose_validity_equal=(captured is None)==(b is None),
+                        reference_passed=reference_passed,capture_replay_passed=capture_passed,
+                        passed=reference_passed and capture_passed))
         gpu.close()
         print(cfg['configuration_label'],len(entries),'images audited',flush=True)
     result=dict(images=len(cases),opencv_version=cv2.__version__,torch_version=torch.__version__,
         library_sha256=hashlib.sha256(library.read_bytes()).hexdigest(),
         inputs=[str(p) for p in inputs],cases=cases,
         passed=sum(c['passed'] for c in cases),failed=sum(not c['passed'] for c in cases),
+        reference_failed=sum(not c['reference_passed'] for c in cases),
+        reference_gate_passed=all(c['reference_passed'] for c in cases),
+        capture_replay_failed=sum(not c['capture_replay_passed'] for c in cases),
+        pose_validity_mismatches=sum(c['cpu_pose_valid']!=c['gpu_pose_valid'] for c in cases),
+        main_pose_validity_mismatches=sum(not c['main_pose_validity_equal'] for c in cases),
+        decoder_mode='cell ratios' if hasattr(cv2.aruco.DetectorParameters(),'validBitIdThreshold') else 'binary majority',
+        replay_source_sha256=hashlib.sha256((ARUCO/'src/aruco_landing/gpu_opencv.py').read_bytes()).hexdigest(),
+        capture_source_sha256=[json.loads((p/'manifest.json').read_text())['gpu_compatibility_sources_sha256']['gpu_opencv.py'] for p in inputs],
         ordered_ids_mismatches=sum(not c['ordered_ids_equal'] for c in cases),
         max_corner_delta_px=max((c['corner_max_delta_px'] or 0 for c in cases),default=0),
         max_pose_position_delta_m=max((c['pose_position_delta_m'] or 0 for c in cases),default=0),
