@@ -495,7 +495,7 @@
         "runtime_service": "isaac"
       },
       "repository": "https://github.com/sanghun17/aruco_landing.git",
-      "revision": "e93daf0e9c428689240b53074c23e1b0cd2f8a93",
+      "revision": "ecce1d35e332d6344baa1d754c0c0011801679ec",
       "subdir": "deployment/stack-modules/planner/aruco-batch"
     },
     "planner/aruco-landing": {

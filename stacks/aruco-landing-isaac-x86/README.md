@@ -312,3 +312,30 @@ boot isolation and subsequent GPU pilots.
 trace/metric schema and its successful CPU/GPU and unavailable-marker tests.
 raw logs/reports are ignored
 under `.build/isaac-landing` and `data/results/isaac-landing-validation`.
+
+## OpenCV-compatible GPU frontend
+
+`gpu-opencv-compat` is an optional compatibility prototype, separate from the
+fixed-threshold CUDA detector used in the previous campaigns. Adaptive
+thresholds, RETR_LIST contours, quad approximation and patch extraction run on
+CUDA; compact grouping, dictionary verification and OpenCV subpixel refinement
+remain on CPU. It retains the CPU detector parameters and correction dictionary.
+Whole images are not downloaded. Classic ArUco with NONE/SUBPIX refinement is
+supported; ArUco3 and AprilTag-specific quad extraction are rejected explicitly.
+
+Build on a CUDA toolkit host from the locked ArUco owner source:
+
+```bash
+PYTHONPATH=ws/aruco-landing/src/aruco_landing/src python3 -c \
+  "from aruco_landing.gpu_opencv import build_library; build_library('.build/isaac-landing/libaruco_opencv_cuda.so')"
+```
+
+Inside the native Isaac container, set
+`ARUCO_OPENCV_CUDA_LIBRARY=/work/.build/isaac-landing/libaruco_opencv_cuda.so`
+and select `--detector gpu-opencv-compat`. The evaluation records the binary
+and implementation hashes. Run the module's `scripts/qualify_gpu_opencv.py`
+on the target OpenCV runtime before using it. Its benchmark includes compact
+CPU verification and compares against parallel CPU detection including grayscale
+download; it excludes rendering. Previous configs, campaign traces and published
+figures are preserved. Matching CPU outputs does not imply ground-truth accuracy:
+B3's existing CPU pose discrepancy remains observable in a compatible frontend.

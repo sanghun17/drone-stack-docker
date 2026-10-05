@@ -26,7 +26,7 @@ def main():
     parser.add_argument('--trial-start', type=int, default=0, help='stable trial ID offset for separate GPU workers')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--resume', action='store_true')
-    parser.add_argument('--detector', choices=['cpu','gpu-experimental','cpu-nested-apriltag'])
+    parser.add_argument('--detector', choices=['cpu','gpu-experimental','cpu-nested-apriltag','gpu-opencv-compat'])
     parser.add_argument('--smoke', action='store_true', help='render and detect; fail unless every camera finds the pad')
     parser.add_argument('--isolation-smoke', action='store_true',
                         help='smoke with an env-1 visual occluder directly in front of env-0 camera')
@@ -84,6 +84,14 @@ def main():
         library=Path(os.environ.get('ARUCO_CUDA_LIBRARY',''))
         if not library.is_file(): parser.error('gpu-experimental requires ARUCO_CUDA_LIBRARY')
         metadata['gpu_detector_library_sha256']=hashlib.sha256(library.read_bytes()).hexdigest()
+    elif cfg['detector_backend']=='gpu-opencv-compat':
+        library=Path(os.environ.get('ARUCO_OPENCV_CUDA_LIBRARY',''))
+        if not library.is_file(): parser.error('gpu-opencv-compat requires ARUCO_OPENCV_CUDA_LIBRARY')
+        metadata['gpu_detector_library_sha256']=hashlib.sha256(library.read_bytes()).hexdigest()
+        metadata['gpu_compatibility_sources_sha256']={
+            name:hashlib.sha256((ARUCO/'src/aruco_landing'/name).read_bytes()).hexdigest()
+            for name in ['gpu_opencv.py','cuda/opencv_candidates.cu']}
+        metadata['gpu_compatibility_scope']='GPU image processing; CPU grouping/dictionary/subpixel; opt-in prototype'
     store = TrialStore(args.output, metadata, args.resume)
     pending = [i for i in range(args.trial_start,args.trial_start+args.trials) if i not in store.completed]
     if args.smoke: pending = list(range(args.num_envs))
