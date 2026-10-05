@@ -21,7 +21,7 @@ from aruco_landing.gpu_opencv import GpuOpenCVDetector
 from pad_scene import metric_pad_manifest
 
 
-def audit(inputs, output):
+def audit(inputs, output, allow_frontend_change=False):
     cv2.setNumThreads(1)
     library=Path(os.environ['ARUCO_OPENCV_CUDA_LIBRARY'])
     cases=[]
@@ -29,8 +29,10 @@ def audit(inputs, output):
         manifest=json.loads((directory/'manifest.json').read_text())
         cfg=manifest['config']
         if cfg['detector_backend']!='gpu-opencv-compat': raise ValueError('GPU capture required')
-        if hashlib.sha256(library.read_bytes()).hexdigest()!=manifest['gpu_detector_library_sha256']:
+        if not allow_frontend_change and hashlib.sha256(library.read_bytes()).hexdigest()!=manifest['gpu_detector_library_sha256']:
             raise ValueError('replay library differs from capture')
+        if not allow_frontend_change and hashlib.sha256((ARUCO/'src/aruco_landing/gpu_opencv.py').read_bytes()).hexdigest()!=manifest['gpu_compatibility_sources_sha256']['gpu_opencv.py']:
+            raise ValueError('replay source differs from capture; use --allow-frontend-change for correction audits')
         base=ROOT/'stacks/aruco-landing-isaac-x86' if cfg.get('pad_manifest_root')=='stack' else ARUCO
         pad_path=base/cfg['pad_manifest']
         if hashlib.sha256(pad_path.read_bytes()).hexdigest()!=manifest['pad_sha256']:
@@ -103,6 +105,8 @@ def audit(inputs, output):
         decoder_mode='cell ratios' if hasattr(cv2.aruco.DetectorParameters(),'validBitIdThreshold') else 'binary majority',
         replay_source_sha256=hashlib.sha256((ARUCO/'src/aruco_landing/gpu_opencv.py').read_bytes()).hexdigest(),
         capture_source_sha256=[json.loads((p/'manifest.json').read_text())['gpu_compatibility_sources_sha256']['gpu_opencv.py'] for p in inputs],
+        frontend_change_allowed=allow_frontend_change,
+        capture_library_sha256=[json.loads((p/'manifest.json').read_text())['gpu_detector_library_sha256'] for p in inputs],
         ordered_ids_mismatches=sum(not c['ordered_ids_equal'] for c in cases),
         max_corner_delta_px=max((c['corner_max_delta_px'] or 0 for c in cases),default=0),
         max_pose_position_delta_m=max((c['pose_position_delta_m'] or 0 for c in cases),default=0),
@@ -120,8 +124,10 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--inputs',nargs='+',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--allow-frontend-change',action='store_true',
+        help='audit a corrected frontend; captured-output reproduction stays a separate strict gate')
     args=parser.parse_args()
-    if not audit(args.inputs,args.output): raise SystemExit(1)
+    if not audit(args.inputs,args.output,args.allow_frontend_change): raise SystemExit(1)
 
 
 if __name__=='__main__': main()
