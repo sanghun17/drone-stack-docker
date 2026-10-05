@@ -190,8 +190,12 @@ def figures(directory,output,result,rows):
     fig,axs=plt.subplots(2,2,figsize=(9,7),layout='constrained')
     for ax,(key,title,unit,vmin,vmax) in zip(axs.flat,panels):
         data=np.array([r[key] if r[key] is not None else np.nan for r in result['grid']]).reshape(n,n)
-        artist=ax.pcolormesh(axes,axes,data,shading='nearest',cmap='viridis',vmin=vmin,vmax=vmax)
-        fig.colorbar(artist,ax=ax,label=unit)
+        if np.isfinite(data).any():
+            artist=ax.pcolormesh(axes,axes,data,shading='nearest',cmap='viridis',vmin=vmin,vmax=vmax)
+            fig.colorbar(artist,ax=ax,label=unit)
+        else:
+            reason='No vision-height events' if key=='d_touchdown_cm' else 'No valid estimates'
+            ax.text(.5,.5,'N/A\n'+reason,ha='center',va='center',transform=ax.transAxes)
         ax.set(title=title,xlabel=r'$x_0/f_w(h_{max})$',ylabel=r'$y_0/f_w(h_{max})$',
                xlim=(-1,1),ylim=(-1,1),aspect='equal')
     fig.suptitle(f"{result['config']['configuration_label']}: {n}×{n} positions, {result['config']['initial_protocol']['repeats']} repetitions")
