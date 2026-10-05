@@ -27,6 +27,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--resume', action='store_true')
     parser.add_argument('--detector', choices=['cpu','gpu-experimental','cpu-nested-apriltag','gpu-opencv-compat'])
+    parser.add_argument('--save-audit-images-every',type=int,default=0,
+                        help='save grayscale/GT evidence every N camera captures, plus up to 16 large-error batches')
     parser.add_argument('--smoke', action='store_true', help='render and detect; fail unless every camera finds the pad')
     parser.add_argument('--isolation-smoke', action='store_true',
                         help='smoke with an env-1 visual occluder directly in front of env-0 camera')
@@ -40,6 +42,9 @@ def main():
         args.smoke = True
     if args.num_envs < 1 or args.trials < 1 or args.trial_start < 0:
         parser.error('num-envs/trials must be positive and trial-start nonnegative')
+    if args.save_audit_images_every<0: parser.error('audit image interval must be nonnegative')
+    if args.save_audit_images_every and args.resume:
+        parser.error('camera evidence capture requires a fresh run')
     cfg = yaml.safe_load(args.config.read_text())
     if args.detector:
         cfg['detector_backend'] = args.detector
@@ -92,6 +97,10 @@ def main():
             name:hashlib.sha256((ARUCO/'src/aruco_landing'/name).read_bytes()).hexdigest()
             for name in ['gpu_opencv.py','cuda/opencv_candidates.cu']}
         metadata['gpu_compatibility_scope']='GPU image processing; CPU grouping/dictionary/subpixel; opt-in prototype'
+    if args.save_audit_images_every:
+        metadata['camera_evidence_sampling']=dict(every_camera_batches=args.save_audit_images_every,
+            extra_position_error_threshold_m=.3,max_extra_batches=16,
+            scope='same-image grayscale audit evidence; may include warmup and inactive environments; never used by policy')
     store = TrialStore(args.output, metadata, args.resume)
     pending = [i for i in range(args.trial_start,args.trial_start+args.trials) if i not in store.completed]
     if args.smoke: pending = list(range(args.num_envs))
@@ -176,6 +185,10 @@ def run(args, cfg, manifest, pending, store):
     native = velocity_controller(robot, robot_cfg, args.num_envs, sim.device, gains)
     allocation = torch.linalg.pinv(torch.tensor(robot_cfg.allocation_matrix,device=sim.device))
     detector = BatchedPadDetector(manifest,args.num_envs,K,cfg['detector_backend'])
+    samples=None
+    if args.save_audit_images_every:
+        from camera_samples import CameraSamples
+        samples=CameraSamples(store,manifest['dictionary'],args.save_audit_images_every)
     offset = torch.tensor(camera_cfg['body_position_m'],device=sim.device).expand(args.num_envs,-1)
     optical_quat = torch.tensor(camera_cfg['body_quaternion_xyzw'],device=sim.device).expand(args.num_envs,-1)
     body_from_camera = pose_matrix(camera_cfg['body_position_m'],camera_cfg['body_quaternion_xyzw'])
@@ -215,6 +228,8 @@ def run(args, cfg, manifest, pending, store):
         sampled_truth[:,:3,:3] = gt_rotations @ body_from_camera[:3,:3]
         sampled_truth[:,:3,3] = gt_positions + gt_rotations @ body_from_camera[:3,3]
         sampled_velocity = robot.data.root_link_vel_w.torch.detach().cpu().numpy()
+        if samples is not None:
+            samples.capture(totals['camera_batches'],rgb,sampled_truth,observations,detector.last_detected_ids)
         for env, observation in enumerate(observations):
             if observation is None: continue
             estimated = inverse(observation['camera_from_pad'])
