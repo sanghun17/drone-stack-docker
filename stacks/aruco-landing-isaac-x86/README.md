@@ -14,14 +14,14 @@ see [the grid protocol and pad mapping](docs/paper-grid.md). It uses the revised
 funnel, nominal print geometry, and matched 500-trial inputs for each configuration.
 
 The campaign runner accepts a common detector override without changing the
-historical configuration files. On IM's SSD Docker daemon, for example:
+historical configuration files. Use ordinary CPU OpenCV to compare every pad
+under the same extraction/PnP/control pipeline. On IM's SSD Docker daemon:
 
 ```bash
 DOCKER_HOST=unix:///tmp/docker-ssd.sock \
-ARUCO_OPENCV_CUDA_LIBRARY=/work/.build/isaac-landing/libaruco_opencv_cuda.so \
 python3 stacks/aruco-landing-isaac-x86/scripts/paper_campaign.py \
-  --output data/results/isaac/my-common-opencv-campaign \
-  --num-envs 90 --trials 500 --detector gpu-opencv-compat \
+  --output data/results/isaac/my-common-cpu-campaign \
+  --num-envs 90 --trials 500 --detector cpu \
   --configs paper-grid-pad1.yaml paper-grid-pad2.yaml paper-grid-pad3.yaml \
     paper-grid-pad4.yaml paper-grid-b1.yaml paper-grid-10x10.yaml paper-grid-b3.yaml
 ```
@@ -32,6 +32,13 @@ policy. CPU detection still uses Isaac's GPU rendering/physics and downloads one
 batched grayscale image tensor. The OpenCV-compatible GPU frontend also retains
 compact CPU stages; it is not a complete CUDA OpenCV build. Measure complete
 landing throughput on the target host before selecting either frontend.
+
+The [seven-pad CPU evaluation](../../data/analysis/aruco/isaac_paper_grid_cpu_common_20261006.md)
+contains the fresh 500-trial results for each layout, separate from all prior
+GPU captures. Every layout uses the same CPU extraction parameters and shared
+PnP/controller, with its own marker dictionary. This compares layouts under a
+common pipeline; it does not reproduce the papers' different specialized
+detectors. B1 has no template tracker or original MVFAN in this experiment.
 
 The [IM rerun and correction report](../../data/analysis/aruco/isaac_paper_grid_opencv_common_20261005.md)
 records the 2026-10-06 baseline pilot: both frontends succeeded in 16/16 trials,
