@@ -1,0 +1,872 @@
+{
+  "experiment": "OpenCV-compatible CUDA image frontend qualification",
+  "status": "complete",
+  "capture_root_commit": "a11226151a01785d4f1d8ea38daf7673f065d648",
+  "capture_aruco_revision": "ecce1d35e332d6344baa1d754c0c0011801679ec",
+  "current_aruco_revision": "d5b3b97e72707b5dab62794749df6725d0cbf557",
+  "backend": "gpu-opencv-compat",
+  "full_cuda_detector": false,
+  "existing_campaigns_modified": false,
+  "device_stages": [
+    "replicate-border adaptive thresholds",
+    "RETR_LIST / CHAIN_APPROX_NONE border following",
+    "closed Douglas-Peucker / convex quad filtering",
+    "candidate image rectification",
+    "corner ROI extraction"
+  ],
+  "cpu_stages": [
+    "homography matrices",
+    "stable candidate grouping and hierarchy",
+    "OpenCV Otsu and dictionary identification",
+    "OpenCV cornerSubPix",
+    "shared PnP"
+  ],
+  "scope": "classic ArUco, one dictionary, NONE/SUBPIX; finite-corpus equivalence, no universal bitwise guarantee",
+  "library_sha256": "8749b3a8f2ab5b7bdf6dc3adfe5d5d74399084780c616cab0731b2527d170926",
+  "sources_sha256": {
+    "src/aruco_landing/gpu_opencv.py": "5404391323de54d931f34d53c8030ef75a3234907999b9ac6d0e15d6f906d0b2",
+    "src/aruco_landing/cuda/opencv_candidates.cu": "faac14ff821bd49bac9c200bd19c0220b3888e016fabfbe200dd415b6577c2e6",
+    "src/aruco_landing/cuda/opencv-port.md": "529521ba9c0c8ba07d09d352ea0e3395df0360d86684794c76f87ade4e591422",
+    "scripts/qualify_gpu_opencv.py": "68d74768df69becf89b6feac4f3f3872ad77224e7a77cd09cac90cbb327a4f28",
+    "test/test_gpu_opencv.py": "89475e4a181a54aa2de46678806d2da2d0f893ff0ddeeac8dd776eb7451f4c00"
+  },
+  "checks": {
+    "root_grid_tests": 7,
+    "adaptive_threshold_pixel_oracle": {
+      "pixels": 360000,
+      "differences": 0
+    },
+    "local": {
+      "opencv_version": "4.13.0",
+      "torch_version": "2.2.0a0+git39901f2",
+      "device": "NVIDIA GeForce RTX 2080 Ti",
+      "images": 125,
+      "accuracy_gate_passed": true,
+      "max_corner_delta_px": 0,
+      "mismatched_images": []
+    },
+    "IM": {
+      "opencv_version": "4.14.0",
+      "torch_version": "2.11.0+cu128",
+      "device": "NVIDIA GeForce RTX 4090",
+      "images": 125,
+      "accuracy_gate_passed": true,
+      "max_corner_delta_px": 0,
+      "mismatched_images": []
+    },
+    "local_module_tests": 5
+  },
+  "qualification_paths_sha256": {
+    "data/results/isaac/opencv-gpu-compat-local-v2-20261005.json": "906f1f604057f0e193c3e04849bc1ca023c19bba8a23a4d5367b7317378a0955",
+    "data/results/isaac/opencv-gpu-compat-im-20261005.json": "697d211e4eb08b2e8152173fd55e2f0d51db074e95844e5b199504a0eb97d64f",
+    "data/results/isaac/opencv-compat-native-audit-20261005.json": "8d5dc02cce31c2b766639776368fab3c0606225c2bc62777e142fe005f3333a7"
+  },
+  "IM_timings": [
+    {
+      "dictionary": "DICT_4X4_100",
+      "batch_size": 1,
+      "gpu_frontend_wall_s": 0.08840959500230383,
+      "cpu_download_and_detection_wall_s": 0.06665476100170054,
+      "speedup_cpu_over_gpu": 0.7539313012344826,
+      "gpu_download_bytes": 278520,
+      "cpu_grayscale_download_bytes": 518400
+    },
+    {
+      "dictionary": "DICT_4X4_100",
+      "batch_size": 16,
+      "gpu_frontend_wall_s": 0.1965040700015379,
+      "cpu_download_and_detection_wall_s": 0.17572252899117302,
+      "speedup_cpu_over_gpu": 0.8942437120503293,
+      "gpu_download_bytes": 4434896,
+      "cpu_grayscale_download_bytes": 8294400
+    },
+    {
+      "dictionary": "DICT_4X4_100",
+      "batch_size": 90,
+      "gpu_frontend_wall_s": 1.1629561390000163,
+      "cpu_download_and_detection_wall_s": 0.9224440389953088,
+      "speedup_cpu_over_gpu": 0.7931890189672027,
+      "gpu_download_bytes": 25121340,
+      "cpu_grayscale_download_bytes": 46656000
+    },
+    {
+      "dictionary": "DICT_6X6_50",
+      "batch_size": 1,
+      "gpu_frontend_wall_s": 0.09524115700332914,
+      "cpu_download_and_detection_wall_s": 0.07715022600314114,
+      "speedup_cpu_over_gpu": 0.810051331069449,
+      "gpu_download_bytes": 51316,
+      "cpu_grayscale_download_bytes": 518400
+    },
+    {
+      "dictionary": "DICT_6X6_50",
+      "batch_size": 16,
+      "gpu_frontend_wall_s": 0.12177139898994938,
+      "cpu_download_and_detection_wall_s": 0.1537959889974445,
+      "speedup_cpu_over_gpu": 1.2629894234042458,
+      "gpu_download_bytes": 853484,
+      "cpu_grayscale_download_bytes": 8294400
+    },
+    {
+      "dictionary": "DICT_6X6_50",
+      "batch_size": 90,
+      "gpu_frontend_wall_s": 0.7158459659985965,
+      "cpu_download_and_detection_wall_s": 0.8510988110065227,
+      "speedup_cpu_over_gpu": 1.188941268697729,
+      "gpu_download_bytes": 4733928,
+      "cpu_grayscale_download_bytes": 46656000
+    },
+    {
+      "dictionary": "DICT_APRILTAG_36h11",
+      "batch_size": 1,
+      "gpu_frontend_wall_s": 0.09884327999316156,
+      "cpu_download_and_detection_wall_s": 0.07402911699318793,
+      "speedup_cpu_over_gpu": 0.7489544762001991,
+      "gpu_download_bytes": 45416,
+      "cpu_grayscale_download_bytes": 518400
+    },
+    {
+      "dictionary": "DICT_APRILTAG_36h11",
+      "batch_size": 16,
+      "gpu_frontend_wall_s": 0.13803599300445057,
+      "cpu_download_and_detection_wall_s": 0.17187553299299907,
+      "speedup_cpu_over_gpu": 1.2451501181105529,
+      "gpu_download_bytes": 707616,
+      "cpu_grayscale_download_bytes": 8294400
+    },
+    {
+      "dictionary": "DICT_APRILTAG_36h11",
+      "batch_size": 90,
+      "gpu_frontend_wall_s": 0.8032886839937419,
+      "cpu_download_and_detection_wall_s": 0.8857961799949408,
+      "speedup_cpu_over_gpu": 1.1027121353073133,
+      "gpu_download_bytes": 3950640,
+      "cpu_grayscale_download_bytes": 46656000
+    }
+  ],
+  "timing_scope": "single warmed sample per case, GPU-resident grayscale; CPU 8 workers including download; excludes rendering",
+  "input_cases": [
+    {
+      "name": "synthetic-DICT_4X4_100-00",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "3306a358b3d6971b6510c7aaf6e79b67f51272811ef69586f62a29eb572a7ba5"
+    },
+    {
+      "name": "synthetic-DICT_4X4_100-01",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "60c4c53424d8bfb0e35851b7d9488278b2b1c0d4ab2653b34f236f09ef0eba52"
+    },
+    {
+      "name": "synthetic-DICT_4X4_100-02",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "ff08ea75a6ba1b0f8bd6997b580a71cfb79c9c13d69768e029ce73bf3778afd9"
+    },
+    {
+      "name": "synthetic-DICT_4X4_100-03",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "55a03f35255fe306e3413ecf8c69268a947748abb1a5460205ece4a79ec16d59"
+    },
+    {
+      "name": "synthetic-DICT_4X4_100-04",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "ae846f9b431291deec3f6299283d6f48540e2440d64f47e6c34a2e2e73c2e36f"
+    },
+    {
+      "name": "synthetic-DICT_4X4_100-05",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "ebe42ceddee4152524a12016516d237a0a4eec1c28ee939d2a41c028745f7c46"
+    },
+    {
+      "name": "synthetic-DICT_4X4_100-06",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "74aac6f676d3165de29daa5f2ee5bacaa9a5bc095c7bb1e46879745f1b9a200c"
+    },
+    {
+      "name": "synthetic-DICT_4X4_100-07",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "c1a6546e6fc02cc119330b46fe91710c97317781462e2d1f8f162e7fa51468dd"
+    },
+    {
+      "name": "synthetic-DICT_4X4_100-08",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "1c34e03c50182a20eca6760ac54609d3275dc10e2148a9754ffbf7efe14411af"
+    },
+    {
+      "name": "synthetic-DICT_4X4_100-09",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "d83212db08fb38730ba225ce98c0641b6ec50b0a63f2eafcd6822f0dbfcabd43"
+    },
+    {
+      "name": "synthetic-DICT_4X4_100-10",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "f3127d0c6830f856d21b7e0f749b17b932e18605cd95c86662f2024ef433f7ca"
+    },
+    {
+      "name": "synthetic-DICT_4X4_100-11",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "70316830d0e464b593e333b7324b46d09f1599550fdeb9798f76b9bd6d37bcd5"
+    },
+    {
+      "name": "synthetic-DICT_4X4_100-12",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "029220d4bf768426f0a014a7c67120337d4378a476773a487c722dbe9a408be3"
+    },
+    {
+      "name": "synthetic-DICT_4X4_100-13",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "8f95c458066df666c09dd51a471f98c45b47d3844a26b4b9f0f3d14530312d3f"
+    },
+    {
+      "name": "synthetic-DICT_4X4_100-14",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "a26a45ffaaf85dd2feb59eecb1e0d8d513eb0adf7447946a407aaebad913e29a"
+    },
+    {
+      "name": "synthetic-DICT_4X4_100-15",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "aa9a968db8287dcc98ff156de9d0ca8bf2b1df7580737a51582afd83e25af12e"
+    },
+    {
+      "name": "synthetic-DICT_4X4_100-16",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "10dcf362a3b32cdfa4ef15035e50a855a4e0dea03ac60c15285331ae18fa6eef"
+    },
+    {
+      "name": "synthetic-DICT_4X4_100-17",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "f8e92bc46669f209c0009120e0efcb840345bf2c045fe455966a95bae9c0fe6d"
+    },
+    {
+      "name": "synthetic-DICT_4X4_100-18",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "79e863801b8f2afd168c79b77873270aa543c3216e087696242005c2f0f7618f"
+    },
+    {
+      "name": "synthetic-DICT_4X4_100-19",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "4187ac67de8fcd0d932a55c8dc5e6f100ffe31974e474620a8effc8b376bbdbe"
+    },
+    {
+      "name": "synthetic-DICT_4X4_100-20",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "f3baf00378b457f6de181163c72bbdbc390bed06017a74080b9998ca5aec7baf"
+    },
+    {
+      "name": "synthetic-DICT_4X4_100-21",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "6a277a2aafbe2d6b78f8dd55efdf837875e91755b6219ae07af2ded3c2299c7f"
+    },
+    {
+      "name": "synthetic-DICT_4X4_100-22",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "8da2075359d184101042b4153287d797a37fb020fdb915b2741c780612414a17"
+    },
+    {
+      "name": "synthetic-DICT_4X4_100-23",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "721dc51f9d37ef635e2fbb4cbfc764c82915218ce735f4c8d3797d1855989e0b"
+    },
+    {
+      "name": "negative-0",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "d015983d12b84bdec9127812df800368bb7914ddc7dafc0d044d759dea19ed59"
+    },
+    {
+      "name": "negative-1",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "6973378f17ac8765e5aec8a9a830c7988760d49b4114c128d6bacbd8fe3da68c"
+    },
+    {
+      "name": "negative-2",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "e077f365c4a6e0ae0650ddb5147af3a151e8a4f8392e043786933699eeef461c"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-000.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "0ef02b526594eaf10909307d6a91fda46ca0ead91b628bd1b4f75608b612958c"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-001.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "edfe5bdd6c4c3a10992f8890b15e7bd0ddc13ea46be0b71e65374bc084701491"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-002.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "c91bda04af3b2ee1c312f5efd3b9b451c6fddb5219567722915bb63a3405dffd"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-003.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "5560fce7c19ab35af2a3573ac0a78df8343c351919070a55d170c5acfd75425d"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-004.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "b37c6d2ac09b0d9a156f9e4bdaaca02203540b64ad733db75f81557badcb0056"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-005.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "471e5a3f686b803916ae25b6d9e50442560afdac48bdb2b060214f94393f0980"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-006.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "3c1573dc5da6596dd072c6eaa9f5ec2f4b8ac9b78f6eca00e2cc7e4a41551a61"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-007.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "16a801eee15807f87d805c7bca2a2762550229664a4a3f24ec586118e3feee13"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-008.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "acc005590aca4e4d1ea59339cdeec58e938e2d3ff986897e5dd85806b02135a9"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-009.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "c0fa9da3e6cb903972ba99c65944d569d0eeb6b854e678f031f75f5f6e60fde2"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-010.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "12eb53c450b748999949d79033b6c5e35f2877d35dec1641907bb35fc66b45d7"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-011.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "4dc0e553864e6c30f494377396a6ff9ac5ce3434cfca0a41fbc9ce3a2c19ec6e"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-012.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "8f5370936826f1af55b37e708c186dd94362962bb5b044943e55253ece12108e"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-013.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "83293488b7e27fddb11b848223f691c325e04eaaf427ff0572cd486f38d8f937"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-014.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "86fc8e911abb32eecc098d6a06396e736ff05ae9d2df0ff112bd0088a1e4188d"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-015.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "f6c496fe268025829ad8b1e1aa909ee46c412a81f518aeb7402532d9af32e69e"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-016.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "71e5451c1c7e6e09809aeff1d58bd34852a837afaf870e7cdf4c57b2c38647f5"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-017.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "838ce92285d4ff96119c1472d0996c4ffb72167f85528da0f2b579aaf0fa1edf"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-018.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "cf21a17b1a9e09ee1d622b69289e1aca21961ec007b391bb55ca6545f7529e93"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-019.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "1a1f53101e0581115e10a1b94f8af1061db7ba4db9e73e8fbae29628639d4187"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-020.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "1d01250890fd8fc5cd10b0493035b5f356036b016808a37ed9cb08da628151d8"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-021.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "624f406ecce81c40f8fbad173584c9876438b80dba91fd857d62e80f4533efc2"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-022.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "6792e05fb5a764bb1ad3a6c74d2e0eeec9020d586373d4ffbf6ed6fec0d180a5"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-023.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "484546240ba8883e01aece6181835cf0ae56c4818f8282fc588d75c2fc9bfd6b"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-024.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "760b64ff0fdedca1f38748b9025e04824ed84707101e13beb637d35834a5cbca"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-025.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "89268ac512dedfc199833bc1a9833ab787731c8d7960f81d5a1f5657e4fe3bb6"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-026.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "4e952c6e2451b7c21ccba41734eb012f95f2d613f2aa0b5ca4ad6b4633ee0b51"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-027.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "912998229a21e6c0b0f313e3306a279f4bb278e9c8f28f6c966e0ca6c41df61a"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-028.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "ce4afd7ab553aebf38da2d7f850746078840dfa1f5bbf48608a505e5f87d8468"
+    },
+    {
+      "name": "data/assets/opencv-compat-20261005/local-native-baseline/camera-029.png",
+      "dictionary": "DICT_4X4_100",
+      "sha256": "b2222c1922d83f8adf623c30dd3991319aae87251cc91dc3b483c47ff7b2e0d8"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-00",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "bfa70431a1974d5ec21acd0c19fc4338d7443910aa28b2d386268b3866e5e870"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-01",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "e569fb9f1f9b0af88c22d51c35fd9aec36e2b2112e5cf0b085468e66d2a932b1"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-02",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "056df160e1944aef5408b45aac04240aa4117df29f754de59517d3dc85640699"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-03",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "b344e8a1e0487a76c7cd8d8febfc11bf1e88620025beae54e5cdbcc2de32c9d5"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-04",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "7347fc741aba05357b2d3bd34680c5744a9360eb63b33d4b04d81954efc33e15"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-05",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "c8f42878dfc79464bb71112eb2d98f7ffe71dd4cc46d4e42d25568e5002c0dbc"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-06",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "ea4b1a1a82ba03f3cdda1973cd59a48e634c163bc77d4cf7df710e81a46b2e54"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-07",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "60381da9615b268276e07c876508ae2256f9b553f32d519e2bb61064dc060a6c"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-08",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "68d98513aea375cfbdc59c267828ae7ae4bbe77fa1c8a2e6c0633ee89999ef9c"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-09",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "0c96f154969cf94250451a82e5aed986da4d202be196cf242a6028a9769913ed"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-10",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "7462fb3f5d8fe665456e500805570ade505fd50001dbe1f647f607a4086d6cc9"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-11",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "594ea6f33544ff7400d4cc5bb7581d76349bf871562f8923189483f80720b8d4"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-12",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "b05ae9af9b4e111f5abe26007921c7fc826d3be5483f82d7b07de11ffe61fd74"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-13",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "952c45608463b5926a7fc24080853d7f88eb88d523b567e9a3ceb00f4e45de98"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-14",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "451406aef3d8b250d86c43fafafe2f2d22e71ff7c8ec4dced879edf347d8cc16"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-15",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "dee88bc6219b59e84c7c49d7a4e32256dc4813b299cd4433a57485584d0e66ed"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-16",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "57360fdd314cd7b6e85746dcf44a74bb4f6cba28d2ccdae80433868fb5c23c7b"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-17",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "c3501a973ae559883aaa53f228f01fb2fe00f3b899cc93a35a074ea96f9ba4ac"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-18",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "dd524b05473d31765ceec82c5340eac00f6ff9956cdfcfd85a6cdc125e07bad3"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-19",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "28cbd8b1dd047ea9e4918bac23a1ea04a7f15a3b04c490c06cb557067aa3bfbc"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-20",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "e4846b0de7f339219730c65bdae4fb3cd54dcb1d1140e8da34a07ca4b1fb8d29"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-21",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "5a05467fb2cba9c92ca7bf7564d0cdbc86a9da2ccbdc3d2fb9ab3eb47be0131c"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-22",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "b6ff3c80c338a4fd2c56361645ddc611ff85cd567dd7f71482a74b31a94cd684"
+    },
+    {
+      "name": "synthetic-DICT_6X6_50-23",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "dbb475a6a79081ed57963d6983ddcaa7e4aca758a1083d75f210f3cfff41cf6c"
+    },
+    {
+      "name": "data/results/isaac/paper-b3-optical-20261005/camera-000.png",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "07f11c447644e5e5784f32b1a5e0b8f50e1d8bc61459b212084df81e6f0a6ea8"
+    },
+    {
+      "name": "data/results/isaac/paper-b3-optical-20261005/camera-001.png",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "00eb718451f94e5c87a23dda1a15570a43340ccbc959eb058bd3785f109df4c1"
+    },
+    {
+      "name": "data/results/isaac/paper-b3-optical-20261005/camera-002.png",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "9bd6dc44a2f1d138bcd78a394a67655440223d10907cc02dbf2be602426e19c3"
+    },
+    {
+      "name": "data/results/isaac/paper-b3-optical-20261005/camera-003.png",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "16a0de348aa62bd9d19c9c5bb17e16cdb9cb44ce0dc12b9b8e85f86a88543670"
+    },
+    {
+      "name": "data/results/isaac/paper-b3-optical-20261005/camera-004.png",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "558cab6f349cf450496fcf000af4a4a88c91ef635cd861b040f5087489a62d2d"
+    },
+    {
+      "name": "data/results/isaac/paper-b3-optical-20261005/camera-005.png",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "6e4449306153d07ca509d37e968f05247beb6eb087cae8c650ebecdff14c4c54"
+    },
+    {
+      "name": "data/results/isaac/paper-b3-optical-20261005/camera-006.png",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "e66213c896a69db5da990a1dcbd161bfe0f3a1027495afd7130b0bde0cbd1bea"
+    },
+    {
+      "name": "data/results/isaac/paper-b3-optical-20261005/camera-007.png",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "386d6f1173c698f6b7fc430ba829eb3780971c5cb070199438a7538f9d2eceb0"
+    },
+    {
+      "name": "data/results/isaac/paper-b3-optical-20261005/camera-008.png",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "0515e118ccb6e7a6cd6a9e68cfb9380a1f69baa781830f36c1f33b817197ec26"
+    },
+    {
+      "name": "data/results/isaac/paper-b3-optical-20261005/camera-009.png",
+      "dictionary": "DICT_6X6_50",
+      "sha256": "8efadf23bf81f33044e0f368a80af83e21a7a2af28580171790bf5dada4d6326"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-00",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "b9893f147fd7525dcec4443674b9f7a5c0a1e23c8dba2adc80cfad223f390f7f"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-01",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "5cc685149e360272901bd30a7a9bc48d8bcfe7da14e5e9b9e637e70a41c3b494"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-02",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "b9dd0b913b3d46720aacd070668d6d4dbc04b70e7888d762ce59409527619dc3"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-03",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "504ed6d8681899c3604b2b10a8ee61bd83df8f809e58bf2df7c997d4eec8251f"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-04",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "fe36715d46d4df73d0569839ca2cc73e50a8f0cde9d0c0b61d62d96202820311"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-05",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "ddc7d52425b311df42fc03343379690fb360558be86f28d4d8f4d7af4704438a"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-06",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "198bcc9ade9350b13b3191a70e54f2a8085d4c2bf5282377089d179994048e41"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-07",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "bbbc13d7f2fe26fadc0e965571a8aa9530730488a1380a8afe21de1341997e74"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-08",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "7c79f1c0d961ed7b3b46d4a07a739ca98fb286b5fe312e530d92ec575ebbdde5"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-09",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "56a909b9b0d9b9b030d5c4c55a1e50ec57855a5773c9e042f18f82358ef0f3bd"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-10",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "12506aed9c8369f97eefce563046a34722d82add6ec3458b39cbd500071b5c0a"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-11",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "e0052c41110bea9c86f6a79c3d95323d83566788d0dd57b5f09306bfd21c0479"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-12",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "14095313ba2eef4719c8962911c3d38408f2f208cbde81987e34b7f436850211"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-13",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "2439d8f12d88a6c588fb2c1c43f46c3eab98b27b736a470ded5725f8736e2583"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-14",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "7d85fe7c7a97a5df83245b54ebe5df40b3d631d182136b375dc75f89133e8d3a"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-15",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "2d81f7d15b696e2ab71c7ffbe25e0a126ad24819d98cd93e924274b433e3ca23"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-16",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "43732029aa3a30eb39335113fb60c90777140b97c45294b2e0b67efe394b4eb2"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-17",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "a3fcbfbaaf4f26ef4942f214bbc2fc6bc355cb2a305c523166b0ba774693d170"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-18",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "5840c2cae0573f1071eb7983087c6dd4afb046d34d1c5a4919609f14e985ad0f"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-19",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "7618579c736e40e6b25b16a3e92c52471553026b832c8b9facc5b2d7ffa9aad0"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-20",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "8b5143170065284afd64e78435d1bc6b3bf98045e54b9f9b2df539e5d8fea5e1"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-21",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "46fd977619862eba3afcd625fdf2188682dc4e696b11b0d0cf588341dc0ae514"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-22",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "4dead09a92161e3c7318a0310ea38b50aca3bc77942e592865c7561de74d38c6"
+    },
+    {
+      "name": "synthetic-DICT_APRILTAG_36h11-23",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "37ea1937b899badbad534af0e0813b7a31b61b0ca83e1af59c315557313d6ca8"
+    },
+    {
+      "name": "data/results/isaac/paper-b1-optical-cpu-20261005/camera-000.png",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "f6eb5867f6865aa9cac27817c39d9de73e3c6b600affb8c29bb7dead5da7e9cf"
+    },
+    {
+      "name": "data/results/isaac/paper-b1-optical-cpu-20261005/camera-001.png",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "c077cff82cac66b4db21e4bfa71159ffd2fefa21ac0858bdddd15eaa20c78fd7"
+    },
+    {
+      "name": "data/results/isaac/paper-b1-optical-cpu-20261005/camera-002.png",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "1bcfc546f2f18a55fe314b300dbdf9ace783209cd183fb693e1e22a67a38cd7c"
+    },
+    {
+      "name": "data/results/isaac/paper-b1-optical-cpu-20261005/camera-003.png",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "e6da17a81cb58b67b48d38c39c9cac2ddad095e7961b61e5ac660313779790a6"
+    },
+    {
+      "name": "data/results/isaac/paper-b1-optical-cpu-20261005/camera-004.png",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "a25ab923ae183a26010f59c2fc5d2565579e9a8fa6a1afa7a3666590d52d4dcf"
+    },
+    {
+      "name": "data/results/isaac/paper-b1-optical-cpu-20261005/camera-005.png",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "554b9cffc99a29167dbc585af123d539c2d8a9feaabbb16988bb9dd21fad4d11"
+    },
+    {
+      "name": "data/results/isaac/paper-b1-optical-cpu-20261005/camera-006.png",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "8b6689469bda6541a113af6a12be661ecd5079e3d3dc7a511c5ce846b3edebe2"
+    },
+    {
+      "name": "data/results/isaac/paper-b1-optical-cpu-20261005/camera-007.png",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "ad17f2e412010d5000addd76faf8cac6a564b13c52a02706f5ddf68bebd40fb0"
+    },
+    {
+      "name": "data/results/isaac/paper-b1-optical-cpu-20261005/camera-008.png",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "43b9c70197579e36f10587bea28734b40de164d89c4980178c0fd1dd67dad5f8"
+    },
+    {
+      "name": "data/results/isaac/paper-b1-optical-cpu-20261005/camera-009.png",
+      "dictionary": "DICT_APRILTAG_36h11",
+      "sha256": "a12a94d672584eeeab8b116f937eaac2d6bc0b6544e470e047d4749ebc9f6297"
+    }
+  ],
+  "native_validation": {
+    "trials": 16,
+    "successes": 16,
+    "termination": "estimated camera height 0.2 m, not physical contact",
+    "trial_ids": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "mean_camera_rmse_cm": 0.28150478588013805,
+    "mean_terminal_xy_error_cm": 0.6437673757318407,
+    "maximum_active_frame_camera_error_m": 0.01352915517608973,
+    "mean_decoded_marker_availability_pct": 100.0,
+    "mean_pose_availability_pct": 98.73797971585952,
+    "trace_hashes_verified": 16,
+    "runtime_summary": {
+      "num_envs": 8,
+      "completed_trials": 16,
+      "wall_s": 104.7974773360038,
+      "startup_wall_s": 11.882729460005066,
+      "evaluation_wall_s": 116.68022375801229,
+      "new_trials": 16,
+      "trial_per_wall_hour": 549.6315509134033,
+      "aggregate_simulation_s": 64.43333333333334,
+      "aggregate_simulation_per_wall_s": 0.6148366828215328,
+      "gpu_peak_allocated_bytes": 186669056,
+      "hardware": {
+        "gpu_uuid": "GPU-da2b812f-807b-5663-59cf-98dc4c7be812",
+        "gpu_name": "NVIDIA GeForce RTX 4090",
+        "driver": "570.211.01",
+        "memory_mib": 24564,
+        "rtx_driver_floor_passed": true,
+        "image": "Isaac Lab 3.0.0-rc1 / Isaac Sim 6.1",
+        "renderer_log_minimum": "550.90.07",
+        "renderer_log_recommended": "580.95.05",
+        "caveat": "Driver floor is necessary, not a full compatibility or GPU health verdict."
+      },
+      "timing": {
+        "physics_s": 4.3751710399083095,
+        "render_s": 13.943039311037865,
+        "device_and_transfer_s": 76.61106890419615,
+        "detect_s": 0.0002235807478427887,
+        "pnp_s": 7.116530269267969,
+        "control_s": 0.16494101894204505,
+        "transferred_bytes": 1091043128,
+        "markers": 193326,
+        "camera_batches": 494,
+        "physics_steps": 972
+      },
+      "pose_quality": {
+        "valid_poses": 3903,
+        "translation_sum_squared_m2": 0.03243853662655474,
+        "translation_max_m": 0.013529155176089757,
+        "rotation_max_deg": 0.4498570381136884
+      }
+    },
+    "capture_manifest_sha256": "7752659689833131cb706d367095e746a34a7082881f6576b21c5bbb85041c85",
+    "trace_sha256": {
+      "trace-0000000.npz": "05b1e0e984b7e5010afddc46c53f34ba9d8587dbc2d9edd4151bc21b3403ad7d",
+      "trace-0000001.npz": "98beb3404d3e2a910d9fdcd7822c3042b294b7aad9c567d70ee1197e8a2ba431",
+      "trace-0000002.npz": "9e0a2acf75951d1f2b2ae9e274e016231658fe3b055eb1048db1bd71602d1aa7",
+      "trace-0000003.npz": "07a737903d3833234e100a088d9b82514901d09f3ce41616213ac44ace81cd8e",
+      "trace-0000004.npz": "44477e13fec22002bc96e17ccb46d7f3aa9560050cb1947717ec23e2d99f001b",
+      "trace-0000005.npz": "ce652d2a3c26771ea366f200e3d116ec38ed3196bc12ad0ecbc9f7810aeb2498",
+      "trace-0000006.npz": "a501e3abe934938ddfa85a7d9ed9249c7ec2746e22f12e64829d19916fb9a1d5",
+      "trace-0000007.npz": "f466648737926dc0494b6cc67b70cd85bd985462dce801dad6471b8a85969f49",
+      "trace-0000008.npz": "1519ea6c5ea3774903ba25c7d5d612a935689df4d96d21cd24d70b80d4a909ad",
+      "trace-0000009.npz": "50b6d4010168774b4b28752624a30e64f8a47261428a0bdd59dc3d51eb28918b",
+      "trace-0000010.npz": "c2fc2486f04da0646c51f4440e1ff9c50c387616b8af076b74c90f2b80683b2a",
+      "trace-0000011.npz": "de60ade622ef3cd0fac5708da3fa8074ebeb24bfb33c4b8cdef794cadea52742",
+      "trace-0000012.npz": "7298d462386926a0cf3281dd160e5eb28999db04b92e2467b581697c71b97bf4",
+      "trace-0000013.npz": "25efddcbc3c9c1b046718ec539edb794f7ab58fa21bd81b06bd2b997ec043d48",
+      "trace-0000014.npz": "5448c58f2f2970a90db62576360f126e7c4bef79f0a26d61a51721d0a1d37b98",
+      "trace-0000015.npz": "d51ef9a2dd8ce20a169b3f7f3983fa9331d6b85e4e4f1c0b77700554f3389095"
+    }
+  },
+  "limitations": [
+    "Not all CUDA: compact CPU stages remain.",
+    "Dense baseline is slower than the eight-worker CPU reference in the IM pilot.",
+    "Timing samples do not establish full-campaign speedup.",
+    "B1 special tracker is excluded from the reference comparison.",
+    "B3 CPU pose discrepancy is not fixed by matching CPU detections.",
+    "Sparse subpixel neighborhoods do not guarantee equivalence for pathological iterations leaving their bounds."
+  ]
+}
