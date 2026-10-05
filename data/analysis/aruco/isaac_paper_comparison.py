@@ -29,23 +29,33 @@ def compare(inputs,output):
         raise ValueError('comparison requires identical sampling protocols')
     def common_config(report):
         return {key:value for key,value in report['config'].items()
-                if key not in ('pad_manifest','pad_manifest_root','configuration_label')}
+                if key not in ('pad_manifest','pad_manifest_root','configuration_label','detector_backend')}
     if any(common_config(r)!=common_config(reports[0]) for r in reports):
-        raise ValueError('camera, detector, dynamics and policy must match across configurations')
+            raise ValueError('camera, dynamics and policy must match across configurations')
+    backends={r['config']['detector_backend'] for r in reports}
+    if not backends<= {'gpu-experimental','cpu-nested-apriltag'}:
+        raise ValueError('unsupported detector comparison; describe a new protocol explicitly')
+    mixed_frontends=len(backends)>1
+    def shared_algorithm_hashes(report):
+        return {name:digest for name,digest in report['aruco_algorithm_sources_sha256'].items()
+                if name!='batched_detection.py'}
     dynamics_files=('native_runtime.py','trial_inputs.py','trial_trace.py')
     for r in reports:
         if any(r['application_sources_sha256'][name]!=reports[0]['application_sources_sha256'][name]
-               for name in dynamics_files) or r['aruco_algorithm_sources_sha256']!=reports[0]['aruco_algorithm_sources_sha256']:
+               for name in dynamics_files) or shared_algorithm_hashes(r)!=shared_algorithm_hashes(reports[0]):
             raise ValueError('comparison requires unchanged dynamics, policy and pose estimation code')
     output.mkdir(parents=True,exist_ok=False)
     plt.rcParams.update({'font.size':10,'font.family':'DejaVu Sans','pdf.fonttype':42})
-    labels=['Baseline / B2' if r['marker_count']==61 else r['config']['configuration_label'] for r in reports]
+    labels=['B1 (CPU tracker)' if r['config']['detector_backend']=='cpu-nested-apriltag'
+            else 'Baseline / B2' if r['marker_count']==61 else r['config']['configuration_label'] for r in reports]
     table='| Configuration | N | Trials | A (%) | E (cm) | d (cm) | S_land (%) |\n| --- | --- | --- | --- | --- | --- | --- |\n'
     records=[]
     for label,r in zip(labels,reports):
         s=r['summary']
         table+=f"| {label} | {r['marker_count']} | {r['trials']} | {statistic(s,'A_marker_visible_40px_pct')} | {statistic(s,'E_camera_rmse_cm')} | {statistic(s,'d_touchdown_cm')} | {s['S_land_pct']['mean']:.2f} |\n"
         record=dict(configuration=label,N=r['marker_count'],trials=r['trials'],successes=r['successes'],fingerprint=r['fingerprint'],
+            detector_backend=r['config']['detector_backend'],
+            comparison_caveat='B1 uses a compatible CPU template tracker; other pads use the CUDA detector. Not a uniform-frontend comparison.' if mixed_frontends else '',
             maximum_funnel_excess_m=r['maximum_funnel_excess_m'],
             trials_outside_funnel_0_1mm=sum(row['maximum_funnel_excess_m']>.0001 for row in r['trials_detail']))
         for key,value in s.items():
@@ -72,7 +82,8 @@ def compare(inputs,output):
         ax.plot([-half,half,half,-half,-half],[-half,-half,half,half,-half],color='.6')
         ax.set(title=f"{label}\nN = {r['marker_count']}",xlabel='Print x (m)',ylabel='Print y (m)',
                xlim=(-half,half),ylim=(-half,half),aspect='equal')
-    fig.suptitle('Nominal landing pad layouts (0.7 m); print x = −pad Y, print y = pad X')
+    frontend_note='\nB1: compatible CPU tracker; other configurations: CUDA detector' if mixed_frontends else ''
+    fig.suptitle('Nominal landing pad layouts (0.7 m); print x = −pad Y, print y = pad X'+frontend_note)
     figures.append(('pad_layouts',fig))
     panels=[('A_marker_visible_40px_pct','Marker availability: complete marker with all edges ≥ 40 px','%',100),
             ('E_camera_rmse_cm','Mean per-trial camera localization RMSE','cm',None),
@@ -92,7 +103,7 @@ def compare(inputs,output):
             ax.set(title=label+'\n'+subtitle,xlabel=r'$x_0/f_w(h_{max})$',ylabel=r'$y_0/f_w(h_{max})$',
                    xlim=(-1,1),ylim=(-1,1),aspect='equal')
         fig.colorbar(artist,ax=list(axs.flat),label=unit,shrink=.85)
-        fig.suptitle(title+f"; {n}×{n} cells, {protocol['repeats']} trials/cell")
+        fig.suptitle(title+f"; {n}×{n} cells, {protocol['repeats']} trials/cell"+frontend_note)
         figures.append((key,fig))
     fig,axs=plt.subplots(1,3,figsize=(13,4.3),layout='constrained')
     for ax,key,title,unit in zip(axs,['A_marker_visible_40px_pct','E_camera_rmse_cm','d_touchdown_cm'],
@@ -103,7 +114,7 @@ def compare(inputs,output):
         ax.set_xticks(np.arange(count),labels,rotation=25,ha='right')
         ax.set(title=title,ylabel=unit)
         ax.set_ylim(bottom=0); ax.grid(axis='y',alpha=.2)
-    fig.suptitle('Equal-weight trial means ± sample standard deviations')
+    fig.suptitle('Equal-weight trial means ± sample standard deviations'+frontend_note)
     figures.append(('metric_comparison',fig))
     with PdfPages(output/'paper_figures.pdf') as pdf:
         for name,fig in figures:

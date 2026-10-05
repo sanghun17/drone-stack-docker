@@ -53,7 +53,7 @@ def main():
             status['configurations'].append(entry)
             save()
             relative_output=(output/name).relative_to(ROOT)
-            command=['bash',str(HERE/'evaluate.sh'),'--detector','gpu-experimental',
+            command=['bash',str(HERE/'evaluate.sh'),
                 '--config','/work/'+str(config.relative_to(ROOT)),
                 '--num-envs',str(args.num_envs),'--trials',str(args.trials),
                 '--output','/work/'+str(relative_output)]

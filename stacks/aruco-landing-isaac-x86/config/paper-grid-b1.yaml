@@ -6,7 +6,7 @@ seed: 1701
 max_duration_s: 20.0
 sensor_latency_s: 0.0
 success_radius_m: 0.1
-detector_backend: gpu-experimental
+detector_backend: cpu-nested-apriltag
 pad_manifest: config/paper-b1-layout.yaml
 configuration_label: B1 (nested AprilTag, reconstructed)
 camera:

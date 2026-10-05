@@ -26,7 +26,7 @@ def main():
     parser.add_argument('--trial-start', type=int, default=0, help='stable trial ID offset for separate GPU workers')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--resume', action='store_true')
-    parser.add_argument('--detector', choices=['cpu','gpu-experimental'])
+    parser.add_argument('--detector', choices=['cpu','gpu-experimental','cpu-nested-apriltag'])
     parser.add_argument('--smoke', action='store_true', help='render and detect; fail unless every camera finds the pad')
     parser.add_argument('--isolation-smoke', action='store_true',
                         help='smoke with an env-1 visual occluder directly in front of env-0 camera')
@@ -233,6 +233,7 @@ def run(args, cfg, manifest, pending, store):
             angle = math.radians(row['yaw_deg'])/2
             poses[env,3:7] = torch.tensor([0.,0.,math.sin(angle),math.cos(angle)],device=sim.device)
         reset_robot(robot, native, poses, gains['trim_initial_motors'])
+        detector.reset()
         camera.reset()
         # Flush render startup/reset history without advancing physics or trial time.
         for _ in range(3): observations = capture()
