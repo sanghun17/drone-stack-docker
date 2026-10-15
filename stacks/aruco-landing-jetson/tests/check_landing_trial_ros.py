@@ -14,6 +14,7 @@ import numpy as np
 import yaml
 
 ROOT=Path(__file__).resolve().parents[3]
+RESTART_QUEUE=os.environ.get('TEST_TRAJECTORY_RESTART')=='1'
 OPTI_TERMINATION=os.environ.get('TEST_OPTITRACK_TERMINATION')=='1'
 TRAJECTORY=os.environ.get('TEST_TRAJECTORY_SET')=='1'
 REPEAT=os.environ.get('TEST_REPEAT_TRIAL')=='1' or TRAJECTORY
@@ -111,6 +112,10 @@ def main():
                     selections=[dict(type='inside',reference_id=i) for i in [0,1]])
                 (OUT/'set.json').write_text(json.dumps(manifest))
                 progress=OUT/('progress_%s.json'%time.time_ns())
+                if RESTART_QUEUE:
+                    previous_progress=json.dumps(dict(set_sha256=hashlib.sha256((OUT/'set.json').read_bytes()).hexdigest(),completed=[0],active=1,halted=True))
+                    progress.write_text(previous_progress)
+                    repeat_args+=['trajectory_restart_on_start:=true']
                 repeat_args+=['trajectory_set_file:='+str(OUT/'set.json'),'trajectory_progress_file:='+str(progress)]
         spawn('trial',['roslaunch',str(ROOT/'ws/aruco-landing/src/aruco_landing/launch/landing_trial.launch'),'dry_run:=false','landing_finish_mode:='+('force_disarm' if CUT else 'auto_land'),'termination_height_source:='+('optitrack' if OPTI_TERMINATION else 'dual_height'),'auto_start_on_offboard:='+str(AUTO).lower(),'estimation_transition:='+str(TRANSITION).lower(),'config_root:='+str(ROOT/'stacks/aruco-landing-jetson/config')]+(['approach_speed_mps:=0.5','landing_horizontal_speed_mps:=2.0','descent_speed_mps:=0.5'] if SPEEDS else [])+repeat_args)
         pubs={}
@@ -193,12 +198,15 @@ def main():
             assert all(p in phase_history for p in expected)
             if TRAJECTORY:
                 wait_for(lambda:latest['status']['trajectory_set']['completed']==2)
+                if RESTART_QUEUE:
+                    backups=list(OUT.glob(progress.stem+'.previous.*.json'))
+                    assert len(backups)==1 and backups[0].read_text()==previous_progress
                 time.sleep(1.3)
                 assert not latest['status']['offboard_entry_ready'] and len(arm_calls)==2
                 sim['mode']='OFFBOARD';time.sleep(.5)
                 assert len(arm_calls)==2, 'exhausted set must not rearm/replay'
             report=dict(result='PASS',transport='localhost mock FCU and velocity-integrated synthetic pose, not flight dynamics',auto_arm_calls=len(arm_calls),completed_trials=len(kill_calls),random_targets=targets,sync_blocks_arm=True,transfer_speed_cap=.5,height_m=2.)
-            if TRAJECTORY:report.update(selected_reference_ids=[0,1],initial_targets=targets,
+            if TRAJECTORY:report.update(restart_from_first_with_archive=RESTART_QUEUE,selected_reference_ids=[0,1],initial_targets=targets,
                 alignment_blocks_descent=True,queue_exhaustion_blocks_rearm=True,pilot_offboard_per_trial=True)
             (OUT/'ros_repeat_trial.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2));return
         if AUTO:

@@ -101,5 +101,12 @@ router, MUX and safety with a mock FCU: high-altitude marker loss still latches
 failed hold; low-height loss issues one generic safety termination and waits for
 disarm. No test sends commands to the hardware master.
 
-A halted trajectory progress file is preserved across deployment/restart. This
-change does not mark the interrupted second trial successful or reset its queue.
+The hardware stack selects `LANDING_TRAJECTORY_RESTART_ON_START=true`: every
+planner invocation archives the exact old progress as
+`flight_logs/inside20_progress.previous.<time_ns>.json` and creates a fresh queue
+at the first selected reference, even after an interrupted or completed run.
+Recorded bags remain unchanged. Within one invocation each successful landing
+advances to the next reference; failures still halt that invocation. Startup
+never starts motion: a fresh prepared pilot OFFBOARD edge is still required.
+The generic launch default is false, retaining durable resume/refusal behavior
+for callers that do not select the hardware startup policy.

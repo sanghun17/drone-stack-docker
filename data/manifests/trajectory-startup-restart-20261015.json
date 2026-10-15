@@ -1,0 +1,43 @@
+{
+  "result": "PASS",
+  "transport": "localhost mock FCU and velocity-integrated synthetic pose, not flight dynamics",
+  "auto_arm_calls": 2,
+  "completed_trials": 2,
+  "random_targets": [
+    [
+      0.07464386782359791,
+      -7.830621472088443e-05,
+      2.0068549675466665
+    ],
+    [
+      -0.32535613217640214,
+      -7.830621472088443e-05,
+      2.0068549675466665
+    ]
+  ],
+  "sync_blocks_arm": true,
+  "transfer_speed_cap": 0.5,
+  "height_m": 2.0,
+  "restart_from_first_with_archive": true,
+  "selected_reference_ids": [
+    0,
+    1
+  ],
+  "initial_targets": [
+    [
+      0.07464386782359791,
+      -7.830621472088443e-05,
+      2.0068549675466665
+    ],
+    [
+      -0.32535613217640214,
+      -7.830621472088443e-05,
+      2.0068549675466665
+    ]
+  ],
+  "alignment_blocks_descent": true,
+  "queue_exhaustion_blocks_rearm": true,
+  "pilot_offboard_per_trial": true,
+  "aruco_revision": "981e5a0b3444fbe5b77cb8b9193af317df83c15b",
+  "focused_tests_passed": 76
+}
