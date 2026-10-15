@@ -1,0 +1,167 @@
+{
+  "scope": "Counterfactual state-machine replay of recorded height/health flags. No dynamics, worker timing or new closed-loop trajectory is simulated.",
+  "inputs": [
+    {
+      "name": "flight_2026-10-15_21-18-32.bag",
+      "sha256": "9f591d07d6407b084dbedd674c77504d5e09a514b9f907fcc6d220f1dbc323ad",
+      "dual_height": {
+        "phase": "CUT_WAIT",
+        "reason": "dual_height_force_disarm_requested",
+        "bag_time_s": 1792066731.3280735,
+        "elapsed_descent_s": 3.406324863433838,
+        "marker_qualified": true,
+        "marker_height_m": 0.1808741200296989,
+        "mocap_camera_height_m": 0.1870310660097197
+      },
+      "optitrack": {
+        "phase": "CUT_WAIT",
+        "reason": "optitrack_height_force_disarm_requested",
+        "bag_time_s": 1792066731.2643301,
+        "elapsed_descent_s": 3.3425815105438232,
+        "marker_qualified": true,
+        "marker_height_m": 0.21839144073923483,
+        "mocap_camera_height_m": 0.19676232083428216
+      }
+    },
+    {
+      "name": "flight_2026-10-15_21-20-56.bag",
+      "sha256": "222c556b5625bebdc01b0964f11acf44571e4b1b9c231f118c17c7dd07253f3d",
+      "dual_height": {
+        "phase": "FAILED_HOLD",
+        "reason": "marker_lost_trial_failed",
+        "bag_time_s": 1792066877.6057155,
+        "elapsed_descent_s": 4.283915996551514,
+        "marker_qualified": false,
+        "marker_height_m": null,
+        "mocap_camera_height_m": 0.18281005734925848
+      },
+      "optitrack": {
+        "phase": "CUT_WAIT",
+        "reason": "optitrack_height_force_disarm_requested",
+        "bag_time_s": 1792066876.685698,
+        "elapsed_descent_s": 3.363898515701294,
+        "marker_qualified": false,
+        "marker_height_m": null,
+        "mocap_camera_height_m": 0.19258605363723696
+      }
+    }
+  ],
+  "aruco_revision": "b1cc9adcbc266c79772c84e2a4bdba6b5626bad2",
+  "validation": {
+    "focused_tests_passed": 53,
+    "low_height_marker_loss": {
+      "result": "PASS",
+      "optitrack_terminal_without_marker": true,
+      "transition": true,
+      "loss_to_failed_hold_s": 0.5125903749999452,
+      "router": {
+        "source": "optitrack",
+        "output_topic": "/landing/vision_pose_selected",
+        "last_output_source": "optitrack",
+        "trial_enabled": false,
+        "fallback_latched": false,
+        "switch_check": {
+          "consistent": false,
+          "translation_jump_m": null,
+          "rotation_jump_deg": null,
+          "pair_dt_s": null,
+          "allowed": true,
+          "alignment_ready": true,
+          "marker_fresh": false,
+          "mocap_fresh": true,
+          "quality_valid": false,
+          "stable_samples": 0,
+          "stable_duration_s": 0.0,
+          "ready": false
+        },
+        "last_switch": {
+          "time": 1792067320.6704595,
+          "source": "optitrack",
+          "check": {
+            "reason": "trial_disabled"
+          }
+        },
+        "published": {
+          "optitrack": 861,
+          "marker": 30
+        },
+        "marker_loss_policy": "optitrack_after_timeout"
+      },
+      "transport": "localhost mock FCU; real safety/planner/MUX",
+      "kill_calls": [
+        {
+          "command": 400,
+          "param1": 0.0,
+          "param2": 21196.0
+        }
+      ],
+      "mode_calls": [],
+      "final": {
+        "phase": "COMPLETE",
+        "reason": "force_disarm_confirmed",
+        "dry_run": false,
+        "estimation_source": "optitrack",
+        "estimation_transition": true,
+        "landing_finish_mode": "force_disarm",
+        "termination_height_source": "optitrack",
+        "termination_height_m": 0.2,
+        "mocap_camera_height_m": 0.19,
+        "force_disarm_ack": true,
+        "offboard_entry_ready": false,
+        "healthy": false,
+        "marker_qualified": false,
+        "marker_height_m": null,
+        "marker_confirm_s": 1.0,
+        "marker_loss_s": 0.5,
+        "repeat_test": null,
+        "data_sync_ready": true,
+        "trajectory_set": null,
+        "trajectory_controller_ready": null,
+        "data_sync_reason": "not_required",
+        "pad_alignment_ready": true,
+        "command_frame": "MAVROS local ENU",
+        "live_output": "/local_controller/setpoint_raw/local"
+      }
+    },
+    "trajectory_queue": {
+      "result": "PASS",
+      "transport": "localhost mock FCU and velocity-integrated synthetic pose, not flight dynamics",
+      "auto_arm_calls": 2,
+      "completed_trials": 2,
+      "random_targets": [
+        [
+          0.07464386782359791,
+          -7.830621472088443e-05,
+          2.0068549675466665
+        ],
+        [
+          -0.32535613217640214,
+          -7.830621472088443e-05,
+          2.0068549675466665
+        ]
+      ],
+      "sync_blocks_arm": true,
+      "transfer_speed_cap": 0.5,
+      "height_m": 2.0,
+      "selected_reference_ids": [
+        0,
+        1
+      ],
+      "initial_targets": [
+        [
+          0.07464386782359791,
+          -7.830621472088443e-05,
+          2.0068549675466665
+        ],
+        [
+          -0.32535613217640214,
+          -7.830621472088443e-05,
+          2.0068549675466665
+        ]
+      ],
+      "alignment_blocks_descent": true,
+      "queue_exhaustion_blocks_rearm": true,
+      "pilot_offboard_per_trial": true
+    }
+  }
+}

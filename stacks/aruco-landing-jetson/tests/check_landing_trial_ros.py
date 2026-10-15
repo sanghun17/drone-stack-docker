@@ -14,6 +14,7 @@ import numpy as np
 import yaml
 
 ROOT=Path(__file__).resolve().parents[3]
+OPTI_TERMINATION=os.environ.get('TEST_OPTITRACK_TERMINATION')=='1'
 TRAJECTORY=os.environ.get('TEST_TRAJECTORY_SET')=='1'
 REPEAT=os.environ.get('TEST_REPEAT_TRIAL')=='1' or TRAJECTORY
 CUT=os.environ.get('TEST_TERMINATION')=='1' or REPEAT
@@ -111,7 +112,7 @@ def main():
                 (OUT/'set.json').write_text(json.dumps(manifest))
                 progress=OUT/('progress_%s.json'%time.time_ns())
                 repeat_args+=['trajectory_set_file:='+str(OUT/'set.json'),'trajectory_progress_file:='+str(progress)]
-        spawn('trial',['roslaunch',str(ROOT/'ws/aruco-landing/src/aruco_landing/launch/landing_trial.launch'),'dry_run:=false','landing_finish_mode:='+('force_disarm' if CUT else 'auto_land'),'auto_start_on_offboard:='+str(AUTO).lower(),'estimation_transition:='+str(TRANSITION).lower(),'config_root:='+str(ROOT/'stacks/aruco-landing-jetson/config')]+(['approach_speed_mps:=0.5','landing_horizontal_speed_mps:=2.0','descent_speed_mps:=0.5'] if SPEEDS else [])+repeat_args)
+        spawn('trial',['roslaunch',str(ROOT/'ws/aruco-landing/src/aruco_landing/launch/landing_trial.launch'),'dry_run:=false','landing_finish_mode:='+('force_disarm' if CUT else 'auto_land'),'termination_height_source:='+('optitrack' if OPTI_TERMINATION else 'dual_height'),'auto_start_on_offboard:='+str(AUTO).lower(),'estimation_transition:='+str(TRANSITION).lower(),'config_root:='+str(ROOT/'stacks/aruco-landing-jetson/config')]+(['approach_speed_mps:=0.5','landing_horizontal_speed_mps:=2.0','descent_speed_mps:=0.5'] if SPEEDS else [])+repeat_args)
         pubs={}
         for key,topic,kind in [('marker','/landing/vision_pose_marker',PoseStamped),('velocity','/mavros/local_position/velocity_local',TwistStamped),('mocap','/vrpn_client_node/pure/pose',PoseStamped),('local','/mavros/local_position/pose',PoseStamped),('state','/mavros/state',State),('extended','/mavros/extended_state',ExtendedState),('pad','/landing/pad_pose_global',PoseStamped),('ready','/landing/alignment/ready',Bool),('visible','/landing/target_visible',Bool),('inliers','/landing/estimator/inlier_ids',Int32MultiArray),('body','/landing/vehicle_pose_pad',PoseWithCovarianceStamped),('camera','/landing/camera_pose_pad',PoseWithCovarianceStamped)]:pubs[key]=rospy.Publisher(topic,kind,queue_size=10)
         rospy.Subscriber('/landing/trial/status',String,status)
@@ -250,6 +251,7 @@ def main():
         if AUTO:wait_for(lambda:latest['status']['offboard_entry_ready'])
         else:assert start().success
         time.sleep(1.1);sim['mode']='OFFBOARD';wait_for(lambda:latest['status']['phase']=='DESCEND',5)
+        if OPTI_TERMINATION:sim['visible']=False
         sim['z']=.19-X[2,3]
         if CUT:
             wait_for(lambda:latest['status']['phase']=='COMPLETE',4)
@@ -257,7 +259,7 @@ def main():
             time.sleep(.3);assert len(kill_calls)==1
             producers=dict(master.getSystemState('/trial_test')[2][0])
             assert producers['/mavros/setpoint_raw/local']==['/flight_safety_response']
-            report=dict(result='PASS',transition=TRANSITION,loss_to_failed_hold_s=loss_delay,router=latest.get('router'),transport='localhost mock FCU; real safety/planner/MUX',kill_calls=kill_calls,mode_calls=mode_calls,final=latest['status'])
+            report=dict(result='PASS',optitrack_terminal_without_marker=OPTI_TERMINATION,transition=TRANSITION,loss_to_failed_hold_s=loss_delay,router=latest.get('router'),transport='localhost mock FCU; real safety/planner/MUX',kill_calls=kill_calls,mode_calls=mode_calls,final=latest['status'])
             (OUT/'ros_force_disarm.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2));return
         wait_for(lambda:'AUTO.LAND'in mode_calls,3)
         assert latest['status']['phase']=='AUTO_LAND'
@@ -275,6 +277,7 @@ def main():
         if AUTO:wait_for(lambda:latest['status']['offboard_entry_ready'])
         else:assert start().success
         time.sleep(1.1);sim['mode']='OFFBOARD';wait_for(lambda:latest['status']['phase']=='DESCEND',5)
+        if OPTI_TERMINATION:sim['visible']=False
         sim['z']=.19-X[2,3];wait_for(lambda:len(mode_calls)==2,3)
         sim['visible']=False;wait_for(lambda:'POSCTL'in mode_calls,3)
         assert mode_calls==['AUTO.LAND','AUTO.LAND','POSCTL']

@@ -501,7 +501,7 @@
     "planner/aruco-landing": {
       "files": {
         "module.yml": "9596662d3c555924467985a07f3f153901580cc5c9ade5ceef57a1eb91462c8f",
-        "run.sh": "c09028486b9fc6eeaf8136b3dc78f750d0d5d43d3e3f59f0e9c1e5dad17962e0"
+        "run.sh": "87487d21fa9e0fcd66f241aa7792874f70d082341ff447e566eb0cd3ca0558d9"
       },
       "manifest": {
         "description": "Pilot OFFBOARD triggered approach, marker qualification and landing through shared safety.",
@@ -520,7 +520,7 @@
         ]
       },
       "repository": "https://github.com/sanghun17/aruco_landing.git",
-      "revision": "d3a0fa90d099c797af5c0309262e9fc90f304a7d",
+      "revision": "b1cc9adcbc266c79772c84e2a4bdba6b5626bad2",
       "subdir": "deployment/stack-modules/planner/aruco-landing"
     },
     "planner/la-planner": {

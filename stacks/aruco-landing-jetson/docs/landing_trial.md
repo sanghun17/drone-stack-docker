@@ -34,9 +34,9 @@ There is no separate start service/script in the normal operator flow. The plann
 3. Pre-OFFBOARD marker observations never count toward source selection or descent qualification. Once a valid new marker is seen during approach, stop horizontal motion and hold altitude while validating observations for at least 1 s and 30 router samples. Before qualification, invalid observations reset the dwell and approach may resume. The router switches only after its time-paired position/rotation checks pass; descent waits until marker output has actually been published and the route is healthy. Session alignment may be prepared beforehand. There is no pose blending; a timestamp-monotonic handoff can briefly withhold output.
 4. Descend with the existing PD controller and pad-relative yaw target 0 degrees. Horizontal command cap 2.0 m/s, descent 0.5 m/s, yaw-rate cap 0.35 rad/s (20.1 degrees/s). Final transformed descent commands also use the 2.0 m/s combined XY cap. These phase-specific limits are selected by `LANDING_APPROACH_SPEED_MPS`, `LANDING_HORIZONTAL_SPEED_MPS`, and `LANDING_DESCENT_SPEED_MPS` in the stack runtime.env. Marker validity requires at least 1 inlier, fresh poses and agreement with OptiTrack within 0.15 m / 12 degrees.
 5. Invalid marker observations brake descent immediately. Missing or rejected marker poses for 0.5 s return estimation to fresh OptiTrack and latch failed position hold. Rediscovery never resumes descent or reselects marker in the same OFFBOARD episode; leave autonomous mode and initiate a new trial. If OptiTrack is stale, the router does not fabricate a fallback pose; common safety remains authoritative. During airborne AUTO.LAND, loss requests POSCTL. Leaving OFFBOARD manually and deliberately re-entering after preparation starts a new trial; no separate reset command is needed.
-6. Default finish policy is now `force_disarm`, explicitly requested by the operator. Only after entering DESCEND, a valid marker camera height in [0, 0.20] m AND fresh OptiTrack-derived camera height in [0, 0.25] m trigger a request to `/flight_safety_response/request_termination`. OptiTrack height is `(inverse(Global←Pad) × Global←Body × Body←Camera)[2,3]`, not global Z. Existing marker freshness, pose agreement and inlier gates remain active. The request worker rechecks both conditions and armed OFFBOARD before calling safety. No averaging/dwell is added to these thresholds.
+6. The stack selects `force_disarm` with `LANDING_TERMINATION_HEIGHT_SOURCE=optitrack`. Only after entering DESCEND, a fresh OptiTrack-derived **camera height above the aligned pad in [0, 0.20] m** triggers `/flight_safety_response/request_termination`. Height is `(inverse(Global←Pad) × Global←Body × Body←Camera)[2,3]`, not global Z or body height. Current marker visibility is not required for this terminal request. Healthy safety/routing, fresh OptiTrack and local/FCU state, armed OFFBOARD and valid unchanged session alignment remain required. This terminal gate is evaluated before marker-loss/fallback failure in the same tick; a previously failed/cancelled trial never resumes or cuts. Above the threshold, marker loss retains its existing brake and failed-hold behavior. The request worker recomputes the height and rechecks the same conditions immediately before calling safety. No averaging/dwell is added. The generic launch default `termination_height_source:=dual_height` retains the previous marker <=0.20 m AND OptiTrack <=0.25 m policy; `auto_land` behavior is unchanged.
 7. The common safety node independently requires opt-in, fresh connected armed OFFBOARD state, no pilot manual override, and an admitted fresh Normal stream. Safety alone sends MAV_CMD_COMPONENT_ARM_DISARM (400), param1=0, param2=21196. This stops motors before contact; it does not assert physical touchdown. The planner waits for armed=false before COMPLETE. Rejected or unconfirmed requests fail into hold; they are not repeatedly fired.
-8. Safety's existing KILL latch remains active after success. Restart safety and planner while disarmed before another flight. The LED therefore retains the existing solid-red automatic KILL meaning. Optional `landing_finish_mode:=auto_land` retains the former PX4 landing handoff.
+8. Safety's existing KILL latch remains active after success. In repeat mode, return to POSCTL while disarmed; preparation may clear a mission-requested termination through the existing guarded safety reset. Other fault/kill latches remain authoritative. The LED therefore retains the existing solid-red automatic KILL meaning. Optional `landing_finish_mode:=auto_land` retains the former PX4 landing handoff.
 
 For OptiTrack-only operation, run safety with `estimation_source:=mocap` and planner with `estimation_transition:=false`; change both together.
 
@@ -83,3 +83,23 @@ marker routing gates are unchanged. Restart flight-safety while disarmed;
 these thresholds are read once at diagnosis startup.
 
 Single-marker update: physical PnP, pose router and trial now accept one valid marker. Zero markers still withhold pose; reprojection, freshness, alignment and pose-agreement checks remain active.
+
+## OptiTrack terminal policy validation (2026-10-15)
+
+The second inside-path flight lost qualified optical poses near the camera-height
+cutoff and reached `marker_lost_trial_failed` without a termination request.
+Read-only replay of both preserved flight bags compares the old dual-height gate
+with the OptiTrack gate in `data/manifests/optitrack-terminal-replay-20261015.json`.
+For the second bag, the new lifecycle requests termination at OptiTrack camera
+height 0.1926 m with no qualified marker. This is counterfactual lifecycle replay,
+not a new closed-loop flight or physical-contact certification.
+
+Focused tests cover threshold boundaries, stale/missing/nonfinite height, pad
+frame/mount conversion, pilot takeover, invalid alignment, phase restrictions
+and the service-worker recheck. Localhost integration uses the real planner,
+router, MUX and safety with a mock FCU: high-altitude marker loss still latches
+failed hold; low-height loss issues one generic safety termination and waits for
+disarm. No test sends commands to the hardware master.
+
+A halted trajectory progress file is preserved across deployment/restart. This
+change does not mark the interrupted second trial successful or reset its queue.

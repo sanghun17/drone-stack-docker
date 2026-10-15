@@ -34,7 +34,7 @@ The phases are:
 3. CENTER: settle at global XY=(0,0), retaining Z=2.0 m.
 4. RANDOM_POSITION: move to a uniformly sampled XY point inside the inset fence.
 5. APPROACH: begin the existing return-to-(0,0) and marker qualification logic.
-6. DESCEND: existing marker landing and dual-height termination policy.
+6. DESCEND: existing marker landing and OptiTrack pad-relative camera-height termination policy (see landing_trial.md).
 7. COMPLETE: wait for verified transfer and the next pilot mode transition.
 
 Takeoff/center/random motion has combined XY and vertical command limits of
