@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Real ROS nodes on localhost only; synthetic FCU, no hardware or PX4 transport."""
 import json
+import hashlib
 import os
 from pathlib import Path
 import signal
@@ -13,13 +14,15 @@ import numpy as np
 import yaml
 
 ROOT=Path(__file__).resolve().parents[3]
-REPEAT=os.environ.get('TEST_REPEAT_TRIAL')=='1'
+TRAJECTORY=os.environ.get('TEST_TRAJECTORY_SET')=='1'
+REPEAT=os.environ.get('TEST_REPEAT_TRIAL')=='1' or TRAJECTORY
 CUT=os.environ.get('TEST_TERMINATION')=='1' or REPEAT
 AUTO=os.environ.get('TEST_AUTO_PLANNER')=='1' or REPEAT
 SPEEDS=os.environ.get('TEST_LANDING_SPEEDS')=='1' or REPEAT
 TRANSITION=os.environ.get('TEST_TRANSITION')=='1'
-PORT=11358 if TRANSITION else 11357
+PORT=11359 if TRAJECTORY else (11358 if TRANSITION else 11357)
 OUT=ROOT/('flight_logs/aruco-landing/trial-transition-integration' if TRANSITION else 'flight_logs/aruco-landing/trial-regression')
+if TRAJECTORY:OUT=ROOT/'flight_logs/aruco-landing/trajectory-set-integration'
 
 
 def main():
@@ -71,6 +74,7 @@ def main():
         assert req.command==400 and req.param1==0 and req.param2==21196
         assert sim['mode']=='OFFBOARD' and sim['armed']
         sim['armed']=False
+        if TRAJECTORY:sim['landed']=True
         return CommandLongResponse(success=True,result=0)
     def param(_):
         r=ParamGetResponse();r.success=True;r.value.real=2.;return r
@@ -94,6 +98,19 @@ def main():
             repeat_config.update(sync_status_file=str(OUT/'.sync_gate.json'),settle_s=.2,random_seed=17)
             (OUT/'repeat.yaml').write_text(yaml.safe_dump(repeat_config))
             repeat_args=['repeat_test:=true','repeat_config:='+str(OUT/'repeat.yaml')]
+            if TRAJECTORY:
+                # Two synthetic references exercise wiring only; no selected
+                # user bank, PX4 transport or flight dynamics is involved.
+                c=np.zeros((2,1,3,6));c[:,0,2,:2]=[2.,-.55]
+                c[:,0,0,0]=[.2,-.2];c[:,0,0,1]=-c[:,0,0,0]/(1.8/.55)
+                bank=OUT/'synthetic_bank.npz'
+                np.savez(bank,coefficients=c,durations=np.full((2,1),1.8/.55),candidate_ids=[10,20])
+                manifest=dict(schema_version=1,reference_id_convention='zero_based_bank_index',
+                    banks={'inside':dict(path=bank.name,sha256=hashlib.sha256(bank.read_bytes()).hexdigest())},
+                    selections=[dict(type='inside',reference_id=i) for i in [0,1]])
+                (OUT/'set.json').write_text(json.dumps(manifest))
+                progress=OUT/('progress_%s.json'%time.time_ns())
+                repeat_args+=['trajectory_set_file:='+str(OUT/'set.json'),'trajectory_progress_file:='+str(progress)]
         spawn('trial',['roslaunch',str(ROOT/'ws/aruco-landing/src/aruco_landing/launch/landing_trial.launch'),'dry_run:=false','landing_finish_mode:='+('force_disarm' if CUT else 'auto_land'),'auto_start_on_offboard:='+str(AUTO).lower(),'estimation_transition:='+str(TRANSITION).lower(),'config_root:='+str(ROOT/'stacks/aruco-landing-jetson/config')]+(['approach_speed_mps:=0.5','landing_horizontal_speed_mps:=2.0','descent_speed_mps:=0.5'] if SPEEDS else [])+repeat_args)
         pubs={}
         for key,topic,kind in [('marker','/landing/vision_pose_marker',PoseStamped),('velocity','/mavros/local_position/velocity_local',TwistStamped),('mocap','/vrpn_client_node/pure/pose',PoseStamped),('local','/mavros/local_position/pose',PoseStamped),('state','/mavros/state',State),('extended','/mavros/extended_state',ExtendedState),('pad','/landing/pad_pose_global',PoseStamped),('ready','/landing/alignment/ready',Bool),('visible','/landing/target_visible',Bool),('inliers','/landing/estimator/inlier_ids',Int32MultiArray),('body','/landing/vehicle_pose_pad',PoseWithCovarianceStamped),('camera','/landing/camera_pose_pad',PoseWithCovarianceStamped)]:pubs[key]=rospy.Publisher(topic,kind,queue_size=10)
@@ -125,6 +142,7 @@ def main():
                 if sim['visible']:
                     pubs['pad'].publish(pose(np.eye(4)));pubs['ready'].publish(Bool(True))
                     b=pose(G,PoseWithCovarianceStamped,'physical_landing_pad');b.header.stamp=mc.header.stamp-rospy.Duration(.04)
+                    b.pose.pose.position.x+=sim.get('marker_error',0.)
                     c=pose(G@X,PoseWithCovarianceStamped,'physical_landing_pad');c.header.stamp=mc.header.stamp-rospy.Duration(.04)
                     pubs['body'].publish(b);pubs['camera'].publish(c)
                     marker=pose(G);marker.header.stamp=b.header.stamp
@@ -149,8 +167,16 @@ def main():
                 wait_for(lambda:latest.get('mission',{}).get('offboard_entry_ready') is True)
                 sim['mode']='OFFBOARD'
                 wait_for(lambda:len(arm_calls)==number,5)
-                wait_for(lambda:latest['status']['phase']=='RANDOM_POSITION',35)
-                targets.append(latest['status']['repeat_test']['random_goal_global_m'])
+                wait_for(lambda:latest['status']['phase']==('INITIAL_POSITION' if TRAJECTORY else 'RANDOM_POSITION'),35)
+                targets.append(latest['status']['repeat_test']['initial_goal_global_m' if TRAJECTORY else 'random_goal_global_m'])
+                if TRAJECTORY:
+                    assert latest['status']['trajectory_set']['current']['reference_id']==number-1
+                    np.testing.assert_allclose(targets[-1],np.array([.2 if number==1 else -.2,0.,2.])-X[:3,3])
+                    sim['marker_error']=.3
+                    wait_for(lambda:latest['status']['phase']=='APPROACH',35)
+                    time.sleep(1.3)
+                    assert latest['status']['phase']=='APPROACH', 'must wait for marker/mocap agreement'
+                    sim['marker_error']=0.
                 wait_for(lambda:latest['status']['phase']=='DESCEND',35)
                 wait_for(lambda:latest['status']['phase']=='COMPLETE',15)
                 assert len(kill_calls)==number and not sim['armed']
@@ -159,11 +185,20 @@ def main():
                 time.sleep(.2)
             assert targets[0]!=targets[1]
             for phase,m in tagged_commands:
-                if phase in ('TAKEOFF','CENTER','RANDOM_POSITION'):
+                if phase in ('TAKEOFF','CENTER','RANDOM_POSITION','INITIAL_POSITION'):
                     assert np.hypot(m.velocity.x,m.velocity.y)<=.500001
                     assert abs(m.velocity.z)<=.500001
-            assert all(p in phase_history for p in ['ARMING','TAKEOFF','CENTER','RANDOM_POSITION','APPROACH','DESCEND','CUT_WAIT','COMPLETE'])
+            expected=['ARMING','TAKEOFF','INITIAL_POSITION','APPROACH','DESCEND','CUT_WAIT','COMPLETE'] if TRAJECTORY else ['ARMING','TAKEOFF','CENTER','RANDOM_POSITION','APPROACH','DESCEND','CUT_WAIT','COMPLETE']
+            assert all(p in phase_history for p in expected)
+            if TRAJECTORY:
+                wait_for(lambda:latest['status']['trajectory_set']['completed']==2)
+                time.sleep(1.3)
+                assert not latest['status']['offboard_entry_ready'] and len(arm_calls)==2
+                sim['mode']='OFFBOARD';time.sleep(.5)
+                assert len(arm_calls)==2, 'exhausted set must not rearm/replay'
             report=dict(result='PASS',transport='localhost mock FCU and velocity-integrated synthetic pose, not flight dynamics',auto_arm_calls=len(arm_calls),completed_trials=len(kill_calls),random_targets=targets,sync_blocks_arm=True,transfer_speed_cap=.5,height_m=2.)
+            if TRAJECTORY:report.update(selected_reference_ids=[0,1],initial_targets=targets,
+                alignment_blocks_descent=True,queue_exhaustion_blocks_rearm=True,pilot_offboard_per_trial=True)
             (OUT/'ros_repeat_trial.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2));return
         if AUTO:
             wait_for(lambda:latest['status']['offboard_entry_ready'])

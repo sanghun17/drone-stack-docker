@@ -1,0 +1,40 @@
+{
+  "status": "GIT_READY_NOT_DEPLOYED",
+  "date": "2026-10-15",
+  "branch": "feat/hardware-trajectory-set",
+  "source_repository": "https://github.com/sanghun17/aruco_landing.git",
+  "runtime_revision": "b865ddcb02cb3d11346605343d74fe754bbad203",
+  "deployment_package_revision": "a4a5f52d323e24b2f2d358c3902c7283f0da61e1",
+  "unit_regression_tests": {
+    "passed": 41
+  },
+  "ros_integration": {
+    "environment": "localhost mock FCU and velocity-integrated synthetic pose, not flight dynamics",
+    "selected_set_completed_trials": 2,
+    "legacy_repeat_completed_trials": 2,
+    "marker_alignment_blocks_descent": true,
+    "sync_blocks_arm": true,
+    "exhausted_set_blocks_rearm": true,
+    "pilot_offboard_each_trial": true
+  },
+  "verified_unchanged": [
+    "legacy landing termination state machine",
+    "recording configurations",
+    "repeat transfer and geofence configurations",
+    "existing simulation trajectory banks"
+  ],
+  "trajectory_mode_default": "disabled",
+  "user_selected_trajectories": [],
+  "configuration": {
+    "kp_z_s_inv": 2.0,
+    "vertical_speed_limit_m_s": 1.6,
+    "reference_id_convention": "zero_based_bank_index"
+  },
+  "deployment_pending": [
+    "User deployment signal",
+    "User trajectory selection and resolved bank paths",
+    "Validate selected paths against configured hardware speed limits and measured flight space"
+  ],
+  "jetson_accessed": false,
+  "IM_modified": false
+}
