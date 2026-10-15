@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "reference_id_convention": "zero_based_bank_index",
+  "banks": {
+    "inside": {
+      "path": "../../../data/assets/hardware_inside20_20261015/inside_bank.npz",
+      "sha256": "b03e27d92d0a9eaa8dd7f0b84412edc32ff6ffd422385e79dcaec0ded6ca22b2"
+    }
+  },
+  "selections": [
+    {
+      "type": "inside",
+      "reference_id": 9595
+    },
+    {
+      "type": "inside",
+      "reference_id": 3254
+    },
+    {
+      "type": "inside",
+      "reference_id": 9946
+    },
+    {
+      "type": "inside",
+      "reference_id": 9449
+    },
+    {
+      "type": "inside",
+      "reference_id": 9012
+    },
+    {
+      "type": "inside",
+      "reference_id": 7001
+    },
+    {
+      "type": "inside",
+      "reference_id": 2893
+    },
+    {
+      "type": "inside",
+      "reference_id": 9507
+    },
+    {
+      "type": "inside",
+      "reference_id": 1146
+    },
+    {
+      "type": "inside",
+      "reference_id": 1276
+    },
+    {
+      "type": "inside",
+      "reference_id": 4364
+    },
+    {
+      "type": "inside",
+      "reference_id": 6549
+    },
+    {
+      "type": "inside",
+      "reference_id": 8397
+    },
+    {
+      "type": "inside",
+      "reference_id": 9957
+    },
+    {
+      "type": "inside",
+      "reference_id": 6834
+    },
+    {
+      "type": "inside",
+      "reference_id": 9204
+    },
+    {
+      "type": "inside",
+      "reference_id": 6881
+    },
+    {
+      "type": "inside",
+      "reference_id": 3358
+    },
+    {
+      "type": "inside",
+      "reference_id": 6927
+    },
+    {
+      "type": "inside",
+      "reference_id": 3365
+    }
+  ]
+}
