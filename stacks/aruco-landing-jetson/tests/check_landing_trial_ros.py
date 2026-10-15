@@ -14,6 +14,8 @@ import numpy as np
 import yaml
 
 ROOT=Path(__file__).resolve().parents[3]
+EMERGENCY=os.environ.get('TEST_EMERGENCY_LAND')=='1'
+PARALLEL=os.environ.get('TEST_PARALLEL_QUALIFICATION')=='1'
 RESTART_QUEUE=os.environ.get('TEST_TRAJECTORY_RESTART')=='1'
 OPTI_TERMINATION=os.environ.get('TEST_OPTITRACK_TERMINATION')=='1'
 TRAJECTORY=os.environ.get('TEST_TRAJECTORY_SET')=='1'
@@ -37,13 +39,14 @@ def main():
     env['PYTHONPATH']=':'.join(str(ROOT/p)for p in ['ws/flight-safety/devel/.private/flight_safety/lib/python3/dist-packages','ws/flight-safety/src/flight_safety/src','ws/aruco-landing/src/aruco_landing/src'])+':'+env.get('PYTHONPATH','')
     os.environ.update(env)
     import sys
-    for p in env['PYTHONPATH'].split(':'):
+    for p in reversed(env['PYTHONPATH'].split(':')):
         if p and p not in sys.path:sys.path.insert(0,p)
     import rospy
     from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped, TwistStamped
     from mavros_msgs.msg import State, ExtendedState, PositionTarget
     from mavros_msgs.srv import SetMode, SetModeResponse, ParamGet, ParamGetResponse, CommandLong, CommandLongResponse, CommandBool, CommandBoolResponse
     from std_msgs.msg import Bool, Int32MultiArray, String
+    from flight_safety.msg import Fault,FlightState
     from std_srvs.srv import Trigger
     from aruco_landing.pose_alignment import matrix_pose
     children=[];logs=[];stop=threading.Event();latest={};commands=[];mode_calls=[];kill_calls=[];arm_calls=[];phase_history=[];tagged_commands=[]
@@ -97,7 +100,7 @@ def main():
         repeat_args=[]
         if REPEAT:
             repeat_config=yaml.safe_load((ROOT/'stacks/aruco-landing-jetson/config/repeat_trial.yaml').read_text())
-            repeat_config.update(sync_status_file=str(OUT/'.sync_gate.json'),settle_s=.2,random_seed=17)
+            repeat_config.update(sync_status_file=str(OUT/'.sync_gate.json'),settle_s=1. if PARALLEL else .2,random_seed=17)
             (OUT/'repeat.yaml').write_text(yaml.safe_dump(repeat_config))
             repeat_args=['repeat_test:=true','repeat_config:='+str(OUT/'repeat.yaml')]
             if TRAJECTORY:
@@ -120,6 +123,8 @@ def main():
         spawn('trial',['roslaunch',str(ROOT/'ws/aruco-landing/src/aruco_landing/launch/landing_trial.launch'),'dry_run:=false','landing_finish_mode:='+('force_disarm' if CUT else 'auto_land'),'termination_height_source:='+('optitrack' if OPTI_TERMINATION else 'dual_height'),'auto_start_on_offboard:='+str(AUTO).lower(),'estimation_transition:='+str(TRANSITION).lower(),'config_root:='+str(ROOT/'stacks/aruco-landing-jetson/config')]+(['approach_speed_mps:=0.5','landing_horizontal_speed_mps:=2.0','descent_speed_mps:=0.5'] if SPEEDS else [])+repeat_args)
         pubs={}
         for key,topic,kind in [('marker','/landing/vision_pose_marker',PoseStamped),('velocity','/mavros/local_position/velocity_local',TwistStamped),('mocap','/vrpn_client_node/pure/pose',PoseStamped),('local','/mavros/local_position/pose',PoseStamped),('state','/mavros/state',State),('extended','/mavros/extended_state',ExtendedState),('pad','/landing/pad_pose_global',PoseStamped),('ready','/landing/alignment/ready',Bool),('visible','/landing/target_visible',Bool),('inliers','/landing/estimator/inlier_ids',Int32MultiArray),('body','/landing/vehicle_pose_pad',PoseWithCovarianceStamped),('camera','/landing/camera_pose_pad',PoseWithCovarianceStamped)]:pubs[key]=rospy.Publisher(topic,kind,queue_size=10)
+        fault_pub=rospy.Publisher('/flight_safety/fault',Fault,queue_size=1,latch=True)
+        rospy.Subscriber('/flight_safety/state',FlightState,lambda m:latest.update(safety=m))
         rospy.Subscriber('/landing/trial/status',String,status)
         rospy.Subscriber('/control/mission_status',String,lambda m:latest.update(mission=json.loads(m.data)))
         rospy.Subscriber('/landing/pose_transition/status',String,lambda m:latest.update(router=json.loads(m.data)))
@@ -178,12 +183,17 @@ def main():
                 if TRAJECTORY:
                     assert latest['status']['trajectory_set']['current']['reference_id']==number-1
                     np.testing.assert_allclose(targets[-1],np.array([.2 if number==1 else -.2,0.,2.])-X[:3,3])
-                    sim['marker_error']=.3
+                    sim['marker_error']=0. if PARALLEL else .3
                     wait_for(lambda:latest['status']['phase']=='APPROACH',35)
-                    time.sleep(1.3)
-                    assert latest['status']['phase']=='APPROACH', 'must wait for marker/mocap agreement'
-                    sim['marker_error']=0.
+                    qualification_started=time.monotonic()
+                    if not PARALLEL:
+                        time.sleep(1.3)
+                        assert latest['status']['phase']=='APPROACH', 'must wait for marker/mocap agreement'
+                        sim['marker_error']=0.
                 wait_for(lambda:latest['status']['phase']=='DESCEND',35)
+                if PARALLEL:
+                    qualification_elapsed=time.monotonic()-qualification_started
+                    assert .9<qualification_elapsed<1.7, 'position and marker dwell must overlap: '+str(qualification_elapsed)
                 wait_for(lambda:latest['status']['phase']=='COMPLETE',15)
                 assert len(kill_calls)==number and not sim['armed']
                 time.sleep(.3);assert len(arm_calls)==number
@@ -206,7 +216,7 @@ def main():
                 sim['mode']='OFFBOARD';time.sleep(.5)
                 assert len(arm_calls)==2, 'exhausted set must not rearm/replay'
             report=dict(result='PASS',transport='localhost mock FCU and velocity-integrated synthetic pose, not flight dynamics',auto_arm_calls=len(arm_calls),completed_trials=len(kill_calls),random_targets=targets,sync_blocks_arm=True,transfer_speed_cap=.5,height_m=2.)
-            if TRAJECTORY:report.update(restart_from_first_with_archive=RESTART_QUEUE,selected_reference_ids=[0,1],initial_targets=targets,
+            if TRAJECTORY:report.update(parallel_arrival_marker_checks=PARALLEL,restart_from_first_with_archive=RESTART_QUEUE,selected_reference_ids=[0,1],initial_targets=targets,
                 alignment_blocks_descent=True,queue_exhaustion_blocks_rearm=True,pilot_offboard_per_trial=True)
             (OUT/'ros_repeat_trial.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2));return
         if AUTO:
@@ -243,6 +253,29 @@ def main():
             sim['marker_dx']=0.
             wait_for(lambda:latest['router']['switch_check']['consistent'])
             wait_for(lambda:commands[-1][1].velocity.z<-.1)
+        if EMERGENCY:
+            fault_pub.publish(Fault(level=1,names=['consistency'],messages=['synthetic difference']))
+            wait_for(lambda:latest['safety'].control_lane=='LAND')
+            wait_for(lambda:latest['status']['phase']=='FAILED_HOLD')
+            sim['z']=.19-X[2,3];sim['landed']=False
+            fault_pub.publish(Fault())
+            wait_for(lambda:latest['safety'].level==0)
+            cleared=time.monotonic();time.sleep(.6)
+            assert latest['safety'].control_lane=='LAND', 'clearing warning must not restore Normal'
+            after=[m for stamp,m in commands if stamp>cleared+.1]
+            assert after and all(m.type_mask&PositionTarget.IGNORE_PZ and m.velocity.z<0 for m in after)
+            assert not kill_calls, 'low height alone is not emergency ground contact'
+            sim['landed']=True
+            wait_for(lambda:len(kill_calls)==1 and not sim['armed'],4)
+            time.sleep(.3)
+            assert latest['safety'].control_lane=='KILL' and len(kill_calls)==1
+            report=dict(result='PASS',transport='localhost mock FCU; real safety, MUX, planner and router',
+                cleared_warn_keeps_land=True,stale_airborne_planner_target_blocked=True,
+                fresh_fcu_ground_triggers_disarm=True,kill_calls=kill_calls,
+                sole_setpoint_publisher=dict(master.getSystemState('/trial_test')[2][0])['/mavros/setpoint_raw/local'])
+            assert report['sole_setpoint_publisher']==['/flight_safety_response']
+            (OUT/'ros_emergency_land.json').write_text(json.dumps(report,indent=2)+'\n')
+            print(json.dumps(report,indent=2));return
         # A failed trial must latch a POSITION hover and never resume on rediscovery.
         sim['x']=.7;sim['visible']=False;lost_at=time.monotonic()
         wait_for(lambda:latest['status']['phase']=='FAILED_HOLD',2)

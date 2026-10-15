@@ -11,7 +11,8 @@ gui:
   web_port: 6081
   rviz_config: /work/stacks/aruco-landing-jetson/config/detected_preview.rviz
 environment:
-  ARUCO_LANDING_REVISION: "981e5a0b3444fbe5b77cb8b9193af317df83c15b"
+  SAFETY_REVISION: "ceed188d2d51f386878892ae5b70d164bc7d9431"
+  ARUCO_LANDING_REVISION: "c7af54aa6d4b391300e6dc23186bfbb18557e153"
   SESSION_RECORDER_PROFILE: hardware
   SESSION_RECORDER_CONFIG: /work/stacks/aruco-landing-jetson/config/session_recorder.yaml
   # Bench lighting: gain 10 saturated 31.6% of pixels and erased marker edges.

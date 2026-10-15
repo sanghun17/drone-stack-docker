@@ -96,7 +96,7 @@
         "workspace": "/work/ws/flight-safety"
       },
       "repository": "https://github.com/sanghun17/flight_safety.git",
-      "revision": "bdd2706c469b6b646af3fe979a657fef4a36f0b6",
+      "revision": "ceed188d2d51f386878892ae5b70d164bc7d9431",
       "subdir": "deployment/stack-modules/control/flight-safety"
     },
     "control/local-controller": {
@@ -520,7 +520,7 @@
         ]
       },
       "repository": "https://github.com/sanghun17/aruco_landing.git",
-      "revision": "981e5a0b3444fbe5b77cb8b9193af317df83c15b",
+      "revision": "c7af54aa6d4b391300e6dc23186bfbb18557e153",
       "subdir": "deployment/stack-modules/planner/aruco-landing"
     },
     "planner/la-planner": {

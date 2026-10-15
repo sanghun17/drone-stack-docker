@@ -1,0 +1,15 @@
+{
+  "bag": "flight_2026-10-15_22-14-04.bag",
+  "sha256": "f726724e967c852247d23eea75e3a82a4b36ebc081e1be2285a17f2c9beec1bf",
+  "warning_time_s": 22.765554904937744,
+  "warning_cleared_time_s": 24.265182733535767,
+  "post_clear_forced_descent_outputs": 6,
+  "post_clear_airborne_hold_outputs": 0,
+  "disarm_request_times_s": [
+    24.39908790588379,
+    25.399282217025757,
+    26.39993643760681,
+    27.41908621788025
+  ],
+  "scope": "Recorded sensor/FCU inputs only; publishers, timers and actuator services mocked. New dynamics, ground detection and FCU disarm response are not simulated."
+}

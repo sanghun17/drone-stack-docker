@@ -4,6 +4,10 @@ speed_mps: 0.5
 vertical_speed_mps: 0.5
 position_tolerance_m: 0.10
 velocity_tolerance_mps: 0.10
+# At first qualified arrival, start transfer / optical qualification immediately.
+takeoff_settle_s: 0.0
+initial_position_settle_s: 0.0
+# In APPROACH, this arrival dwell runs concurrently with marker/router dwell.
 settle_s: 1.0
 stage_timeout_s: 30.0
 arm_timeout_s: 5.0

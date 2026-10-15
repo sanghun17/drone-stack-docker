@@ -110,3 +110,30 @@ advances to the next reference; failures still halt that invocation. Startup
 never starts motion: a fresh prepared pilot OFFBOARD edge is still required.
 The generic launch default is false, retaining durable resume/refusal behavior
 for callers that do not select the hardware startup policy.
+
+## Emergency LAND ownership and parallel qualification (2026-10-15)
+
+The 22:14:04 flight entered safety LAND on a consistency WARN. When WARN cleared
+near the pad, the old response returned to NORMAL and forwarded a failed-trial
+hold target at local Z=1.591 m, producing a climb. Emergency LAND now latches in
+the shared safety response, the sole MAVROS command publisher: new Normal and
+IdleHold commands are discarded even when the triggering fault clears. IMU
+contact detection stays active throughout that descent. Fresh FCU ON_GROUND
+samples after LAND entry, continuously confirmed for 0.3 s, also trigger safety
+force-disarm. Rejected/unconfirmed emergency disarm is retried no faster than
+once per second until FCU disarm, subject to pilot authority. POSCTL/manual
+mode always suspends automatic actuation. A safety KILL requires a disarmed
+safety restart before a new flight; mission-requested termination retains its
+existing guarded reset.
+
+The stack removes only the separate TAKEOFF and INITIAL_POSITION arrival dwells.
+Position <=0.10 m and speed <=0.10 m/s are still required at stage transition.
+In APPROACH the one-second position/speed dwell and one-second/30-sample optical
+router checks run concurrently. Marker disagreement still resets optical
+qualification, and no source transition or descent bypasses its gates.
+
+Validation uses 80 focused planner tests, 41 focused safety/LED/termination tests,
+localhost real safety/planner/router/MUX tests with a mock FCU, and read-only
+command arbitration replay of the preserved incident bag. No physics or actual
+new flight is simulated. See `data/manifests/emergency-land-replay-20261015.json`
+and `data/manifests/emergency-land-validation-20261015.json`.

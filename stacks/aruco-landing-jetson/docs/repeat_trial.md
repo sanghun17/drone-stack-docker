@@ -38,8 +38,12 @@ The phases are:
 7. COMPLETE: wait for verified transfer and the next pilot mode transition.
 
 Takeoff/center/random motion has combined XY and vertical command limits of
-0.5 m/s. Arrival requires 3D position error <=0.10 m and measured speed <=0.10 m/s
-continuously for 1 s. The current XY fence is ±2.5 m, with its 0.4 m safety margin
+0.5 m/s. Arrival requires 3D position error <=0.10 m and measured speed <=0.10 m/s.
+TAKEOFF advances immediately at the first qualified arrival (`takeoff_settle_s=0`).
+INITIAL_POSITION also advances immediately (`initial_position_settle_s=0`) so
+APPROACH checks one second of arrival stability concurrently with the fresh
+marker/router qualification dwell. Neither check is removed; they overlap.
+Other legacy CENTER/RANDOM_POSITION stages retain `settle_s`. The current XY fence is ±2.5 m, with its 0.4 m safety margin
 plus 0.3 m experiment inset: random coordinates are within ±1.8 m, at least
 0.75 m from the origin. Stage timeout is 30 s; arming timeout is 5 s.
 These settings belong to `config/repeat_trial.yaml`; the fence is read from

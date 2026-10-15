@@ -1,0 +1,67 @@
+{
+  "aruco_revision": "c7af54aa6d4b391300e6dc23186bfbb18557e153",
+  "safety_revision": "ceed188d2d51f386878892ae5b70d164bc7d9431",
+  "planner_tests_passed": 80,
+  "safety_tests_passed": 41,
+  "emergency": {
+    "result": "PASS",
+    "transport": "localhost mock FCU; real safety, MUX, planner and router",
+    "cleared_warn_keeps_land": true,
+    "stale_airborne_planner_target_blocked": true,
+    "fresh_fcu_ground_triggers_disarm": true,
+    "kill_calls": [
+      {
+        "command": 400,
+        "param1": 0.0,
+        "param2": 21196.0
+      }
+    ],
+    "sole_setpoint_publisher": [
+      "/flight_safety_response"
+    ]
+  },
+  "parallel_qualification": {
+    "result": "PASS",
+    "transport": "localhost mock FCU and velocity-integrated synthetic pose, not flight dynamics",
+    "auto_arm_calls": 2,
+    "completed_trials": 2,
+    "random_targets": [
+      [
+        0.07464386782359791,
+        -7.830621472088443e-05,
+        2.0068549675466665
+      ],
+      [
+        -0.32535613217640214,
+        -7.830621472088443e-05,
+        2.0068549675466665
+      ]
+    ],
+    "sync_blocks_arm": true,
+    "transfer_speed_cap": 0.5,
+    "height_m": 2.0,
+    "parallel_arrival_marker_checks": true,
+    "restart_from_first_with_archive": true,
+    "selected_reference_ids": [
+      0,
+      1
+    ],
+    "initial_targets": [
+      [
+        0.07464386782359791,
+        -7.830621472088443e-05,
+        2.0068549675466665
+      ],
+      [
+        -0.32535613217640214,
+        -7.830621472088443e-05,
+        2.0068549675466665
+      ]
+    ],
+    "alignment_blocks_descent": true,
+    "queue_exhaustion_blocks_rearm": true,
+    "pilot_offboard_per_trial": true
+  },
+  "baseline_test_limitations": "Four existing test_localization_policy geofence fixtures lack the axes attribute; reproduced against unchanged bdd2706 owner source. The four deployment geofence profile tests pass when run from the synchronized stack module path.",
+  "synchronized_geofence_profile_tests_passed": 4
+}
