@@ -469,7 +469,7 @@
         "workspace": "/work/ws/aruco-landing"
       },
       "repository": "https://github.com/sanghun17/aruco_landing.git",
-      "revision": "163e06caa738ca053fce717904929224f96c2a1a",
+      "revision": "72f010a64f3e77c868a978ac1de1ea6e55c9d916",
       "subdir": "deployment/stack-modules/perception/aruco-landing"
     },
     "planner/aruco-batch": {
@@ -520,7 +520,7 @@
         ]
       },
       "repository": "https://github.com/sanghun17/aruco_landing.git",
-      "revision": "163e06caa738ca053fce717904929224f96c2a1a",
+      "revision": "72f010a64f3e77c868a978ac1de1ea6e55c9d916",
       "subdir": "deployment/stack-modules/planner/aruco-landing"
     },
     "planner/la-planner": {

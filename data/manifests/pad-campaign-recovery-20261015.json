@@ -1,6 +1,6 @@
 {
-  "aruco_revision": "163e06caa738ca053fce717904929224f96c2a1a",
-  "focused_source_tests_passed": 86,
+  "aruco_revision": "72f010a64f3e77c868a978ac1de1ea6e55c9d916",
+  "focused_source_tests_passed": 87,
   "catalog_tests_passed": 2,
   "integration": {
     "result": "PASS",
