@@ -24,6 +24,9 @@ runtime_manifest_repo_paths:
 runtime_manifest_config_paths:
   geofence: /work/stacks/aruco-landing-jetson/config/geofence.yaml
   aruco_runtime: /work/stacks/aruco-landing-jetson/config/runtime.env
+  selected_baseline_pad: /work/ws/aruco-landing/src/aruco_landing/config/paper_pad_layout_physical_20260920_runtime.yaml
+  selected_proposed1_pad: /work/ws/aruco-landing/src/aruco_landing/config/proposed_pad_1_layout_physical_20260920_runtime.yaml
+  trajectory_set: /work/stacks/aruco-landing-jetson/config/trajectory_set_inside20.json
   aruco_pad: /work/stacks/aruco-landing-jetson/config/physical_pad.yaml
   aruco_trial: /work/ws/aruco-landing/src/aruco_landing/launch/landing_trial.launch
   aruco_controller: /work/ws/aruco-landing/src/aruco_landing/config/common_experiment.yaml
@@ -107,3 +110,7 @@ topics:
 - /landing/trial/yaw_cmd
 - /landing/trial/yaw_error
 - /landing/trial/controller/state
+
+# Explicit selected reference and controller identity in every arm recording.
+- /landing/trajectory/selection
+- /landing/trajectory/ready

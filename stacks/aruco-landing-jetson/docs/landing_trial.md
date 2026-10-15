@@ -101,15 +101,24 @@ router, MUX and safety with a mock FCU: high-altitude marker loss still latches
 failed hold; low-height loss issues one generic safety termination and waits for
 disarm. No test sends commands to the hardware master.
 
-The hardware stack selects `LANDING_TRAJECTORY_RESTART_ON_START=true`: every
-planner invocation archives the exact old progress as
-`flight_logs/inside20_progress.previous.<time_ns>.json` and creates a fresh queue
-at the first selected reference, even after an interrupted or completed run.
-Recorded bags remain unchanged. Within one invocation each successful landing
-advances to the next reference; failures still halt that invocation. Startup
-never starts motion: a fresh prepared pilot OFFBOARD edge is still required.
-The generic launch default is false, retaining durable resume/refusal behavior
-for callers that do not select the hardware startup policy.
+The hardware stack now selects pad-scoped continuation through
+`LANDING_TRAJECTORY_CAMPAIGN_ROOT=/work/flight_logs/trajectory_campaign` and
+`LANDING_TRAJECTORY_RESTART_ON_START=false`. The perception-selected metric YAML
+(name plus exact SHA-256) and immutable reference-set hash identify the queue.
+Each successful grounded disarm records that reference once; restarting retries
+the first unfinished reference. Interrupted state is archived, never counted as
+success. The planner requires a fresh matching perception pad identity before
+readiness and rejects a changed identity during a trial. After all selected
+references (20 in this hardware set) are complete, `all_complete=true`, readiness
+stays false and OFFBOARD edges cannot arm, including after restarting. Changing
+pads requires restarting perception and planner; the other pad's queue stays
+independent. A campaign file lock excludes simultaneous planner/recovery writes.
+
+`recover_trajectory_campaign.py` reconstructs queues from finalized bags with
+matching pad/layout/set/reference identity, observed successful termination,
+ground and disarm confirmation. It requires a stopped planner and fresh disarmed
+ground POSCTL state. Failed and duplicate attempts never advance the queue.
+Original generic resume/reset options remain available outside campaign mode.
 
 ## Emergency LAND ownership and parallel qualification (2026-10-15)
 
@@ -137,3 +146,21 @@ localhost real safety/planner/router/MUX tests with a mock FCU, and read-only
 command arbitration replay of the preserved incident bag. No physics or actual
 new flight is simulated. See `data/manifests/emergency-land-replay-20261015.json`
 and `data/manifests/emergency-land-validation-20261015.json`.
+
+## ML catalog and recovery (2026-10-15)
+
+`data/analysis/aruco/catalog_hardware_trials.py` groups finalized recordings under
+`data/results/hardware_trials/<pad>/layout_<sha>/set_<sha>/<type>/ref_<id>/<flight>/`.
+Views contain links to original bags, manifests and cam1/cam2 directories plus
+`attempt.json` with outcome, exact pad/set/reference identity and code revisions.
+Only the latest confirmed success per pad/reference appears in the active view;
+failed and duplicate attempts are omitted there and retained in `history.json`.
+Raw recordings are never modified. The ML user service `aruco-flight-catalog`
+refreshes this view for future finalized flights. Its versioned unit is in
+`stacks/aruco-landing-jetson/config/systemd/`.
+
+The 2026-10-15 reconstruction found five unique Proposed 1 successes (queue
+indices 0–4), two duplicate successes and two failed attempts. The selected
+reference IDs are 9595, 3254, 9946, 9449 and 9012; the next unfinished reference
+is index 5 / ID 7001. Old and new controller revisions stay visible per attempt;
+counting a successful route does not assert identical experiment conditions.

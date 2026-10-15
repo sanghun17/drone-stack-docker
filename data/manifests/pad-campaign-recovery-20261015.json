@@ -1,0 +1,227 @@
+{
+  "aruco_revision": "163e06caa738ca053fce717904929224f96c2a1a",
+  "focused_source_tests_passed": 86,
+  "catalog_tests_passed": 2,
+  "integration": {
+    "result": "PASS",
+    "transport": "localhost mock FCU and velocity-integrated synthetic pose, not flight dynamics",
+    "auto_arm_calls": 2,
+    "completed_trials": 2,
+    "random_targets": [
+      [
+        0.07464386782359791,
+        -7.830621472088443e-05,
+        2.0068549675466665
+      ],
+      [
+        -0.32535613217640214,
+        -7.830621472088443e-05,
+        2.0068549675466665
+      ]
+    ],
+    "sync_blocks_arm": true,
+    "transfer_speed_cap": 0.5,
+    "height_m": 2.0,
+    "pad_campaign_resume_and_restart_exhaustion": true,
+    "parallel_arrival_marker_checks": true,
+    "restart_from_first_with_archive": false,
+    "selected_reference_ids": [
+      0,
+      1
+    ],
+    "initial_targets": [
+      [
+        0.07464386782359791,
+        -7.830621472088443e-05,
+        2.0068549675466665
+      ],
+      [
+        -0.32535613217640214,
+        -7.830621472088443e-05,
+        2.0068549675466665
+      ]
+    ],
+    "alignment_blocks_descent": true,
+    "queue_exhaustion_blocks_rearm": true,
+    "pilot_offboard_per_trial": true
+  },
+  "restored_catalog": {
+    "schema_version": 1,
+    "selection_policy": "latest confirmed success per pad layout / trajectory set / reference",
+    "campaigns": [
+      {
+        "pad": {
+          "key": "proposed1",
+          "layout_sha256": "e39542c2b2adbaf370b6712b9a49b3e1f5cd02db562a36f77440dbf868635dbf",
+          "configuration": "proposed_pad_1_layout_physical_20260920_runtime.yaml"
+        },
+        "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+        "completed_indices": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "completed": 5
+      }
+    ],
+    "flights": [
+      {
+        "session": "flight_2026-10-15_22-57-37",
+        "pad": {
+          "key": "proposed1",
+          "layout_sha256": "e39542c2b2adbaf370b6712b9a49b3e1f5cd02db562a36f77440dbf868635dbf",
+          "configuration": "proposed_pad_1_layout_physical_20260920_runtime.yaml"
+        },
+        "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+        "selection": {
+          "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+          "index": 0,
+          "type": "inside",
+          "reference_id": 9595,
+          "raw_candidate_id": 50781,
+          "bank_sha256": "b03e27d92d0a9eaa8dd7f0b84412edc32ff6ffd422385e79dcaec0ded6ca22b2"
+        },
+        "outcome": "success",
+        "final_phase": "COMPLETE",
+        "reason": "force_disarm_confirmed",
+        "disarmed": true,
+        "grounded": true,
+        "safety_faults": [],
+        "revisions": {
+          "aruco_landing": "c7af54aa6d4b391300e6dc23186bfbb18557e153",
+          "drone_stack": "678b9d9eab441e224364e202b572f3ac2318a5b9",
+          "flight_safety": "ceed188d2d51f386878892ae5b70d164bc7d9431"
+        },
+        "bag_path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-15_22-57-37/flight_2026-10-15_22-57-37.bag",
+        "manifest_path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-15_22-57-37/flight_2026-10-15_22-57-37.runtime_manifest.yaml",
+        "bag_sha256": "4f04027f1df34d7a9e8cab559c35988098faf437900c64f5cfd273d152a1fb61"
+      },
+      {
+        "session": "flight_2026-10-15_22-11-36",
+        "pad": {
+          "key": "proposed1",
+          "layout_sha256": "e39542c2b2adbaf370b6712b9a49b3e1f5cd02db562a36f77440dbf868635dbf",
+          "configuration": "proposed_pad_1_layout_physical_20260920_runtime.yaml"
+        },
+        "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+        "selection": {
+          "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+          "index": 1,
+          "type": "inside",
+          "reference_id": 3254,
+          "raw_candidate_id": 46483,
+          "bank_sha256": "b03e27d92d0a9eaa8dd7f0b84412edc32ff6ffd422385e79dcaec0ded6ca22b2"
+        },
+        "outcome": "success",
+        "final_phase": "COMPLETE",
+        "reason": "force_disarm_confirmed",
+        "disarmed": true,
+        "grounded": true,
+        "safety_faults": [],
+        "revisions": {
+          "aruco_landing": "981e5a0b3444fbe5b77cb8b9193af317df83c15b",
+          "drone_stack": "221f425c5df0006ec4b923cc86a3534d182ea9a4",
+          "flight_safety": "c3ae14accbd9f0796b8840deffc4c93e1b03f34c"
+        },
+        "bag_path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-15_22-11-36/flight_2026-10-15_22-11-36.bag",
+        "manifest_path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-15_22-11-36/flight_2026-10-15_22-11-36.runtime_manifest.yaml",
+        "bag_sha256": "8e20997a731418c53aae52942dfe34f20b7429016ccf14141d6accf462227491"
+      },
+      {
+        "session": "flight_2026-10-15_22-12-09",
+        "pad": {
+          "key": "proposed1",
+          "layout_sha256": "e39542c2b2adbaf370b6712b9a49b3e1f5cd02db562a36f77440dbf868635dbf",
+          "configuration": "proposed_pad_1_layout_physical_20260920_runtime.yaml"
+        },
+        "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+        "selection": {
+          "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+          "index": 2,
+          "type": "inside",
+          "reference_id": 9946,
+          "raw_candidate_id": 49685,
+          "bank_sha256": "b03e27d92d0a9eaa8dd7f0b84412edc32ff6ffd422385e79dcaec0ded6ca22b2"
+        },
+        "outcome": "success",
+        "final_phase": "COMPLETE",
+        "reason": "force_disarm_confirmed",
+        "disarmed": true,
+        "grounded": true,
+        "safety_faults": [],
+        "revisions": {
+          "aruco_landing": "981e5a0b3444fbe5b77cb8b9193af317df83c15b",
+          "drone_stack": "221f425c5df0006ec4b923cc86a3534d182ea9a4",
+          "flight_safety": "c3ae14accbd9f0796b8840deffc4c93e1b03f34c"
+        },
+        "bag_path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-15_22-12-09/flight_2026-10-15_22-12-09.bag",
+        "manifest_path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-15_22-12-09/flight_2026-10-15_22-12-09.runtime_manifest.yaml",
+        "bag_sha256": "2c461116b2650204b23250a7063fac22d1714c26506b53e73c238f62a7b48271"
+      },
+      {
+        "session": "flight_2026-10-15_22-12-46",
+        "pad": {
+          "key": "proposed1",
+          "layout_sha256": "e39542c2b2adbaf370b6712b9a49b3e1f5cd02db562a36f77440dbf868635dbf",
+          "configuration": "proposed_pad_1_layout_physical_20260920_runtime.yaml"
+        },
+        "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+        "selection": {
+          "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+          "index": 3,
+          "type": "inside",
+          "reference_id": 9449,
+          "raw_candidate_id": 52388,
+          "bank_sha256": "b03e27d92d0a9eaa8dd7f0b84412edc32ff6ffd422385e79dcaec0ded6ca22b2"
+        },
+        "outcome": "success",
+        "final_phase": "COMPLETE",
+        "reason": "force_disarm_confirmed",
+        "disarmed": true,
+        "grounded": true,
+        "safety_faults": [],
+        "revisions": {
+          "aruco_landing": "981e5a0b3444fbe5b77cb8b9193af317df83c15b",
+          "drone_stack": "221f425c5df0006ec4b923cc86a3534d182ea9a4",
+          "flight_safety": "c3ae14accbd9f0796b8840deffc4c93e1b03f34c"
+        },
+        "bag_path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-15_22-12-46/flight_2026-10-15_22-12-46.bag",
+        "manifest_path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-15_22-12-46/flight_2026-10-15_22-12-46.runtime_manifest.yaml",
+        "bag_sha256": "4eca1932ff2aed76eb0466bfc4c8178e8f325700dc213f5267ab5b3a1a1a8110"
+      },
+      {
+        "session": "flight_2026-10-15_22-13-20",
+        "pad": {
+          "key": "proposed1",
+          "layout_sha256": "e39542c2b2adbaf370b6712b9a49b3e1f5cd02db562a36f77440dbf868635dbf",
+          "configuration": "proposed_pad_1_layout_physical_20260920_runtime.yaml"
+        },
+        "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+        "selection": {
+          "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+          "index": 4,
+          "type": "inside",
+          "reference_id": 9012,
+          "raw_candidate_id": 38661,
+          "bank_sha256": "b03e27d92d0a9eaa8dd7f0b84412edc32ff6ffd422385e79dcaec0ded6ca22b2"
+        },
+        "outcome": "success",
+        "final_phase": "COMPLETE",
+        "reason": "force_disarm_confirmed",
+        "disarmed": true,
+        "grounded": true,
+        "safety_faults": [],
+        "revisions": {
+          "aruco_landing": "981e5a0b3444fbe5b77cb8b9193af317df83c15b",
+          "drone_stack": "221f425c5df0006ec4b923cc86a3534d182ea9a4",
+          "flight_safety": "c3ae14accbd9f0796b8840deffc4c93e1b03f34c"
+        },
+        "bag_path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-15_22-13-20/flight_2026-10-15_22-13-20.bag",
+        "manifest_path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-15_22-13-20/flight_2026-10-15_22-13-20.runtime_manifest.yaml",
+        "bag_sha256": "39c0333a3f5a20b754f0f41173cf21c0ca5fd7d5f07f638be56deddac695664d"
+      }
+    ]
+  }
+}

@@ -14,6 +14,7 @@ import numpy as np
 import yaml
 
 ROOT=Path(__file__).resolve().parents[3]
+CAMPAIGN=os.environ.get('TEST_PAD_CAMPAIGN')=='1'
 EMERGENCY=os.environ.get('TEST_EMERGENCY_LAND')=='1'
 PARALLEL=os.environ.get('TEST_PARALLEL_QUALIFICATION')=='1'
 RESTART_QUEUE=os.environ.get('TEST_TRAJECTORY_RESTART')=='1'
@@ -49,10 +50,11 @@ def main():
     from flight_safety.msg import Fault,FlightState
     from std_srvs.srv import Trigger
     from aruco_landing.pose_alignment import matrix_pose
-    children=[];logs=[];stop=threading.Event();latest={};commands=[];mode_calls=[];kill_calls=[];arm_calls=[];phase_history=[];tagged_commands=[]
+    child_commands={};children=[];logs=[];stop=threading.Event();latest={};commands=[];mode_calls=[];kill_calls=[];arm_calls=[];phase_history=[];tagged_commands=[]
     sim=dict(mode='POSCTL',armed=not AUTO,visible=AUTO,z=1.2,x=4. if SPEEDS else 1.,landed=AUTO)
     if REPEAT:sim.update(x=0.,y=0.,z=.2,sync_ready=False)
     def spawn(name,args):
+        child_commands[name]=args
         f=(OUT/(name+'.log')).open('w');logs.append(f)
         p=subprocess.Popen(args,env=env,cwd=ROOT,stdout=f,stderr=f,start_new_session=True);children.append(p)
     def wait_for(predicate,timeout=6):
@@ -98,6 +100,10 @@ def main():
         rospy.set_param('/flight_safety_response/allow_external_termination',CUT)
         spawn('safety',['python3',str(ROOT/'ws/flight-safety/src/flight_safety/scripts/response_node.py')])
         repeat_args=[]
+        if CAMPAIGN:
+            from aruco_landing.campaign import pad_identity,progress_path
+            campaign_pad=pad_identity(ROOT/'stacks/aruco-landing-jetson/config/physical_pad.yaml')
+            rospy.set_param('/physical_pad_estimator/pad_configuration',str(ROOT/'stacks/aruco-landing-jetson/config/physical_pad.yaml'))
         if REPEAT:
             repeat_config=yaml.safe_load((ROOT/'stacks/aruco-landing-jetson/config/repeat_trial.yaml').read_text())
             repeat_config.update(sync_status_file=str(OUT/'.sync_gate.json'),settle_s=1. if PARALLEL else .2,random_seed=17)
@@ -119,10 +125,19 @@ def main():
                     previous_progress=json.dumps(dict(set_sha256=hashlib.sha256((OUT/'set.json').read_bytes()).hexdigest(),completed=[0],active=1,halted=True))
                     progress.write_text(previous_progress)
                     repeat_args+=['trajectory_restart_on_start:=true']
+                if CAMPAIGN:
+                    checkpoint=progress_path(OUT/'campaign',hashlib.sha256((OUT/'set.json').read_bytes()).hexdigest(),campaign_pad)
+                    # Isolate every test invocation; no real or prior campaign state.
+                    checkpoint=progress_path(OUT/('campaign_'+str(time.time_ns())),hashlib.sha256((OUT/'set.json').read_bytes()).hexdigest(),campaign_pad)
+                    checkpoint.parent.mkdir(parents=True,exist_ok=True)
+                    checkpoint.write_text(json.dumps(dict(set_sha256=hashlib.sha256((OUT/'set.json').read_bytes()).hexdigest(),pad=campaign_pad,completed=[],active=0,halted=True)))
+                    campaign_root=checkpoint.parents[2]
+                    repeat_args+=['trajectory_campaign_root:='+str(campaign_root)]
                 repeat_args+=['trajectory_set_file:='+str(OUT/'set.json'),'trajectory_progress_file:='+str(progress)]
         spawn('trial',['roslaunch',str(ROOT/'ws/aruco-landing/src/aruco_landing/launch/landing_trial.launch'),'dry_run:=false','landing_finish_mode:='+('force_disarm' if CUT else 'auto_land'),'termination_height_source:='+('optitrack' if OPTI_TERMINATION else 'dual_height'),'auto_start_on_offboard:='+str(AUTO).lower(),'estimation_transition:='+str(TRANSITION).lower(),'config_root:='+str(ROOT/'stacks/aruco-landing-jetson/config')]+(['approach_speed_mps:=0.5','landing_horizontal_speed_mps:=2.0','descent_speed_mps:=0.5'] if SPEEDS else [])+repeat_args)
         pubs={}
         for key,topic,kind in [('marker','/landing/vision_pose_marker',PoseStamped),('velocity','/mavros/local_position/velocity_local',TwistStamped),('mocap','/vrpn_client_node/pure/pose',PoseStamped),('local','/mavros/local_position/pose',PoseStamped),('state','/mavros/state',State),('extended','/mavros/extended_state',ExtendedState),('pad','/landing/pad_pose_global',PoseStamped),('ready','/landing/alignment/ready',Bool),('visible','/landing/target_visible',Bool),('inliers','/landing/estimator/inlier_ids',Int32MultiArray),('body','/landing/vehicle_pose_pad',PoseWithCovarianceStamped),('camera','/landing/camera_pose_pad',PoseWithCovarianceStamped)]:pubs[key]=rospy.Publisher(topic,kind,queue_size=10)
+        if CAMPAIGN:estimator_pub=rospy.Publisher('/landing/estimator/status',String,queue_size=1,latch=True)
         fault_pub=rospy.Publisher('/flight_safety/fault',Fault,queue_size=1,latch=True)
         rospy.Subscriber('/flight_safety/state',FlightState,lambda m:latest.update(safety=m))
         rospy.Subscriber('/landing/trial/status',String,status)
@@ -132,6 +147,7 @@ def main():
         X=np.array(yaml.safe_load((ROOT/'stacks/aruco-landing-jetson/config/calibration/20260919/base_link_to_see3cam_optical_frame.yaml').read_text())['matrix_row_major']).reshape(4,4)
         def feed():
             while not stop.is_set():
+                if CAMPAIGN:estimator_pub.publish(json.dumps(dict(pad_identity=campaign_pad)))
                 velocity=np.zeros(3)
                 if REPEAT:
                     if commands and sim['mode']=='OFFBOARD' and sim['armed']:
@@ -215,8 +231,18 @@ def main():
                 assert not latest['status']['offboard_entry_ready'] and len(arm_calls)==2
                 sim['mode']='OFFBOARD';time.sleep(.5)
                 assert len(arm_calls)==2, 'exhausted set must not rearm/replay'
+                if CAMPAIGN:
+                    sim['mode']='POSCTL'
+                    previous=children.pop();os.killpg(previous.pid,signal.SIGINT);previous.wait(timeout=8)
+                    latest['status']={}
+                    spawn('trial_restart',child_commands['trial'])
+                    wait_for(lambda:latest.get('status',{}).get('reason')=='pad_trajectory_set_complete',10)
+                    assert latest['status']['trajectory_set']['all_complete']
+                    assert latest['status']['trajectory_set']['completed']==2 and not latest['status']['offboard_entry_ready']
+                    sim['mode']='OFFBOARD';time.sleep(.6)
+                    assert len(arm_calls)==2 and latest['status']['reason']=='pad_trajectory_set_complete'
             report=dict(result='PASS',transport='localhost mock FCU and velocity-integrated synthetic pose, not flight dynamics',auto_arm_calls=len(arm_calls),completed_trials=len(kill_calls),random_targets=targets,sync_blocks_arm=True,transfer_speed_cap=.5,height_m=2.)
-            if TRAJECTORY:report.update(parallel_arrival_marker_checks=PARALLEL,restart_from_first_with_archive=RESTART_QUEUE,selected_reference_ids=[0,1],initial_targets=targets,
+            if TRAJECTORY:report.update(pad_campaign_resume_and_restart_exhaustion=CAMPAIGN,parallel_arrival_marker_checks=PARALLEL,restart_from_first_with_archive=RESTART_QUEUE,selected_reference_ids=[0,1],initial_targets=targets,
                 alignment_blocks_descent=True,queue_exhaustion_blocks_rearm=True,pilot_offboard_per_trial=True)
             (OUT/'ros_repeat_trial.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2));return
         if AUTO:

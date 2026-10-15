@@ -1,0 +1,13 @@
+[Unit]
+Description=Catalog finalized ArUco hardware flights by pad and reference
+After=default.target
+
+[Service]
+Type=simple
+EnvironmentFile=%h/.config/aruco-flight-catalog.env
+ExecStart=/usr/bin/python3 ${CATALOG_SCRIPT} --source-root ${CATALOG_SOURCE_ROOT} --output-root ${CATALOG_OUTPUT_ROOT} --owner-source ${CATALOG_OWNER_SOURCE} --watch
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

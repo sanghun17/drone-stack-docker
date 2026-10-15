@@ -67,3 +67,10 @@ no ArUco/Jetson/ML paths and can serve other stacks using separate service names
 
 Verification uses unit tests and a localhost mock FCU with integrated commanded
 velocities. It does not model PX4 dynamics or certify real takeoff behavior.
+
+
+For the selected 20-path hardware mode, progress is independent per
+perception-selected pad YAML and resumes across planner restarts. A failed
+attempt is retried after restarting; completed references are skipped. The
+queue blocks new automatic arming at 20/20, including after restart. See
+landing_trial.md for evidence recovery and the ML pad/reference catalog.
