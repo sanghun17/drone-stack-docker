@@ -972,11 +972,11 @@
         "module.yml": "6a3e17d5f533bcb7aead491b96eddafbc46addeb9b48dfd210621ea25ad63014",
         "run.sh": "8d5c37f844dacd92b5ac4689a3eeeefd0b7731480b4c94e69265fb5e7a8e1b94",
         "scripts/flightlog_sync.sh": "939b96bb1d2443819f09ee3d57dc0098c8346441ce22ecb5d086b46abb7fb1d1",
-        "scripts/install_verified_sync.py": "5a7adc20518d6f2e875227ac7768de0873c622a60a4726e3dffa65c166a8e6ad",
-        "scripts/verified_flight_sync.py": "ae05ea6353cf8e30a8af24e3bcf8cadb5371e897fa369374fa4bd62d475847ec",
+        "scripts/install_verified_sync.py": "a12a4b2e5bd16e2a876159a7eedbd1ebe33ecf766b3fc304918cdffe6f9161a2",
+        "scripts/verified_flight_sync.py": "613619aec769521c2119bae00a42f1c45dea3e9076e4990376f1063f1d13f929",
         "session_recorder_node.py": "3fc5e083020294b64c2da56ef81659d2343b36461c658e5a4410cd2b136bc4c9",
         "sessionctl.sh": "94cbec8e465c4d555ee2e33db316abe740d893a5e330ed7d39e0b0f9fcfc0662",
-        "tests/test_verified_flight_sync.py": "bea38cfb3ef3812799c659a03924e6bdf354d582962382e569c2c87b6dddd997"
+        "tests/test_verified_flight_sync.py": "5e6019f7305fe6ffce35e23c15202d13a8369e2bd1928d1d0fa659f535d39744"
       },
       "manifest": {
         "deps": {
@@ -997,7 +997,7 @@
         ]
       },
       "repository": "https://github.com/sanghun17/drone-runtime-modules.git",
-      "revision": "0e7561edf0d1a03896dce9fd85c38c00d1da072b",
+      "revision": "a8264eec8dbcb50e98bd1a15e1b84ed04c90f2d0",
       "subdir": "deployment/stack-modules/utility/session-recorder"
     }
   },
