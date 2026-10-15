@@ -1,0 +1,18 @@
+{
+  "schema": "recording/webcam-exceptions/v1",
+  "sessions": {
+    "safety_2026-10-15-14-38-25": {
+      "sha256": {
+        "safety_2026-10-15-14-38-25.bag": "d180b5576203c2c76525b7b83cc553af78735249fd8ac8a77b6cff7ed3e89dae",
+        "safety_2026-10-15-14-38-25.runtime_manifest.yaml": "234b82379e9fbcafadd7697405c7d798e15c947a21d51a9e3e0df9478e1a897f"
+      },
+      "missing_webcams": [
+        "cam1",
+        "cam2"
+      ],
+      "reason": "User explicitly requested unblocking this aborted trial. Webcam start/stop fanout was unregistered; recordings are absent. Preserve bag/manifest; exclude from complete trial evidence.",
+      "authorization_date": "2026-10-15",
+      "disposition": "incomplete_excluded"
+    }
+  }
+}
