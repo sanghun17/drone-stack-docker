@@ -1,0 +1,150 @@
+{
+  "date": "2026-10-16",
+  "scope": "Offline review only. No new extrinsic/session-reference deployed. Jetson shutdown requested; no further device access.",
+  "extrinsic_method": "Existing calibrate_pad_extrinsics.py AXZY conventions, shared mount over two flights, fixed runtime timestamps, held-out 2-second blocks.",
+  "extrinsic_rotation_candidate_change_deg": 0.34403789725602785,
+  "full_extrinsic_translation_candidate_change_m": [
+    -0.10457124820519506,
+    0.14999999999982708,
+    0.14999999999999933
+  ],
+  "extrinsic_conclusion": "Do not deploy fit: rotation-only change gives negligible held-out gain; full fit reaches 15cm translation bounds under limited motion.",
+  "latest_failure": {
+    "bag": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-15_23-59-14/flight_2026-10-15_23-59-14.bag",
+    "bag_sha256": "093f21863fb5fbacafa84f86ed01979e4c1018deb36a1b3eeed7ff120f9d23d2",
+    "phase_events": [
+      {
+        "time": 0.03464818000793457,
+        "phase": "TAKEOFF",
+        "reason": "repeat_takeoff",
+        "source": "optitrack"
+      },
+      {
+        "time": 8.323056936264038,
+        "phase": "INITIAL_POSITION",
+        "reason": "repeat_initial_position",
+        "source": "optitrack"
+      },
+      {
+        "time": 10.555033445358276,
+        "phase": "APPROACH",
+        "reason": "repeat_approach",
+        "source": "optitrack"
+      },
+      {
+        "time": 14.887077569961548,
+        "phase": "APPROACH",
+        "reason": "repeat_approach",
+        "source": "marker"
+      },
+      {
+        "time": 16.503254175186157,
+        "phase": "FAILED_HOLD",
+        "reason": "required_input_or_estimation_route_invalid",
+        "source": "marker"
+      },
+      {
+        "time": 16.52134919166565,
+        "phase": "FAILED_HOLD",
+        "reason": "required_input_or_estimation_route_invalid",
+        "source": "optitrack"
+      }
+    ],
+    "safety_events": [
+      {
+        "time": 0.011741161346435547,
+        "level": 0,
+        "lane": "NORMAL",
+        "response": "",
+        "summary": "OK | OFFBOARD/NORMAL | est VRPN | mon OK"
+      },
+      {
+        "time": 16.48890233039856,
+        "level": 1,
+        "lane": "LAND",
+        "response": "land",
+        "summary": "WARN | OFFBOARD/LAND | est VRPN | consistency: diff 0.25m"
+      },
+      {
+        "time": 18.00476312637329,
+        "level": 0,
+        "lane": "LAND",
+        "response": "land",
+        "summary": "OK | OFFBOARD/LAND | est VRPN | mon OK"
+      },
+      {
+        "time": 18.4700984954834,
+        "level": 0,
+        "lane": "KILL",
+        "response": "kill",
+        "summary": "OK | KILL(auto)/OFFBOARD | est VRPN | mon OK"
+      }
+    ],
+    "px4_texts": [],
+    "inlier_id_counts_after_switch": {
+      "(1, 0)": 94,
+      "(0,)": 3
+    },
+    "marker_vs_opti_after_switch": {
+      "count": 96,
+      "error_m_p50_p95_max": [
+        0.16743618925874115,
+        0.18651615595886595,
+        0.1980907337532928
+      ],
+      "median_delta_xyz_m": [
+        -0.15176684557991363,
+        -0.06784041670493644,
+        0.017303660560447853
+      ],
+      "max_at_bag_s": 15.259353876113892
+    },
+    "local_vs_opti_after_switch": {
+      "count": 48,
+      "error_m_p50_p95_max": [
+        0.02820603410604942,
+        0.24989140418386852,
+        0.25007147469240404
+      ],
+      "median_delta_xyz_m": [
+        -0.02171558141708374,
+        0.001552005298435688,
+        0.015649795532226562
+      ],
+      "max_at_bag_s": 16.377585411071777
+    },
+    "local_vs_opti_before_switch": {
+      "count": 130,
+      "error_m_p50_p95_max": [
+        0.0060694535862128845,
+        0.007694883714760406,
+        0.007909622791890766
+      ],
+      "median_delta_xyz_m": [
+        0.00039996206760406494,
+        0.004163211211562157,
+        0.003473341464996338
+      ],
+      "max_at_bag_s": 12.113287210464478
+    },
+    "vision_input_vs_opti_after_switch": {
+      "count": 94,
+      "error_m_p50_p95_max": [
+        0.16804547059747882,
+        0.18689043289878504,
+        0.1980907337532928
+      ],
+      "median_delta_xyz_m": [
+        -0.15194328612515665,
+        -0.06784041670493644,
+        0.017047857505685604
+      ],
+      "max_at_bag_s": 15.259971857070923
+    },
+    "raw_camera_images_recorded": false,
+    "diagnosis": "Consistency WARN at 25 cm after marker source switch, before DESCEND; latched emergency LAND then KILL/disarm. Estimator algorithm causality not proven; no raw images for an identical-image three-stage comparison."
+  },
+  "algorithm_comparison": "Legacy C++: per-marker PnP+LM, marker-to-pad transform, score-weighted RANSAC fusion. Current physical estimator: joint metric-board IPPE+LM and corner/inlier rejection. Neither is a three-to-one change of PX4 EKF stages.",
+  "comparison_limit": "No original camera image topic in the flight recording; annotated JPEG debug images cannot establish a fair same-image estimator comparison.",
+  "full_extrinsic_review": "/home/ml/aruco-stack-docker/data/results/alignment_diagnosis_20261015/extrinsic_review.json"
+}
