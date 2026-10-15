@@ -14,5 +14,6 @@ containers:
     gpu_uuid_denylist:
       - GPU-8149eb0b-023a-17dd-b942-c622f0b8c4ca  # user-confirmed failed card, PCI 1a:00.0
     environment:
+      # Unified bank-only source is maintained in ML and deployed to IM.
       ISAAC_SCRIPT: /work/stacks/aruco-landing-isaac-x86/scripts/evaluate.py
       ISAAC_REQUIRED_ISOLATION_PCI: '0000:1a:00.0'

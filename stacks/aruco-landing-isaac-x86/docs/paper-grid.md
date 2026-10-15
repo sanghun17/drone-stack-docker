@@ -1,3 +1,6 @@
+> Historical documentation: the ML random/grid runtime was retired on 2026-10-15.
+> Commands below describe the earlier setup; see [the current execution location](../README.md).
+
 # Paper grid evaluation
 
 The protocol combines the revised funnel in `pad_design_Amit (3).pdf` with the

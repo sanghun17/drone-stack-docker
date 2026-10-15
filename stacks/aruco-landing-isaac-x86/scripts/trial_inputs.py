@@ -1,4 +1,8 @@
-"""Explicit paper grid inputs, expressed at the camera in the pad frame."""
+"""Historical random/grid inputs for saved-result verification.
+
+Not the current trajectory-bank experiment input path; see ../README.md.
+Grid analysis and detector verification still import these helpers.
+"""
 
 
 def grid_shape(config):

@@ -35,6 +35,9 @@ def metric_pad_manifest(manifest, pad_side_m=None):
 
 
 def marker_cells(manifest):
+    if manifest.get('family') == 'fractal':
+        from aruco_landing.fractal import marker_quads
+        return marker_quads(manifest)
     dictionary = cv2.aruco.getPredefinedDictionary(getattr(cv2.aruco, manifest['dictionary']))
     cells_per_side = dictionary.markerSize + 2
     quads = []

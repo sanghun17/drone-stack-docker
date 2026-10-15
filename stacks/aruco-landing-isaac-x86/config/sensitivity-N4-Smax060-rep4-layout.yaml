@@ -1,0 +1,21 @@
+name: sensitivity-N4-Smax060-rep4
+dictionary: DICT_4X4_100
+canvas_units: 0.7
+marker_border_bits: 1
+markers:
+- id: 0
+  x: 0.4033
+  y: 0.0519
+  size: 0.2904
+- id: 1
+  x: 0.1531
+  y: 0.2826
+  size: 0.1032
+- id: 2
+  x: 0.3121
+  y: 0.3492
+  size: 0.05
+- id: 3
+  x: 0.36825
+  y: 0.43135
+  size: 0.1609

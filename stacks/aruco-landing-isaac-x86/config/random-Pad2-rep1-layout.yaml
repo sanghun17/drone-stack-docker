@@ -1,0 +1,13 @@
+name: random-Pad2-rep1
+dictionary: DICT_4X4_100
+canvas_units: 0.7
+marker_border_bits: 1
+markers:
+- id: 0
+  x: 0.4049351087052386
+  y: 0.5550872831222049
+  size: 0.1307
+- id: 1
+  x: 0.35936535687475357
+  y: 0.23585119675071123
+  size: 0.1007

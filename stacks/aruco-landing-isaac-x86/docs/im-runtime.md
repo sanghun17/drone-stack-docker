@@ -1,3 +1,6 @@
+> Historical documentation: the ML random/grid runtime was retired on 2026-10-15.
+> Commands below describe the earlier setup; see [the current execution location](../README.md).
+
 # ArUco Isaac landing on IM
 
 The 2026-10-04 deployment qualified RTX 4090, driver 570.211.01, Ubuntu 20.04.6

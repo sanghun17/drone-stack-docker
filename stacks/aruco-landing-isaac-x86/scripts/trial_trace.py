@@ -14,7 +14,22 @@ class TrialTrace:
         self.period = sample_period_s
         self.frames = []
 
-    def append(self, now, truth, velocity, observation, detected_ids, command, policy):
+    def append(self, now, truth, velocity, observation, detected_ids, command, policy,
+               *, reference_time_s=None, evaluation_phase=None, reference_sample=None):
+        reference = None
+        supplied = (reference_time_s is not None, evaluation_phase is not None,
+                    reference_sample is not None)
+        if any(supplied):
+            if not all(supplied):
+                raise ValueError('reference time, evaluation phase and sample must be supplied together')
+            reference = dict(time=float(reference_time_s), phase=int(evaluation_phase))
+            if not np.isfinite(reference['time']) or evaluation_phase not in (0, 1):
+                raise ValueError('reference time must be finite and evaluation phase must be 0 or 1')
+            for key in ('position_pad_m','velocity_pad_m','acceleration_pad_m','jerk_pad_m'):
+                value = np.asarray(reference_sample[key], dtype=np.float64)
+                if value.shape != (3,) or not np.isfinite(value).all():
+                    raise ValueError('reference sample needs four finite camera vec3 values')
+                reference[key] = value.copy()
         self.frames.append(dict(
             time=float(now), truth=np.asarray(truth).copy(), velocity=np.asarray(velocity).copy(),
             estimate=np.full((4, 4), np.nan) if observation is None else
@@ -23,7 +38,7 @@ class TrialTrace:
             rms=np.nan if observation is None else float(observation['rms_px']),
             command=np.asarray(command).copy(), state=STATES[policy.state],
             controller_stamp=np.nan if policy.stamp is None else float(policy.stamp),
-            controller_visible=bool(policy.visible)))
+            controller_visible=bool(policy.visible), reference=reference))
 
     def arrays(self):
         def ragged(key):
@@ -33,7 +48,7 @@ class TrialTrace:
             return values, offsets
         decoded, decoded_offsets=ragged('decoded')
         inliers, inlier_offsets=ragged('inliers')
-        return dict(schema_version=np.array(SCHEMA_VERSION), trial_id=np.array(self.trial_id),
+        result = dict(schema_version=np.array(SCHEMA_VERSION), trial_id=np.array(self.trial_id),
             sample_period_s=np.array(self.period), body_from_camera=self.mount, pad_marker_ids=self.pad_ids,
             capture_time_s=np.asarray([f['time'] for f in self.frames], dtype=np.float64),
             gt_pad_from_camera=np.asarray([f['truth'] for f in self.frames], dtype=np.float64),
@@ -46,6 +61,15 @@ class TrialTrace:
             pnp_reprojection_rms_px=np.asarray([f['rms'] for f in self.frames]),
             decoded_marker_ids=decoded, decoded_marker_offsets=decoded_offsets,
             inlier_marker_ids=inliers, inlier_marker_offsets=inlier_offsets)
+        references = [f['reference'] for f in self.frames]
+        if any(value is not None for value in references):
+            if any(value is None for value in references):
+                raise ValueError('reference fields must cover every logged capture')
+            result['reference_time_s'] = np.asarray([r['time'] for r in references], dtype=np.float64)
+            result['evaluation_phase'] = np.asarray([r['phase'] for r in references], dtype=np.uint8)
+            for key in ('position_pad_m','velocity_pad_m','acceleration_pad_m','jerk_pad_m'):
+                result['reference_camera_'+key] = np.asarray([r[key] for r in references], dtype=np.float64)
+        return result
 
 
 def dropout_frames(available):

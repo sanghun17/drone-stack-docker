@@ -1,3 +1,6 @@
+> Historical documentation: the ML random/grid runtime was retired on 2026-10-15.
+> Commands below describe the earlier setup; see [the current execution location](../README.md).
+
 # Run the measured experiment on another Linux GPU workstation
 
 The current experiment can move to an RTX 4080 workstation without changing
