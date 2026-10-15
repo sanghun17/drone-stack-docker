@@ -77,10 +77,14 @@ representative switch still has 9.67 cm / 2.35 degree input difference and a
 ## ArUco consistency limits
 
 The stack supplies `config/consistency.yaml` through the generic
-`consistency_config` launch argument: WARN above 0.20 m, ERROR above 0.50 m.
+`consistency_config` launch argument: WARN above 0.25 m, ERROR above 0.50 m.
 Other stacks retain 0.10 m / 0.25 m. Response policy, source freshness and
 marker routing gates are unchanged. Restart flight-safety while disarmed;
 these thresholds are read once at diagnosis startup.
+
+The hardware runtime sets `LANDING_MAX_SWITCH_TRANSLATION_JUMP_M=0.20`.
+The trial launch passes this bound to the router for both source qualification
+and rejection of inconsistent marker updates. Its standalone default is 0.15 m.
 
 Single-marker update: physical PnP, pose router and trial now accept one valid marker. Zero markers still withhold pose; reprojection, freshness, alignment and pose-agreement checks remain active.
 
