@@ -424,7 +424,7 @@
       "files": {
         "README.md": "5dc7ffe588e3ed195f733e231b36bcf76ae40307dcbaf0b0bf8284fd18868871",
         "build_ws.sh": "e11767fbad1541b58fbeb57a0d3f3c69d28e1e9dc20132a7d3262b1a42cbb48f",
-        "clone.sh": "92a8a8271ad8b9148bb4dc7112bce5108b1b59c98a7b2e0a880635ba892737e2",
+        "clone.sh": "8b3d8347355c416881e15818394e9ddb61ef63ec03904a2c4447a47a83a583c3",
         "install_aruco_cpp.sh": "1d7a1b7097a9515a2544943efdcf2cb62783f39bc2aa13994c46edec3149fc34",
         "module.yml": "ef0055c479349a23e7dbd251d4b3954a5a863e9b4688b67bdebc3962248f3b58",
         "run.sh": "c3c5e9161faecad0b41840d04d5630fc5cca66d58eb0f218121baaf18ddfae5e",
@@ -469,8 +469,8 @@
         ],
         "workspace": "/work/ws/aruco-landing"
       },
-      "repository": "git@github.com:sanghun17/aruco_landing.git",
-      "revision": "1316fab8c66f6ce6f97d15dc3c385606f295deaf",
+      "repository": "https://github.com/sanghun17/aruco_landing.git",
+      "revision": "f32f538f41a9686b6c7a49403fea5841c20942eb",
       "subdir": "deployment/stack-modules/perception/aruco-landing"
     },
     "planner/aruco-batch": {
@@ -520,8 +520,8 @@
           "run.sh"
         ]
       },
-      "repository": "git@github.com:sanghun17/aruco_landing.git",
-      "revision": "1316fab8c66f6ce6f97d15dc3c385606f295deaf",
+      "repository": "https://github.com/sanghun17/aruco_landing.git",
+      "revision": "f32f538f41a9686b6c7a49403fea5841c20942eb",
       "subdir": "deployment/stack-modules/planner/aruco-landing"
     },
     "planner/la-planner": {

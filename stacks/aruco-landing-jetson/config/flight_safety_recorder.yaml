@@ -42,6 +42,7 @@ topics:
 - /landing/target_visible
 - /landing/alignment/ready
 - /landing/estimator/inlier_ids
+- /landing/estimator/consensus
 - /landing/estimator/status
 - /landing/camera/camera_info
 - /landing/debug/image/compressed

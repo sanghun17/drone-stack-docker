@@ -57,6 +57,7 @@ topics:
 - /landing/target_visible
 - /landing/alignment/ready
 - /landing/estimator/inlier_ids
+- /landing/estimator/consensus
 - /landing/markers/ids
 - /landing/estimator/status
 - /landing/camera/camera_info
