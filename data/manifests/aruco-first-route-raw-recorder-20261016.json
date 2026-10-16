@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-16",
+  "stack_revision": "f415cbdd9b09165f88f87b6592136d3df051d08f",
+  "safety_owner_revision": "d1392a8f83f3a72903fc8a3b6095140e4e22f870",
+  "implementation_revision": "53a12aeb398a3d9a3b5bff0e8b47405643f4c307",
+  "policy": "Record /landing/camera/image_raw only when the selected pad campaign next_index is zero. Snapshot the topic selection on ARM and retain it until DISARM. First-route retries retain raw; other pads start with their own queue. Base evidence and webcam recording remain enabled on every route.",
+  "unavailable_status_policy": "Include diagnostic raw if route status is missing, malformed or older than 2s; log that fallback. Normal selected-route flights publish fresh status before ARM.",
+  "implementation": "Generic conditional recording groups in flight_safety; ArUco topic, field and index are supplied by stack configuration. Shared code contains no ArUco-specific policy.",
+  "tests": {
+    "unit_and_runtime_manifest_tests_passed": 14,
+    "actual_private_master_recorder": "data/results/aruco-conditional-recorder-20261016/result.json",
+    "isolated_ros_cases": [
+      {"pad": "a", "route_index": 0, "raw_recorded": true},
+      {"pad": "a", "route_index": 1, "raw_recorded": false},
+      {"pad": "b", "route_index": 0, "raw_recorded": true}
+    ],
+    "hardware_worktree_layout_and_diff_checks": "passed"
+  },
+  "live_deployment": {
+    "method": "Clean committed Git revisions only; owner and module lock updated, snapshot synchronized without bypassing dirty guards.",
+    "restart": "Temporary recorder-only check followed by normal safety launcher restart while disarmed POSCTL. Perception, planner and trajectory queue retained.",
+    "fcu_armed": false,
+    "fcu_mode": "POSCTL",
+    "completed": 3,
+    "next_index": 3,
+    "halted": false,
+    "offboard_entry_ready": true,
+    "data_sync_ready": true,
+    "healthy": true,
+    "selected_topics": 75,
+    "raw_selected_for_current_route": false,
+    "recorder_running": true
+  },
+  "postflight_latency_evidence": {
+    "scope": "Three preceding full-raw flights. ML file ctime approximates transfer completion, before subsequent checksum/readiness checks.",
+    "bag_MB": [1394.1, 1438.8, 1436.7],
+    "manifest_finalization_after_disarm_s": [5.4, 5.4, 5.4],
+    "ML_file_completion_after_disarm_s": [28.1, 27.8, 28.7],
+    "camera": "Real frame stalls also occurred during the postflight interval. Transfer workload coincides with them; causation is not established. Camera node reported three cumulative stream restart attempts; camera recovery code was not changed.",
+    "readiness": "JSON sync proof is valid for 6 seconds. Repeated latest-large-bag verification can leave stale intervals. LED blue/white means preparing; fixed ready color corresponds to a fresh ready mission hint."
+  },
+  "remaining_validation": "Next real flight must confirm the smaller bag and postflight delay reduction. This change does not claim to fix the USB camera stall mechanism."
+}
