@@ -1,0 +1,47 @@
+{
+  "session": "flight_2026-10-16_20-04-39",
+  "pad": "b2",
+  "trajectory_index_zero_based": 8,
+  "reference_id": 1146,
+  "raw_candidate_id": 26741,
+  "outcome": "failed",
+  "reason": "trajectory_initial_alignment_timeout",
+  "operator_manual_landing": true,
+  "evidence": {
+    "approach_frames": 1738,
+    "detected_frames": 1738,
+    "position_error_median_m": 0.01994,
+    "position_error_p95_m": 0.36551,
+    "position_error_max_m": 0.4235,
+    "approach_timeout_s": 30
+  },
+  "review": {
+    "user_requested_failure_and_continue": true,
+    "successful_entries": 8,
+    "failed_entries": 1,
+    "next_index_zero_based": 9,
+    "next_reference_id": 1276
+  },
+  "policy": {
+    "marker_failure_recovery": "verified OptiTrack route then PX4 AUTO.LAND at current location",
+    "next_entry": "only after grounded disarm, sync verification, and subsequent pilot OFFBOARD edge",
+    "successful_marker_trial_criteria_unchanged": true
+  },
+  "validation": {
+    "unit_tests_passed": 68,
+    "airborne_recovery_flight_tested": false,
+    "grounded_disarmed_posctl": true,
+    "offboard_entry_ready": true,
+    "pad_alignment_ready": true,
+    "next_index_zero_based": 9,
+    "failed_trial_gt_recovery_enabled": true,
+    "frozen_pad_reference_restored_from_identical_bag_samples": 221
+  },
+  "deployment": {
+    "stack_revision": "9773d3b3",
+    "owner_revision": "d9eb11b65b867e6d041c1aff8da620c69e47fb21",
+    "source_branch": "deploy/aruco-raw-capture-20261016",
+    "jetson_planner_restarted": true,
+    "perception_session_preserved": true
+  }
+}
