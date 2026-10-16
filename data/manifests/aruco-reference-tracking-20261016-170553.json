@@ -1,0 +1,67 @@
+{
+  "reference_id": 9449,
+  "reference_duration_s": 3.2727272727272725,
+  "reference_start_bag_s": 12.45408821105957,
+  "start_time_method": "Command header stamp in timer callback that first published DESCENDING; uncertainty approximately one 60Hz controller cycle",
+  "last_valid_marker_bag_s": 15.638404130935669,
+  "reference_elapsed_at_last_marker_s": 3.1843159198760986,
+  "sample_count": 221,
+  "GT_camera_tracking": {
+    "xyz_norm_m_p50_p95_max": [
+      0.13197225486162031,
+      0.19029097882200788,
+      0.22942243637539236
+    ],
+    "xy_norm_m_p50_p95_max": [
+      0.11487862304025699,
+      0.14127448659574918,
+      0.15238633653920508
+    ],
+    "abs_z_m_p50_p95_max": [
+      0.08099828252507757,
+      0.14397627745216468,
+      0.18423451299633875
+    ],
+    "median_delta_xyz_m": [
+      0.0902761003331557,
+      0.037752700321065535,
+      0.08099828252507757
+    ]
+  },
+  "reference_start": [
+    0.25,
+    0.31666666666666665,
+    2.0
+  ],
+  "reference_end": [
+    -3.469446951953614e-18,
+    -6.938893903907228e-18,
+    0.19999999999999996
+  ],
+  "last_sample": {
+    "elapsed_s": 3.1795785427093506,
+    "actual_camera_pad_m": [
+      0.13049645171660115,
+      -0.04164688610880047,
+      0.3636216667906897
+    ],
+    "reference_m": [
+      7.830742669802035e-05,
+      7.471235853962616e-05,
+      0.25123180150985697
+    ],
+    "delta_xyz_m": [
+      0.13041814428990314,
+      -0.041721598467340096,
+      0.11238986528083272
+    ]
+  },
+  "session": "flight_2026-10-16_17-05-53",
+  "scope": "GT body pose transformed to camera center using configured extrinsics, then frozen session pad frame. Same capture timestamp reference comparison, before last valid marker. Reference start reconstructed from first DESCENDING callback command timestamp; about one control-cycle uncertainty.",
+  "marker_feedback_xy_error_m_p50_p95_max": [
+    0.1091913158,
+    0.1372576676,
+    0.1507663302
+  ],
+  "interpretation": "Reference advanced almost to its endpoint, but actual camera lagged with substantial residual horizontal error. Loss near the ground occurred with the small marker occluded by a landing leg and the big marker clipped; tracking offset may contribute to that occlusion. No controller or safety setting changed in this analysis."
+}
