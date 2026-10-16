@@ -1,0 +1,1432 @@
+{
+  "scope": "B2 campaign closure, read-only recording integrity audit, cancelled RANSAC, and A1 random configuration switch",
+  "b2_campaign": {
+    "total": 20,
+    "success": 9,
+    "failed": 11,
+    "all_finished": true,
+    "progress": {
+      "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+      "completed": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        15
+      ],
+      "active": null,
+      "halted": false,
+      "failed": [
+        {
+          "index": 8,
+          "reason": "trajectory_initial_alignment_timeout",
+          "selection": {
+            "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+            "index": 8,
+            "type": "inside",
+            "reference_id": 1146,
+            "raw_candidate_id": 26741,
+            "bank_sha256": "b03e27d92d0a9eaa8dd7f0b84412edc32ff6ffd422385e79dcaec0ded6ca22b2"
+          }
+        },
+        {
+          "index": 9,
+          "reason": "trajectory_initial_alignment_timeout",
+          "selection": {
+            "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+            "index": 9,
+            "type": "inside",
+            "reference_id": 1276,
+            "raw_candidate_id": 29743,
+            "bank_sha256": "b03e27d92d0a9eaa8dd7f0b84412edc32ff6ffd422385e79dcaec0ded6ca22b2"
+          }
+        },
+        {
+          "index": 10,
+          "reason": "trajectory_initial_alignment_timeout",
+          "selection": {
+            "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+            "index": 10,
+            "type": "inside",
+            "reference_id": 4364,
+            "raw_candidate_id": 25556,
+            "bank_sha256": "b03e27d92d0a9eaa8dd7f0b84412edc32ff6ffd422385e79dcaec0ded6ca22b2"
+          }
+        },
+        {
+          "index": 11,
+          "reason": "trajectory_initial_alignment_timeout",
+          "selection": {
+            "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+            "index": 11,
+            "type": "inside",
+            "reference_id": 6549,
+            "raw_candidate_id": 25958,
+            "bank_sha256": "b03e27d92d0a9eaa8dd7f0b84412edc32ff6ffd422385e79dcaec0ded6ca22b2"
+          }
+        },
+        {
+          "index": 12,
+          "reason": "trajectory_initial_alignment_timeout",
+          "selection": {
+            "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+            "index": 12,
+            "type": "inside",
+            "reference_id": 8397,
+            "raw_candidate_id": 14831,
+            "bank_sha256": "b03e27d92d0a9eaa8dd7f0b84412edc32ff6ffd422385e79dcaec0ded6ca22b2"
+          }
+        },
+        {
+          "index": 13,
+          "reason": "trajectory_initial_alignment_timeout",
+          "selection": {
+            "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+            "index": 13,
+            "type": "inside",
+            "reference_id": 9957,
+            "raw_candidate_id": 17933,
+            "bank_sha256": "b03e27d92d0a9eaa8dd7f0b84412edc32ff6ffd422385e79dcaec0ded6ca22b2"
+          }
+        },
+        {
+          "index": 14,
+          "reason": "trajectory_initial_alignment_timeout",
+          "selection": {
+            "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+            "index": 14,
+            "type": "inside",
+            "reference_id": 6834,
+            "raw_candidate_id": 15936,
+            "bank_sha256": "b03e27d92d0a9eaa8dd7f0b84412edc32ff6ffd422385e79dcaec0ded6ca22b2"
+          }
+        },
+        {
+          "index": 16,
+          "reason": "trajectory_initial_alignment_timeout",
+          "selection": {
+            "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+            "index": 16,
+            "type": "inside",
+            "reference_id": 6881,
+            "raw_candidate_id": 2711,
+            "bank_sha256": "b03e27d92d0a9eaa8dd7f0b84412edc32ff6ffd422385e79dcaec0ded6ca22b2"
+          }
+        },
+        {
+          "index": 17,
+          "reason": "trajectory_initial_alignment_timeout",
+          "selection": {
+            "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+            "index": 17,
+            "type": "inside",
+            "reference_id": 3358,
+            "raw_candidate_id": 8213,
+            "bank_sha256": "b03e27d92d0a9eaa8dd7f0b84412edc32ff6ffd422385e79dcaec0ded6ca22b2"
+          }
+        },
+        {
+          "index": 18,
+          "reason": "trajectory_initial_alignment_timeout",
+          "selection": {
+            "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+            "index": 18,
+            "type": "inside",
+            "reference_id": 6927,
+            "raw_candidate_id": 6415,
+            "bank_sha256": "b03e27d92d0a9eaa8dd7f0b84412edc32ff6ffd422385e79dcaec0ded6ca22b2"
+          }
+        },
+        {
+          "index": 19,
+          "reason": "trajectory_initial_alignment_timeout",
+          "selection": {
+            "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+            "index": 19,
+            "type": "inside",
+            "reference_id": 3365,
+            "raw_candidate_id": 4218,
+            "bank_sha256": "b03e27d92d0a9eaa8dd7f0b84412edc32ff6ffd422385e79dcaec0ded6ca22b2"
+          }
+        }
+      ],
+      "pad": {
+        "key": "b2",
+        "layout_sha256": "a8386588f1580ab6c78a51affa3b7adab47463df6e0586b47acb8b8d2c14a14a",
+        "configuration": "baseline_b2_700mm_runtime.yaml"
+      }
+    }
+  },
+  "archive": {
+    "scope": "Read-only bag full-payload scan, SHA256, camera MP4 full video decode; no recording changes",
+    "sessions": 20,
+    "b2_sessions": 20,
+    "video_files": 40,
+    "errors": 1,
+    "covered_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19
+    ],
+    "rows": [
+      {
+        "session": "flight_2026-10-16_19-58-08",
+        "errors": [],
+        "videos": [
+          {
+            "camera": "cam1",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_19-58-08/cam1/flight_2026-10-16_19-58-08_cam1.mp4",
+            "bytes": 74070162,
+            "duration_s": 16.634,
+            "frames": 499,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "6f8eb0cfaac4f91ee9ef7614444d70ffcaaa895249c3775c0e48383575a867f5"
+          },
+          {
+            "camera": "cam2",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_19-58-08/cam2/flight_2026-10-16_19-58-08_cam2.mp4",
+            "bytes": 62214268,
+            "duration_s": 16.7,
+            "frames": 501,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "31de1c3fabf899f13e1739b1f68ea255975cc495246f3e50cb5c6ef7336a11e2"
+          }
+        ],
+        "manifest_capture_status": "complete",
+        "manifest_capture_errors": [],
+        "manifest_sha256": "dc3b5ccb985b6043e72c60ebab3f2e462bfa01d14d1cca0f1c1d89b0cc9019e6",
+        "bag_duration_s": 16.62766742706299,
+        "bag_messages": 40415,
+        "raw_camera_frames": 985,
+        "debug_camera_frames": 166,
+        "pad": {
+          "key": "b2",
+          "layout_sha256": "a8386588f1580ab6c78a51affa3b7adab47463df6e0586b47acb8b8d2c14a14a",
+          "configuration": "baseline_b2_700mm_runtime.yaml"
+        },
+        "reference_indices": [
+          0,
+          1
+        ],
+        "phases": [
+          "TAKEOFF",
+          "INITIAL_POSITION",
+          "APPROACH",
+          "DESCEND",
+          "CUT_WAIT",
+          "COMPLETE"
+        ],
+        "last_reason": "force_disarm_confirmed",
+        "bag_scanned_messages": 40415,
+        "bag_bytes": 1275279151,
+        "bag_sha256": "597d25dc253f8051247110e1dc75e718f566cea90ce5f60d868e7d113969d6de"
+      },
+      {
+        "session": "flight_2026-10-16_20-01-19",
+        "errors": [],
+        "videos": [
+          {
+            "camera": "cam1",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-01-19/cam1/flight_2026-10-16_20-01-19_cam1.mp4",
+            "bytes": 75118890,
+            "duration_s": 16.7,
+            "frames": 501,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "2e67d5b57a96be3df208da8019c2bad3b801aebe8139ce55a2dd69101d9a2979"
+          },
+          {
+            "camera": "cam2",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-01-19/cam2/flight_2026-10-16_20-01-19_cam2.mp4",
+            "bytes": 62050277,
+            "duration_s": 16.7,
+            "frames": 501,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "fb067c44d725573e4721f302187d4726275fec3b1cf100900a9a9a8fd5cee308"
+          }
+        ],
+        "manifest_capture_status": "complete",
+        "manifest_capture_errors": [],
+        "manifest_sha256": "46ca558959076ba1a80bd8e36d860552caddacfa010fb003b3357b658461b0e0",
+        "bag_duration_s": 16.69626259803772,
+        "bag_messages": 40005,
+        "raw_camera_frames": 0,
+        "debug_camera_frames": 166,
+        "pad": {
+          "key": "b2",
+          "layout_sha256": "a8386588f1580ab6c78a51affa3b7adab47463df6e0586b47acb8b8d2c14a14a",
+          "configuration": "baseline_b2_700mm_runtime.yaml"
+        },
+        "reference_indices": [
+          1,
+          2
+        ],
+        "phases": [
+          "TAKEOFF",
+          "INITIAL_POSITION",
+          "APPROACH",
+          "DESCEND",
+          "CUT_WAIT",
+          "COMPLETE"
+        ],
+        "last_reason": "force_disarm_confirmed",
+        "bag_scanned_messages": 40005,
+        "bag_bytes": 9164069,
+        "bag_sha256": "825f3a904e39d3033c7e8f4109d1f696c9c14d1003b56f14f36193e6ce75621b"
+      },
+      {
+        "session": "flight_2026-10-16_20-01-48",
+        "errors": [],
+        "videos": [
+          {
+            "camera": "cam1",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-01-48/cam1/flight_2026-10-16_20-01-48_cam1.mp4",
+            "bytes": 75119746,
+            "duration_s": 16.7,
+            "frames": 501,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "925d827c2c815dc96dc54586cd42c4380af06ff0fc43d6273bf6e56c6ec463dc"
+          },
+          {
+            "camera": "cam2",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-01-48/cam2/flight_2026-10-16_20-01-48_cam2.mp4",
+            "bytes": 62042581,
+            "duration_s": 16.7,
+            "frames": 501,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "4324f281bdbb42718f6225403ff7d74e04c8f2efac1ec95a024f08ed52ad528a"
+          }
+        ],
+        "manifest_capture_status": "complete",
+        "manifest_capture_errors": [],
+        "manifest_sha256": "442e475386a99bea56bd93404eeed8d9bd203cbb70f443100a8a084aa0918b32",
+        "bag_duration_s": 16.772966384887695,
+        "bag_messages": 39959,
+        "raw_camera_frames": 0,
+        "debug_camera_frames": 167,
+        "pad": {
+          "key": "b2",
+          "layout_sha256": "a8386588f1580ab6c78a51affa3b7adab47463df6e0586b47acb8b8d2c14a14a",
+          "configuration": "baseline_b2_700mm_runtime.yaml"
+        },
+        "reference_indices": [
+          2,
+          3
+        ],
+        "phases": [
+          "TAKEOFF",
+          "INITIAL_POSITION",
+          "APPROACH",
+          "DESCEND",
+          "CUT_WAIT",
+          "COMPLETE"
+        ],
+        "last_reason": "force_disarm_confirmed",
+        "bag_scanned_messages": 39959,
+        "bag_bytes": 8955586,
+        "bag_sha256": "9583377d6eba2ca725c7838aa8761d88b12c18d485a534ea5c371cc38e9535f2"
+      },
+      {
+        "session": "flight_2026-10-16_20-02-15",
+        "errors": [],
+        "videos": [
+          {
+            "camera": "cam1",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-02-15/cam1/flight_2026-10-16_20-02-15_cam1.mp4",
+            "bytes": 70022600,
+            "duration_s": 15.7,
+            "frames": 471,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "3d0a32ddfcdc764dee23291abf53b9ec3e822d29c34fd38ca4564bf1acf5a039"
+          },
+          {
+            "camera": "cam2",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-02-15/cam2/flight_2026-10-16_20-02-15_cam2.mp4",
+            "bytes": 58090060,
+            "duration_s": 15.7,
+            "frames": 471,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "2f56cd7c345abc5ec51f9029c123500abe226057259c9d67e30593982dc5b139"
+          }
+        ],
+        "manifest_capture_status": "complete",
+        "manifest_capture_errors": [],
+        "manifest_sha256": "22b13d93311e8ba445df7e54e6c7b789adcc298175aa3bc3674fb9aa363e7062",
+        "bag_duration_s": 15.733124732971191,
+        "bag_messages": 37789,
+        "raw_camera_frames": 0,
+        "debug_camera_frames": 157,
+        "pad": {
+          "key": "b2",
+          "layout_sha256": "a8386588f1580ab6c78a51affa3b7adab47463df6e0586b47acb8b8d2c14a14a",
+          "configuration": "baseline_b2_700mm_runtime.yaml"
+        },
+        "reference_indices": [
+          3,
+          4
+        ],
+        "phases": [
+          "TAKEOFF",
+          "INITIAL_POSITION",
+          "APPROACH",
+          "DESCEND",
+          "CUT_WAIT",
+          "COMPLETE"
+        ],
+        "last_reason": "force_disarm_confirmed",
+        "bag_scanned_messages": 37789,
+        "bag_bytes": 8430344,
+        "bag_sha256": "13b01217e6117da1e3804ebf384165163bd3b8c614d7561cec9990e09f008e03"
+      },
+      {
+        "session": "flight_2026-10-16_20-02-41",
+        "errors": [],
+        "videos": [
+          {
+            "camera": "cam1",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-02-41/cam1/flight_2026-10-16_20-02-41_cam1.mp4",
+            "bytes": 107343043,
+            "duration_s": 23.734,
+            "frames": 712,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "e448a1adab156b69d015e0d3b9d526cf94e1e1322ce4ddcd88e6e0917d2b629f"
+          },
+          {
+            "camera": "cam2",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-02-41/cam2/flight_2026-10-16_20-02-41_cam2.mp4",
+            "bytes": 88875102,
+            "duration_s": 23.734,
+            "frames": 712,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "4946b2983060c471bd3ffa1561c1c962444783cbc9345e278b1345959b7c455b"
+          }
+        ],
+        "manifest_capture_status": "complete",
+        "manifest_capture_errors": [],
+        "manifest_sha256": "4a1225548815d6b02fb6363f28c01f0a64e9494f5816fc9e18d437574320f764",
+        "bag_duration_s": 23.718939304351807,
+        "bag_messages": 57102,
+        "raw_camera_frames": 0,
+        "debug_camera_frames": 236,
+        "pad": {
+          "key": "b2",
+          "layout_sha256": "a8386588f1580ab6c78a51affa3b7adab47463df6e0586b47acb8b8d2c14a14a",
+          "configuration": "baseline_b2_700mm_runtime.yaml"
+        },
+        "reference_indices": [
+          4,
+          5
+        ],
+        "phases": [
+          "TAKEOFF",
+          "INITIAL_POSITION",
+          "APPROACH",
+          "DESCEND",
+          "CUT_WAIT",
+          "COMPLETE"
+        ],
+        "last_reason": "force_disarm_confirmed",
+        "bag_scanned_messages": 57102,
+        "bag_bytes": 12826917,
+        "bag_sha256": "d793b2f895b0546460122610912760d5717e867511dc514731c38566a6a3afa3"
+      },
+      {
+        "session": "flight_2026-10-16_20-03-16",
+        "errors": [],
+        "videos": [
+          {
+            "camera": "cam1",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-03-16/cam1/flight_2026-10-16_20-03-16_cam1.mp4",
+            "bytes": 70041609,
+            "duration_s": 15.7,
+            "frames": 471,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "712aa68e8ff74ddae28a699249face7135b399d69e06db77f434668139aa8e15"
+          },
+          {
+            "camera": "cam2",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-03-16/cam2/flight_2026-10-16_20-03-16_cam2.mp4",
+            "bytes": 57883115,
+            "duration_s": 15.7,
+            "frames": 471,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "c729761ce8533890011a589e7bc1a73778a4dd5e8213e96ad51d4fa026891e17"
+          }
+        ],
+        "manifest_capture_status": "complete",
+        "manifest_capture_errors": [],
+        "manifest_sha256": "b8e3f58a285060c9b728ce1c2465caf52ae5882f260218c5ecc4c5a5f3aa7f76",
+        "bag_duration_s": 15.726414442062378,
+        "bag_messages": 37535,
+        "raw_camera_frames": 0,
+        "debug_camera_frames": 156,
+        "pad": {
+          "key": "b2",
+          "layout_sha256": "a8386588f1580ab6c78a51affa3b7adab47463df6e0586b47acb8b8d2c14a14a",
+          "configuration": "baseline_b2_700mm_runtime.yaml"
+        },
+        "reference_indices": [
+          5,
+          6
+        ],
+        "phases": [
+          "TAKEOFF",
+          "INITIAL_POSITION",
+          "APPROACH",
+          "DESCEND",
+          "CUT_WAIT",
+          "COMPLETE"
+        ],
+        "last_reason": "force_disarm_confirmed",
+        "bag_scanned_messages": 37535,
+        "bag_bytes": 8687190,
+        "bag_sha256": "f779ea3afd798d753b48def82ac5cd8f990e0c019d1ac1805c92dedc92ff6812"
+      },
+      {
+        "session": "flight_2026-10-16_20-03-42",
+        "errors": [],
+        "videos": [
+          {
+            "camera": "cam1",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-03-42/cam1/flight_2026-10-16_20-03-42_cam1.mp4",
+            "bytes": 70114356,
+            "duration_s": 15.7,
+            "frames": 471,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "8d0535a1b2f08d7c71fc1a5d9eefc2edca86cc6421ce3fe7998b833150bd5959"
+          },
+          {
+            "camera": "cam2",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-03-42/cam2/flight_2026-10-16_20-03-42_cam2.mp4",
+            "bytes": 57878971,
+            "duration_s": 15.7,
+            "frames": 471,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "68244a580d54f158e0d067c33250729e65c7144f22dd09a66fa447ad19bcb80b"
+          }
+        ],
+        "manifest_capture_status": "complete",
+        "manifest_capture_errors": [],
+        "manifest_sha256": "f8862bd8771663c81d0e297c267b6a47f9e3c594819d9881b9231f5d392a0ce1",
+        "bag_duration_s": 15.678807497024536,
+        "bag_messages": 37599,
+        "raw_camera_frames": 0,
+        "debug_camera_frames": 156,
+        "pad": {
+          "key": "b2",
+          "layout_sha256": "a8386588f1580ab6c78a51affa3b7adab47463df6e0586b47acb8b8d2c14a14a",
+          "configuration": "baseline_b2_700mm_runtime.yaml"
+        },
+        "reference_indices": [
+          6,
+          7
+        ],
+        "phases": [
+          "TAKEOFF",
+          "INITIAL_POSITION",
+          "APPROACH",
+          "DESCEND",
+          "CUT_WAIT",
+          "COMPLETE"
+        ],
+        "last_reason": "force_disarm_confirmed",
+        "bag_scanned_messages": 37599,
+        "bag_bytes": 8593113,
+        "bag_sha256": "bb279064de49cb3656bfe82387259b7baa44664dc681042338de3c8f132216ef"
+      },
+      {
+        "session": "flight_2026-10-16_20-04-09",
+        "errors": [],
+        "videos": [
+          {
+            "camera": "cam1",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-04-09/cam1/flight_2026-10-16_20-04-09_cam1.mp4",
+            "bytes": 70084839,
+            "duration_s": 15.7,
+            "frames": 471,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "35463cae444eba3b92a6731ae5af819409e0639242a491599d676418ce8fbd6b"
+          },
+          {
+            "camera": "cam2",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-04-09/cam2/flight_2026-10-16_20-04-09_cam2.mp4",
+            "bytes": 57927137,
+            "duration_s": 15.7,
+            "frames": 471,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "1fc62385d08ccb81c4662c6b40b1e522487822c080043d889ac6369c32b60627"
+          }
+        ],
+        "manifest_capture_status": "complete",
+        "manifest_capture_errors": [],
+        "manifest_sha256": "885cec18456aa06bfe65443ead81a342ace371aa1a85953f123112d4d09beb69",
+        "bag_duration_s": 15.774940967559814,
+        "bag_messages": 37748,
+        "raw_camera_frames": 0,
+        "debug_camera_frames": 157,
+        "pad": {
+          "key": "b2",
+          "layout_sha256": "a8386588f1580ab6c78a51affa3b7adab47463df6e0586b47acb8b8d2c14a14a",
+          "configuration": "baseline_b2_700mm_runtime.yaml"
+        },
+        "reference_indices": [
+          7,
+          8
+        ],
+        "phases": [
+          "TAKEOFF",
+          "INITIAL_POSITION",
+          "APPROACH",
+          "DESCEND",
+          "CUT_WAIT",
+          "COMPLETE"
+        ],
+        "last_reason": "force_disarm_confirmed",
+        "bag_scanned_messages": 37748,
+        "bag_bytes": 8573599,
+        "bag_sha256": "58562ee1fdef0566c603b4e3436ac9b4fb66d75b7bbaaa7fb6b46e97cbc7d8ad"
+      },
+      {
+        "session": "flight_2026-10-16_20-04-39",
+        "errors": [],
+        "videos": [
+          {
+            "camera": "cam1",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-04-39/cam1/flight_2026-10-16_20-04-39_cam1.mp4",
+            "bytes": 247490631,
+            "duration_s": 53.667,
+            "frames": 1610,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "faa76fdfcecb4eddf4177650ac31b383a62af0a78b928f0a426aab57bba82249"
+          },
+          {
+            "camera": "cam2",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-04-39/cam2/flight_2026-10-16_20-04-39_cam2.mp4",
+            "bytes": 203944457,
+            "duration_s": 53.667,
+            "frames": 1610,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "40f9eff8989d1efbef6216f9543aa3f8782134c2a8ba48777ae0257c8fb3dd60"
+          }
+        ],
+        "manifest_capture_status": "complete",
+        "manifest_capture_errors": [],
+        "manifest_sha256": "2138233d2c5c8edb939e213ace26053d153ab466ab7070ea894d51a557586432",
+        "bag_duration_s": 53.712589263916016,
+        "bag_messages": 126235,
+        "raw_camera_frames": 0,
+        "debug_camera_frames": 535,
+        "pad": {
+          "key": "b2",
+          "layout_sha256": "a8386588f1580ab6c78a51affa3b7adab47463df6e0586b47acb8b8d2c14a14a",
+          "configuration": "baseline_b2_700mm_runtime.yaml"
+        },
+        "reference_indices": [
+          8
+        ],
+        "phases": [
+          "TAKEOFF",
+          "INITIAL_POSITION",
+          "APPROACH",
+          "FAILED_HOLD",
+          "CANCELLED"
+        ],
+        "last_reason": "pilot_left_autonomous_mode",
+        "bag_scanned_messages": 126235,
+        "bag_bytes": 28149822,
+        "bag_sha256": "77165190df3910c844c7e042cd542f330c5f79944234621c59347fad87c150a6"
+      },
+      {
+        "session": "flight_2026-10-16_20-18-48",
+        "errors": [],
+        "videos": [
+          {
+            "camera": "cam1",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-18-48/cam1/flight_2026-10-16_20-18-48_cam1.mp4",
+            "bytes": 223812632,
+            "duration_s": 48.7,
+            "frames": 1461,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "234d223ef6cfb216145c2c0c3736b719cd4dc29dcee8187868a0b75e17b2139b"
+          },
+          {
+            "camera": "cam2",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-18-48/cam2/flight_2026-10-16_20-18-48_cam2.mp4",
+            "bytes": 185210504,
+            "duration_s": 48.7,
+            "frames": 1461,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "4b80d1fd3b249c7bf6ee46fa64d8193caf1bd3b4c6b5288dd41ddc3e545771ff"
+          }
+        ],
+        "manifest_capture_status": "complete",
+        "manifest_capture_errors": [],
+        "manifest_sha256": "721a66bbfaaa82fb9ebc7839fc18978d50d31ddaaccb71d16846f5a9dcc4f08d",
+        "bag_duration_s": 48.72724390029907,
+        "bag_messages": 117761,
+        "raw_camera_frames": 0,
+        "debug_camera_frames": 486,
+        "pad": {
+          "key": "b2",
+          "layout_sha256": "a8386588f1580ab6c78a51affa3b7adab47463df6e0586b47acb8b8d2c14a14a",
+          "configuration": "baseline_b2_700mm_runtime.yaml"
+        },
+        "reference_indices": [
+          9,
+          10
+        ],
+        "phases": [
+          "TAKEOFF",
+          "INITIAL_POSITION",
+          "APPROACH",
+          "GT_RECOVERY",
+          "FAILED_COMPLETE"
+        ],
+        "last_reason": "trajectory_initial_alignment_timeout",
+        "bag_scanned_messages": 117761,
+        "bag_bytes": 26349319,
+        "bag_sha256": "fd01303052ecc425211e92c9a4b2ac4854995d8282f206748b0c1f1c25ee2054"
+      },
+      {
+        "session": "flight_2026-10-16_20-29-49",
+        "errors": [],
+        "videos": [
+          {
+            "camera": "cam1",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-29-49/cam1/flight_2026-10-16_20-29-49_cam1.mp4",
+            "bytes": 116519094,
+            "duration_s": 25.667,
+            "frames": 770,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "368cf6d72b9e32958cc74e98a060c8f7e1882941f7a1d8984514e77d1635c469"
+          },
+          {
+            "camera": "cam2",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-29-49/cam2/flight_2026-10-16_20-29-49_cam2.mp4",
+            "bytes": 97044291,
+            "duration_s": 25.667,
+            "frames": 770,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "e5d864babb41ff802dc633a4f8674ee144ec690fc494f9293d95d1e7ffaffbfa"
+          }
+        ],
+        "manifest_capture_status": "complete",
+        "manifest_capture_errors": [],
+        "manifest_sha256": "0a07ab46a12e329c313c7ce9c792b028243e18475697842b49b09f65b9a46913",
+        "bag_duration_s": 25.699949502944946,
+        "bag_messages": 62000,
+        "raw_camera_frames": 0,
+        "debug_camera_frames": 257,
+        "pad": {
+          "key": "b2",
+          "layout_sha256": "a8386588f1580ab6c78a51affa3b7adab47463df6e0586b47acb8b8d2c14a14a",
+          "configuration": "baseline_b2_700mm_runtime.yaml"
+        },
+        "reference_indices": [
+          10,
+          11
+        ],
+        "phases": [
+          "TAKEOFF",
+          "INITIAL_POSITION",
+          "APPROACH",
+          "GT_RECOVERY",
+          "GT_DESCEND",
+          "GT_CUT_WAIT",
+          "FAILED_COMPLETE"
+        ],
+        "last_reason": "trajectory_initial_alignment_timeout",
+        "bag_scanned_messages": 62000,
+        "bag_bytes": 14081394,
+        "bag_sha256": "0e8e0133d33e78e183c6540ccdf07f980a5f8426af79796e33277bf50e09c000"
+      },
+      {
+        "session": "flight_2026-10-16_20-30-35",
+        "errors": [],
+        "videos": [
+          {
+            "camera": "cam1",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-30-35/cam1/flight_2026-10-16_20-30-35_cam1.mp4",
+            "bytes": 111820494,
+            "duration_s": 24.667,
+            "frames": 740,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "45c125749947a2f589233d8823294a33d93af0e5c27385f00b9a18f294244136"
+          },
+          {
+            "camera": "cam2",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-30-35/cam2/flight_2026-10-16_20-30-35_cam2.mp4",
+            "bytes": 92557433,
+            "duration_s": 24.667,
+            "frames": 740,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "5dd579b2daa7816018a40cacd4d82f911a10baaf5d6ca48b80191c0b13bb7a7b"
+          }
+        ],
+        "manifest_capture_status": "complete",
+        "manifest_capture_errors": [],
+        "manifest_sha256": "c28b9f534f97b0028f9fa649d41b770d6456f40f187fc59c627e9200cb6ce1bb",
+        "bag_duration_s": 24.705139636993408,
+        "bag_messages": 59058,
+        "raw_camera_frames": 0,
+        "debug_camera_frames": 247,
+        "pad": {
+          "key": "b2",
+          "layout_sha256": "a8386588f1580ab6c78a51affa3b7adab47463df6e0586b47acb8b8d2c14a14a",
+          "configuration": "baseline_b2_700mm_runtime.yaml"
+        },
+        "reference_indices": [
+          11,
+          12
+        ],
+        "phases": [
+          "TAKEOFF",
+          "INITIAL_POSITION",
+          "APPROACH",
+          "GT_RECOVERY",
+          "GT_DESCEND",
+          "GT_CUT_WAIT",
+          "FAILED_COMPLETE"
+        ],
+        "last_reason": "trajectory_initial_alignment_timeout",
+        "bag_scanned_messages": 59058,
+        "bag_bytes": 13094313,
+        "bag_sha256": "033d7d6b2fe8aea2f88ca45b9986f4a16e35b3b80a87f5bf2728af9f6f47ca60"
+      },
+      {
+        "session": "flight_2026-10-16_20-31-12",
+        "errors": [],
+        "videos": [
+          {
+            "camera": "cam1",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-31-12/cam1/flight_2026-10-16_20-31-12_cam1.mp4",
+            "bytes": 117147947,
+            "duration_s": 25.667,
+            "frames": 770,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "1676e05b02b821c8ce1611e4ce0a75a369f0b94a75ed7b86140d0fccb8057775"
+          },
+          {
+            "camera": "cam2",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-31-12/cam2/flight_2026-10-16_20-31-12_cam2.mp4",
+            "bytes": 96850858,
+            "duration_s": 25.667,
+            "frames": 770,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "f7aad3ff5165f733fa50762d3567a774d2d8af0f98b651e7e31e9d458cecc28e"
+          }
+        ],
+        "manifest_capture_status": "complete",
+        "manifest_capture_errors": [],
+        "manifest_sha256": "f30f1311bacc3f5f2e47d88a25fae3df2b2908d566df02f1f7e0f4d54c5e4320",
+        "bag_duration_s": 25.672305583953857,
+        "bag_messages": 61788,
+        "raw_camera_frames": 0,
+        "debug_camera_frames": 256,
+        "pad": {
+          "key": "b2",
+          "layout_sha256": "a8386588f1580ab6c78a51affa3b7adab47463df6e0586b47acb8b8d2c14a14a",
+          "configuration": "baseline_b2_700mm_runtime.yaml"
+        },
+        "reference_indices": [
+          12,
+          13
+        ],
+        "phases": [
+          "TAKEOFF",
+          "INITIAL_POSITION",
+          "APPROACH",
+          "GT_RECOVERY",
+          "GT_DESCEND",
+          "GT_CUT_WAIT",
+          "FAILED_COMPLETE"
+        ],
+        "last_reason": "trajectory_initial_alignment_timeout",
+        "bag_scanned_messages": 61788,
+        "bag_bytes": 13913894,
+        "bag_sha256": "e222f1a64a591db609a4e37f685a782ae508f8ae1c7efe313dde0d3619bb5235"
+      },
+      {
+        "session": "flight_2026-10-16_20-31-49",
+        "errors": [],
+        "videos": [
+          {
+            "camera": "cam1",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-31-49/cam1/flight_2026-10-16_20-31-49_cam1.mp4",
+            "bytes": 111929541,
+            "duration_s": 24.667,
+            "frames": 740,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "9d4d7ba69f983100f3a03181ba6986aa65189167453a0f31a0d6372701a171c4"
+          },
+          {
+            "camera": "cam2",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_20-31-49/cam2/flight_2026-10-16_20-31-49_cam2.mp4",
+            "bytes": 92586477,
+            "duration_s": 24.667,
+            "frames": 740,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "dee8a9673186f4ffefc4c1f226ee571b1ac7b5a35d5be7e8c3c5ebff850d5cbf"
+          }
+        ],
+        "manifest_capture_status": "complete",
+        "manifest_capture_errors": [],
+        "manifest_sha256": "ccad28e5453cb7a5621ce69fdd43386588ee8f4c7de970bfc52b0670f392305e",
+        "bag_duration_s": 24.713536500930786,
+        "bag_messages": 59088,
+        "raw_camera_frames": 0,
+        "debug_camera_frames": 246,
+        "pad": {
+          "key": "b2",
+          "layout_sha256": "a8386588f1580ab6c78a51affa3b7adab47463df6e0586b47acb8b8d2c14a14a",
+          "configuration": "baseline_b2_700mm_runtime.yaml"
+        },
+        "reference_indices": [
+          13,
+          14
+        ],
+        "phases": [
+          "TAKEOFF",
+          "INITIAL_POSITION",
+          "APPROACH",
+          "GT_RECOVERY",
+          "GT_DESCEND",
+          "GT_CUT_WAIT",
+          "FAILED_COMPLETE"
+        ],
+        "last_reason": "trajectory_initial_alignment_timeout",
+        "bag_scanned_messages": 59088,
+        "bag_bytes": 13490720,
+        "bag_sha256": "2cf177d3037bc4fda3f499578bdf85dd282b45ba7471f2e0cc57fccda54d37ea"
+      },
+      {
+        "session": "flight_2026-10-16_21-02-05",
+        "errors": [],
+        "videos": [
+          {
+            "camera": "cam1",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_21-02-05/cam1/flight_2026-10-16_21-02-05_cam1.mp4",
+            "bytes": 106557102,
+            "duration_s": 23.567,
+            "frames": 707,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "1e511ea495125bf9575cebaeaaad7bc5105c853886ef05d3ef473eba28007962"
+          },
+          {
+            "camera": "cam2",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_21-02-05/cam2/flight_2026-10-16_21-02-05_cam2.mp4",
+            "bytes": 88257636,
+            "duration_s": 23.567,
+            "frames": 707,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "5e5e77815200a323ed865d9b610da7f54d1855b089be7013128eb4c28d07fa70"
+          }
+        ],
+        "manifest_capture_status": "complete",
+        "manifest_capture_errors": [],
+        "manifest_sha256": "d785d60cd1aa7f0d84b412dbf8bffcf7ecdf51ada3680fb9cc903b620ddcef75",
+        "bag_duration_s": 23.662561416625977,
+        "bag_messages": 57311,
+        "raw_camera_frames": 0,
+        "debug_camera_frames": 236,
+        "pad": {
+          "key": "b2",
+          "layout_sha256": "a8386588f1580ab6c78a51affa3b7adab47463df6e0586b47acb8b8d2c14a14a",
+          "configuration": "baseline_b2_700mm_runtime.yaml"
+        },
+        "reference_indices": [
+          14,
+          15
+        ],
+        "phases": [
+          "TAKEOFF",
+          "INITIAL_POSITION",
+          "APPROACH",
+          "GT_RECOVERY",
+          "GT_DESCEND",
+          "GT_CUT_WAIT",
+          "FAILED_COMPLETE"
+        ],
+        "last_reason": "trajectory_initial_alignment_timeout",
+        "bag_scanned_messages": 57311,
+        "bag_bytes": 12739830,
+        "bag_sha256": "b6378de7a0abb0b24747697fed1efbcc7aaeb293328a7e35a984b98bd6162b84"
+      },
+      {
+        "session": "flight_2026-10-16_21-02-44",
+        "errors": [],
+        "videos": [
+          {
+            "camera": "cam1",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_21-02-44/cam1/flight_2026-10-16_21-02-44_cam1.mp4",
+            "bytes": 84399059,
+            "duration_s": 18.667,
+            "frames": 560,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "7f00e5a95afe4b58a804f4e519954bb00415fc5d605e131357c8c6df26d87625"
+          },
+          {
+            "camera": "cam2",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_21-02-44/cam2/flight_2026-10-16_21-02-44_cam2.mp4",
+            "bytes": 69620810,
+            "duration_s": 18.634,
+            "frames": 559,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "9e093b7a22e2b04e798dd6f9b06edfd1b13adc946847b88a7caf7a54d43127a1"
+          }
+        ],
+        "manifest_capture_status": "complete",
+        "manifest_capture_errors": [],
+        "manifest_sha256": "39a609b73324c89072a8d71b5510e69d6c052db453954b817dd87398eadfa905",
+        "bag_duration_s": 18.67856526374817,
+        "bag_messages": 44891,
+        "raw_camera_frames": 0,
+        "debug_camera_frames": 185,
+        "pad": {
+          "key": "b2",
+          "layout_sha256": "a8386588f1580ab6c78a51affa3b7adab47463df6e0586b47acb8b8d2c14a14a",
+          "configuration": "baseline_b2_700mm_runtime.yaml"
+        },
+        "reference_indices": [
+          15,
+          16
+        ],
+        "phases": [
+          "TAKEOFF",
+          "INITIAL_POSITION",
+          "APPROACH",
+          "DESCEND",
+          "CUT_WAIT",
+          "COMPLETE"
+        ],
+        "last_reason": "force_disarm_confirmed",
+        "bag_scanned_messages": 44891,
+        "bag_bytes": 10138644,
+        "bag_sha256": "4e276805ad407728873d3969a7c48324166cb8515607228a9dd068c9562cc19b"
+      },
+      {
+        "session": "flight_2026-10-16_21-03-13",
+        "errors": [],
+        "videos": [
+          {
+            "camera": "cam1",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_21-03-13/cam1/flight_2026-10-16_21-03-13_cam1.mp4",
+            "bytes": 111821461,
+            "duration_s": 24.667,
+            "frames": 740,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "af7c7f6da8e483cf830a751519bcb80fcded63e10bb7ebf59ba898d6d2202628"
+          },
+          {
+            "camera": "cam2",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_21-03-13/cam2/flight_2026-10-16_21-03-13_cam2.mp4",
+            "bytes": 92614676,
+            "duration_s": 24.667,
+            "frames": 740,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "611b88c6a9c3c2bdb4586fd28abd46275092a4278f040f28ee38bc73360ed6b7"
+          }
+        ],
+        "manifest_capture_status": "complete",
+        "manifest_capture_errors": [],
+        "manifest_sha256": "46aa9eb2113be7e9dafeb1b24c051e3567a9b86d1e106d83886d1ef32c80211d",
+        "bag_duration_s": 24.74454402923584,
+        "bag_messages": 59626,
+        "raw_camera_frames": 0,
+        "debug_camera_frames": 247,
+        "pad": {
+          "key": "b2",
+          "layout_sha256": "a8386588f1580ab6c78a51affa3b7adab47463df6e0586b47acb8b8d2c14a14a",
+          "configuration": "baseline_b2_700mm_runtime.yaml"
+        },
+        "reference_indices": [
+          16
+        ],
+        "phases": [
+          "TAKEOFF",
+          "INITIAL_POSITION",
+          "APPROACH",
+          "GT_RECOVERY",
+          "GT_DESCEND",
+          "GT_CUT_WAIT"
+        ],
+        "last_reason": "trajectory_initial_alignment_timeout",
+        "bag_scanned_messages": 59626,
+        "bag_bytes": 13247952,
+        "bag_sha256": "eee0384dbf4705d09d1af75b629205c878b230e1ec22259f3bdcfb23093109d0"
+      },
+      {
+        "session": "flight_2026-10-16_21-03-49",
+        "errors": [],
+        "videos": [
+          {
+            "camera": "cam1",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_21-03-49/cam1/flight_2026-10-16_21-03-49_cam1.mp4",
+            "bytes": 116815014,
+            "duration_s": 25.667,
+            "frames": 770,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "b666318d82a6e789b0213cc3b6e1ab667cd073db832fba582651929c5abb911e"
+          },
+          {
+            "camera": "cam2",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_21-03-49/cam2/flight_2026-10-16_21-03-49_cam2.mp4",
+            "bytes": 96704034,
+            "duration_s": 25.667,
+            "frames": 770,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "8de87177d9d3b207092724b34fd4f46c7c3d43e5c71e1a89842b3ed13200b713"
+          }
+        ],
+        "manifest_capture_status": "complete",
+        "manifest_capture_errors": [],
+        "manifest_sha256": "ba0ad9961e4703003c6d0c244a5326323396b13e881f00089f1f91d905e60644",
+        "bag_duration_s": 25.759855270385742,
+        "bag_messages": 61549,
+        "raw_camera_frames": 0,
+        "debug_camera_frames": 257,
+        "pad": {
+          "key": "b2",
+          "layout_sha256": "a8386588f1580ab6c78a51affa3b7adab47463df6e0586b47acb8b8d2c14a14a",
+          "configuration": "baseline_b2_700mm_runtime.yaml"
+        },
+        "reference_indices": [
+          17,
+          18
+        ],
+        "phases": [
+          "TAKEOFF",
+          "INITIAL_POSITION",
+          "APPROACH",
+          "GT_RECOVERY",
+          "GT_DESCEND",
+          "GT_CUT_WAIT",
+          "FAILED_COMPLETE"
+        ],
+        "last_reason": "trajectory_initial_alignment_timeout",
+        "bag_scanned_messages": 61549,
+        "bag_bytes": 13845005,
+        "bag_sha256": "49fddc5138b9dd5bb62ccd7cc79a7db20855c3dc98b5b383ddcc09f56ecb8cbb"
+      },
+      {
+        "session": "flight_2026-10-16_21-04-28",
+        "errors": [
+          "cam1 shorter than bag by >1s"
+        ],
+        "videos": [
+          {
+            "camera": "cam1",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_21-04-28/cam1/flight_2026-10-16_21-04-28_cam1.mp4",
+            "bytes": 111657085,
+            "duration_s": 24.667,
+            "frames": 740,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "add3c4ec92b0ab0b2f3f9f08bf46497ad52849a47543d4859b2a0310d3e653c8"
+          },
+          {
+            "camera": "cam2",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_21-04-28/cam2/flight_2026-10-16_21-04-28_cam2.mp4",
+            "bytes": 104490410,
+            "duration_s": 27.734,
+            "frames": 832,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "dc9b6a5d53f9415a6f5f704e9d320ed8de35322fed5a3043ae69ed9af4557b5b"
+          }
+        ],
+        "manifest_capture_status": "complete",
+        "manifest_capture_errors": [],
+        "manifest_sha256": "98710c78850338d63838fc4397964f08a8cc8472de3a3760a8aa4797b99f79a8",
+        "bag_duration_s": 27.67077350616455,
+        "bag_messages": 65772,
+        "raw_camera_frames": 0,
+        "debug_camera_frames": 272,
+        "pad": {
+          "key": "b2",
+          "layout_sha256": "a8386588f1580ab6c78a51affa3b7adab47463df6e0586b47acb8b8d2c14a14a",
+          "configuration": "baseline_b2_700mm_runtime.yaml"
+        },
+        "reference_indices": [
+          18,
+          19
+        ],
+        "phases": [
+          "TAKEOFF",
+          "INITIAL_POSITION",
+          "APPROACH",
+          "GT_RECOVERY",
+          "GT_DESCEND",
+          "GT_CUT_WAIT",
+          "FAILED_COMPLETE"
+        ],
+        "last_reason": "trajectory_initial_alignment_timeout",
+        "bag_scanned_messages": 65772,
+        "bag_bytes": 14382886,
+        "bag_sha256": "79685e469d991279bada9e58db8b17c0051fd01bd048c07826911b4c6c7e8434"
+      },
+      {
+        "session": "flight_2026-10-16_21-05-06",
+        "errors": [],
+        "videos": [
+          {
+            "camera": "cam1",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_21-05-06/cam1/flight_2026-10-16_21-05-06_cam1.mp4",
+            "bytes": 116880630,
+            "duration_s": 25.667,
+            "frames": 770,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "35efdad1ac5065b8b49509ff6e20d903a8ff614fbe90c0332e39288545df7757"
+          },
+          {
+            "camera": "cam2",
+            "path": "/home/ml/drone-data/shared/results/webcam-recordings/flight_2026-10-16_21-05-06/cam2/flight_2026-10-16_21-05-06_cam2.mp4",
+            "bytes": 96678866,
+            "duration_s": 25.667,
+            "frames": 770,
+            "width": 2592,
+            "height": 1944,
+            "full_decode_ok": true,
+            "decode_errors": "",
+            "sha256": "d49af7145f9f573d785af3e36ec68c9ef8a9b64d05e30adc4bcccf197cfaf37b"
+          }
+        ],
+        "manifest_capture_status": "complete",
+        "manifest_capture_errors": [],
+        "manifest_sha256": "d29b5644718ddac0d29536d6262ef841fd0f34d9964ca55ae05e82d4491a37f9",
+        "bag_duration_s": 25.760262966156006,
+        "bag_messages": 61873,
+        "raw_camera_frames": 0,
+        "debug_camera_frames": 256,
+        "pad": {
+          "key": "b2",
+          "layout_sha256": "a8386588f1580ab6c78a51affa3b7adab47463df6e0586b47acb8b8d2c14a14a",
+          "configuration": "baseline_b2_700mm_runtime.yaml"
+        },
+        "reference_indices": [
+          19
+        ],
+        "phases": [
+          "TAKEOFF",
+          "INITIAL_POSITION",
+          "APPROACH",
+          "GT_RECOVERY",
+          "GT_DESCEND",
+          "GT_CUT_WAIT",
+          "FAILED_COMPLETE",
+          "COMPLETE"
+        ],
+        "last_reason": "pad_trajectory_set_complete",
+        "bag_scanned_messages": 61873,
+        "bag_bytes": 13619277,
+        "bag_sha256": "cc986cfd874491e421080559fd9ca170c6dba4fa0fb44014a50b68fd47f0add9"
+      }
+    ]
+  },
+  "ransac": {
+    "active_on_jetson": false,
+    "owner_revert": "194c69f",
+    "stack_revert": "4018608",
+    "owner_tree_restored_to": "1316fab8c66f6ce6f97d15dc3c385606f295deaf",
+    "stack_tree_restored_to": "2fbd9b73e4872bcf7a575f156f26d8fe138321ca",
+    "experimental_benchmarks_preserved": "data/results/b2_corner_ransac_20261016/"
+  },
+  "random_runtime": {
+    "print": "A1_20261015 / random-Pad1-rep1",
+    "dictionary": "DICT_4X4_100",
+    "ids": [
+      0,
+      1
+    ],
+    "marker_sides_m": [
+      0.2135,
+      0.0574
+    ],
+    "configuration": "random_a1_700mm_runtime.yaml",
+    "pad_identity": {
+      "key": "random_a1",
+      "layout_sha256": "c76a51429a71f761cb209b1605afd0ab0be4bd11de0046bdae1dea566a0f7eef",
+      "configuration": "random_a1_700mm_runtime.yaml"
+    },
+    "stack_deployed": "dd326566",
+    "owner_source": "d1e62bb1e721b9da56320a8869b312da67aeb194",
+    "module_pin": "e5c97931ab6b4e275b3e264289e01f11e6af423e",
+    "algorithm": "Original IPPE + all-point LM + residual-filter LM; physical_pad.py and physical_pad_estimator.py byte-identical to 1316fab",
+    "tests_passed_native_opencv_4_2": 41,
+    "live_hz": 59.96808780392215,
+    "live_processing_ms_p95": 6.63043849999667,
+    "alignment_ready": false,
+    "marker_fresh": false,
+    "phase": "IDLE",
+    "campaign": {
+      "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+      "next_index": 0,
+      "total": 20,
+      "completed": 0,
+      "failed": 0,
+      "finished": 0,
+      "failure_records": [],
+      "active": null,
+      "halted": false,
+      "pad": {
+        "key": "random_a1",
+        "layout_sha256": "c76a51429a71f761cb209b1605afd0ab0be4bd11de0046bdae1dea566a0f7eef",
+        "configuration": "random_a1_700mm_runtime.yaml"
+      },
+      "all_complete": false,
+      "current": {
+        "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+        "index": 0,
+        "type": "inside",
+        "reference_id": 9595,
+        "raw_candidate_id": 50781,
+        "bank_sha256": "b03e27d92d0a9eaa8dd7f0b84412edc32ff6ffd422385e79dcaec0ded6ca22b2"
+      }
+    },
+    "data_sync_ready": true,
+    "fcu": {
+      "armed": false,
+      "mode": "POSCTL"
+    }
+  },
+  "limitations": [
+    "21:04:28 cam1 is 24.667s versus bag 27.671s; fully decodable, but approximately 3s shorter. Original evidence unchanged.",
+    "Onboard lossless raw images exist only in the first B2 flight by the original recording policy; all 20 bags contain compressed debug images.",
+    "A1 random pad was absent from the camera at inspection; visual detection and session alignment remain pending."
+  ]
+}
