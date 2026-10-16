@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-16",
+  "stack_revision": "06610f6b669c843630adcd34a742e6e0ee5892dc",
+  "owner_revision": "56d5a70f5815f3df18f53323f26cc96ce7df8620",
+  "deployment": "Committed ML hardware branch fetched and checked out on clean Jetson repository using root_guard. No Jetson source/configuration edits.",
+  "configuration": {
+    "gravity_constraint": false,
+    "level_pad": true,
+    "small_marker_attachment_correction": false,
+    "campaign_root": "/work/flight_logs/trajectory_campaign_visual_level_20261016",
+    "restart_on_every_planner_start": false,
+    "recorder": "/work/stacks/aruco-landing-jetson/config/flight_safety_recorder_raw.yaml"
+  },
+  "live_verification": {
+    "alignment_ready": true,
+    "marker_fresh": true,
+    "estimator_hz": 59.99183411737359,
+    "raw_image_hz": 60.007265870330265,
+    "raw_image_samples": 172,
+    "pad_global_roll_pitch_yaw_deg": [3.935377942261262e-16, 3.816462749023312e-14, 1.1682568803367193],
+    "raw_and_imu_topics_in_running_recorder": true,
+    "trial_phase": "IDLE",
+    "offboard_entry_ready": true,
+    "data_sync_ready": true,
+    "healthy": true,
+    "fcu_connected": true,
+    "fcu_armed": false,
+    "fcu_mode": "POSCTL"
+  },
+  "trajectory_queue": {
+    "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+    "total": 20,
+    "completed": 0,
+    "next_index": 0,
+    "active": null,
+    "halted": false,
+    "first_reference_id": 9595,
+    "previous_campaign_completed_indices_preserved": [0, 1, 2, 3, 4, 5, 6]
+  },
+  "processes": "Camera, OptiTrack and MAVROS retained. Perception restarted; flight safety and planner started with normal pilot OFFBOARD-entry gate. No flight or mode command issued by deployment.",
+  "checks": "Hardware worktree and main worktree layout checks, shell syntax, git diff checks and live runtime assertions passed.",
+  "limitation": "Readiness is a live snapshot. New closed-loop flight with visual PnP plus level pad has not yet been performed."
+}
