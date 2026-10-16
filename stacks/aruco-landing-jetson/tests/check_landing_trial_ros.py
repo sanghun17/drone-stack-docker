@@ -18,13 +18,14 @@ CAMPAIGN=os.environ.get('TEST_PAD_CAMPAIGN')=='1'
 EMERGENCY=os.environ.get('TEST_EMERGENCY_LAND')=='1'
 PARALLEL=os.environ.get('TEST_PARALLEL_QUALIFICATION')=='1'
 RESTART_QUEUE=os.environ.get('TEST_TRAJECTORY_RESTART')=='1'
-OPTI_TERMINATION=os.environ.get('TEST_OPTITRACK_TERMINATION')=='1'
-TRAJECTORY=os.environ.get('TEST_TRAJECTORY_SET')=='1'
+OPTI_TERMINATION=os.environ.get('TEST_OPTITRACK_TERMINATION')=='1' or os.environ.get('TEST_GT_REFERENCE_RECOVERY')=='1'
+GT_RECOVERY=os.environ.get('TEST_GT_REFERENCE_RECOVERY')=='1'
+TRAJECTORY=os.environ.get('TEST_TRAJECTORY_SET')=='1' or GT_RECOVERY
 REPEAT=os.environ.get('TEST_REPEAT_TRIAL')=='1' or TRAJECTORY
 CUT=os.environ.get('TEST_TERMINATION')=='1' or REPEAT
 AUTO=os.environ.get('TEST_AUTO_PLANNER')=='1' or REPEAT
 SPEEDS=os.environ.get('TEST_LANDING_SPEEDS')=='1' or REPEAT
-TRANSITION=os.environ.get('TEST_TRANSITION')=='1'
+TRANSITION=os.environ.get('TEST_TRANSITION')=='1' or GT_RECOVERY
 PORT=11359 if TRAJECTORY else (11358 if TRANSITION else 11357)
 OUT=ROOT/('flight_logs/aruco-landing/trial-transition-integration' if TRANSITION else 'flight_logs/aruco-landing/trial-regression')
 if TRAJECTORY:OUT=ROOT/'flight_logs/aruco-landing/trajectory-set-integration'
@@ -134,6 +135,7 @@ def main():
                     campaign_root=checkpoint.parents[2]
                     repeat_args+=['trajectory_campaign_root:='+str(campaign_root)]
                 repeat_args+=['trajectory_set_file:='+str(OUT/'set.json'),'trajectory_progress_file:='+str(progress)]
+        if GT_RECOVERY:repeat_args+=['failed_trial_gt_recovery:=true','trajectory_initial_alignment_timeout_s:=10.0']
         spawn('trial',['roslaunch',str(ROOT/'ws/aruco-landing/src/aruco_landing/launch/landing_trial.launch'),'dry_run:=false','landing_finish_mode:='+('force_disarm' if CUT else 'auto_land'),'termination_height_source:='+('optitrack' if OPTI_TERMINATION else 'dual_height'),'auto_start_on_offboard:='+str(AUTO).lower(),'estimation_transition:='+str(TRANSITION).lower(),'config_root:='+str(ROOT/'stacks/aruco-landing-jetson/config')]+(['approach_speed_mps:=0.5','landing_horizontal_speed_mps:=2.0','descent_speed_mps:=0.5'] if SPEEDS else [])+repeat_args)
         pubs={}
         for key,topic,kind in [('marker','/landing/vision_pose_marker',PoseStamped),('velocity','/mavros/local_position/velocity_local',TwistStamped),('mocap','/vrpn_client_node/pure/pose',PoseStamped),('local','/mavros/local_position/pose',PoseStamped),('state','/mavros/state',State),('extended','/mavros/extended_state',ExtendedState),('pad','/landing/pad_pose_global',PoseStamped),('ready','/landing/alignment/ready',Bool),('visible','/landing/target_visible',Bool),('inliers','/landing/estimator/inlier_ids',Int32MultiArray),('body','/landing/vehicle_pose_pad',PoseWithCovarianceStamped),('camera','/landing/camera_pose_pad',PoseWithCovarianceStamped)]:pubs[key]=rospy.Publisher(topic,kind,queue_size=10)
@@ -180,6 +182,45 @@ def main():
         rospy.wait_for_service('/landing_trial/start',timeout=10)
         start=rospy.ServiceProxy('/landing_trial/start',Trigger);reset=rospy.ServiceProxy('/landing_trial/reset',Trigger)
         wait_for(lambda:latest.get('status',{}).get('healthy'),10)
+        if GT_RECOVERY:
+            sim['sync_ready']=True
+            waits=[]
+            for number in (1,2):
+                sim.update(visible=True,marker_error=.3 if number==1 else 0.,marker_dx=.3 if number==1 else 0.)
+                wait_for(lambda:latest['status']['offboard_entry_ready'],10)
+                sim['mode']='OFFBOARD'
+                wait_for(lambda:len(arm_calls)==number,5)
+                wait_for(lambda:latest['status']['phase']=='APPROACH',35)
+                approach_at=time.monotonic()
+                if number==2:
+                    wait_for(lambda:latest['status']['phase']=='DESCEND',5)
+                    time.sleep(.4);sim['visible']=False
+                wait_for(lambda:latest['status']['phase']=='GT_RECOVERY',13)
+                waits.append(time.monotonic()-approach_at)
+                sim['visible']=False
+                wait_for(lambda:latest['status']['phase']=='GT_DESCEND',4)
+                assert latest['status']['estimation_source']=='optitrack'
+                assert latest['status']['gt_reference_resume_ack']
+                wait_for(lambda:any(p=='GT_DESCEND' and m.velocity.z<-.1 for p,m in tagged_commands),2)
+                wait_for(lambda:latest['status']['phase']=='FAILED_COMPLETE',15)
+                wait_for(lambda:latest['status']['trajectory_set']['failed']==number,3)
+                assert latest['status']['trajectory_set']['completed']==0
+                assert len(kill_calls)==number and not mode_calls
+                assert not sim['armed'] and sim['landed']
+                assert latest['status']['failure_reason'] in ('trajectory_initial_alignment_timeout','marker_source_lost_trial_failed','marker_lost_trial_failed')
+                sim['mode']='POSCTL';sim['visible']=True
+                time.sleep(.3)
+            assert 9.8<waits[0]<10.7,waits
+            assert all(p in phase_history for p in ('DESCEND','GT_RECOVERY','GT_DESCEND','GT_CUT_WAIT','FAILED_COMPLETE'))
+            assert latest['status']['trajectory_set']['all_complete']
+            assert not latest['status']['offboard_entry_ready']
+            assert dict(master.getSystemState('/trial_test')[2][0])['/mavros/setpoint_raw/local']==['/flight_safety_response']
+            report=dict(result='PASS',transport='localhost synthetic FCU; real planner, controller, router, safety and mux',
+                approach_to_recovery_s=waits,alignment_timeout_s=10,px4_mode_calls=mode_calls,
+                gt_reference_landings=2,failed_entries=2,successful_entries=0,force_disarms=len(kill_calls),
+                scenarios=['entry_alignment_timeout','mid_reference_marker_loss'],phases=list(dict.fromkeys(phase_history)))
+            (OUT/'ros_gt_reference_recovery.json').write_text(json.dumps(report,indent=2)+'\n')
+            print(json.dumps(report,indent=2));return
         if REPEAT:
             wait_for(lambda:latest.get('mission',{}).get('ground_start_enabled') is True)
             assert latest['mission']['offboard_entry_ready'] is False
