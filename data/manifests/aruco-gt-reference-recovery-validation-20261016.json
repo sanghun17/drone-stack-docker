@@ -1,0 +1,39 @@
+{
+  "result": "PASS",
+  "transport": "localhost synthetic FCU; real planner, controller, router, safety and mux",
+  "approach_to_recovery_s": [
+    10.016285247998894,
+    2.056939321992104
+  ],
+  "alignment_timeout_s": 10,
+  "px4_mode_calls": [],
+  "gt_reference_landings": 2,
+  "failed_entries": 2,
+  "successful_entries": 0,
+  "force_disarms": 2,
+  "scenarios": [
+    "entry_alignment_timeout",
+    "mid_reference_marker_loss"
+  ],
+  "phases": [
+    "IDLE",
+    "ARMING",
+    "TAKEOFF",
+    "INITIAL_POSITION",
+    "APPROACH",
+    "GT_RECOVERY",
+    "GT_DESCEND",
+    "GT_CUT_WAIT",
+    "FAILED_COMPLETE",
+    "DESCEND",
+    "COMPLETE"
+  ],
+  "unit_tests_passed": 81,
+  "airborne_flight_tested": false,
+  "hardware_policy": {
+    "trajectory_initial_alignment_timeout_s": 10.0,
+    "failed_trial_recovery": "same selected reference, controller, pad transform, limits, terminal landing and GT height cutoff; OptiTrack replaces marker feedback",
+    "mid_reference_recovery": "pause reference time during source change; continue from last command",
+    "next_trial": "grounded disarm, sync verification, pilot OFFBOARD edge"
+  }
+}

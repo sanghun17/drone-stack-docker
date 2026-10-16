@@ -1,0 +1,184 @@
+{
+  "session": "flight_2026-10-16_20-18-48",
+  "duration_s": 48.72724390029907,
+  "approach": {
+    "start_s": 10.860039949417114,
+    "end_s": 40.8350043296814,
+    "duration_s": 29.974964380264282,
+    "detection_messages": 1792,
+    "detected_messages": 1792,
+    "router_checks": 1498,
+    "router_ready_messages": 0,
+    "inconsistent_checks": 217,
+    "maximum_stable_duration_s": 0.5665490627288818,
+    "gt_marker_position_error_m": {
+      "median": 0.03331567810047909,
+      "p95": 0.5142714189381595,
+      "max": 0.6146351581809539
+    },
+    "gt_marker_rotation_error_deg": {
+      "median": 1.0682453364543127,
+      "p95": 15.260244453733238,
+      "max": 20.427747969656117
+    },
+    "gt_distance_to_entry_goal_m": {
+      "median": 0.05780612885504275,
+      "p95": 0.07874880985746212,
+      "max": 0.10402239494494278
+    },
+    "gt_speed_mps": {
+      "median": 0.037951782266843176,
+      "p95": 0.06293237989735567,
+      "max": 0.09986056001187824
+    }
+  },
+  "final_phase": "FAILED_COMPLETE",
+  "failure_reason": "trajectory_initial_alignment_timeout",
+  "final_trajectory_set": {
+    "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+    "next_index": 10,
+    "total": 20,
+    "completed": 8,
+    "failed": 2,
+    "finished": 10,
+    "failure_records": [
+      {
+        "index": 8,
+        "reason": "trajectory_initial_alignment_timeout",
+        "selection": {
+          "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+          "index": 8,
+          "type": "inside",
+          "reference_id": 1146,
+          "raw_candidate_id": 26741,
+          "bank_sha256": "b03e27d92d0a9eaa8dd7f0b84412edc32ff6ffd422385e79dcaec0ded6ca22b2"
+        }
+      },
+      {
+        "index": 9,
+        "reason": "trajectory_initial_alignment_timeout",
+        "selection": {
+          "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+          "index": 9,
+          "type": "inside",
+          "reference_id": 1276,
+          "raw_candidate_id": 29743,
+          "bank_sha256": "b03e27d92d0a9eaa8dd7f0b84412edc32ff6ffd422385e79dcaec0ded6ca22b2"
+        }
+      }
+    ],
+    "active": null,
+    "halted": false,
+    "pad": {
+      "key": "b2",
+      "layout_sha256": "a8386588f1580ab6c78a51affa3b7adab47463df6e0586b47acb8b8d2c14a14a",
+      "configuration": "baseline_b2_700mm_runtime.yaml"
+    },
+    "all_complete": false,
+    "current": {
+      "set_sha256": "54f13331d55d4d822300cc617be7c925e3a068e7d200efee77fee10bb2bb39ff",
+      "index": 10,
+      "type": "inside",
+      "reference_id": 4364,
+      "raw_candidate_id": 25556,
+      "bank_sha256": "b03e27d92d0a9eaa8dd7f0b84412edc32ff6ffd422385e79dcaec0ded6ca22b2"
+    }
+  },
+  "events": [
+    {
+      "time_s": 5.602836608886719e-05,
+      "topic": "/landing/pose_transition/status",
+      "value": [
+        "optitrack",
+        "optitrack"
+      ]
+    },
+    {
+      "time_s": 0.0065844058990478516,
+      "topic": "/flight_safety/state",
+      "value": [
+        0,
+        "NORMAL"
+      ]
+    },
+    {
+      "time_s": 0.02539515495300293,
+      "topic": "/mavros/state",
+      "value": [
+        "OFFBOARD",
+        true
+      ]
+    },
+    {
+      "time_s": 0.03571724891662598,
+      "topic": "/landing/trial/status",
+      "value": [
+        "TAKEOFF",
+        "repeat_takeoff"
+      ]
+    },
+    {
+      "time_s": 8.833529233932495,
+      "topic": "/landing/trial/status",
+      "value": [
+        "INITIAL_POSITION",
+        "repeat_initial_position"
+      ]
+    },
+    {
+      "time_s": 10.860039949417114,
+      "topic": "/landing/trial/status",
+      "value": [
+        "APPROACH",
+        "repeat_approach"
+      ]
+    },
+    {
+      "time_s": 40.8350043296814,
+      "topic": "/landing/trial/status",
+      "value": [
+        "GT_RECOVERY",
+        "trajectory_initial_alignment_timeout"
+      ]
+    },
+    {
+      "time_s": 42.19453716278076,
+      "topic": "/mavros/state",
+      "value": [
+        "AUTO.LAND",
+        true
+      ]
+    },
+    {
+      "time_s": 42.20208764076233,
+      "topic": "/flight_safety/state",
+      "value": [
+        0,
+        "MANUAL"
+      ]
+    },
+    {
+      "time_s": 48.20305418968201,
+      "topic": "/mavros/state",
+      "value": [
+        "OFFBOARD",
+        false
+      ]
+    },
+    {
+      "time_s": 48.21561336517334,
+      "topic": "/landing/trial/status",
+      "value": [
+        "FAILED_COMPLETE",
+        "trajectory_initial_alignment_timeout"
+      ]
+    }
+  ],
+  "bag_sha256": "fd01303052ecc425211e92c9a4b2ac4854995d8282f206748b0c1f1c25ee2054",
+  "conclusions": {
+    "marker_detection_failure": false,
+    "entry_blocked_by": "GT-marker inconsistency repeatedly resets required one-second stability; maximum stable interval 0.567s",
+    "old_recovery_observed": "GT_RECOVERY then PX4 AUTO.LAND, not original reference controller",
+    "physical_root_cause": "not uniquely isolated by this recording"
+  }
+}
