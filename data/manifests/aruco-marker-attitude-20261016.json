@@ -1,0 +1,665 @@
+{
+  "bag": "flight_2026-10-16_15-38-47",
+  "scope": "Diagnostic independent PnP per marker and actual joint PnP; RP numbers are implied global-pad orientation, expected 0 on a flat floor, not raw camera Euler angles or directly measured drone RP.",
+  "metric": "angle between inferred global-pad normal and world +Z; uses GT attitude and configured body-camera rotation, no frozen pad alignment",
+  "marker_ids": {
+    "0": "large, side 0.2181535821m",
+    "1": "small, side 0.0574m"
+  },
+  "height_bands": [
+    {
+      "height_m": [
+        0,
+        0.4
+      ],
+      "gt_frames": 82,
+      "detected_frames": {
+        "0": 0,
+        "1": 72
+      },
+      "poses": {
+        "0": {
+          "count": 0
+        },
+        "1": {
+          "count": 72,
+          "normal_error_deg_p50_p95_max": [
+            3.6918303005372426,
+            6.619599874710656,
+            8.222786594767118
+          ],
+          "inferred_pad_roll_pitch_deg_median": [
+            0.12524039714056656,
+            -3.3795698394415647
+          ],
+          "inferred_pad_roll_pitch_deg_std": [
+            1.2732138522519014,
+            1.5145593541438411
+          ],
+          "reprojection_rms_px_p50_p95_max": [
+            0.6412225730080339,
+            1.0575344944524012,
+            1.3899941346084195
+          ],
+          "edge_px_p50_p95_max": [
+            192.95968969714585,
+            207.62949983081967,
+            208.31251676286604
+          ]
+        },
+        "combined": {
+          "count": 72,
+          "normal_error_deg_p50_p95_max": [
+            3.6918303005372426,
+            6.619599874710656,
+            8.222786594767118
+          ],
+          "inferred_pad_roll_pitch_deg_median": [
+            0.12524039714056656,
+            -3.3795698394415647
+          ],
+          "inferred_pad_roll_pitch_deg_std": [
+            1.2732138522519014,
+            1.5145593541438411
+          ],
+          "reprojection_rms_px_p50_p95_max": [
+            0.6412225730080339,
+            1.0575344944524012,
+            1.3899941346084195
+          ]
+        }
+      }
+    },
+    {
+      "height_m": [
+        0.4,
+        1.0
+      ],
+      "gt_frames": 87,
+      "detected_frames": {
+        "0": 52,
+        "1": 87
+      },
+      "poses": {
+        "0": {
+          "count": 52,
+          "normal_error_deg_p50_p95_max": [
+            1.856000922272711,
+            2.5740781756151234,
+            2.6602951021878507
+          ],
+          "inferred_pad_roll_pitch_deg_median": [
+            -1.7550485010187789,
+            -0.6339188621812977
+          ],
+          "inferred_pad_roll_pitch_deg_std": [
+            0.23437855455645742,
+            0.260106897265033
+          ],
+          "reprojection_rms_px_p50_p95_max": [
+            0.2181999701001781,
+            0.2963836206683996,
+            0.35489043998954134
+          ],
+          "edge_px_p50_p95_max": [
+            164.59776893228718,
+            277.17077965353104,
+            302.94563426287675
+          ]
+        },
+        "1": {
+          "count": 87,
+          "normal_error_deg_p50_p95_max": [
+            4.627839655758121,
+            6.13686846233901,
+            7.7145362040932985
+          ],
+          "inferred_pad_roll_pitch_deg_median": [
+            -0.8363770970738308,
+            -4.511639438352701
+          ],
+          "inferred_pad_roll_pitch_deg_std": [
+            0.7874377185622927,
+            0.8727006627036236
+          ],
+          "reprojection_rms_px_p50_p95_max": [
+            0.07314409641655131,
+            0.18455738762429216,
+            0.23702250409154504
+          ],
+          "edge_px_p50_p95_max": [
+            52.60158933450296,
+            84.5987482180878,
+            100.1394985852996
+          ]
+        },
+        "combined": {
+          "count": 87,
+          "normal_error_deg_p50_p95_max": [
+            1.812799733115469,
+            4.792400711127149,
+            7.7145362040932985
+          ],
+          "inferred_pad_roll_pitch_deg_median": [
+            -1.279979339009255,
+            -0.9133529578029786
+          ],
+          "inferred_pad_roll_pitch_deg_std": [
+            0.5623344037336757,
+            1.8135094900005488
+          ],
+          "reprojection_rms_px_p50_p95_max": [
+            0.2691040339824446,
+            0.736941708228547,
+            1.0107175704006137
+          ]
+        }
+      }
+    },
+    {
+      "height_m": [
+        1.0,
+        1.7
+      ],
+      "gt_frames": 92,
+      "detected_frames": {
+        "0": 92,
+        "1": 91
+      },
+      "poses": {
+        "0": {
+          "count": 92,
+          "normal_error_deg_p50_p95_max": [
+            1.6393282571103294,
+            2.056316744446463,
+            2.39170755100078
+          ],
+          "inferred_pad_roll_pitch_deg_median": [
+            -1.5676676645151173,
+            -0.3940394857634053
+          ],
+          "inferred_pad_roll_pitch_deg_std": [
+            0.3070594363992685,
+            0.34338482840624546
+          ],
+          "reprojection_rms_px_p50_p95_max": [
+            0.11849464596939588,
+            0.19156727483065064,
+            0.24243620169245045
+          ],
+          "edge_px_p50_p95_max": [
+            104.63558393382809,
+            132.89951018620243,
+            136.82783291169693
+          ]
+        },
+        "1": {
+          "count": 91,
+          "normal_error_deg_p50_p95_max": [
+            5.8046185187329735,
+            9.233448479937737,
+            12.897610900117307
+          ],
+          "inferred_pad_roll_pitch_deg_median": [
+            -2.3092870768573155,
+            -4.706976118392664
+          ],
+          "inferred_pad_roll_pitch_deg_std": [
+            1.5704369805553353,
+            3.048333614471884
+          ],
+          "reprojection_rms_px_p50_p95_max": [
+            0.03826797119381254,
+            0.08030065716892557,
+            0.09428727302010421
+          ],
+          "edge_px_p50_p95_max": [
+            28.36192775672197,
+            36.249376056823664,
+            37.40576756909253
+          ]
+        },
+        "combined": {
+          "count": 92,
+          "normal_error_deg_p50_p95_max": [
+            1.4946731617703612,
+            1.8633871277988843,
+            2.183160092690823
+          ],
+          "inferred_pad_roll_pitch_deg_median": [
+            -1.261010356853872,
+            -0.7507075322344348
+          ],
+          "inferred_pad_roll_pitch_deg_std": [
+            0.24672468387711502,
+            0.2621854465974845
+          ],
+          "reprojection_rms_px_p50_p95_max": [
+            0.16520159299241166,
+            0.24154496981752716,
+            0.29185822317430427
+          ]
+        }
+      }
+    },
+    {
+      "height_m": [
+        1.7,
+        2.4
+      ],
+      "gt_frames": 138,
+      "detected_frames": {
+        "0": 138,
+        "1": 124
+      },
+      "poses": {
+        "0": {
+          "count": 138,
+          "normal_error_deg_p50_p95_max": [
+            1.51583415219859,
+            2.2985209565598277,
+            3.728263938917893
+          ],
+          "inferred_pad_roll_pitch_deg_median": [
+            -1.2754558583297677,
+            -0.419239880608933
+          ],
+          "inferred_pad_roll_pitch_deg_std": [
+            0.5248669785173834,
+            0.5000846716693454
+          ],
+          "reprojection_rms_px_p50_p95_max": [
+            0.08027914093039046,
+            0.12699483954658675,
+            0.2080417753225656
+          ],
+          "edge_px_p50_p95_max": [
+            74.89672930633125,
+            82.15236226540833,
+            84.28734281237826
+          ]
+        },
+        "1": {
+          "count": 124,
+          "normal_error_deg_p50_p95_max": [
+            8.771832056846037,
+            11.583135827799241,
+            12.611508352883138
+          ],
+          "inferred_pad_roll_pitch_deg_median": [
+            -5.054377375235374,
+            -6.30073577638859
+          ],
+          "inferred_pad_roll_pitch_deg_std": [
+            2.1199730829859775,
+            3.7007503639942607
+          ],
+          "reprojection_rms_px_p50_p95_max": [
+            0.05436042287217603,
+            0.11460077178368909,
+            0.16526163084380863
+          ],
+          "edge_px_p50_p95_max": [
+            19.875864398995994,
+            21.903891525358027,
+            22.559613445475698
+          ]
+        },
+        "combined": {
+          "count": 138,
+          "normal_error_deg_p50_p95_max": [
+            1.9040672998805754,
+            2.6159868927506778,
+            3.20392110510079
+          ],
+          "inferred_pad_roll_pitch_deg_median": [
+            -1.4640496858308096,
+            -1.2070308396766203
+          ],
+          "inferred_pad_roll_pitch_deg_std": [
+            0.4268927193138617,
+            0.5040925890837726
+          ],
+          "reprojection_rms_px_p50_p95_max": [
+            0.1400177834139747,
+            0.18196563671100688,
+            0.21701717271568688
+          ]
+        }
+      }
+    }
+  ],
+  "same_image_pairs": [
+    {
+      "height_m": [
+        0,
+        0.4
+      ],
+      "count": 0,
+      "normal_difference_deg_p50_p95_max": null,
+      "poses": {
+        "0": {
+          "count": 0
+        },
+        "1": {
+          "count": 0
+        },
+        "combined": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "height_m": [
+        0.4,
+        1.0
+      ],
+      "count": 52,
+      "normal_difference_deg_p50_p95_max": [
+        4.086906691672747,
+        5.228286454476732,
+        5.609275291367005
+      ],
+      "poses": {
+        "0": {
+          "count": 52,
+          "normal_error_deg_p50_p95_max": [
+            1.856000922272711,
+            2.5740781756151234,
+            2.6602951021878507
+          ],
+          "inferred_pad_roll_pitch_deg_median": [
+            -1.7550485010187789,
+            -0.6339188621812977
+          ],
+          "inferred_pad_roll_pitch_deg_std": [
+            0.23437855455645742,
+            0.260106897265033
+          ],
+          "reprojection_rms_px_p50_p95_max": [
+            0.2181999701001781,
+            0.2963836206683996,
+            0.35489043998954134
+          ],
+          "edge_px_p50_p95_max": [
+            164.59776893228718,
+            277.17077965353104,
+            302.94563426287675
+          ]
+        },
+        "1": {
+          "count": 52,
+          "normal_error_deg_p50_p95_max": [
+            4.936134498750273,
+            6.178774960288938,
+            6.274949378324404
+          ],
+          "inferred_pad_roll_pitch_deg_median": [
+            -1.494570109692364,
+            -4.713551822985071
+          ],
+          "inferred_pad_roll_pitch_deg_std": [
+            0.6856866241825511,
+            0.9488166230091254
+          ],
+          "reprojection_rms_px_p50_p95_max": [
+            0.06489636285457984,
+            0.14776302305870614,
+            0.205957050853292
+          ],
+          "edge_px_p50_p95_max": [
+            45.212107041108624,
+            82.23292328109923,
+            91.48718023793509
+          ]
+        },
+        "combined": {
+          "count": 52,
+          "normal_error_deg_p50_p95_max": [
+            1.5877935206233507,
+            1.9488853985468855,
+            2.0550112584101443
+          ],
+          "inferred_pad_roll_pitch_deg_median": [
+            -1.3902613126693453,
+            -0.7774384687777998
+          ],
+          "inferred_pad_roll_pitch_deg_std": [
+            0.1844533046935899,
+            0.15932605996252616
+          ],
+          "reprojection_rms_px_p50_p95_max": [
+            0.33285224319312867,
+            0.8321350738768301,
+            1.0107175704006137
+          ]
+        }
+      }
+    },
+    {
+      "height_m": [
+        1.0,
+        1.7
+      ],
+      "count": 91,
+      "normal_difference_deg_p50_p95_max": [
+        5.000890931025989,
+        8.669441524251155,
+        12.698051752857342
+      ],
+      "poses": {
+        "0": {
+          "count": 91,
+          "normal_error_deg_p50_p95_max": [
+            1.6485859323181244,
+            2.0577847582162025,
+            2.39170755100078
+          ],
+          "inferred_pad_roll_pitch_deg_median": [
+            -1.569148495111293,
+            -0.39451495178794777
+          ],
+          "inferred_pad_roll_pitch_deg_std": [
+            0.3087309078733145,
+            0.3421394919835651
+          ],
+          "reprojection_rms_px_p50_p95_max": [
+            0.11936047227339405,
+            0.19174253505179695,
+            0.24243620169245045
+          ],
+          "edge_px_p50_p95_max": [
+            104.72563308920415,
+            132.96501101364052,
+            136.82783291169693
+          ]
+        },
+        "1": {
+          "count": 91,
+          "normal_error_deg_p50_p95_max": [
+            5.8046185187329735,
+            9.233448479937737,
+            12.897610900117307
+          ],
+          "inferred_pad_roll_pitch_deg_median": [
+            -2.3092870768573155,
+            -4.706976118392664
+          ],
+          "inferred_pad_roll_pitch_deg_std": [
+            1.5704369805553353,
+            3.048333614471884
+          ],
+          "reprojection_rms_px_p50_p95_max": [
+            0.03826797119381254,
+            0.08030065716892557,
+            0.09428727302010421
+          ],
+          "edge_px_p50_p95_max": [
+            28.36192775672197,
+            36.249376056823664,
+            37.40576756909253
+          ]
+        },
+        "combined": {
+          "count": 91,
+          "normal_error_deg_p50_p95_max": [
+            1.4913915873220627,
+            1.865174152171559,
+            2.183160092690823
+          ],
+          "inferred_pad_roll_pitch_deg_median": [
+            -1.2601281808611944,
+            -0.7538717406602904
+          ],
+          "inferred_pad_roll_pitch_deg_std": [
+            0.2465136650600372,
+            0.24916126972628477
+          ],
+          "reprojection_rms_px_p50_p95_max": [
+            0.16571147826854354,
+            0.2418146036463231,
+            0.29185822317430427
+          ]
+        }
+      }
+    },
+    {
+      "height_m": [
+        1.7,
+        2.4
+      ],
+      "count": 124,
+      "normal_difference_deg_p50_p95_max": [
+        7.648554597107102,
+        10.561250132528034,
+        12.533378426258116
+      ],
+      "poses": {
+        "0": {
+          "count": 124,
+          "normal_error_deg_p50_p95_max": [
+            1.513268867945488,
+            2.2837703749902554,
+            3.728263938917893
+          ],
+          "inferred_pad_roll_pitch_deg_median": [
+            -1.2696213204449065,
+            -0.4028044905445057
+          ],
+          "inferred_pad_roll_pitch_deg_std": [
+            0.5190516348370383,
+            0.500922469582002
+          ],
+          "reprojection_rms_px_p50_p95_max": [
+            0.08027914093039046,
+            0.12790353434542268,
+            0.2080417753225656
+          ],
+          "edge_px_p50_p95_max": [
+            75.24415557084717,
+            82.36038555859074,
+            84.28734281237826
+          ]
+        },
+        "1": {
+          "count": 124,
+          "normal_error_deg_p50_p95_max": [
+            8.771832056846037,
+            11.583135827799241,
+            12.611508352883138
+          ],
+          "inferred_pad_roll_pitch_deg_median": [
+            -5.054377375235374,
+            -6.30073577638859
+          ],
+          "inferred_pad_roll_pitch_deg_std": [
+            2.1199730829859775,
+            3.7007503639942607
+          ],
+          "reprojection_rms_px_p50_p95_max": [
+            0.05436042287217603,
+            0.11460077178368909,
+            0.16526163084380863
+          ],
+          "edge_px_p50_p95_max": [
+            19.875864398995994,
+            21.903891525358027,
+            22.559613445475698
+          ]
+        },
+        "combined": {
+          "count": 124,
+          "normal_error_deg_p50_p95_max": [
+            1.9685559470130478,
+            2.6219093108870917,
+            3.20392110510079
+          ],
+          "inferred_pad_roll_pitch_deg_median": [
+            -1.4640496858308096,
+            -1.2799328384549196
+          ],
+          "inferred_pad_roll_pitch_deg_std": [
+            0.4060436281571698,
+            0.44873312382933506
+          ],
+          "reprojection_rms_px_p50_p95_max": [
+            0.14338454854873417,
+            0.18602117918852495,
+            0.21701717271568688
+          ]
+        }
+      }
+    }
+  ],
+  "limitations": "One mostly vertical flight. Physical nonplanarity, print aspect/edge deformation, camera distortion and corner/PnP bias remain confounded. Stable bias does not prove incorrect physical mounting. Rejected PnP poses are absent; acceptance coverage is reported.",
+  "deployment_changed": false,
+  "static_relative_rotation_test": {
+    "fitted_relative_xyz_deg": [
+      0.9596629326077714,
+      -4.392777238236047,
+      -0.10075247019574218
+    ],
+    "validation": {
+      "train_resolved_takeoff": {
+        "count": 18,
+        "before_normal_deg_p50_p95_max": [
+          4.382376288843059,
+          5.504346499120225,
+          5.609275291367005
+        ],
+        "after_static_rotation_deg_p50_p95_max": [
+          0.5241558476875947,
+          1.1887615093179045,
+          1.2664592884788288
+        ]
+      },
+      "heldout_descent": {
+        "count": 84,
+        "before_normal_deg_p50_p95_max": [
+          4.039447207137599,
+          9.290046438278416,
+          12.134564367162003
+        ],
+        "after_static_rotation_deg_p50_p95_max": [
+          2.360815146073934,
+          9.092254984654852,
+          16.529520409421277
+        ]
+      },
+      "heldout_high": {
+        "count": 124,
+        "before_normal_deg_p50_p95_max": [
+          7.648554597107102,
+          10.561250132528034,
+          12.533378426258116
+        ],
+        "after_static_rotation_deg_p50_p95_max": [
+          5.427106674351107,
+          9.459650486091071,
+          17.027284944589844
+        ]
+      }
+    },
+    "scope": "Diagnostic consistency test; no production correction or physical tilt claim."
+  }
+}
