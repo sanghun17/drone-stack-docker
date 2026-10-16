@@ -1,0 +1,76 @@
+{
+  "scope": "Prevent webcam mux service loss after ROS master restart; no flight/arming/control or estimator changes",
+  "root_cause": "Mux watchdog checked master PID only. Container ROS master PID reuse left the mux process alive while /recorder/start and /recorder/stop were absent from the new master. Camera nodes already had a node-URI guard; mux did not.",
+  "owner_repository": "https://github.com/sanghun17/webcam-flight-recorder",
+  "owner_branch": "fix/mux-master-reregistration-20261016",
+  "owner_revision": "80b33a6155b2c1c88bac9f99414d410ec05e6d24",
+  "implementation": {
+    "file": "recorder_mux.py",
+    "sha256": "1e123c61ebf3142a40c241e697fac5cb674f7531568f4ba4c8234017ba54340e",
+    "checks": [
+      "Master PID change",
+      "Own node name resolves to this process XML-RPC URI",
+      "Both start and stop services resolve to this process ROSRPC URI"
+    ],
+    "response": "Exit when ownership/registration is lost; existing Restart=always supervisor restarts and re-registers. Temporary master unreachability is retried.",
+    "poll_interval_s": 5,
+    "shutdown_grace_s": 2,
+    "systemd_restart_delay_s": 10,
+    "recovery_budget_note": "Approximately 17s once master is reachable, plus node initialization; no video is recovered retroactively."
+  },
+  "validation": {
+    "command": "source /opt/ros/noetic/setup.bash; WEBCAM_TEST_REAL_MASTER=1 /usr/bin/python3 -s -m unittest -v test_recorder_mux",
+    "tests_passed": 8,
+    "unit_tests": 7,
+    "isolated_real_ros_test": 1,
+    "isolated_master": "http://127.0.0.1:11399",
+    "reproduced": [
+      "Replacement ROS master process advertising identical PID 85",
+      "Service-only removal while node URI registration remains"
+    ],
+    "fake_camera_fanout": "Both start and stop succeed before restart, after supervised relaunch, and after service-only loss recovery. No actual camera devices used.",
+    "live_registration": {
+      "master_pid": 125,
+      "services": {
+        "/recorder/start": {
+          "uri": "rosrpc://192.168.50.12:42299",
+          "reachable": true
+        },
+        "/recorder/stop": {
+          "uri": "rosrpc://192.168.50.12:42299",
+          "reachable": true
+        },
+        "/recorder_cam1/start": {
+          "uri": "rosrpc://192.168.50.12:40783",
+          "reachable": true
+        },
+        "/recorder_cam1/stop": {
+          "uri": "rosrpc://192.168.50.12:40783",
+          "reachable": true
+        },
+        "/recorder_cam2/start": {
+          "uri": "rosrpc://192.168.50.12:43881",
+          "reachable": true
+        },
+        "/recorder_cam2/stop": {
+          "uri": "rosrpc://192.168.50.12:43881",
+          "reachable": true
+        }
+      }
+    }
+  },
+  "deployment": {
+    "machine": "ML",
+    "service": "webcam-recorder-mux.service",
+    "previous_pid": 3385524,
+    "new_pid": 3471761,
+    "method": "Reload only the owned mux process through its existing systemd Restart=always supervisor; existing camera services untouched.",
+    "live_trigger_services_registered_and_reachable": 6,
+    "flight_test_performed": false
+  },
+  "preserved_user_state": [
+    "Existing dirty webcam calibration and historical recording moves left untouched",
+    "No Jetson source/configuration edits",
+    "Deleted incomplete session was not recreated"
+  ]
+}
