@@ -35,5 +35,29 @@
     "failed_trial_recovery": "same selected reference, controller, pad transform, limits, terminal landing and GT height cutoff; OptiTrack replaces marker feedback",
     "mid_reference_recovery": "pause reference time during source change; continue from last command",
     "next_trial": "grounded disarm, sync verification, pilot OFFBOARD edge"
+  },
+  "safety_reset_race": {
+    "reproduced": "reset clears Normal between freshness check and forwarding; None.header raises and stops rospy Timer",
+    "fix": "skip cleared setpoint while keeping state timer alive",
+    "tests_passed": 43,
+    "observed_on_jetson": "state topic stopped after prior AUTO.LAND flight; exact exception traceback unavailable"
+  },
+  "deployment": {
+    "stack_revision": "2fbd9b73e4872bcf7a575f156f26d8fe138321ca",
+    "aruco_revision": "1316fab8c66f6ce6f97d15dc3c385606f295deaf",
+    "safety_revision": "a8d29e55f240003c0cdaa7d8f57c668e3a5b23ca",
+    "jetson_ground_verification": {
+      "disarmed": true,
+      "mode": "POSCTL",
+      "healthy": true,
+      "pad_alignment_ready": true,
+      "offboard_entry_ready": true,
+      "alignment_timeout_s": 10,
+      "successful_entries": 8,
+      "failed_entries": 2,
+      "next_index_zero_based": 10,
+      "next_reference_id": 4364
+    },
+    "perception_session_preserved": true
   }
 }
