@@ -1,0 +1,46 @@
+{
+  "scope": "Same flight, identical measurement timestamps. All modes learn pad alignment from the same independent earlier ground bag and freeze it before flight. Visual modes use no IMU constraint.",
+  "matched_samples": 772,
+  "modes": {
+    "visual_free": {
+      "position_m_p50_p95_max": [
+        0.05415494105486369,
+        0.09675588859961987,
+        0.13662986765315074
+      ],
+      "angle_deg_p50_p95_max": [
+        2.173091366581712,
+        3.0406181792574216,
+        5.700948224737434
+      ],
+      "replay": "/home/ml/aruco-stack-docker/data/results/aruco-gravity-fix-20261016/free_visual/node_replay.json"
+    },
+    "visual_level_pad": {
+      "position_m_p50_p95_max": [
+        0.036800771873835375,
+        0.08567374227079327,
+        0.11166154061593052
+      ],
+      "angle_deg_p50_p95_max": [
+        1.8740750656642136,
+        4.773336429673325,
+        8.365283784619185
+      ],
+      "replay": "/home/ml/aruco-stack-docker/data/results/aruco-gravity-fix-20261016/level_only/node_replay.json"
+    },
+    "gravity_level_pad": {
+      "position_m_p50_p95_max": [
+        0.03143252045453897,
+        0.05085334438658998,
+        0.05273965836421752
+      ],
+      "angle_deg_p50_p95_max": [
+        0.9947558969307092,
+        1.2453896009934178,
+        1.430472708642996
+      ],
+      "replay": "/home/ml/aruco-stack-docker/data/results/aruco-gravity-fix-20261016/actual_node/node_replay.json"
+    }
+  },
+  "deployment": "Comparison only; existing Jetson runtime not changed."
+}
