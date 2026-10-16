@@ -35,5 +35,11 @@
     "failed_trial_recovery": "same selected reference, controller, pad transform, limits, terminal landing and GT height cutoff; OptiTrack replaces marker feedback",
     "mid_reference_recovery": "pause reference time during source change; continue from last command",
     "next_trial": "grounded disarm, sync verification, pilot OFFBOARD edge"
+  },
+  "safety_reset_race": {
+    "reproduced": "reset clears Normal between freshness check and forwarding; None.header raises and stops rospy Timer",
+    "fix": "skip cleared setpoint while keeping state timer alive",
+    "tests_passed": 43,
+    "observed_on_jetson": "state topic stopped after prior AUTO.LAND flight; exact exception traceback unavailable"
   }
 }

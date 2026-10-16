@@ -57,7 +57,7 @@
     "control/flight-safety": {
       "files": {
         "build_ws.sh": "ebe313a5d0f7d5a4178dc06a5ed96b983b3ef28088b1538f05ee8cbf73c46049",
-        "clone.sh": "d673c2107a6ef00318aef1602e542461af33c4f4d1f6ff2eda09f342932bd135",
+        "clone.sh": "43793f7e245b1cd147209332fcfed8120de38a04fc8f673af34885ff07774655",
         "fs_led_node.py": "0370febc79167de8e3c78d0a7655abc90e4ccaa1b70d9db2ef34b5ee35e8d1bc",
         "module.yml": "de508fb37f65245a80cccfd2efc48304372a44a578df4d4a14db8a4754e3edf2",
         "run.sh": "a963f76fbd16a4c4240d0cbe52064df05476a7aaabc3113691f0338c85a4d30d",
@@ -95,8 +95,8 @@
         ],
         "workspace": "/work/ws/flight-safety"
       },
-      "repository": "https://github.com/sanghun17/flight_safety.git",
-      "revision": "d1392a8f83f3a72903fc8a3b6095140e4e22f870",
+      "repository": "git@github.com:sanghun17/flight_safety.git",
+      "revision": "a8d29e55f240003c0cdaa7d8f57c668e3a5b23ca",
       "subdir": "deployment/stack-modules/control/flight-safety"
     },
     "control/local-controller": {
