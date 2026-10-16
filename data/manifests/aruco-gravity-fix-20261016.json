@@ -1,0 +1,176 @@
+{
+  "date": "2026-10-16",
+  "status": "fixed, committed, pushed and deployed; independent ground-to-flight actual-node replay and live disarmed recording checks passed; no new flight initiated",
+  "identified_failure_mechanism": "A small near-frontal planar marker does not reliably determine camera/pad tilt; marker/model/corner deviations can yield different normal estimates with tiny reprojection residual. A free 6D pad registration frozen from that ground pose converts the biased tilt into height-dependent lateral position error when the visible marker set changes.",
+  "fix": [
+    "Solve planar marker pose with the measured outward plane normal from IMU gravity; yaw and position remain visual. The solution uses no flight GT position.",
+    "Learn a bounded IMU-to-reference up-vector correction from synchronized preflight reference/IMU orientations; freeze it in memory for the session. IMU yaw is not used.",
+    "Constrain the flat hardware pad global registration to yaw plus translation, preserving zero roll/pitch.",
+    "Withhold marker poses for missing/unbracketed IMU attitude or unlearned reference; keep image quality, reprojection, freshness and router safety gates."
+  ],
+  "unchanged": "body-camera calibration, metric pad geometry, image time correction and safety thresholds",
+  "scope": "ArUco hardware opts in via LANDING_GRAVITY_CONSTRAINT=true and LANDING_LEVEL_PAD=true. Other launches retain previous behavior by default.",
+  "source_revision": "56d5a70f5815f3df18f53323f26cc96ce7df8620",
+  "implementation_revision": "2783a1b0641bfa1186e01df63ffb34cfdd98a83c",
+  "stack_revision": "0f97d57d2855d26ccc2b72280c1995a0d89c9dc7",
+  "source_branch": "fix/gravity-constrained-pad-20261016",
+  "deployment_branch": "deploy/aruco-raw-capture-20261016",
+  "tests": {
+    "unit_tests_passed": 32,
+    "coverage": "distorted single-marker metric pose and yaw, constrained-normal preservation, wrong visible face rejection, IMU gaps/extrapolation/jumps, reference freeze/reset and excessive tilt refusal, level alignment, legacy PnP/alignment and router transition regressions",
+    "actual_node_replay": {
+      "initialization": "independent earlier 12s ground bag; reference and pad alignment frozen before flight bag begins",
+      "flight": "flight_2026-10-16_15-38-47",
+      "all_matched_GT_metrics": {
+        "count": 773,
+        "position_m_p50_p95_max": [
+          0.03128325841310784,
+          0.05085319617108263,
+          0.05273965836421752
+        ],
+        "median_delta_xyz_m": [
+          -0.020570513050272524,
+          0.009103443958155842,
+          0.02444764047495407
+        ],
+        "angle_deg_p50_p95_max": [
+          0.9939147976753826,
+          1.2451941596204354,
+          1.430472708642996
+        ]
+      },
+      "same_timestamps_before_after": {
+        "matched_samples": 723,
+        "before_position_m_p50_p95_max": [
+          0.05817548199338884,
+          0.10587515649701602,
+          0.1346336074333389
+        ],
+        "after_position_m_p50_p95_max": [
+          0.03377038360998752,
+          0.05093457006456837,
+          0.05273965836421752
+        ]
+      },
+      "final_status": {
+        "pad_identity": {
+          "key": "proposed1",
+          "layout_sha256": "e39542c2b2adbaf370b6712b9a49b3e1f5cd02db562a36f77440dbf868635dbf",
+          "configuration": "proposed_pad_1_layout_physical_20260920_runtime.yaml"
+        },
+        "alignment_ready": true,
+        "alignment_mode": "frozen_for_this_session",
+        "gravity_constraint": true,
+        "level_pad": true,
+        "gravity_reference_ready": true,
+        "gravity_reference_correction_deg": 1.3742957540523024,
+        "gravity_reference_rms_deg": 0.020925324031428834,
+        "alignment_pairs": 118,
+        "marker_fresh": true,
+        "last_error": "",
+        "processing_width": 720,
+        "processing_height": 720,
+        "center_crop": true,
+        "images_received": 1488,
+        "images_processed": 1342,
+        "valid_poses": 1316,
+        "processing_hz": 59.9095638513004,
+        "processing_ms_mean": 7.970990458306915,
+        "processing_ms_p95": 11.270624047756428,
+        "estimate_rate_limit_hz": 60.0,
+        "detected_image_rate_limit_hz": 10.0,
+        "detected_images_published": 0,
+        "image_time_offset_s": -0.041589316816677754,
+        "alignment_quality": {
+          "inlier_count": 118,
+          "translation_std_m": 0.00019685412097566777,
+          "rotation_std_deg": 0.16609691016128325
+        }
+      }
+    },
+    "live_disarmed_ground_recording": {
+      "stack_revision": "0f97d57",
+      "source_revision": "56d5a70f5815f3df18f53323f26cc96ce7df8620",
+      "scope": "Live camera, OptiTrack, MAVROS and corrected estimator; disarmed POSCTL; raw recording active; no planner launched",
+      "raw_profile": "/work/stacks/aruco-landing-jetson/config/flight_safety_recorder_raw.yaml",
+      "bag": "/work/flight_logs/aruco-landing/gravity-fix-20261016/ground_raw.bag",
+      "size_bytes": 1106104035,
+      "raw_frames": 681,
+      "raw_hz": 59.99993983443066,
+      "max_raw_gap_s": 0.017061710357666016,
+      "ground_position_error_m_p50_p95_max": [
+        0.00018532183488242481,
+        0.00042607764052500545,
+        0.00092282691879837
+      ],
+      "pad_rotation_matrix": [
+        [
+          0.9997364517338387,
+          -0.022957070253713897,
+          2.22030043109659e-16
+        ],
+        [
+          0.022957070253713897,
+          0.9997364517338387,
+          2.542944883438224e-18
+        ],
+        [
+          -2.2202990604110214e-16,
+          2.5548846033803156e-18,
+          1.0
+        ]
+      ],
+      "estimator_hz_range": [
+        59.88511858346071,
+        60.196194070242925
+      ],
+      "estimator_ms_p95_range": [
+        8.899733399834984,
+        18.571639750075512
+      ],
+      "last_status": {
+        "pad_identity": {
+          "key": "proposed1",
+          "layout_sha256": "e39542c2b2adbaf370b6712b9a49b3e1f5cd02db562a36f77440dbf868635dbf",
+          "configuration": "proposed_pad_1_layout_physical_20260920_runtime.yaml"
+        },
+        "alignment_ready": true,
+        "alignment_mode": "frozen_for_this_session",
+        "gravity_constraint": true,
+        "level_pad": true,
+        "gravity_reference_ready": true,
+        "gravity_reference_correction_deg": 1.6303402786190866,
+        "gravity_reference_rms_deg": 0.008218711897715525,
+        "alignment_pairs": 99,
+        "marker_fresh": true,
+        "last_error": "",
+        "processing_width": 720,
+        "processing_height": 720,
+        "center_crop": true,
+        "images_received": 5257,
+        "images_processed": 5111,
+        "valid_poses": 5111,
+        "processing_hz": 60.02632132590726,
+        "processing_ms_mean": 10.00943242916795,
+        "processing_ms_p95": 13.282866649990407,
+        "estimate_rate_limit_hz": 60.0,
+        "detected_image_rate_limit_hz": 10.0,
+        "detected_images_published": 108,
+        "image_time_offset_s": -0.041589316816677754,
+        "alignment_quality": {
+          "inlier_count": 99,
+          "translation_std_m": 0.0001016464641130875,
+          "rotation_std_deg": 0.06771420778752467
+        }
+      },
+      "buffer_drop_warnings": []
+    }
+  },
+  "remaining_validation": "A new closed-loop flight with this revision has not been performed. Raw recording remains the default for that validation. No intrinsic/print/extrinsic physical calibration claim is made from one mostly vertical flight.",
+  "artifacts": {
+    "plot": "/home/ml/aruco-stack-docker/data/results/aruco-gravity-fix-20261016/before_after.png",
+    "actual_node_replay": "/home/ml/aruco-stack-docker/data/results/aruco-gravity-fix-20261016/actual_node/node_replay.json",
+    "live_ground": "/home/ml/aruco-stack-docker/data/results/aruco-gravity-fix-20261016/ground_check.json"
+  },
+  "workspace_handling": "Existing dirty development checkouts and modules.lock changes were preserved. Owner changes were made in an isolated clean source worktree; the dedicated hardware deployment branch owns its updated module lock and synchronized snapshot."
+}
