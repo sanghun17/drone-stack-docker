@@ -123,3 +123,9 @@ condition. See the [camera/cable validation report](/home/ml/drone-data/aruco/re
 for measured rates, failed software experiments, repository revisions and final
 stopped-node state. The [landing trial guide](docs/landing_trial.md) describes the
 current OptiTrack-based OFFBOARD workflow and landing policies.
+
+### Printed A1 random pad
+
+Use `./scripts/perception_aruco-landing.sh pad:=random` (alias `pad:=a1`) for the existing A1_20261015 print, `random-Pad1-rep1`, 700 mm, DICT_4X4_100, IDs 0 and 1. Its nominal marker sides are 213.5 mm and 57.4 mm. The runtime geometry is module-owned `config/random_a1_700mm_runtime.yaml`; campaign identity `random_a1` keeps its progress separate from B2 and proposed1.
+
+Pose estimation retains the original IPPE + LM + residual-filter implementation. The experimental corner RANSAC deployment was cancelled and reverted before activation.
