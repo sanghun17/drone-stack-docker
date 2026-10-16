@@ -1,4 +1,4 @@
-# Diagnostic landing capture: exact RGB estimator input plus normal flight evidence.
+# First-route capture per pad campaign: exact RGB input plus normal evidence.
 # Select via FLIGHT_SAFETY_RECORDER_CONFIG. ARM starts and disarm stops capture.
 # At 1280x720 RGB8/60Hz the pre-LZ4 payload is 166 MB/s; verify camera,
 # estimator and recording rates while disarmed before using this profile in flight.
@@ -39,6 +39,14 @@ runtime_manifest_config_paths:
   repeat_trial: /work/stacks/aruco-landing-jetson/config/repeat_trial.yaml
   module_sources: /work/config/modules.lock.json
   flight_safety_recorder: /work/stacks/aruco-landing-jetson/config/flight_safety_recorder_raw.yaml
+conditional_topic_groups:
+- topics: [/landing/camera/image_raw]
+  status_topic: /landing/trial/status
+  field: trajectory_set.next_index
+  equals: 0
+  max_age_s: 2.0
+  # Preserve diagnostic evidence when the route identity is unavailable.
+  on_unavailable: include
 topics:
 - /vrpn_client_node/pure/pose
 - /landing/vision_pose_marker
@@ -51,9 +59,6 @@ topics:
 - /landing/markers/ids
 - /landing/estimator/status
 - /landing/camera/camera_info
-# Exact full-resolution sensor input, losslessly compressed at bag level.
-# Do not also request the full-view JPEG: that adds camera-thread encoding work.
-- /landing/camera/image_raw
 - /landing/debug/image/compressed
 - /landing/debug/image/mouse_click
 - /mavros/imu/data_raw
