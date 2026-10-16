@@ -1,0 +1,126 @@
+{
+  "scope": "Read-only analysis of finalized random A1 bags; runtime unchanged",
+  "sessions": [
+    {
+      "session": "flight_2026-10-16_21-44-58",
+      "approach_s": [
+        9.843218088150024,
+        10.958701372146606
+      ],
+      "pose": {
+        "n": 67,
+        "bad": 0,
+        "bad_pct": 0.0,
+        "position_m_p50_p95_max": [
+          0.03349728888310145,
+          0.10030920683939958,
+          0.11597835050415665
+        ],
+        "rotation_deg_p50_p95_max": [
+          1.171277244734094,
+          2.972628049512432,
+          3.5671431762467445
+        ]
+      },
+      "over15cm": 0,
+      "router": {
+        "checks": 56,
+        "bad_checks": 0,
+        "max_stable_s": 1.0833463668823242,
+        "ready_checks": 5
+      },
+      "detected_messages": null,
+      "detected_sets": null,
+      "trial_qualified": 67,
+      "trial_checks": 67,
+      "max_qualified_interval_receipt_s": 1.1154639720916748
+    },
+    {
+      "session": "flight_2026-10-16_21-45-26",
+      "approach_s": [
+        9.329882144927979,
+        19.34531545639038
+      ],
+      "pose": {
+        "n": 601,
+        "bad": 272,
+        "bad_pct": 45.257903494176375,
+        "position_m_p50_p95_max": [
+          0.19739279992960582,
+          0.2521627804448842,
+          0.2809323842458242
+        ],
+        "rotation_deg_p50_p95_max": [
+          6.028294732261691,
+          7.650483989223542,
+          8.4015609485712
+        ]
+      },
+      "over15cm": 530,
+      "router": {
+        "checks": 501,
+        "bad_checks": 227,
+        "max_stable_s": 0.23335838317871094,
+        "ready_checks": 0
+      },
+      "detected_messages": 602,
+      "detected_sets": {
+        "0,1": 504,
+        "0": 98
+      },
+      "trial_qualified": 73,
+      "trial_checks": 601,
+      "max_qualified_interval_receipt_s": 0.20007991790771484
+    },
+    {
+      "session": "flight_2026-10-16_21-46-01",
+      "approach_s": [
+        10.19919204711914,
+        20.215378761291504
+      ],
+      "pose": {
+        "n": 601,
+        "bad": 7,
+        "bad_pct": 1.1647254575707155,
+        "position_m_p50_p95_max": [
+          0.12493627996701888,
+          0.17034621517704046,
+          0.24974785947608266
+        ],
+        "rotation_deg_p50_p95_max": [
+          3.92249255247804,
+          5.223179229611607,
+          7.325157270986834
+        ]
+      },
+      "over15cm": 96,
+      "router": {
+        "checks": 501,
+        "bad_checks": 5,
+        "max_stable_s": 5.766529083251953,
+        "ready_checks": 342
+      },
+      "detected_messages": 601,
+      "detected_sets": {
+        "0,1": 446,
+        "0": 155
+      },
+      "trial_qualified": 498,
+      "trial_checks": 600,
+      "max_qualified_interval_receipt_s": 1.0155375003814697
+    }
+  ],
+  "findings": [
+    "Last two APPROACH intervals have 100% valid visual poses/target_visible. Markers are detected and accepted; this is not camera/detector dropout.",
+    "21:45:26 median position disagreement 19.7cm, exceeding the trial 15cm and often the router 20cm consistency limits. Router never qualifies.",
+    "21:46:01 router switches to marker, but marker 15cm qualification repeatedly resets and GT arrival/velocity dwell is lost. Recorded marker-sourced target error median 11.6cm exceeds 10cm arrival tolerance.",
+    "Both last flights terminate as trajectory_initial_alignment_timeout after ten seconds, before DESCEND.",
+    "Previous ten flights entered DESCEND, then failed with marker_lost_trial_failed or marker_source_lost_trial_failed and continued through GT recovery."
+  ],
+  "limitations": [
+    "Latest flights contain annotated compressed debug images, not lossless raw images; exact fresh-corner replay cannot isolate the physical estimation bias.",
+    "Per-ID lists use receipt matching; trial/arrival timing reconstruction is approximate and does not replay internal ROS callbacks.",
+    "Viewpoint-dependent bias, physical geometry and fixed registration contributions have not been uniquely isolated."
+  ],
+  "evidence_image": "data/results/random_a1_failures_20261016/21-46-01_15.04s.jpg"
+}
