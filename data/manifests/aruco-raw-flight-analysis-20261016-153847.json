@@ -1,0 +1,426 @@
+{
+  "date": "2026-10-16",
+  "session": "flight_2026-10-16_15-38-47",
+  "bag": "data/results/alignment_20261016_153847/flight_2026-10-16_15-38-47.bag",
+  "bag_sha256": "cfee37df8545f5d513845ec7960496a1a9668843f407f764af36de2ff4fa785b",
+  "outcome": "COMPLETE; marker DESCEND followed by configured OptiTrack-height force-disarm; no safety LAND or ERROR",
+  "raw_recording": {
+    "frames": 819,
+    "bag_size_bytes": 1136072399,
+    "bag_sha256_matches_runtime_manifest": true
+  },
+  "events": [
+    {
+      "s": 0.0029175281524658203,
+      "kind": "source",
+      "source": "optitrack"
+    },
+    {
+      "s": 0.02071356773376465,
+      "kind": "safety",
+      "level": 0,
+      "lane": "NORMAL",
+      "response": "",
+      "summary": "OK | OFFBOARD/NORMAL | est VRPN | mon OK"
+    },
+    {
+      "s": 0.03194284439086914,
+      "kind": "trial",
+      "phase": "TAKEOFF",
+      "reason": "repeat_takeoff",
+      "source": "optitrack"
+    },
+    {
+      "s": 7.76203989982605,
+      "kind": "trial",
+      "phase": "INITIAL_POSITION",
+      "reason": "repeat_initial_position",
+      "source": "optitrack"
+    },
+    {
+      "s": 8.588300704956055,
+      "kind": "trial",
+      "phase": "APPROACH",
+      "reason": "repeat_approach",
+      "source": "optitrack"
+    },
+    {
+      "s": 9.612643718719482,
+      "kind": "source",
+      "source": "marker"
+    },
+    {
+      "s": 9.619672298431396,
+      "kind": "trial",
+      "phase": "APPROACH",
+      "reason": "repeat_approach",
+      "source": "marker"
+    },
+    {
+      "s": 9.722850799560547,
+      "kind": "trial",
+      "phase": "DESCEND",
+      "reason": "marker_qualified",
+      "source": "marker"
+    },
+    {
+      "s": 13.05804705619812,
+      "kind": "source",
+      "source": "optitrack"
+    },
+    {
+      "s": 13.081744194030762,
+      "kind": "trial",
+      "phase": "CUT_WAIT",
+      "reason": "optitrack_height_force_disarm_requested",
+      "source": "marker"
+    },
+    {
+      "s": 13.085588455200195,
+      "kind": "trial",
+      "phase": "CUT_WAIT",
+      "reason": "optitrack_height_force_disarm_requested",
+      "source": "optitrack"
+    },
+    {
+      "s": 13.10074257850647,
+      "kind": "safety",
+      "level": 0,
+      "lane": "KILL",
+      "response": "kill",
+      "summary": "OK | KILL(auto)/OFFBOARD | est VRPN | mon OK"
+    },
+    {
+      "s": 13.213917970657349,
+      "kind": "trial",
+      "phase": "COMPLETE",
+      "reason": "force_disarm_confirmed",
+      "source": "optitrack"
+    }
+  ],
+  "production_marker_position_error_m_p50_p95_max": [
+    0.05797055607894627,
+    0.1058087812822478,
+    0.1346336074333389
+  ],
+  "px4_position_error_m_p50_p95_max": [
+    0.007339070386847824,
+    0.1304979228239879,
+    0.16912954296255187
+  ],
+  "exact_replay": {
+    "n": 362,
+    "position_m_p50_p95_max": [
+      1.9992865642764067e-15,
+      3.085330657022018e-09,
+      3.3114820173500705e-07
+    ],
+    "angle_deg_p50_p95_max": [
+      1.0621643501874078e-11,
+      7.306537858932507e-07,
+      0.00015369581910877294
+    ]
+  },
+  "replay_provenance": {
+    "opencv": "4.2.0 native on ML; matches Jetson Python OpenCV 4.2.0",
+    "aruco_source_revision": "c0a3548d226d28b8e06e0315b86a123028162430",
+    "sampled_frames": 410,
+    "GT_paired_frames": 399
+  },
+  "confirmed_findings": [
+    "Original frames reproduce production PnP to numerical precision. The offline tool matches the actual hardware estimator.",
+    "Resolved same-image marker normals disagree by median 4.09 degrees at GT body height 0.4-1.0m; the angle computation uses only camera images and intrinsics, not GT or the body-camera transform.",
+    "At GT body height 1.7-2.4m, small ID1 alone has median 25.3cm body position error despite median reprojection RMS 0.054px. This is diagnostic single-marker replay, not the live joint estimate.",
+    "Joint production estimation is much better but remains affected by frozen registration learned from a different visible-marker regime. Learned floor-pad tilt is not the actual physical floor tilt.",
+    "Position and orientation bias changes with marker set and height. A changed GT body frame or camera mount alone cannot explain the camera-only two-marker disagreement; either may still contribute common error."
+  ],
+  "camera_only_normal_difference_deg_p50_p95_max_at_0p4_to_1m": [
+    4.086906691672747,
+    5.228286454476732,
+    5.609275291367005
+  ],
+  "high_altitude_diagnostic_single_marker_errors": {
+    "height_m": [
+      1.7,
+      2.4
+    ],
+    "frames": 138,
+    "poses": {
+      "combined": {
+        "n": 138,
+        "position_error_m_p50_p95_max": [
+          0.0848669967416445,
+          0.11344069145258573,
+          0.13444707799060754
+        ],
+        "rms_px_p50_p95_max": [
+          0.1400177834139747,
+          0.18196563671100688,
+          0.21701717271568688
+        ],
+        "median_inferred_pad_euler_xyz_deg": [
+          -1.4640496858308096,
+          -1.2070308396766203,
+          1.1734926760587916
+        ]
+      },
+      "0": {
+        "n": 138,
+        "position_error_m_p50_p95_max": [
+          0.09677107001654846,
+          0.13064445639728625,
+          0.16777131820721614
+        ],
+        "rms_px_p50_p95_max": [
+          0.08027914093039046,
+          0.12699483954658675,
+          0.2080417753225656
+        ],
+        "median_inferred_pad_euler_xyz_deg": [
+          -1.2754558583297677,
+          -0.419239880608933,
+          1.0973874434004367
+        ]
+      },
+      "1": {
+        "n": 124,
+        "position_error_m_p50_p95_max": [
+          0.2531443173142623,
+          0.35056183957942266,
+          0.5022573576793421
+        ],
+        "rms_px_p50_p95_max": [
+          0.05436042287217603,
+          0.11460077178368909,
+          0.16526163084380863
+        ],
+        "median_inferred_pad_euler_xyz_deg": [
+          -5.054377375235374,
+          -6.30073577638859,
+          1.5172823937106372
+        ]
+      }
+    },
+    "single_marker_normal_difference_deg_p50_p95_max": [
+      7.648554597107102,
+      10.561250132528034,
+      12.533378426258116
+    ]
+  },
+  "airborne_registration_diagnostic": {
+    "train_count": 143,
+    "heldout": {
+      "count": 132,
+      "position_m_p50_p95_max": [
+        0.019890325268191025,
+        0.041349112633429934,
+        0.05589793325906154
+      ],
+      "median_delta_xyz_m": [
+        0.00015501303794884097,
+        0.007122040601026749,
+        -0.002838758207823533
+      ],
+      "angle_deg_p50_p95_max": [
+        0.5957619410955661,
+        1.1078660513730225,
+        1.5379032589536072
+      ]
+    },
+    "global_pad_matrix": [
+      [
+        0.9995926552789046,
+        -0.018826966522116826,
+        -0.021449215464478318,
+        -0.0014730548263677534
+      ],
+      [
+        0.019406792089795077,
+        0.9994428923300308,
+        0.027152926025817557,
+        -0.11137599304509004
+      ],
+      [
+        0.02092605871276268,
+        -0.02755812588974703,
+        0.9994011455687813,
+        -0.062435508197566714
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "scope": "offline diagnostic; same mount and PnP; ground and airborne registration cannot be assumed interchangeable",
+    "same_heldout_original": {
+      "count": 132,
+      "position_m_p50_p95_max": [
+        0.08053042634982285,
+        0.10753865077063485,
+        0.12746024140225437
+      ],
+      "median_delta_xyz_m": [
+        -0.04076976313366578,
+        -0.05358787610766246,
+        0.044801677245580485
+      ],
+      "angle_deg_p50_p95_max": [
+        2.1575029209050465,
+        2.9095580113479724,
+        3.454027719177573
+      ]
+    }
+  },
+  "rejected_quick_fix": {
+    "image_only_geometry_models": {
+      "nominal": {
+        "resolved_descent_corner_rmse_px": 0.3418479779915116,
+        "high_altitude_pose_error_m_p50_p95_max": [
+          0.08347178236810351,
+          0.10991849618867203,
+          0.128621101326952
+        ]
+      },
+      "planar": {
+        "parameters": [
+          0.00013543632447269782,
+          0.00116788733757345,
+          -0.005807320346364416,
+          0.0007766176773620324
+        ],
+        "near_bounds": [],
+        "resolved_descent_corner_rmse_px": 0.26842209246496035,
+        "high_altitude_pose_error_m_p50_p95_max": [
+          0.09861084747388042,
+          0.12924680737637964,
+          0.15305033038432042
+        ]
+      },
+      "nonplanar": {
+        "parameters": [
+          -0.00033080945359820457,
+          0.0027778342200161163,
+          -0.0015684612203698254,
+          -0.015210665396864791,
+          -0.015748174151756143,
+          0.07591852895119645,
+          0.0008347303772152058
+        ],
+        "relative_tilt_deg": 4.44241045623788,
+        "near_bounds": [],
+        "resolved_descent_corner_rmse_px": 0.21486601438294153,
+        "high_altitude_pose_error_m_p50_p95_max": [
+          0.1386220758137437,
+          0.16844060558892726,
+          0.20097465768865266
+        ]
+      }
+    },
+    "reason": "A fitted relative tilt improves resolved low-altitude pixel residual but worsens high-altitude position error. It is not accepted as a calibration or deployed."
+  },
+  "static_GT_ray_fit": {
+    "effective_rotation_time": {
+      "success": true,
+      "nfev": 38,
+      "rotation_delta_xyz_deg": [
+        0.27397403746107485,
+        0.13481366729662125,
+        -0.4497282219179364
+      ],
+      "time_change_s": 0.005343912708608138,
+      "effective_body_from_camera": [
+        [
+          0.039354319369941736,
+          0.9992163856186216,
+          -0.004225193272015638,
+          0.1253561321764021
+        ],
+        [
+          0.9992224506737585,
+          -0.03934372344655905,
+          0.0025623221671991527,
+          7.830621472088443e-05
+        ],
+        [
+          0.002394079459096766,
+          -0.004322746420730379,
+          -0.9999877910489333,
+          -0.006854967546666358
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "train_corner_rmse_px": 1.546904246211044,
+      "heldout_corner_rmse_px": 4.278837642173352,
+      "near_bounds": [],
+      "markers": [
+        {
+          "id": 0,
+          "edge_lengths_m": [
+            0.2125372862755372,
+            0.2131392079567107,
+            0.21360670066110946,
+            0.21441271462307349
+          ],
+          "normal_global": [
+            -0.012860145861382864,
+            0.04386765486167614,
+            0.9989545762973213
+          ],
+          "tilt_from_world_up_deg": 2.620122785445338,
+          "nonplanarity_singular_value_m": 5.768923313562745e-05
+        },
+        {
+          "id": 1,
+          "edge_lengths_m": [
+            0.056256416773481935,
+            0.055988750113775604,
+            0.055928729293603215,
+            0.05573547076138201
+          ],
+          "normal_global": [
+            -0.051442453622142593,
+            -0.007896943646644639,
+            0.9986447377553115
+          ],
+          "tilt_from_world_up_deg": 2.983309842252475,
+          "nonplanarity_singular_value_m": 0.00036432099232544063
+        }
+      ],
+      "heldout_pose_error_m_p50_p95_max": [
+        0.021573566044527863,
+        0.05584925948800158,
+        0.0764976258302288
+      ],
+      "heldout_angle_error_deg_p50_p95_max": [
+        0.6502662859564622,
+        2.788081110351048,
+        4.564520038064078
+      ]
+    },
+    "limitations": "Single flight. Effective mount rotation confounds GT body axes and camera mount; free corner geometry can absorb intrinsic errors. Not a deployable calibration.",
+    "accepted_for_deployment": false
+  },
+  "remaining_ambiguity": "Physical sheet shape/aspect/relative geometry versus intrinsic distortion and size-dependent corner/PnP bias are not uniquely separated by this short mostly vertical flight. GT axes and physical mount are not individually identified.",
+  "runtime_changes_during_analysis": false,
+  "further_flight_requested": false,
+  "artifacts": {
+    "figure": "/home/ml/aruco-stack-docker/data/results/alignment_20261016_153847/raw_flight_findings.png",
+    "raw_replay": "/home/ml/aruco-stack-docker/data/results/alignment_20261016_153847/replay/raw_replay.json",
+    "geometry_fit": "/home/ml/aruco-stack-docker/data/results/alignment_20261016_153847/replay/relative_geometry_fit.json",
+    "static_ray_fit": "/home/ml/aruco-stack-docker/data/results/alignment_20261016_153847/replay/static_ray_fit.json"
+  },
+  "reproduce": [
+    "/usr/bin/python3 data/analysis/aruco/alignment_20261016/audit.py --bags \"data/results/alignment_20261016_153847/*.bag\" --output data/results/alignment_20261016_153847",
+    "/usr/bin/python3 data/analysis/aruco/alignment_20261016/replay_raw.py data/results/alignment_20261016_153847/flight_2026-10-16_15-38-47.bag --output data/results/alignment_20261016_153847/replay",
+    "/usr/bin/python3 data/analysis/aruco/alignment_20261016/fit_two_marker_geometry.py data/results/alignment_20261016_153847/replay/raw_replay.json",
+    "/usr/bin/python3 data/analysis/aruco/alignment_20261016/fit_static_rays.py data/results/alignment_20261016_153847/flight_2026-10-16_15-38-47.bag data/results/alignment_20261016_153847/replay/raw_replay.json",
+    "/usr/bin/python3 data/analysis/aruco/alignment_20261016/report_raw_flight.py"
+  ]
+}
