@@ -3722,5 +3722,13 @@
     "position_plot": "data/results/b2_marker_jumps_20261016/live_position_jumps.png",
     "live_images": "data/results/b2_marker_jumps_20261016/live_good_bad_images.jpg",
     "raw_corner_pair": "data/results/b2_marker_jumps_20261016/raw_id19_corner_jump.png"
+  },
+  "brief_switch_on_twelfth_entry": {
+    "session": "flight_2026-10-16_20-30-35",
+    "marker_selected_bag_s": 14.7132,
+    "last_output_still_optitrack": true,
+    "next_inconsistency_bag_s": 14.7794,
+    "first_marker_output_bag_s": 14.7934,
+    "interpretation": "Router stability briefly exceeded one second, but output had not yet switched because marker capture stamps trailed the last OptiTrack output stamp. Pose inconsistency returned before valid descent admission."
   }
 }
