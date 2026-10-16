@@ -1,0 +1,35 @@
+{
+  "session": "flight_2026-10-16_16-57-06",
+  "bag_sha256_before_user_requested_deletion": "3f01155a64075034fd4c36a756f0b3ede8c302f996ecfec30b26ed25db7dca25",
+  "duration_s": 30.80926203727722,
+  "trajectory_index": 3,
+  "completed_before_and_after": 3,
+  "events_s": {"takeoff": 0.03, "initial_position": 9.06, "approach": 11.55, "pilot_or_safety_left_offboard": 22.28},
+  "findings": {
+    "camera": "Active approximately 60Hz throughout approach. Captured frame counter advanced normally; empty_polls remained 617. Pad visible in debug preview. No camera stream stall explains this flight's failure.",
+    "approach_frames": 644,
+    "approach_frames_with_detected_markers": 57,
+    "longest_continuous_detection_s": 0.020773887634277344,
+    "max_router_stability_s": 0.01685166358947754,
+    "marker_position_jump_m_p50_p95_max": [0.10404550775752959, 0.12368559860155139, 0.13248657855347917],
+    "router_ready_samples": 0,
+    "descend_entered": false,
+    "explanation": "Intermittent marker detection prevented stable marker qualification and source transition. Mission remained APPROACH until OFFBOARD was left."
+  },
+  "debug_JPEG_redetection": {
+    "frames": 107,
+    "old_windows_min_max_step": [7, 27, 20],
+    "old_detected_frames": 12,
+    "restored_default_windows_min_max_step": [3, 23, 10],
+    "restored_detected_frames": 96,
+    "limitations": "Annotated 10Hz JPEG, not original raw input. Marker regions are clear of overlays. Demonstrates threshold-window sensitivity but does not prove a future closed-loop landing."
+  },
+  "fix": {
+    "stack_revision": "8d613d0d2a4dee6c356dc22a2879b88828b4a6f1",
+    "perception_owner_revision": "f1a34d8803acaa34ff08692a9929ffaa4d32e981",
+    "policy": "Restore OpenCV 3/13/23-pixel adaptive threshold windows through stack-supplied configuration. Marker PnP and level-pad mode retained; no safety limit relaxed.",
+    "regression_tests_passed": 32
+  },
+  "deletion_scope_authorized_by_user": "Only this failed flight's Jetson bag/manifest/sync sidecars and ML copy including both webcams, plus temporary extracted JPEGs. Earlier successful flights and operational campaign history retained.",
+  "retained_evidence": "This numeric diagnosis only; no flight payload copy is retained by this analysis."
+}
