@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-16",
+  "physical_pad": "B2 (He et al., 2023), existing B2_20261015 print",
+  "identification": {
+    "live_dictionary": "DICT_6X6_50",
+    "live_visible_id": 43,
+    "print_manifest": "data/results/aruco-landing-print/B2_20261015/assembly.json",
+    "print_layout_sha256": "a1e2f5b55e498ef357a6cf1d73424a507dde16d8c7e6800468cbe58b83ee5b68",
+    "print_side_mm": 700,
+    "print_source": "data/results/aruco-landing-print/B2_20261015/generate_B2_print.py",
+    "historical_simulation_label": "B3",
+    "existing_baseline_alias": "61-marker paper pad; different physical layout, retained for historical compatibility"
+  },
+  "runtime": {
+    "selection_argument": "pad:=b2",
+    "configuration": "config/baseline_b2_700mm_runtime.yaml",
+    "pad_identity_key": "b2",
+    "layout_sha256": "a8386588f1580ab6c78a51affa3b7adab47463df6e0586b47acb8b8d2c14a14a",
+    "marker_ids": [1, 2, 3, 4, 19, 43],
+    "coordinates": "Convert exact printed top-left canvas coordinates to metric pad-centered +X paper-up, +Y paper-left, yaw -90 degrees.",
+    "metric_scope": "Nominal 700mm print geometry, not an independent physical survey or new GT calibration.",
+    "gravity_constraint": false,
+    "level_pad": true,
+    "threshold_min_max_step": [3, 23, 10],
+    "campaign": "Independent pad-scoped progress; 20 existing inside references from index zero. First route raw policy applies unchanged."
+  },
+  "revisions": {
+    "implementation": "835da309124c66921134abd774e2b559a69e85ee",
+    "owner": "a2e1d5b10d54ac6e3e1ee71426a41f0d6a9870c2",
+    "stack": "f271866eec45e4ae8ebea72d8665f1fcaa5cea39"
+  },
+  "verification": {
+    "regression_tests_passed": 35,
+    "native_opencv_4_2_metric_pose_test": "passed",
+    "live_inlier_ids": [43],
+    "live_alignment_ready": true,
+    "live_alignment_pairs": 97,
+    "live_marker_fresh": true,
+    "live_hz": 60.014768293561524,
+    "live_fcu_armed": false,
+    "live_fcu_mode": "POSCTL",
+    "existing_b2_progress": null,
+    "perception_started": true,
+    "planner_started_by_this_change": false
+  },
+  "deployment": "Committed owner repository and stack module pin fetched on clean Jetson checkouts; snapshot synchronized through module_sources without bypassing dirty guards. No source/configuration edited on Jetson. Existing print evidence preserved.",
+  "remaining_validation": "No B2 closed-loop flight performed as part of this deployment."
+}

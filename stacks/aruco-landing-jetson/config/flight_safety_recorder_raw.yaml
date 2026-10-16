@@ -33,6 +33,7 @@ runtime_manifest_config_paths:
   camera_time_alignment: /work/stacks/aruco-landing-jetson/config/calibration/20260919/time_alignment.yaml
   camera_intrinsics: /work/stacks/aruco-landing-jetson/config/see3cam_intrinsic_20260915.yaml
   selected_baseline_pad: /work/ws/aruco-landing/src/aruco_landing/config/paper_pad_layout_physical_20260920_runtime.yaml
+  selected_b2_pad: /work/ws/aruco-landing/src/aruco_landing/config/baseline_b2_700mm_runtime.yaml
   selected_proposed1_pad: /work/ws/aruco-landing/src/aruco_landing/config/proposed_pad_1_layout_physical_20260920_runtime.yaml
   aruco_trial: /work/ws/aruco-landing/src/aruco_landing/launch/landing_trial.launch
   aruco_controller: /work/ws/aruco-landing/src/aruco_landing/config/common_experiment.yaml
